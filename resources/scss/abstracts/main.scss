@@ -1,1 +1,6 @@
 @import './variables';
+
+html,
+body {
+  font-family: $fontFamily;
+}

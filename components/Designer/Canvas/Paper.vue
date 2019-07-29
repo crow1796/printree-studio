@@ -24,7 +24,8 @@ export default {
       panzoomController: null,
       canvasSection: null,
       scale: 1.0,
-      paper: null
+      paper: null,
+      isPanning: false
     }
   },
   mounted(){
@@ -33,17 +34,6 @@ export default {
     this.paper.view.onMouseDown = (e) => this.$emit('mouseDown', e)
     this.paper.view.onMouseDrag = (e) => this.$emit('mouseDrag', e)
     this.paper.view.onMouseUp = (e) => this.$emit('mouseUp', e)
-
-    // let rect = new Rectangle(new Point(10, 20), new Size(200, 100));
-    // var centerX = Math.round(Math.random() * (this.paper.view.size.width - 10))
-    // var centerY = Math.round(Math.random() * (this.paper.view.size.height - 10))
-    // var layer = new Layer(new Path.Circle({
-    //   center: new Point(centerX, centerY),
-    //   radius: 200,
-    //   strokeColor: new Color(0, 1, 0)
-    // }))
-
-    // this.paper.project.layers.push(layer)
 
     document.firstElementChild.style.zoom = "reset"
     this.stageContainer = document.querySelector('.panzoom-container')
@@ -65,8 +55,8 @@ export default {
 
     this.canvasSection.addEventListener('mousemove', (e) => {
       if(this.isHoldingSpace){
+        this.isPanning = true
         this.panzoomController.resume()
-        // this.stage.startDrag()
         return
       }
     })
@@ -93,15 +83,11 @@ export default {
     })
 
     this.canvasSection.addEventListener('keyup', (evt) => {
-      if (!evt.ctrlKey && evt.which == 32) {
+      if (evt.which == 32) {
         this.isHoldingSpace = false
         this.stageCursor = 'initial'
+        this.isPanning = false
         this.panzoomController.pause()
-        return
-      }
-      if(evt.which == 27){
-        // this.selectedObjectName = ''
-        // this.updateTransformer()
         return
       }
     })
@@ -124,6 +110,13 @@ export default {
     },
     draw(object){
       this.paper.project.layers.push(object)
+    },
+    layers(){
+      if(!this.paper) return []
+      return this.paper.project.layers
+    },
+    addLayer(child){
+      return new Layer(child)
     }
   },
   watch: {

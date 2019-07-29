@@ -25,7 +25,7 @@ module.exports = {
   */
   css: [
     '~/assets/css/tailwind.css',
-    '~/assets/fonts/rubik.css',
+    '~/assets/fonts/ubuntu.css',
     '~/resources/scss/main.scss'
   ],
   /*

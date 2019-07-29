@@ -11,12 +11,8 @@ module.exports = {
         'smoke-lighter': 'rgba(0, 0, 0, 0.25)',
         'smoke-lightest': 'rgba(0, 0, 0, 0.1)',
         primary: {
-          blue0: '#061223',
-          blue1: '#09182E',
-          blue2: '#1C3457',
-          blue3: '#47C8FF',
-          red1: '#AB0326',
-          red2: '#E1274E'
+          default: '#E1274E',
+          lighter: '#ff446b'
         }
       },
       inset: {

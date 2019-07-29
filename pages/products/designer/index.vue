@@ -1,125 +1,201 @@
 <template>
-  <div class="designer-layout flex flex-col h-screen">
-    <div class="w-full bg-primary-blue0 flex justify-between border-b-2 border-gray-900">
-			<div class="flex lg:w-1/3 items-center">
-				<span class="cursor-pointer text-gray-400 outline-none hover:text-white items-center p-2 w-12 text-center">
-					<font-awesome-icon :icon="['fas', 'bars']"/>
-				</span>
-        <navbar-item :icon="['fas', 'mouse-pointer']" title="Move"/>
-        <navbar-item :icon="['far', 'square']"
-          title="Shapes"
-          :items="shapesNavItems"
-          @trigger-click="prepareToDraw('square')"
-          @item-click="(item) => prepareToDraw(item.value)"/>
-        <navbar-item :icon="['fas', 'font']" title="Text"/>
-        <navbar-item :icon="['far', 'folder']" title="Assets"/>
-        <navbar-item :icon="['fas', 'search-plus']" title="Zoom"/>
-			</div>
-			<div class="flex lg:w-1/3 items-center justify-center">
-				<span class="text-gray-400 hover:text-white cursor-pointer text-sm py-2 px-4">
-					<span class="mr-1">Something Tee</span>
-          <font-awesome-icon :icon="['fas', 'caret-down']"/>
-				</span>
-			</div>
-			<div class="flex lg:w-1/3 items-center justify-end mr-4">
-        <div class="text-gray-400 hover:text-white outline-none px-4 py-2 text-left cursor-pointer"
-          :title="`${isPreviewShown ? 'Hide' : 'Show'} Preview`"
-          v-tippy="{ arrow: true, placement: 'bottom' }"
-          @click="togglePreviewSection">
-          <font-awesome-icon :icon="['far', isPreviewShown ? 'eye-slash' : 'eye']" class="inline-block align-middle"/>
-        </div>
-        <div class="bg-white border rounded-full w-6 h-6 cursor-pointer"></div>
-			</div>
-		</div>
-    <div class="flex flex-grow h-full">
-      <div class="flex flex-shrink-0 w-1/5 h-full bg-primary-blue0 flex-col border-r-2 border-gray-900">
-        <Tabs :tabs="tabs">
-          <template v-slot:layers>
-              <div class="layers h-64 flex flex-col w
-              -full">
-                <div class="layer p-2 flex cursor-pointer">
-                  <div class="flex items-center align-middle pr-2">
-                    <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-xs"/>
+  <div class="flex h-full w-full">
+    <simplebar class="flex w-1/4 border-r h-full">
+      <div class="p-4 w-full h-full overflow-auto">
+        <Tabs :tabs="[{name: 'design', title: 'Design', slot: 'design'}, {name: 'products', title: 'Products', slot: 'products'}]">
+          <template v-slot:design>
+            <div class="mt-4 w-full">
+              <div class="flex w-full">
+                <button type="button"
+                  class="w-1/2 justify-center focus:outline-none mx-1 outline-none flex flex-grow border px-6 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                  <font-awesome-icon :icon="['fas', 'font']" class="text-lg"/>
+                  <span class="ml-2">
+                    ADD A TEXT
+                  </span>
+                </button>
+                <button type="button"
+                  class="w-1/2 justify-center focus:outline-none mx-1 outline-none flex flex-grow border px-6 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                  <font-awesome-icon :icon="['fas', 'cubes']" class="text-lg"/>
+                  <span class="ml-2">
+                    ADD AN ART
+                  </span>
+                </button>
+              </div>
+
+              <div class="mx-1">
+                <div class="font-bold text-lg text-gray-600 mt-4">
+                  Choose a color
+                </div>
+                <div class="colors mt-2 flex flex-wrap">
+                  <div class="rounded-full p-1 bg-white border border-gray-400 m-1 hover:border-gray-300">
+                    <div class="rounded-full cursor-pointer w-8 h-8 bg-primary border border-gray-200"></div>
                   </div>
-                  <div class="thumbnail flex w-12 h-12 bg-white rounded">
-                    <!-- <img src=""/> -->
-                  </div>
-                  <div class="flex flex-grow items-center text-white px-2">
-                    Layer 1
+                  <div class="rounded-full p-1 bg-white border border-white m-1 hover:border-gray-300"
+                    v-for="(color, index) in textColors"
+                    :key="index">
+                    <div class="rounded-full cursor-pointer w-8 h-8 border border-gray-200"
+                      :style="{ 'background-color': color.hex }"></div>
                   </div>
                 </div>
               </div>
+
+              <div class="mx-1">
+                <div class="font-bold text-lg text-gray-600 mt-4">
+                  Font options
+                </div>
+                <div class="colors mt-2 flex flex-wrap">
+                  <Select placeholder="Choose a font"
+                    class="w-full"
+                    v-model="selectedFont"
+                    :options="[{label: 'Arial', value: 'arial'}, {label: 'Arial 2', value: 'arial2'}, {label: 'Arial', value: 'arial3'}, {label: 'Arial', value: 'arial4'}]"
+                    filterable/>
+                </div>
+                <div class="mt-4 text-gray-600">
+                  <div class="font-bold mx-1">
+                    Alignment
+                  </div>
+                  <div class="flex mt-2">
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'align-left']"/>
+                    </button>
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'align-center']"/>
+                    </button>
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'align-right']"/>
+                    </button>
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'align-justify']"/>
+                    </button>
+                  </div>
+                </div>
+                <div class="mt-4 text-gray-600">
+                  <div class="font-bold mx-1">
+                    Styles & Decorations
+                  </div>
+                  <div class="flex mt-2">
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'bold']"/>
+                    </button>
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'italic']"/>
+                    </button>
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'underline']"/>
+                    </button>
+                    <button type="button"
+                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100">
+                      <font-awesome-icon :icon="['fas', 'strikethrough']"/>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </template>
-
-          <template v-slot:variants>
-              <div class="flex flex-col w-full">
-                <div class="add-new-variant-btn cursor-pointer border-2 hover:bg-primary-blue1 rounded w-full h-48 flex border-dashed items-center justify-center"
-                  @click="$refs.variantsPopup.show()">
-                  <div class="flex flex-col items-center">
-                    <font-awesome-icon :icon="['fas', 'plus']" class="flex text-3xl"/>
-                    <div class="flex mt-4 font-bold">
-                      Add New Variant
+          <template v-slot:products>
+            <div class="mt-4 w-full">
+              <div class="px-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed">
+                <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg"/>
+                <span class="font-bold">ADD PRODUCTS</span>
+              </div>
+              <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed">
+                <div class="flex">
+                  <div class="w-1/5">
+                    <img src="~/assets/images/shirtplaceholder.png">
+                  </div>
+                  <div class="flex-grow flex flex-col px-4 py-2">
+                    <div class="font-bold text-gray-600">
+                      Classic Tee
+                    </div>
+                    <div class="flex">
+                      <div class="rounded-full p-1 bg-white border border-white m-1 hover:border-gray-300">
+                        <div class="rounded-full cursor-pointer w-6 h-6 border border-gray-200"
+                          :style="{ 'background-color': '#000000' }"></div>
+                      </div>
                     </div>
                   </div>
+                </div>
+                <div class="absolute hover:text-gray-700" style="top: 15px; right: 15px;">
+                  <font-awesome-icon :icon="['fas', 'trash']"/>
                 </div>
               </div>
-              <vue-tailwind-modal ref="variantsPopup" width="60%">
-                <div class="top-categories flex w-full rounded justify-center">
-                  <div class="flex cursor-pointer mx-2 text-gray-900 bg-gray-400 rounded px-4 py-3 w-1/3">
-                    <div class="text-center w-full">
-                      Apparel
-                    </div>
-                  </div>
-                  <div class="flex cursor-pointer mx-2 text-gray-600 bg-gray-100 rounded px-4 py-3 w-1/3">
-                    <div class="text-center w-full">
-                      Home
-                    </div>
-                  </div>
-                  <div class="flex cursor-pointer mx-2 text-gray-600 bg-gray-100 rounded px-4 py-3 w-1/3">
-                    <div class="text-center w-full">
-                      Accessories
-                    </div>
-                  </div>
-                </div>
-                <div class="flex w-full mt-4">
-                  <div class="flex w-1/3 mx-2 text-gray-600 p-4 bg-gray-100 rounded">
-
-                  </div>
-                  <div class="flex w-1/3 mx-2 text-gray-600 p-4 bg-gray-100 rounded">
-
-                  </div>
-                  <div class="flex w-1/3 mx-2 text-gray-600 p-4 bg-gray-100 rounded">
-
-                  </div>
-                </div>
-              </vue-tailwind-modal>
+            </div>
           </template>
         </Tabs>
       </div>
-      <div class="flex flex-grow overflow-hidden canvas-section-container bg-gray-100 outline-none">
-        <div class="canvas-section w-full h-full">
-          <Paper ref="paper"
-            width="16in"
-            height="20in"
-            name="designer-canvas"
-            @mouseDrag="draw"/>
-        </div>
-        <transition name="slideRight">
-          <div class="fixed shadow-lg w-1/3 h-full right-0 bg-white preview-section"
-            v-if="isPreviewShown" style="animation-duration: 0.4s">
-            <div class="heading text-primary-blue0 p-4 text-sm">
-              <font-awesome-icon :icon="['fas', 'eye']"/>
-              <span class="font-bold inline-block ml-1">Preview</span>
-            </div>
-            <div class="content p-4">
-              <div class="placeholder w-full relative">
-                <div class="placeholder-color bg-primary-blue2">
-                  <img src="~/assets/images/shirtplaceholder.png" class="object-contain">
-                </div>
-              </div>
-            </div>
+    </simplebar>
+    <div class="flex flex-grow h-full flex-col">
+      <div class="actions relative z-10 flex flex-shrink justify-center w-full">
+        <div class="flex mt-4 rounded shadow-xl border">
+          <div class="flex p-4 border-r">
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="Duplicate"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'clone']" class="text-xs"/>
+            </button>
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="To Back"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'angle-double-left']" class="text-xs"/>
+            </button>
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="Backward"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'angle-left']" class="text-xs"/>
+            </button>
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="Forward"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'angle-right']" class="text-xs"/>
+            </button>
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="To Front"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'angle-double-right']" class="text-xs"/>
+            </button>
           </div>
-        </transition>
+          <div class="flex p-4 pr-0">
+            <button type="button"
+              class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100">
+              <font-awesome-icon :icon="['fas', 'sync-alt']" class="text-xs"/>
+              <span class="ml-2 text-xs">
+                SHOW BACK
+              </span>
+            </button>
+          </div>
+          <div class="flex item-center p-4 pl-0">
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="Zoom Out"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'minus']" class="text-xs"/>
+            </button>
+            <span class="flex items-center font-bold text-gray-600 mx-2">100%</span>
+            <button type="button"
+              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              title="Zoom In"
+              v-tippy>
+              <font-awesome-icon :icon="['fas', 'plus']" class="text-xs"/>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-grow w-full h-full justify-center mt-8">
+        <div class="shirt-canvas select-none">
+          <img draggable="false" src="~/assets/images/shirtplaceholder.png">
+        </div>
       </div>
     </div>
   </div>
@@ -127,88 +203,168 @@
 
 <script>
 import Tabs from '@/components/Tabs'
-import Paper from '@/components/Designer/Canvas/Paper'
-import VueTailwindModal from '@/components/VueTailwindModal'
-import { mapGetters } from 'vuex'
+import Select from '@/components/Select'
 
 export default {
   layout: 'designer',
   components: {
     Tabs,
-    VueTailwindModal,
-    Paper,
-    'navbar-item': () => import('@/components/Designer/Navbar/Item')
-  },
-  created(){
-    this.$store.commit('designer/IS_PREVIEW_SHOWN', (localStorage.getItem('printree:isPreviewShown') == 'true') || false)
+    Select
   },
   data(){
     return {
-      isPreparingToDraw: false,
-      stage: null,
-      panzoomController: null,
-      tabs: [
+      textColors: [
         {
-          name: 'layers',
-          title: 'LAYERS',
-          slot: 'layers'
+          hex: '#6AF6FF'
         },
         {
-          name: 'variants',
-          title: 'VARIANTS',
-          slot: 'variants'
+          hex: '#3A5DAB'
+        },
+        {
+          hex: '#2023A8'
+        },
+        {
+          hex: '#012F56'
+        },
+        {
+          hex: '#40263A'
+        },
+        {
+          hex: '#6B3076'
+        },
+        {
+          hex: '#BB19A1'
+        },
+        {
+          hex: '#9595D2'
+        },
+
+        {
+          hex: '#327FE0'
+        },
+        {
+          hex: '#E7B2C2'
+        },
+        {
+          hex: '#EE6078'
+        },
+        {
+          hex: '#EF4E97'
+        },
+        {
+          hex: '#CD1168'
+        },
+        {
+          hex: '#7E2E2C'
+        },
+        {
+          hex: '#AA2227'
+        },
+        {
+          hex: '#D1272F'
+        },
+
+        {
+          hex: '#D58BC8'
+        },
+        {
+          hex: '#E7B2C2'
+        },
+        {
+          hex: '#EE6078'
+        },
+        {
+          hex: '#EF4E97'
+        },
+        {
+          hex: '#CD1168'
+        },
+        {
+          hex: '#7E2E2C'
+        },
+        {
+          hex: '#AA2227'
+        },
+        {
+          hex: '#D1272F'
+        },
+
+        {
+          hex: '#E0513D'
+        },
+        {
+          hex: '#FE6917'
+        },
+        {
+          hex: '#FE8574'
+        },
+        {
+          hex: '#F2CEB3'
+        },
+        {
+          hex: '#EDD385'
+        },
+        {
+          hex: '#F5EA64'
+        },
+        {
+          hex: '#F2E41A'
+        },
+        {
+          hex: '#EFB229'
+        },
+
+        {
+          hex: '#CB890B'
+        },
+        {
+          hex: '#9D6938'
+        },
+        {
+          hex: '#664635'
+        },
+        {
+          hex: '#974755'
+        },
+        {
+          hex: '#D3B49E'
+        },
+        {
+          hex: '#AFA97E'
+        },
+        {
+          hex: '#00C6B1'
+        },
+        {
+          hex: '#70CB98'
+        },
+
+        {
+          hex: '#C1E08A'
+        },
+        {
+          hex: '#76D54E'
+        },
+        {
+          hex: '#1F8748'
+        },
+        {
+          hex: '#1F5632'
+        },
+        {
+          hex: '#005D5C'
+        },
+        {
+          hex: '#017580'
+        },
+        {
+          hex: '#93B6BA'
+        },
+        {
+          hex: '#FEFEFE'
         }
       ],
-      shapesNavItems: [
-        {
-          icon: ['far', 'square'],
-          value: 'square',
-          title: 'Square'
-        },
-        {
-          icon: ['far', 'circle'],
-          value: 'circle',
-          title: 'Ellipse'
-        },
-        {
-          icon: ['far', 'star'],
-          value: 'star',
-          title: 'Star'
-        },
-        {
-          icon: ['fas', 'paint-brush'],
-          value: 'brush',
-          title: 'Brush'
-        }
-      ]
-    }
-  },
-  computed: {
-    ...mapGetters({
-      isPreviewShown: 'designer/isPreviewShown'
-    })
-  },
-  methods: {
-    togglePreviewSection(){
-      this.$store.commit('designer/IS_PREVIEW_SHOWN', !this.isPreviewShown)
-    },
-    prepareToDraw(object){
-      console.log(object)
-    },
-    draw(event){
-      let path = new Path()
-      path.strokeColor = 'black'
-      let vector = event.delta
-
-      // rotate the vector by 90 degrees:
-      vector.angle += 90
-
-      // change its length to 5 pt:
-      vector.length = 5
-
-      path.add(event.middlePoint + vector)
-      path.add(event.middlePoint - vector)
-      this.$refs.paper.draw(path)
+      selectedFont: null
     }
   }
 }
