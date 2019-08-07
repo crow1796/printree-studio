@@ -17,6 +17,9 @@ module.exports = {
       },
       inset: {
         full: '100%'
+      },
+      maxWidth: {
+        '1/5': '20%'
       }
     }
   },

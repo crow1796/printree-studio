@@ -2,3 +2,86 @@
   height: 100vh;
   overflow: hidden;
 }
+
+.printable-area-label{
+  content: 'Printable Area';
+  position: absolute;
+  bottom: -27px;
+  color: rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  width: 100%;
+  text-align: center;
+  font-size: .9em;
+  opacity: 0;
+  transition: all .3s ease;
+}
+
+.printable-area{
+  border: 2px dashed transparent;
+  transition: all .3s ease;
+  &:hover{
+    border-color: rgba(0, 0, 0, .1);
+  }
+
+  &:hover + .printable-area-label{
+    opacity: 1;
+  }
+}
+
+.canvas-object{
+  &:hover{
+    outline: 1px solid rgba(0, 0, 0, .1);
+  }
+}
+
+.ruler {
+  .horiz{
+    height: 1px;
+    background: white;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .vert{
+    width: 1px;
+    background: white;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .horiz.-highlighted,
+  .vert.-highlighted{
+    background: blue;
+  }
+}
+
+.or-divider{
+  width: 1px;
+
+  & > span{
+    font-size: .65rem;
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:before,
+  &:after{
+    content: '';
+    display: block;
+    position: absolute;
+    height: 46%;
+    background: #e2e8f0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+  }
+
+  &:before{
+    top: 0;
+  }
+
+  &:after{
+    bottom: 0;
+  }
+}

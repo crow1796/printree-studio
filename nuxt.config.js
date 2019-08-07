@@ -81,9 +81,11 @@ module.exports = {
     plugins: [
       new webpack.ProvidePlugin({
         '$': 'jquery',
-        '_': 'lodash',
-        'paper': 'paper'
+        '_': 'lodash'
       })
     ]
-  }
+  },
+  serverMiddleware: [
+    '~/server/api/index.js'
+  ]
 }
