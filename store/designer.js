@@ -1,28 +1,13 @@
+import ColorRegulator from '~/plugins/color-regulator.js'
+
 const state = () => ({
   selectedProducts: [
     {
       id: 1,
       name: 'Classic Tee',
-      availableColors: [
+      availableVariants: [
         {
-          label: 'White',
-          color: '#FEFEFE'
-        },
-        {
-          label: 'Black',
-          color: '#000000'
-        },
-        {
-          label: 'Orange',
-          color: '#FE8474'
-        },
-        {
-          label: 'Blue',
-          color: '#3A5DAB'
-        }
-      ],
-      variants: [
-        {
+          id: null,
           printable_area: {
             front: {
               left: 170,
@@ -37,12 +22,77 @@ const state = () => ({
               height: 280
             }
           },
-          base_cost: 499,
+          base_cost: null,
+          color: '#FEFEFE',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        },
+        {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
+          color: '#012F56',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        },
+        {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
           color: '#FE8474',
           placeholder: require('~/assets/images/shirtplaceholder.png'),
           objects: []
         },
         {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
+          color: '#3A5DAB',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        }
+      ],
+      variants: [
+        {
           printable_area: {
             front: {
               left: 170,
@@ -58,53 +108,9 @@ const state = () => ({
             }
           },
           base_cost: 499,
-          color: '#3A5DAB',
+          color: '#FEFEFE',
           placeholder: require('~/assets/images/shirtplaceholder.png'),
           objects: []
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: 'High Quality Classic Tee',
-      availableColors: [
-        {
-          label: 'White',
-          color: '#FEFEFE'
-        },
-        {
-          label: 'Black',
-          color: '#000000'
-        },
-        {
-          label: 'Orange',
-          color: '#FE8474'
-        },
-        {
-          label: 'Blue',
-          color: '#3A5DAB'
-        }
-      ],
-      variants: [
-        {
-          color: '#3A5DAB',
-          placeholder: require('~/assets/images/shirtplaceholder.png'),
-          printable_area: {
-            front: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
-            },
-            back: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
-            }
-          },
-          base_cost: 599,
-          objects: [],
         }
       ]
     }
@@ -427,7 +433,9 @@ const mutations = {
   },
   ADD_OBJECT(state, obj){
     _.map(state.selectedProducts[state.currentProductIndex].variants, (variant) => {
-      variant.objects.push(JSON.parse(JSON.stringify(obj)))
+      obj = JSON.parse(JSON.stringify(obj))
+      obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
+      variant.objects.push(obj)
     })
   },
   REMOVE_OBJECT_BY_INDEX(state, index) {
@@ -438,6 +446,12 @@ const mutations = {
   OBJECT_FROM_VARIANT_INDEX(state, {index, obj}){
     let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[index].objects, { id: obj.id })
     state.selectedProducts[state.currentProductIndex].variants[index].objects[objectIndex] = obj
+  },
+  ADD_VARIANT(state, variant){
+    state.selectedProducts[state.currentProductIndex].variants.push(variant)
+  },
+  REMOVE_VARIANT_BY_INDEX(state, index){
+    state.selectedProducts[state.currentProductIndex].variants.splice(index, 1)
   }
 }
 
@@ -447,6 +461,22 @@ const actions = {
     selectedProducts.push(product)
     context.commit('SELECTED_PRODUCTS', selectedProducts)
   },
+  addVariant(context, variant){
+    let id = '_' + Math.random().toString(36).substr(2, 9)
+    variant = {
+      ...variant,
+      id,
+      objects: JSON.parse(JSON.stringify(context.state.selectedProducts[context.state.currentProductIndex].variants[0].objects))
+    }
+    _.map(variant.objects, (obj) => obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' }))
+    context.commit('ADD_VARIANT', variant)
+    return variant
+  },
+  removeVariant(context, variant){
+    let variantIndex = _.findIndex(context.state.selectedProducts[context.state.currentProductIndex].variants, { color: variant.color })
+    context.commit('REMOVE_VARIANT_BY_INDEX', variantIndex)
+    return variantIndex
+  },
   addObject(context, {type, value}){
     let id = '_' + Math.random().toString(36).substr(2, 9)
     let obj = JSON.parse(JSON.stringify(context.getters.objectBoilerplates[type]))
@@ -454,6 +484,7 @@ const actions = {
     obj.value = value
     obj.bounds.left = obj.bounds.width / 2
     obj.bounds.top = obj.bounds.height / 2
+    obj.style.color = ColorRegulator.getContrastOf(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].color, { dark: '#012F56', light: '#FEFEFE' })
     context.commit('ADD_OBJECT', obj)
     return obj
   },

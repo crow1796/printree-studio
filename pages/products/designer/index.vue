@@ -124,7 +124,7 @@
                     <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
                       :style="{ 'background-color': color.code }">
                       <font-awesome-icon :icon="['fas', 'check']"
-                        :style="{ color: getCorrectTextColor(color.code) }"
+                        :style="{ color: getCorrectColor(color.code) }"
                         v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
                     </div>
                   </div>
@@ -199,7 +199,7 @@
                       :style="{ 'background-color': index == currentProductIndex ? currentVariant.color : product.variants[0].color }">
                   </div>
                   <div class="flex-grow flex flex-col px-4 py-2">
-                    <div class="font-bold text-gray-600">
+                    <div class="font-bold text-gray-600" style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                       {{ product.name }}
                     </div>
                     <div class="flex">
@@ -212,18 +212,18 @@
                           :style="{ 'background-color': variant.color }">
                         </div>
                       </div>
-                      <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300">
-                        <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200 bg-white"
-                        v-popover="{ name: `availableColors_${product.id}` }">
-                          <font-awesome-icon :icon="['fas', 'plus']"
-                            class="text-xs text-gray-600"/>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
-                <div class="absolute hover:text-gray-700" style="top: 15px; right: 15px;">
+                <div v-if="selectedProducts.length > 1"
+                  class="absolute hover:text-gray-700"
+                  style="top: 15px; right: 15px;">
                   <font-awesome-icon :icon="['fas', 'trash']"/>
+                </div>
+                <div class="absolute hover:text-gray-700"
+                  style="top: 50px; right: 15px;"
+                  v-popover="{ name: `availableVariants_${product.id}` }">
+                  <font-awesome-icon :icon="['fas', 'plus']"/>
                 </div>
               </div>
             </div>
@@ -232,115 +232,129 @@
       </div>
     </simplebar>
     <div class="flex flex-grow h-full flex-col">
-      <div class="actions relative z-10 flex flex-shrink justify-center w-full">
-        <div class="flex mt-4 rounded shadow-xl border">
-          <div class="flex p-4 pr-0">
-            <button type="button"
-              class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100">
-              <font-awesome-icon :icon="['fas', 'sync-alt']" class="text-xs"/>
-              <span class="ml-2 text-xs">
-                SHOW BACK
-              </span>
-            </button>
+      <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
+        <div class="canvas-section outline-none select-none relative w-full h-full text-center">
+          <div class="actions bg-transparent relative z-10 flex flex-shrink justify-center w-full">
+            <div class="flex bg-white mt-4 rounded shadow-xl border">
+              <div class="flex p-4 pr-0">
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100">
+                  <font-awesome-icon :icon="['fas', 'sync-alt']" class="text-xs"/>
+                  <span class="ml-2 text-xs">
+                    SHOW BACK
+                  </span>
+                </button>
+              </div>
+              <div class="flex item-center p-4 pl-0">
+                <button type="button"
+                  class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                  title="Zoom Out"
+                  @click="zoomTo(-0.1)"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'minus']" class="text-xs"/>
+                </button>
+                <span class="flex items-center font-bold text-gray-600 mx-2">
+                  {{ parseInt(canvasScale * 100) }}%
+                </span>
+                <button type="button"
+                  class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                  title="Zoom In"
+                  @click="zoomTo(0.1)"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'plus']" class="text-xs"/>
+                </button>
+              </div>
+            </div>
           </div>
-          <div class="flex item-center p-4 pl-0">
-            <button type="button"
-              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-              title="Zoom Out"
-              v-tippy>
-              <font-awesome-icon :icon="['fas', 'minus']" class="text-xs"/>
-            </button>
-            <span class="flex items-center font-bold text-gray-600 mx-2">100%</span>
-            <button type="button"
-              class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-              title="Zoom In"
-              v-tippy>
-              <font-awesome-icon :icon="['fas', 'plus']" class="text-xs"/>
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="flex flex-grow w-full h-full justify-center mt-8">
-        <div class="shirt-canvas select-none relative">
-          <div :style="{ 'background-color': currentVariant.color }">
-            <img draggable="false"
-              class="relative"
-              style="z-index: 2"
-              :src="currentVariant.placeholder">
-          </div>
-          <div class="printable-area-surface absolute"
-            :style="{ left: `${currentVariant.printable_area.front.left}px`, top: `${currentVariant.printable_area.front.top}px`, width: `${currentVariant.printable_area.front.width}px`, height: `${currentVariant.printable_area.front.height}px`, zIndex: 2 }"
-            @mouseenter="printableAreaZ = 3"></div>
-          <div class="printable-area absolute"
-            :style="{ left: `${currentVariant.printable_area.front.left}px`, top: `${currentVariant.printable_area.front.top}px`, width: `${currentVariant.printable_area.front.width}px`, height: `${currentVariant.printable_area.front.height}px`, zIndex: printableAreaZ }"
-            @mouseleave="printableAreaZ = 1">
-            <div class="h-full w-full z-10 relative">
-              <drr v-for="(obj, index) in currentVariant.objects"
-                :key="index"
-                :aspectRatio="obj.editorData.aspectRatio"
-                :w="obj.bounds.width"
-                :h="obj.bounds.height"
-                :x="obj.bounds.left"
-                :y="obj.bounds.top"
-                @select="activated(obj)"
-                @deselect="deactivated"
-                @dragstop="transformStop($event, obj)"
-                @resizestop="transformStop($event, obj)"
-                @rotatestop="transformStop($event, obj)"
-                @drag="transforming($event, obj)"
-                @resize="transforming($event, obj)"
-                @rotate="transforming($event, obj)"
-                :selected="obj.editorData.isActive"
-                :style="{ zIndex: obj.style.zIndex }">
-                <div class="flex flex-wrap w-full h-full relative z-1" v-if="obj.type == 'text'"
-                  :style="obj.style"
-                  @click.stop>
-                  <div class="block break-words break-all w-auto h-auto">
-                    <pre>{{ obj.value || '' }}</pre>
+          <div class="inline-block product-section relative w-auto h-auto">
+            <div class="inline-block relative w-auto h-auto" :style="{ 'background-color': currentVariant.color }">
+              <img draggable="false"
+                class="relative"
+                style="z-index: 2"
+                :src="currentVariant.placeholder">
+            </div>
+            <div class="printable-area-surface absolute"
+              :style="{ left: `${currentVariant.printable_area.front.left}px`, top: `${currentVariant.printable_area.front.top}px`, width: `${currentVariant.printable_area.front.width}px`, height: `${currentVariant.printable_area.front.height}px`, zIndex: 2 }"
+              @mouseenter="printableAreaZ = 3"></div>
+            <div class="printable-area absolute"
+              :style="{ left: `${currentVariant.printable_area.front.left}px`, top: `${currentVariant.printable_area.front.top}px`, width: `${currentVariant.printable_area.front.width}px`, height: `${currentVariant.printable_area.front.height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
+              :class="{ '-has-outline': isPrintableAreaHovered }"
+              @mouseenter="isPrintableAreaHovered = true"
+              @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
+              <div class="h-full w-full z-10 relative">
+                <drr v-for="(obj, index) in currentVariant.objects"
+                  :key="index"
+                  :aspectRatio="obj.editorData.aspectRatio"
+                  :w="obj.bounds.width"
+                  :h="obj.bounds.height"
+                  :x="obj.bounds.left"
+                  :y="obj.bounds.top"
+                  @select="activated(obj)"
+                  @deselect="deactivated"
+                  @dragstop="transformStop($event, obj)"
+                  @resizestop="transformStop($event, obj)"
+                  @rotatestop="transformStop($event, obj)"
+                  @drag="transforming($event, obj)"
+                  @resize="transforming($event, obj)"
+                  @rotate="transforming($event, obj)"
+                  :selected="obj.editorData.isActive"
+                  :style="{ zIndex: obj.bounds.zIndex }">
+                  <div class="flex flex-wrap w-full h-full relative z-1" v-if="obj.type == 'text'"
+                    :style="obj.style"
+                    @click.stop>
+                    <div class="block break-words break-all w-auto h-auto">
+                      <pre>{{ obj.value || '' }}</pre>
+                    </div>
                   </div>
-                </div>
-                <div v-if="obj.type == 'svg'"
-                v-html="obj.value"
-                :style="{ fill: obj.style.color }"></div>
-                <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image'">
-                  <img width="100%" :src="obj.value"/>
-                </div>
-                <div v-if="obj.editorData.isActive" class="absolute flex rounded-full bg-white w-5 h-5 items-center justify-center"
-                  :style="{ fontSize: '.7em', top: '-10px', right: '-10px', zIndex: 1 }"
-                  @click="removeObject(obj)">
-                  <font-awesome-icon :icon="['fas', 'times']"
-                    class="text-red-600"/>
-                </div>
-              </drr>
+                  <div v-if="obj.type == 'svg'"
+                  v-html="obj.value"
+                  :style="{ fill: obj.style.color }"></div>
+                  <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image'">
+                    <img width="100%" :src="obj.value"/>
+                  </div>
+                  <div v-if="obj.editorData.isActive" class="absolute flex rounded-full bg-white w-5 h-5 items-center justify-center"
+                    :style="{ fontSize: '.7em', top: '-10px', right: '-10px', zIndex: 1 }"
+                    @click="removeObject(obj)">
+                    <font-awesome-icon :icon="['fas', 'times']"
+                      class="text-red-600"/>
+                  </div>
+                </drr>
+              </div>
+              <div class="absolute top-0 z-1 ruler w-full h-full"
+                v-show="isMoving">
+                <div class="horiz absolute w-full"
+                  :style="{ backgroundColor: getCorrectColor(currentVariant.color) }"
+                  :class="{ '-highlighted': highlightRuler.horizontal }"></div>
+                <div class="vert absolute h-full"
+                  :style="{ backgroundColor: getCorrectColor(currentVariant.color) }"
+                  :class="{ '-highlighted': highlightRuler.vertical }"></div>
+              </div>
             </div>
-            <div class="absolute top-0 z-1 ruler w-full h-full"
-              v-show="isMoving">
-              <div class="horiz absolute w-full"
-                :class="{ '-highlighted': highlightRuler.horizontal }"></div>
-              <div class="vert absolute h-full"
-                :class="{ '-highlighted': highlightRuler.vertical }"></div>
+            <div class="printable-area-label"
+              v-if="isPrintableAreaHovered"
+              :style="{ top: `${currentVariant.printable_area.front.top + currentVariant.printable_area.front.height + 5}px`, color: getCorrectColor(currentVariant.color) }">
+              Printable Area
             </div>
           </div>
-          <div class="printable-area-label"
-            :style="{ top: `${currentVariant.printable_area.front.top + currentVariant.printable_area.front.height + 5}px`}">Printable Area</div>
         </div>
       </div>
     </div>
 
-    <popover :name="`availableColors_${currentProduct.id}`"
+    <popover :name="`availableVariants_${currentProduct.id}`"
       :width="300">
       <div class="flex flex-col w-full">
         <div class="font-bold text-gray-600 m-2">Choose a color</div>
         <div class="flex">
           <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-            v-for="(color, colorIndex) in currentProduct.availableColors"
-            :key="colorIndex"
-            :class="{ 'border-gray-300 bg-white': _colorIsInVariantsOf(currentProduct, color.color) }">
+            v-for="(variant, variantIndex) in currentProduct.availableVariants"
+            :key="variantIndex"
+            :class="{ 'border-gray-300 bg-white': _colorIsInVariantsOf(currentProduct, variant.color) }"
+            @click="addVariant(variant)">
             <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
-              :style="{ 'background-color': color.color }">
+              :style="{ 'background-color': variant.color }">
               <font-awesome-icon :icon="['fas', 'check']"
-                :style="{ color: getCorrectTextColor(color.color), fontSize: '.8em' }"
-                v-if="_colorIsInVariantsOf(currentProduct, color.color)"/>
+                :style="{ color: getCorrectColor(variant.color), fontSize: '.8em' }"
+                v-if="_colorIsInVariantsOf(currentProduct, variant.color)"/>
             </div>
           </div>
         </div>
@@ -350,10 +364,12 @@
 </template>
 
 <script>
+import panzoom from 'panzoom'
 import Tabs from '@/components/Tabs'
 import Select from '@/components/Select'
 import VueTailwindModal from '@/components/VueTailwindModal'
 import ArtsList from '@/components/Designer/ArtsList'
+import ColorRegulator from '~/plugins/color-regulator.js'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -366,6 +382,8 @@ export default {
   },
   data(){
     return {
+      isPrintableAreaHovered: false,
+      canvasScale: 1.0,
       selectedFont: null,
       currentProduct: null,
       currentVariant: null,
@@ -375,7 +393,13 @@ export default {
         vertical: false,
         horizontal: false
       },
-      printableAreaZ: 2
+      printableAreaZ: 2,
+      isHoldingSpace: false,
+      stageCursor: 'initial',
+      stageContainer: null,
+      panzoomController: null,
+      canvasSection: null,
+      isPanning: false
     }
   },
   computed: {
@@ -391,12 +415,82 @@ export default {
       return _.includes(['text', 'svg'], this.activeObject.type)
     }
   },
+  mounted(){
+    document.firstElementChild.style.zoom = "reset"
+    this.stageContainer = document.querySelector('.panzoom-container')
+    this.canvasSection = document.querySelector('.canvas-section')
+    this.canvasSection.tabIndex = 1
+    this.canvasSection.focus()
+
+    this.panzoomController = panzoom(document.querySelector('.product-section'))
+    this.panzoomController.pause()
+
+    this.canvasSection.addEventListener('keypress', (evt) => {
+      if (evt.which == 32) {
+        this.isHoldingSpace = true
+        this.stageCursor = 'grab'
+        return
+      }
+      this.isHoldingSpace = false
+    })
+
+    this.canvasSection.addEventListener('mousemove', (e) => {
+      if(this.isHoldingSpace){
+        this.isPanning = true
+        this.panzoomController.resume()
+        return
+      }
+    })
+
+    this.canvasSection.addEventListener('keydown', (evt) => {
+      if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
+        evt.preventDefault()
+        this.zoomTo(0.1)
+        return
+      }
+      if (evt.ctrlKey && (evt.which == 109 || evt.which == 189)) {
+        evt.preventDefault()
+        this.zoomTo(-0.1)
+        return
+      }
+      if (evt.ctrlKey && (evt.which == 48 || evt.which == 96)) {
+        evt.preventDefault()
+        this.zoomTo('reset')
+        return
+      }
+    })
+
+    this.canvasSection.addEventListener('keyup', (evt) => {
+      if (evt.which == 32) {
+        this.isHoldingSpace = false
+        this.stageCursor = 'initial'
+        this.isPanning = false
+        this.panzoomController.pause()
+        return
+      }
+    })
+  },
   methods: {
+    async addVariant(variant){
+      if(_.find(this.currentProduct.variants, { color: variant.color }) && this.currentProduct.variants.length == 1) return
+      if(_.find(this.currentProduct.variants, { color: variant.color })){
+        let variantIndex = await this.$store.dispatch('designer/removeVariant', variant)
+        this.currentProduct.variants.splice(variantIndex, 1)
+        this.selectVariant(variantIndex ? variantIndex - 1 : variantIndex, this.currentProductIndex)
+        return
+      }
+      let newVariant = await this.$store.dispatch('designer/addVariant', variant)
+      this.currentProduct.variants.push(newVariant)
+      this.selectVariant((this.currentProduct.variants.length - 1), this.currentProductIndex)
+    },
+    zoomTo(scale){
+      if(scale == 'reset') return this.canvasScale = 1.0
+      this.canvasScale += scale
+    },
     _colorIsInVariantsOf(product, color){
       return _.find(product.variants, (variant) => variant.color.toLowerCase() == color.toLowerCase())
     },
     artAdded(file){
-      console.log(file)
       let type = 'image'
       let value = file.dataURL
       // if(file.type == 'image/svg+xml'){
@@ -498,20 +592,8 @@ export default {
     setColorTo(color){
       this._updateActiveObjectProps('style.color', color.code)
     },
-    getCorrectTextColor(hex){
-			let threshold = 130
-
-			let hRed = hexToR(hex)
-			let hGreen = hexToG(hex)
-			let hBlue = hexToB(hex)
-
-			function hexToR(h) {return parseInt((cutHex(h)).substring(0,2),16)}
-			function hexToG(h) {return parseInt((cutHex(h)).substring(2,4),16)}
-			function hexToB(h) {return parseInt((cutHex(h)).substring(4,6),16)}
-			function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7) : h}
-
-			let cBrightness = ((hRed * 299) + (hGreen * 587) + (hBlue * 114)) / 1000
-      if (cBrightness > threshold){return "#000000"} else { return "#ffffff"}
+    getCorrectColor(hex){
+			return ColorRegulator.getContrastOf(hex)
     }
   },
   watch: {
@@ -526,6 +608,20 @@ export default {
       handler(to){
         this.currentVariant = JSON.parse(JSON.stringify(this.selectedProducts[this.currentProductIndex].variants[to]))
       }
+    },
+    stageCursor(newCursor){
+      if(!this.stageContainer) return
+      this.canvasSection .style.cursor = newCursor
+    },
+    canvasScale(newScale){
+      if(!this.stageContainer) return
+      let transform = this.panzoomController.getTransform()
+      let deltaX = transform.x
+      let deltaY = transform.y
+      let oldScale = transform.scale
+      let offsetX = 0.1 + deltaX
+      let offsetY = 0.1 + deltaY
+      this.panzoomController.zoomAbs(offsetX, offsetY, newScale)
     }
   }
 }

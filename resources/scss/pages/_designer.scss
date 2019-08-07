@@ -4,27 +4,20 @@
 }
 
 .printable-area-label{
-  content: 'Printable Area';
   position: absolute;
   bottom: -27px;
-  color: rgba(0, 0, 0, 0.5);
   font-weight: bold;
   width: 100%;
   text-align: center;
   font-size: .9em;
-  opacity: 0;
-  transition: all .3s ease;
 }
 
 .printable-area{
-  border: 2px dashed transparent;
-  transition: all .3s ease;
-  &:hover{
-    border-color: rgba(0, 0, 0, .1);
-  }
+  outline-width: 0px;
+  outline-style: dashed;
 
-  &:hover + .printable-area-label{
-    opacity: 1;
+  &.-has-outline{
+    outline-width: 1px;
   }
 }
 
@@ -37,14 +30,12 @@
 .ruler {
   .horiz{
     height: 1px;
-    background: white;
     top: 50%;
     transform: translateY(-50%);
   }
 
   .vert{
     width: 1px;
-    background: white;
     left: 50%;
     transform: translateX(-50%);
   }
