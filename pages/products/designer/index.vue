@@ -287,7 +287,7 @@
               :class="{ '-has-outline': isPrintableAreaHovered }"
               @mouseenter="isPrintableAreaHovered = true"
               @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
-              <div class="h-full w-full z-10 relative">
+              <div class="objects-container h-full w-full z-10 relative">
                 <drr v-for="(obj, index) in currentVariant.objects"
                   :key="index"
                   :aspectRatio="obj.editorData.aspectRatio"

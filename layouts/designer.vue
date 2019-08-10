@@ -13,7 +13,9 @@
           </span>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <a href="#" class="text-blue-400">
+          <a href="#"
+            class="text-blue-400"
+            @click.prevent="exportCanvas">
             Continue Later
           </a>
           <div class="w-4"></div>
@@ -30,9 +32,36 @@
 
 
 <script>
+let html2canvas = null
+let reimg = null
+let htmlToImage = null
+let saveAs = null
+if(process.client){
+  html2canvas = require('html2canvas')
+  reimg = require('reimg')
+  htmlToImage = require('html-to-image')
+  saveAs = require('file-saver')
+}
+
 export default {
   head: {
     title: 'Printree Studio'
+  },
+  methods: {
+    async exportCanvas(){
+      let objectsContainer = document.querySelector(".printable-area > .objects-container").cloneNode(true)
+      let blob = await htmlToImage.toBlob(
+        objectsContainer
+      )
+      saveAs(blob, 'image.png')
+      // let canvas = await html2canvas(
+      //   document.querySelector(".printable-area"),
+      //   {
+      //     backgroundColor: null
+      //   }
+      // )
+      // reimg.ReImg.fromCanvas(canvas).downloadPng()
+    }
   }
 }
 </script>
