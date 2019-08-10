@@ -138,10 +138,16 @@
                 </div>
                 <div class="colors mt-2 flex flex-wrap">
                   <Select placeholder="Choose a font"
-                    class="flex-grow"
-                    v-model="selectedFont"
-                    :options="[{label: 'Arial', value: 'arial'}, {label: 'Arial 2', value: 'arial2'}, {label: 'Arial', value: 'arial3'}, {label: 'Arial', value: 'arial4'}]"
-                    filterable/>
+                    class="flex-grow z-10"
+                    @change="changeFontFamily"
+                    :options="webfonts"
+                    filterable>
+                    <template v-slot:item="item">
+                      <span :style="{ fontFamily: item.value }">
+                        {{ item.label }}
+                      </span>
+                    </template>
+                  </Select>
                 </div>
                 <div class="mt-4 text-gray-600">
                   <div class="font-bold mx-1">
@@ -297,13 +303,17 @@
                   @drag="transforming($event, obj)"
                   @resize="transforming($event, obj)"
                   @rotate="transforming($event, obj)"
+                  @mouseenter="printableAreaZ = 3"
                   :selected="obj.editorData.isActive"
+                  :resizable="obj.editorData.isResizable"
                   :style="{ zIndex: obj.bounds.zIndex }">
-                  <div class="flex flex-wrap w-full h-full relative z-1" v-if="obj.type == 'text'"
+                  <div class="flex flex-wrap w-full h-full relative z-1"
+                    v-if="obj.type == 'text'"
                     :style="obj.style"
                     @click.stop>
-                    <div class="block break-words break-all w-auto h-auto">
-                      <pre>{{ obj.value || '' }}</pre>
+                    <div class="block break-words break-all w-auto h-auto"
+                      :ref="`textContainer_${obj.id}`">
+                      <pre :style="{ fontFamily: obj.style.fontFamily }">{{ obj.value || '' }}</pre>
                     </div>
                   </div>
                   <div v-if="obj.type == 'svg'"
@@ -371,6 +381,10 @@ import VueTailwindModal from '@/components/VueTailwindModal'
 import ArtsList from '@/components/Designer/ArtsList'
 import ColorRegulator from '~/plugins/color-regulator.js'
 import { mapGetters } from 'vuex'
+let WebFontLoader = null
+if(process.client){
+  WebFontLoader = require('webfontloader')
+}
 
 export default {
   layout: 'designer',
@@ -379,6 +393,13 @@ export default {
     Select,
     VueTailwindModal,
     ArtsList
+  },
+  created(){
+    WebFontLoader.load({
+      google: {
+        families: _.map(this.webfonts, 'value')
+      }
+    })
   },
   data(){
     return {
@@ -408,7 +429,8 @@ export default {
       selectedProducts: 'designer/selectedProducts',
       currentProductIndex: 'designer/currentProductIndex',
       currentVariantIndex: 'designer/currentVariantIndex',
-      fontSizes: 'designer/fontSizes'
+      fontSizes: 'designer/fontSizes',
+      webfonts: 'designer/webfonts'
     }),
     activeObjectCanBeColored(){
       if(!this.activeObject) return false
@@ -505,7 +527,43 @@ export default {
     },
     async addObject(type, value = ''){
       let newObject = await this.$store.dispatch('designer/addObject', {type, value})
-      this.currentVariant.objects.push(JSON.parse(JSON.stringify(newObject)))
+      newObject = JSON.parse(JSON.stringify(newObject))
+      if(type == 'image'){
+        let i = new Image()
+        i.onload = () => {
+          let ratio = 0
+          if(i.width > this.currentVariant.printable_area['front'].width){
+            ratio = this.currentVariant.printable_area['front'].width / i.width
+            newObject.bounds.width = i.width * ratio
+            newObject.bounds.height = i.height * ratio
+          }
+          if(newObject.bounds.height > this.currentVariant.printable_area['front'].height){
+            ratio = this.currentVariant.printable_area['front'].height / i.height
+            newObject.bounds.width = i.width * ratio
+            newObject.bounds.height = i.height * ratio
+          }
+
+          newObject.bounds.left = newObject.bounds.width / 2
+          newObject.bounds.top = newObject.bounds.height / 2
+          this.currentVariant.objects.push(newObject)
+        }
+        i.src = value
+        return
+      }
+      if(type == 'text'){
+        let el = document.createElement('div')
+        el.innerHTML = value
+        el.style.position = 'absolute'
+        el.style.visibility = 'hidden'
+        el.style.display = 'block'
+
+        document.body.appendChild(el)
+        newObject.bounds.width = el.offsetWidth
+        newObject.bounds.height = el.offsetHeight
+        document.body.removeChild(el)
+        el = null
+      }
+      this.currentVariant.objects.push(newObject)
     },
     async removeObject(obj){
       let index = await this.$store.dispatch('designer/removeObject', obj)
@@ -516,25 +574,51 @@ export default {
     },
     toggleFontWeight(fontWeight){
       this._updateActiveObjectProps('style.fontWeight', fontWeight)
-      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      this.$nextTick(() => {
+        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
+        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
+        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      })
     },
     toggleFontStyle(fontStyle){
       this._updateActiveObjectProps('style.fontStyle', fontStyle)
-      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      this.$nextTick(() => {
+        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
+        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
+        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      })
     },
     toggleTextDecoration(decoration){
       let newDecoration = this.activeObject.style.textDecoration
       newDecoration = this.hasTextDecoration(decoration) ? newDecoration.replace(decoration, '') : newDecoration + ` ${decoration}`
       newDecoration = newDecoration.trim()
       this._updateActiveObjectProps('style.textDecoration', JSON.parse(JSON.stringify(newDecoration)))
-      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      this.$nextTick(() => {
+        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
+        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
+        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      })
     },
-    changeFontSize(font){
-      this._updateActiveObjectProps('style.fontSize', font.value)
-      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+    changeFontFamily(font){
+      this._updateActiveObjectProps('style.fontFamily', font.value)
+      this.$nextTick(() => {
+        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
+        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
+        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      })
+    },
+    changeFontSize(fontSize){
+      this._updateActiveObjectProps('style.fontSize', fontSize.value)
+      this.$nextTick(() => {
+        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
+        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
+        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+      })
     },
     changeText(e){
       this._updateActiveObjectProps('value', e.target.value)
+      this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
+      this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
       this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
     },
     activateEditable(e){

@@ -18,13 +18,21 @@
           <input v-model="query" type="text" class="focus:outline-none w-full" placeholder="Search an item...">
         </div>
         <simplebar class="list">
-          <div class="option hover:bg-gray-200 p-4 flex justify-between" v-for="(option, index) in filteredOptions"
-            :key="index"
-            :class="{ 'border-b': index != (options.length - 1) }"
-            @click.stop="select(option)">
-            <span>{{ option.label }}</span>
-            <font-awesome-icon v-if="model && option.value == model.value" :icon="['fas', 'check']"/>
-          </div>
+          <RecycleScroller
+            :items="filteredOptions"
+            key-field="value"
+            :item-size="54"
+            v-slot="{ item, index }">
+            <div class="option hover:bg-gray-200 p-4 flex justify-between"
+              :class="{ 'border-b': index != (options.length - 1) }"
+              @click="select(item)">
+              <div v-if="!$slots.default">
+                <span>{{ item.label }}</span>
+              </div>
+              <slot v-else name="item" :item="item"></slot>
+              <font-awesome-icon v-if="model && item.value == model.value" :icon="['fas', 'check']"/>
+            </div>
+          </RecycleScroller>
         </simplebar>
       </div>
     </div>
