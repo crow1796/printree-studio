@@ -140,6 +140,7 @@ const state = () => ({
         textAlign: 'center'
       },
       editorData: {
+        isResizable: false,
         isActive: false,
         hasActiveContent: true,
         isEditing: false,
@@ -163,6 +164,7 @@ const state = () => ({
         color: '#FEFEFE'
       },
       editorData: {
+        isResizable: true,
         isActive: false,
         hasActiveContent: false,
         isEditing: false,
@@ -184,7 +186,7 @@ const state = () => ({
       },
       style: {},
       editorData: {
-        isActive: false,
+        isActive: true,
         hasActiveContent: false,
         isEditing: false,
         aspectRatio: true,
@@ -390,10 +392,39 @@ const state = () => ({
       label: 'Printree',
       value: '<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M2.5 0C1.11929 0 0 1.11929 0 2.5V37.5C0 38.8807 1.11929 40 2.5 40H37.5C38.8807 40 40 38.8807 40 37.5V2.5C40 1.11929 38.8807 0 37.5 0H2.5ZM15.2785 5.63048V3H5.25V10.8453L34.8208 10.8453V3H24.0291V5.63048H15.2785ZM16.1127 12.6274H23.9581V36.7668H16.1127V12.6274ZM26.0702 27.4412V19.5958H34.8208V27.4412H26.0702Z"/></svg>'
     }
+  ],
+  webfonts: [
+    {label: 'Lobster', value: 'Lobster'},
+    {label: 'Comfortaa', value: 'Comfortaa'},
+    {label: 'Righteous', value: 'Righteous'},
+    {label: 'Patua One', value: 'Patua One'},
+    {label: 'Afta Slab One', value: 'Afta Slab One'},
+    {label: 'Concert One', value: 'Concert One'},
+    {label: 'Lobster Two', value: 'Lobster Two'},
+    {label: 'Baloo Chettan', value: 'Baloo Chettan'},
+    {label: 'Fredoka One', value: 'Fredoka One'},
+    {label: 'Special Elite', value: 'Special Elite'},
+    {label: 'Luckiest Guy', value: 'Luckiest Guy'},
+    {label: 'Passion One', value: 'Passion One'},
+    {label: 'Bangers', value: 'Bangers'},
+    {label: 'Lalezar', value: 'Lalezar'},
+    {label: 'Baloo', value: 'Baloo'},
+    {label: 'Monoton', value: 'Monoton'},
+    {label: 'Playball', value: 'Playball'},
+    {label: 'Press Start 2P', value: 'Press Start 2P'},
+    {label: 'Fugaz One', value: 'Fugaz One'},
+    {label: 'Fredericka the Great', value: 'Fredericka the Great'},
+    {label: 'Patua', value: 'Patua'},
+    {label: 'Bubblegum Sans', value: 'Bubblegum Sans'},
+    {label: 'Shojumaru', value: 'Shojumaru'},
+    {label: 'Bungee Inline', value: 'Bungee Inline'},
   ]
 })
 
 const getters = {
+  webfonts(state) {
+    return state.webfonts
+  },
   selectedProducts(state){
     return state.selectedProducts
   },
@@ -452,6 +483,9 @@ const mutations = {
   },
   REMOVE_VARIANT_BY_INDEX(state, index){
     state.selectedProducts[state.currentProductIndex].variants.splice(index, 1)
+  },
+  WEBFONTS(state, webfonts){
+    state.webfonts = webfonts
   }
 }
 

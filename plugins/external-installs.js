@@ -4,9 +4,12 @@ import VueTippy from 'vue-tippy'
 import simplebar from 'simplebar-vue'
 import 'simplebar/dist/simplebar.min.css'
 import VueLazyload from 'vue-lazyload'
+import VueVirtualScroller from 'vue-virtual-scroller'
+import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 
 Vue.component('simplebar', simplebar)
 Vue.use(VueTippy)
+Vue.use(VueVirtualScroller)
 Vue.use(VueLazyload, {
   preLoad: 1.3,
   error: require('~/assets/images/logo.png'),

@@ -56,6 +56,11 @@ module.exports = {
           icons: ['fab']
         }
       ]
+    }],
+    ['nuxt-env', {
+      keys: [
+        { key: 'GOOGLE_API', default: 'AIzaSyD1mNhKPk6tzgvsowFvB1KCib3E9MUxn2A' }
+      ]
     }]
   ],
   /*
