@@ -1,9 +1,9 @@
 <template>
   <div class="select select-none relative">
-    <div class="justify-between focus:outline-none mx-1 outline-none flex flex-grow border px-6 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
+    <div class="justify-between focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
       @click="show">
       <span>{{ selectedText }}</span>
-      <span>
+      <span class="inline-block ml-2">
         <font-awesome-icon :icon="['fas', 'sort']"/>
       </span>
       <div class="options bg-white shadow-lg focus:outline-none"

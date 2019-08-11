@@ -1,6 +1,120 @@
 import ColorRegulator from '~/plugins/color-regulator.js'
 
 const state = () => ({
+  availableProducts: [
+    {
+      id: 1,
+      name: 'Classic Tee',
+      availableVariants: [
+        {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
+          color: '#FEFEFE',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        },
+        {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
+          color: '#012F56',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        },
+        {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
+          color: '#FE8474',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        },
+        {
+          id: null,
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: null,
+          color: '#3A5DAB',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        }
+      ],
+      variants: [
+        {
+          printable_area: {
+            front: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            },
+            back: {
+              left: 170,
+              top: 105,
+              width: 190,
+              height: 280
+            }
+          },
+          base_cost: 499,
+          color: '#FEFEFE',
+          placeholder: require('~/assets/images/shirtplaceholder.png'),
+          objects: []
+        }
+      ]
+    }
+  ],
   selectedProducts: [
     {
       id: 1,
@@ -530,7 +644,6 @@ const actions = {
   },
   copyPropsToAllVariantsFrom(context, obj){
     _.map(context.state.selectedProducts[context.state.currentProductIndex].variants, (variant, i) => {
-      if(i == context.state.currentVariantIndex) return
       _.map(variant.objects, (ob) => {
         if (ob.id == obj.id) context.commit('OBJECT_FROM_VARIANT_INDEX', {
           obj: JSON.parse(JSON.stringify({

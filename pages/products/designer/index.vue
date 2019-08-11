@@ -36,27 +36,54 @@
     </VueTailwindModal>
     <simplebar class="flex w-1/4 border-r h-full">
       <div class="p-4 w-full h-full overflow-auto">
-        <Tabs :tabs="[{name: 'design', title: 'Design', slot: 'design'}, {name: 'products', title: 'Products', slot: 'products'}]">
-          <template v-slot:design>
-            <div class="mt-4 w-full">
-              <div class="flex w-full">
-                <button type="button"
-                  class="w-1/2 justify-center focus:outline-none mx-1 outline-none flex flex-grow border p-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="addObject('text', 'TEXT')">
-                  <font-awesome-icon :icon="['fas', 'font']" class="text-lg"/>
-                  <span class="ml-2">
-                    ADD A TEXT
-                  </span>
-                </button>
-                <button type="button"
-                  class="w-1/2 justify-center focus:outline-none mx-1 outline-none flex flex-grow border p-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="$refs.artsModal.show()">
-                  <font-awesome-icon :icon="['fas', 'cubes']" class="text-lg"/>
-                  <span class="ml-2">
-                    ADD AN ART
-                  </span>
-                </button>
+          <div class="w-full">
+            <div class="px-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed">
+              <font-awesome-icon :icon="['fas', 'cubes']"
+                class="mr-2 text-lg"
+                @click="showAvailableProducts"/>
+              <span class="font-bold">ADD PRODUCTS</span>
+            </div>
+            <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded"
+              v-for="(product, index) in selectedProducts"
+              :key="index"
+              :class="{ 'bg-gray-100': index == currentProductIndex }"
+              @click="selectProduct(index)">
+              <div class="flex">
+                <div class="w-1/5">
+                  <img :src="index == currentProductIndex ? currentVariant.placeholder : product.variants[0].placeholder"
+                    :style="{ 'background-color': index == currentProductIndex ? currentVariant.color : product.variants[0].color }">
+                </div>
+                <div class="flex-grow flex flex-col px-4 py-2">
+                  <div class="font-bold text-gray-600" style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ product.name }}
+                  </div>
+                  <div class="flex">
+                    <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
+                      v-for="(variant, variantIndex) in product.variants"
+                      :key="variantIndex"
+                      @click.stop="selectVariant(variantIndex, index)"
+                      :class="{ 'border-gray-300 bg-white': index == currentProductIndex && variantIndex == currentVariantIndex }">
+                      <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
+                        :style="{ 'background-color': variant.color }">
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+              <div v-if="selectedProducts.length > 1"
+                class="absolute hover:text-gray-700"
+                style="top: 15px; right: 15px;">
+                <font-awesome-icon :icon="['fas', 'trash']"/>
+              </div>
+              <div class="absolute hover:text-gray-700"
+                style="top: 50px; right: 15px;"
+                v-popover="{ name: `availableVariants_${product.id}` }">
+                <font-awesome-icon :icon="['fas', 'plus']"/>
+              </div>
+            </div>
+          </div>
+          <!-- <template v-slot:design>
+            <div class="mt-4 w-full">
 
               <div class="mt-4"
                   v-if="activeObject">
@@ -187,60 +214,79 @@
                 </div>
               </div>
             </div>
-          </template>
-          <template v-slot:products>
-            <div class="mt-4 w-full">
-              <div class="px-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed">
-                <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg"/>
-                <span class="font-bold">ADD PRODUCTS</span>
-              </div>
-              <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded"
-                v-for="(product, index) in selectedProducts"
-                :key="index"
-                :class="{ 'bg-gray-100': index == currentProductIndex }"
-                @click="selectProduct(index)">
-                <div class="flex">
-                  <div class="w-1/5">
-                    <img :src="index == currentProductIndex ? currentVariant.placeholder : product.variants[0].placeholder"
-                      :style="{ 'background-color': index == currentProductIndex ? currentVariant.color : product.variants[0].color }">
-                  </div>
-                  <div class="flex-grow flex flex-col px-4 py-2">
-                    <div class="font-bold text-gray-600" style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      {{ product.name }}
-                    </div>
-                    <div class="flex">
-                      <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-                        v-for="(variant, variantIndex) in product.variants"
-                        :key="variantIndex"
-                        @click.stop="selectVariant(variantIndex, index)"
-                        :class="{ 'border-gray-300 bg-white': index == currentProductIndex && variantIndex == currentVariantIndex }">
-                        <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
-                          :style="{ 'background-color': variant.color }">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div v-if="selectedProducts.length > 1"
-                  class="absolute hover:text-gray-700"
-                  style="top: 15px; right: 15px;">
-                  <font-awesome-icon :icon="['fas', 'trash']"/>
-                </div>
-                <div class="absolute hover:text-gray-700"
-                  style="top: 50px; right: 15px;"
-                  v-popover="{ name: `availableVariants_${product.id}` }">
-                  <font-awesome-icon :icon="['fas', 'plus']"/>
-                </div>
-              </div>
-            </div>
-          </template>
-        </Tabs>
+          </template> -->
       </div>
     </simplebar>
     <div class="flex flex-grow h-full flex-col">
       <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
         <div class="canvas-section outline-none select-none relative w-full h-full text-center">
-          <div class="actions bg-transparent relative z-10 flex flex-shrink justify-center w-full">
+          <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
+            <div class="flex bg-white mt-4 rounded shadow-xl border">
+              <div class="flex p-4">
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                  @click="addObject('text', 'TEXT')">
+                  <span class="text-xs">
+                    ADD A TEXT
+                  </span>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                  @click="$refs.artsModal.show()">
+                  <span class="text-xs">
+                    ADD AN ART
+                  </span>
+                </button>
+              </div>
+              <div class="flex item-center p-4 border-l"
+                v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:border-gray-400 text-xs w-8"
+                  :style="{ backgroundColor: activeObject.style.color }"
+                  title="Text Color"
+                  v-tippy>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
+                  @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
+                  title="Bold"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'bold']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
+                  @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
+                  title="Italic"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'italic']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
+                  @click="toggleTextDecoration('underline')"
+                  title="Underline"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'underline']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
+                  @click="toggleTextDecoration('line-through')"
+                  title="Strikethrough"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'strikethrough']"/>
+                </button>
+                <Select :placeholder="activeObject.style.fontSize"
+                  class="flex-grow text-xs"
+                  @change="changeFontSize"
+                  :options="fontSizes"
+                  flexible/>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded shadow-xl border">
               <div class="flex p-4 pr-0">
                 <button type="button"
@@ -272,6 +318,25 @@
               </div>
             </div>
           </div>
+          <div class="bottom-tips absolute z-10 flex flex-shrink">
+            <div class="bg-gray-900 text-xs text-white mt-4 rounded shadow-xl border p-4 text-left">
+              <div class="font-bold mb-2">Tips:</div>
+              <ul class="tips-list">
+                <li>
+                  Hold space + drag to start panning
+                </li>
+                <li>
+                  Ctrl + "+" to zoom in
+                </li>
+                <li>
+                  Ctrl + "-" to zoom out
+                </li>
+                <li>
+                  Ctrl + "0" to reset zoom
+                </li>
+              </ul>
+            </div>
+          </div>
           <div class="inline-block product-section relative w-auto h-auto">
             <div class="inline-block relative w-auto h-auto" :style="{ 'background-color': currentVariant.color }">
               <img draggable="false"
@@ -291,12 +356,12 @@
                 <drr v-for="(obj, index) in currentVariant.objects"
                   :key="index"
                   :aspectRatio="obj.editorData.aspectRatio"
-                  :w="obj.bounds.width"
-                  :h="obj.bounds.height"
-                  :x="obj.bounds.left"
-                  :y="obj.bounds.top"
+                  :w="obj.bounds.width || 1"
+                  :h="obj.bounds.height || 1"
+                  :x="obj.bounds.left || 1"
+                  :y="obj.bounds.top || 1"
                   @select="activated(obj)"
-                  @deselect="deactivated"
+                  @deselect="deactivated(obj)"
                   @dragstop="transformStop($event, obj)"
                   @resizestop="transformStop($event, obj)"
                   @rotatestop="transformStop($event, obj)"
@@ -305,16 +370,20 @@
                   @rotate="transforming($event, obj)"
                   @mouseenter="printableAreaZ = 3"
                   :selected="obj.editorData.isActive"
+                  :hasActiveContent="obj.editorData.hasActiveContent"
+                  @content-active="activateContent(obj)"
                   :resizable="obj.editorData.isResizable"
-                  :style="{ zIndex: obj.bounds.zIndex }">
+                  :style="{ zIndex: obj.bounds.zIndex }"
+                  :ref="`obj_${obj.id}_drr`">
                   <div class="flex flex-wrap w-full h-full relative z-1"
                     v-if="obj.type == 'text'"
                     :style="obj.style"
                     @click.stop>
-                    <div class="block break-words break-all w-auto h-auto"
-                      :ref="`textContainer_${obj.id}`">
-                      <pre :style="{ fontFamily: obj.style.fontFamily }">{{ obj.value || '' }}</pre>
-                    </div>
+                    <pre class="w-auto h-auto outline-none focus:outline-none"
+                      :ref="`textContainer_${obj.id}`"
+                      :style="{ fontFamily: obj.style.fontFamily }"
+                      @input="changeText"
+                      @blur="deactivateContentOf(obj, $event)">{{ obj.value || '' }}</pre>
                   </div>
                   <div v-if="obj.type == 'svg'"
                   v-html="obj.value"
@@ -493,6 +562,19 @@ export default {
     })
   },
   methods: {
+    activateContent(obj){
+      this.activated(obj)
+      this.$refs[`textContainer_${obj.id}`][0].contentEditable = true
+      this.$refs[`textContainer_${obj.id}`][0].focus()
+    },
+    deactivateContentOf(obj, e){
+      if(obj.type == 'text'){
+        this.$refs[`obj_${obj.id}_drr`][0].$emit('content-inactive')
+      }
+    },
+    showAvailableProducts(){
+
+    },
     async addVariant(variant){
       if(_.find(this.currentProduct.variants, { color: variant.color }) && this.currentProduct.variants.length == 1) return
       if(_.find(this.currentProduct.variants, { color: variant.color })){
@@ -546,6 +628,8 @@ export default {
           newObject.bounds.left = newObject.bounds.width / 2
           newObject.bounds.top = newObject.bounds.height / 2
           this.currentVariant.objects.push(newObject)
+          this.activated(newObject)
+          this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
         }
         i.src = value
         return
@@ -564,6 +648,8 @@ export default {
         el = null
       }
       this.currentVariant.objects.push(newObject)
+      this.activated(newObject)
+      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
     },
     async removeObject(obj){
       let index = await this.$store.dispatch('designer/removeObject', obj)
@@ -616,13 +702,10 @@ export default {
       })
     },
     changeText(e){
-      this._updateActiveObjectProps('value', e.target.value)
+      this._updateActiveObjectProps('value', e.target.innerText)
       this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
       this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
       this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
-    },
-    activateEditable(e){
-      this._updateActiveObjectProps('editorData.isEditing', true)
     },
     selectProduct(index){
       if(index == this.currentProductIndex) return
@@ -655,7 +738,6 @@ export default {
     deactivated(){
       if(!this.activeObject) return
       this._updateActiveObjectProps('editorData.isActive', false)
-      this._updateActiveObjectProps('editorData.isEditing', false)
     },
     transforming({x, y, w, h, angle}, obj){
       // let gridX = (this.currentVariant.printable_area.front.width / 2) - (w / 2)
