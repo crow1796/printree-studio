@@ -239,7 +239,6 @@ const state = () => ({
         top: 0,
         width: 80,
         height: 20,
-        zIndex: 0,
         angle: 0
       },
       style: {
@@ -271,7 +270,6 @@ const state = () => ({
         top: 0,
         width: 40,
         height: 40,
-        zIndex: 1,
         angle: 0
       },
       style: {
@@ -295,7 +293,6 @@ const state = () => ({
         top: 0,
         width: 40,
         height: 40,
-        zIndex: 1,
         angle: 0
       },
       style: {},
@@ -441,63 +438,63 @@ const state = () => ({
   ],
   fontSizes: [
     {
-      label: '9',
+      label: '9px',
       value: '9px'
     },
     {
-      label: '10',
+      label: '10px',
       value: '10px'
     },
     {
-      label: '11',
+      label: '11px',
       value: '11px'
     },
     {
-      label: '12',
+      label: '12px',
       value: '12px'
     },
     {
-      label: '13',
+      label: '13px',
       value: '13px'
     },
     {
-      label: '14',
+      label: '14px',
       value: '14px'
     },
     {
-      label: '18',
+      label: '18px',
       value: '18px'
     },
     {
-      label: '24',
+      label: '24px',
       value: '24px'
     },
     {
-      label: '36',
+      label: '36px',
       value: '36px'
     },
     {
-      label: '48',
+      label: '48px',
       value: '48px'
     },
     {
-      label: '64',
+      label: '64px',
       value: '64px'
     },
     {
-      label: '72',
+      label: '72px',
       value: '72px'
     },
     {
-      label: '96',
+      label: '96px',
       value: '96px'
     },
     {
-      label: '144',
+      label: '144px',
       value: '144px'
     },
     {
-      label: '288',
+      label: '288px',
       value: '288px'
     }
   ],
@@ -579,7 +576,6 @@ const mutations = {
   ADD_OBJECT(state, obj){
     _.map(state.selectedProducts[state.currentProductIndex].variants, (variant) => {
       obj = JSON.parse(JSON.stringify(obj))
-      obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
       variant.objects.push(obj)
     })
   },
@@ -600,6 +596,12 @@ const mutations = {
   },
   WEBFONTS(state, webfonts){
     state.webfonts = webfonts
+  },
+  SWAP_OBJECT_INDEX(state, { currentIndex, newIndex }){
+    let variant = state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex]
+    let tmp = variant.objects[currentIndex];
+    variant.objects[currentIndex] = variant.objects[newIndex];
+    variant.objects[newIndex] = tmp
   }
 }
 
@@ -628,11 +630,13 @@ const actions = {
   addObject(context, {type, value}){
     let id = '_' + Math.random().toString(36).substr(2, 9)
     let obj = JSON.parse(JSON.stringify(context.getters.objectBoilerplates[type]))
+    let variant = context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex]
     obj.id = id
     obj.value = value
     obj.bounds.left = obj.bounds.width / 2
     obj.bounds.top = obj.bounds.height / 2
-    obj.style.color = ColorRegulator.getContrastOf(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].color, { dark: '#012F56', light: '#FEFEFE' })
+    obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
+    obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
     context.commit('ADD_OBJECT', obj)
     return obj
   },
@@ -659,6 +663,20 @@ const actions = {
           })), index: i})
       })
     })
+  },
+  duplicate(context, obj){
+    let id = '_' + Math.random().toString(36).substr(2, 9)
+    let newObject = {
+      ...obj,
+      id
+    }
+    context.commit('ADD_OBJECT', newObject)
+    return newObject
+  },
+  moveObjectPosition(context, { obj, newIndex }){
+    let currentIndex = _.findIndex(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].objects, { id: obj.id })
+    context.commit('SWAP_OBJECT_INDEX', { currentIndex, newIndex })
+    return context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].objects
   }
 }
 

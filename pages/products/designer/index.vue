@@ -82,139 +82,6 @@
               </div>
             </div>
           </div>
-          <!-- <template v-slot:design>
-            <div class="mt-4 w-full">
-
-              <div class="mt-4"
-                  v-if="activeObject">
-                <div class="font-bold text-lg text-gray-600 w-full">
-                  Actions
-                </div>
-                <div class="flex mt-2">
-                  <button type="button"
-                    class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="Duplicate"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'clone']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="To Back"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'angle-double-down']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="Backward"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'angle-down']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="Forward"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'angle-up']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="To Front"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'angle-double-up']" class="text-xs"/>
-                  </button>
-                </div>
-              </div>
-
-              <div class="mx-1"
-                v-if="activeObject && activeObject.type == 'text'">
-                <div class="font-bold text-lg text-gray-600 mt-4">
-                  Text
-                </div>
-                <div class="colors mt-2">
-                  <textarea class="border rounded border p-3 outline-none w-full resize-none"
-                    rows="4"
-                    v-model="activeObject.value"
-                    @input="changeText"></textarea>
-                </div>
-              </div>
-
-              <div class="mx-1"
-                v-if="activeObjectCanBeColored">
-                <div class="font-bold text-lg text-gray-600 mt-4">
-                  Choose a color
-                </div>
-                <div class="colors mt-2 flex flex-wrap">
-                  <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
-                    v-for="(color, index) in textColors"
-                    :key="index"
-                    @click="setColorTo(color)"
-                    :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
-                    <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
-                      :style="{ 'background-color': color.code }">
-                      <font-awesome-icon :icon="['fas', 'check']"
-                        :style="{ color: getCorrectColor(color.code) }"
-                        v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="mx-1"
-                v-if="activeObject && activeObject.type == 'text'">
-                <div class="font-bold text-lg text-gray-600 mt-4">
-                  Font options
-                </div>
-                <div class="colors mt-2 flex flex-wrap">
-                  <Select placeholder="Choose a font"
-                    class="flex-grow z-10"
-                    @change="changeFontFamily"
-                    :options="webfonts"
-                    filterable>
-                    <template v-slot:item="item">
-                      <span :style="{ fontFamily: item.value }">
-                        {{ item.label }}
-                      </span>
-                    </template>
-                  </Select>
-                </div>
-                <div class="mt-4 text-gray-600">
-                  <div class="font-bold mx-1">
-                    Styles & Decorations
-                  </div>
-                  <div class="flex mt-2">
-                    <button type="button"
-                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                      :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
-                      @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')">
-                      <font-awesome-icon :icon="['fas', 'bold']"/>
-                    </button>
-                    <button type="button"
-                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                      :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
-                      @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')">
-                      <font-awesome-icon :icon="['fas', 'italic']"/>
-                    </button>
-                    <button type="button"
-                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                      :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
-                      @click="toggleTextDecoration('underline')">
-                      <font-awesome-icon :icon="['fas', 'underline']"/>
-                    </button>
-                    <button type="button"
-                      class="justify-center focus:outline-none mx-1 outline-none flex border px-4 py-3 font-bold rounded cursor-pointer text-gray-600 border-grey-lightest hover:bg-gray-100"
-                      :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
-                      @click="toggleTextDecoration('line-through')">
-                      <font-awesome-icon :icon="['fas', 'strikethrough']"/>
-                    </button>
-                    <Select :placeholder="activeObject.style.fontSize"
-                      class="flex-grow"
-                      @change="changeFontSize"
-                      :options="fontSizes"
-                      flexible/>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </template> -->
       </div>
     </simplebar>
     <div class="flex flex-grow h-full flex-col">
@@ -224,68 +91,142 @@
             <div class="flex bg-white mt-4 rounded shadow-xl border">
               <div class="flex p-4">
                 <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="addObject('text', 'TEXT')">
-                  <span class="text-xs">
-                    ADD A TEXT
-                  </span>
+                  class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                  @click="addObject('text', 'TEXT')"
+                  title="Add a Text"
+                  v-tippy>
+                  <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
+                  </svg>
                 </button>
                 <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="$refs.artsModal.show()">
-                  <span class="text-xs">
-                    ADD AN ART
-                  </span>
+                  class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                  @click="$refs.artsModal.show()"
+                  title="Add an Art"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'image']"/>
                 </button>
               </div>
-              <div class="flex item-center p-4 border-l"
+              <div class="flex items-center p-4 border-l"
                 v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
                 <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:border-gray-400 text-xs w-8"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
                   :style="{ backgroundColor: activeObject.style.color }"
-                  title="Text Color"
-                  v-tippy>
+                  title="Color"
+                  v-if="activeObjectCanBeColored"
+                  v-tippy
+                  v-popover="{ name: 'availableTextColors' }">
                 </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
-                  @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
-                  title="Bold"
-                  v-tippy>
-                  <font-awesome-icon :icon="['fas', 'bold']"/>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
-                  @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
-                  title="Italic"
-                  v-tippy>
-                  <font-awesome-icon :icon="['fas', 'italic']"/>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
-                  @click="toggleTextDecoration('underline')"
-                  title="Underline"
-                  v-tippy>
-                  <font-awesome-icon :icon="['fas', 'underline']"/>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
-                  @click="toggleTextDecoration('line-through')"
-                  title="Strikethrough"
-                  v-tippy>
-                  <font-awesome-icon :icon="['fas', 'strikethrough']"/>
-                </button>
-                <Select :placeholder="activeObject.style.fontSize"
-                  class="flex-grow text-xs"
-                  @change="changeFontSize"
-                  :options="fontSizes"
-                  flexible/>
+                <div class="flex" v-if="activeObject && activeObject.type == 'text'">
+                  <Select placeholder="Choose a font"
+                    class="flex-grow z-10 h-8"
+                    @change="changeFontFamily"
+                    :options="webfonts"
+                    list-height="400px"
+                    list-width="300px"
+                    filterable>
+                    <template v-slot:item="item">
+                      <span :style="{ fontFamily: item.value }">
+                        {{ item.label }}
+                      </span>
+                    </template>
+                  </Select>
+                  <button type="button"
+                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
+                    @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
+                    title="Bold"
+                    v-tippy>
+                    <font-awesome-icon :icon="['fas', 'bold']"/>
+                  </button>
+                  <button type="button"
+                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
+                    @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
+                    title="Italic"
+                    v-tippy>
+                    <font-awesome-icon :icon="['fas', 'italic']"/>
+                  </button>
+                  <button type="button"
+                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
+                    @click="toggleTextDecoration('underline')"
+                    title="Underline"
+                    v-tippy>
+                    <font-awesome-icon :icon="['fas', 'underline']"/>
+                  </button>
+                  <button type="button"
+                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
+                    @click="toggleTextDecoration('line-through')"
+                    title="Strikethrough"
+                    v-tippy>
+                    <font-awesome-icon :icon="['fas', 'strikethrough']"/>
+                  </button>
+                  <Select :placeholder="activeObject.style.fontSize"
+                    class="flex-grow text-xs h-8"
+                    @change="changeFontSize"
+                    :options="fontSizes"
+                    flexible/>
+                </div>
               </div>
             </div>
           </div>
+
+          <div class="left-actions absolute z-10 flex flex-shrink justify-center">
+            <div class="flex bg-white rounded shadow-xl border">
+              <div class="flex flex-col py-4">
+                <button type="button"
+                  class="justify-center items-center mx-4 my-1 mt-0 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  title="Duplicate"
+                  v-tippy
+                  @click="duplicate">
+                  <font-awesome-icon :icon="['fas', 'clone']" class="text-xs"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center mx-4 my-1 mb-0 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  title="To Front"
+                  v-tippy
+                  @click="moveObjectPosition(currentVariant.objects.length - 1)">
+                  <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
+                    <rect x="11" y="11" width="32" height="32" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
+                  </svg>
+                </button>
+                <button type="button"
+                  class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  title="Forward"
+                  v-tippy
+                  @click="moveObjectPosition(activeObjectIndex < (currentVariant.objects.length - 1) ? activeObjectIndex + 1 : activeObjectIndex)">
+                  <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="18" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
+                    <rect x="1" y="1" width="36" height="36" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
+                  </svg>
+                </button>
+                <button type="button"
+                  class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  title="Backward"
+                  v-tippy
+                  @click="moveObjectPosition(activeObjectIndex > 0 ? activeObjectIndex - 1 : activeObjectIndex)">
+                  <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
+                    <rect x="19" y="17" width="38" height="38" rx="3" fill="#718096"/>
+                  </svg>
+                </button>
+                <button type="button"
+                  class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  title="To Back"
+                  v-tippy
+                  @click="moveObjectPosition(0)">
+                  <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
+                    <rect x="11" y="11" width="32" height="32" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded shadow-xl border">
               <div class="flex p-4 pr-0">
@@ -373,7 +314,7 @@
                   :hasActiveContent="obj.editorData.hasActiveContent"
                   @content-active="activateContent(obj)"
                   :resizable="obj.editorData.isResizable"
-                  :style="{ zIndex: obj.bounds.zIndex }"
+                  :style="{ zIndex: (index + 1) }"
                   :ref="`obj_${obj.id}_drr`">
                   <div class="flex flex-wrap w-full h-full relative z-1"
                     v-if="obj.type == 'text'"
@@ -439,6 +380,24 @@
         </div>
       </div>
     </popover>
+
+    <popover name="availableTextColors"
+      :width="310">
+      <div class="colors mt-2 flex flex-wrap">
+        <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
+          v-for="(color, index) in textColors"
+          :key="index"
+          @click="setColorTo(color)"
+          :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
+          <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
+            :style="{ 'background-color': color.code }">
+            <font-awesome-icon :icon="['fas', 'check']"
+              :style="{ color: getCorrectColor(color.code) }"
+              v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
+          </div>
+        </div>
+      </div>
+    </popover>
   </div>
 </template>
 
@@ -489,7 +448,8 @@ export default {
       stageContainer: null,
       panzoomController: null,
       canvasSection: null,
-      isPanning: false
+      isPanning: false,
+      activeObjectIndex: 0
     }
   },
   computed: {
@@ -562,13 +522,33 @@ export default {
     })
   },
   methods: {
+    async moveObjectPosition(newIndex){
+      if(!this.activeObject || (this.activeObjectIndex == newIndex)) return
+      const newObjects = await this.$store.dispatch('designer/moveObjectPosition', {
+        obj: this.activeObject,
+        newIndex
+      })
+      this.currentVariant.objects = JSON.parse(JSON.stringify(newObjects))
+    },
+    async duplicate(){
+      if(!this.activeObject) return
+      let newObject = await this.$store.dispatch('designer/duplicate', JSON.parse(JSON.stringify(this.activeObject)))
+      this.currentVariant.objects.push(newObject)
+      this.activated(newObject)
+      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
+    },
     activateContent(obj){
       this.activated(obj)
-      this.$refs[`textContainer_${obj.id}`][0].contentEditable = true
-      this.$refs[`textContainer_${obj.id}`][0].focus()
+      if(obj.type == 'text'){
+        this.$refs[`textContainer_${obj.id}`][0].contentEditable = true
+        this.$refs[`textContainer_${obj.id}`][0].innerText = ''
+        this.$refs[`textContainer_${obj.id}`][0].innerText = obj.value
+        this.$refs[`textContainer_${obj.id}`][0].focus()
+      }
     },
     deactivateContentOf(obj, e){
       if(obj.type == 'text'){
+        this.$refs[`textContainer_${obj.id}`][0].contentEditable = false
         this.$refs[`obj_${obj.id}_drr`][0].$emit('content-inactive')
       }
     },
@@ -594,16 +574,14 @@ export default {
     _colorIsInVariantsOf(product, color){
       return _.find(product.variants, (variant) => variant.color.toLowerCase() == color.toLowerCase())
     },
-    artAdded(file){
+    artAdded(file, res){
+      console.log(res)
       let type = 'image'
       let value = file.dataURL
-      // if(file.type == 'image/svg+xml'){
-      //   type = 'svg'
-      //   value = document.createElementNS("http://www.w3.org/2000/svg", "image")
-      //   // new
-      //   value.setAttributeNS("http://www.w3.org/1999/xlink", 'xlink:href', file.dataURL)
-      //   value = value.outerHTML
-      // }
+      if(file.type == 'image/svg+xml'){
+        type = 'svg'
+        value = res.files.file
+      }
       this.addObject(type, value)
       this.$refs.artsModal.hide()
     },
@@ -721,6 +699,7 @@ export default {
     },
     activated(obj){
       this.activeObject = obj
+      this.activeObjectIndex = _.findIndex(this.currentVariant.objects, { id: obj.id })
       _.map(this.currentVariant.objects, (ob) => {
         this._updateActiveObjectProps('editorData.isActive', false, ob)
       })
@@ -767,12 +746,18 @@ export default {
       immediate: true,
       handler(to){
         this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[to]))
+        this.deactivated()
+        this.activeObject = null
+        this.activeObjectIndex = null
       }
     },
     currentVariantIndex: {
       immediate: true,
       handler(to){
         this.currentVariant = JSON.parse(JSON.stringify(this.selectedProducts[this.currentProductIndex].variants[to]))
+        this.deactivated()
+        this.activeObject = null
+        this.activeObjectIndex = 0
       }
     },
     stageCursor(newCursor){

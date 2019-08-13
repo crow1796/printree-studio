@@ -18,7 +18,7 @@ Vue.use(VueLazyload, {
 })
 if (process.client) {
   require('vue2-animate/dist/vue2-animate.min.css')
-  const drr = require('@minogin/vue-drag-resize-rotate').default
+  const drr = require('@/components/Designer/drr').default
   const VueKonva = require('vue-konva')
   const vClickOutside = require('v-click-outside')
   const vue2Dropzone = require('vue2-dropzone')
