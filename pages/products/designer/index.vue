@@ -1,9 +1,68 @@
 <template>
   <div class="flex h-full w-full">
-    <VueTailwindModal ref="artsModal" width="70%">
+    <VueTailwindModal ref="availableProductsModal"
+      width="80%"
+      content-class="rounded-none shadow-none text-gray-600">
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase">
+              <strong>Select Products</strong>
+            </div>
+            <div class="flex text-right">
+              <div class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
+                  @click="hideAvailableProducts">
+                <font-awesome-icon :icon="['fas', 'times']"
+                  class="text-xs"/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex modal-body" style="height: 36rem">
+          <simplebar class="h-full w-full">
+            <div class="flex flex-wrap p-4">
+              <div class="flex w-1/3 p-1">
+                <div class="select-product flex border rounded cursor-pointer select-none hover:border-gray-500">
+                  <div class="flex flex-shrink-0 w-1/3 product-thumb p-4">
+                    <img src="~/assets/images/shirtplaceholder.png"
+                      class="w-full"/>
+                  </div>
+                  <div class="flex flex-grow flex-col product-desc p-4 relative">
+                    <div class="font-bold text-lg mb-4">
+                      Premium Unisex Tee
+                    </div>
+                    <div class="flex flex-col">
+                      <div class="flex py-1 items-center">
+                        <font-awesome-icon :icon="['fas', 'tag']"/>
+                        <div class="pl-2">
+                          Sizes - XS to XL
+                        </div>
+                      </div>
+                      <div class="flex py-1 items-center">
+                        <font-awesome-icon :icon="['far', 'circle']"/>
+                        <div class="pl-2">
+                          4 Colors
+                        </div>
+                      </div>
+                    </div>
+                    <div class="absolute outline-none focus:outline-none bg-white select-icon rounded-full border w-10 flex h-10 items-center justify-center"
+                      style="right: 10px; bottom: 10px;">
+                      <font-awesome-icon :icon="['fas', 'plus']"/>
+                      <!-- <font-awesome-icon :icon="['fas', 'check']"/> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </simplebar>
+        </div>
+      </div>
+    </VueTailwindModal>
+    <VueTailwindModal ref="artsModal"
+      width="70%">
       <div class="flex">
         <div class="flex w-1/3 flex-col">
-          <div class="text-xl font-bold text-gray-600 pb-2 px-1">
+          <div class="uppercase font-bold text-gray-600 pb-2 px-1">
             Upload an Image
           </div>
           <div class="flex h-full w-full my-1">
@@ -27,7 +86,7 @@
           </div>
         </div>
         <div class="flex flex-col w-2/3">
-          <div class="text-xl font-bold text-gray-600 pb-2 px-1">
+          <div class="uppercase font-bold text-gray-600 pb-2 px-1">
             Choose an Art
           </div>
           <ArtsList @selected="addObject('svg', $event.value); $refs.artsModal.hide()"/>
@@ -37,10 +96,10 @@
     <simplebar class="flex w-1/4 border-r h-full">
       <div class="p-4 w-full h-full overflow-auto">
           <div class="w-full">
-            <div class="px-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed">
+            <div class="px-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed"
+                @click="showAvailableProducts">
               <font-awesome-icon :icon="['fas', 'cubes']"
-                class="mr-2 text-lg"
-                @click="showAvailableProducts"/>
+                class="mr-2 text-lg"/>
               <span class="font-bold">ADD PRODUCTS</span>
             </div>
             <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded"
@@ -88,88 +147,154 @@
       <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
         <div class="canvas-section outline-none select-none relative w-full h-full text-center">
           <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
-            <div class="flex bg-white mt-4 rounded shadow-xl border">
-              <div class="flex p-4">
-                <button type="button"
-                  class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="addObject('text', 'TEXT')"
-                  title="Add a Text"
-                  v-tippy>
-                  <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="$refs.artsModal.show()"
-                  title="Add an Art"
-                  v-tippy>
-                  <font-awesome-icon :icon="['fas', 'image']"/>
-                </button>
-              </div>
-              <div class="flex items-center p-4 border-l"
-                v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
-                  :style="{ backgroundColor: activeObject.style.color }"
-                  title="Color"
-                  v-if="activeObjectCanBeColored"
-                  v-tippy
-                  v-popover="{ name: 'availableTextColors' }">
-                </button>
-                <div class="flex" v-if="activeObject && activeObject.type == 'text'">
-                  <Select placeholder="Choose a font"
-                    class="flex-grow z-10 h-8"
-                    @change="changeFontFamily"
-                    :options="webfonts"
-                    list-height="400px"
-                    list-width="300px"
-                    filterable>
-                    <template v-slot:item="item">
+            <div class="flex bg-white mt-4 p-4 rounded shadow-xl border">
+              <button type="button"
+                class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                @click="addObject('text', 'TEXT')"
+                title="Add a Text"
+                v-tippy>
+                <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                @click="$refs.artsModal.show()"
+                title="Add an Art"
+                v-tippy>
+                <font-awesome-icon :icon="['fas', 'image']"/>
+              </button>
+            </div>
+            <div class="flex bg-white ml-2 mt-4 p-4 rounded shadow-xl border items-center"
+              v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
+                :style="{ backgroundColor: activeObject.style.color }"
+                title="Color"
+                v-if="activeObjectCanBeColored"
+                v-tippy
+                v-popover="{ name: 'availableTextColors' }">
+              </button>
+              <div class="flex" v-if="activeObject && activeObject.type == 'text'">
+                <div class="w-48 px-1 h-8 z-10 items-center">
+                  <v-select :options="webfonts"
+                    class="flex-grow h-full text-sm"
+                    :value="activeObject.style.fontFamily"
+                    @input="changeFontFamily">
+                    <template slot="option" slot-scope="item">
                       <span :style="{ fontFamily: item.value }">
                         {{ item.label }}
                       </span>
                     </template>
-                  </Select>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
-                    @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
-                    title="Bold"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'bold']"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
-                    @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
-                    title="Italic"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'italic']"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
-                    @click="toggleTextDecoration('underline')"
-                    title="Underline"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'underline']"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
-                    @click="toggleTextDecoration('line-through')"
-                    title="Strikethrough"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'strikethrough']"/>
-                  </button>
-                  <Select :placeholder="activeObject.style.fontSize"
-                    class="flex-grow text-xs h-8"
-                    @change="changeFontSize"
-                    :options="fontSizes"
-                    flexible/>
+                  </v-select>
                 </div>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
+                  @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
+                  title="Bold"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'bold']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
+                  @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
+                  title="Italic"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'italic']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
+                  @click="toggleTextDecoration('underline')"
+                  title="Underline"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'underline']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
+                  @click="toggleTextDecoration('line-through')"
+                  title="Strikethrough"
+                  v-tippy>
+                  <font-awesome-icon :icon="['fas', 'strikethrough']"/>
+                </button>
+                <Select :placeholder="activeObject.style.fontSize"
+                  class="flex-grow text-xs h-8"
+                  @change="changeFontSize"
+                  :options="fontSizes"
+                  flexible/>
               </div>
+            </div>
+            <div class="flex bg-white ml-2 mt-4 p-4 rounded shadow-xl border"
+              v-if="activeObject">
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Left"
+                @click="alignObject('left', activeObject.bounds.width / 2)"
+                v-tippy>
+                <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="4" height="54" rx="2" fill="#718096"/>
+                  <rect x="12" y="21" width="11" height="39" rx="2" transform="rotate(-90 12 21)" fill="#718096"/>
+                  <rect x="12" y="44" width="11" height="27" rx="2" transform="rotate(-90 12 44)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Horizontal Center"
+                @click="alignObject('left', (currentVariant.printable_area['front'].width / 2))"
+                v-tippy>
+                <svg width="13" height="13" viewBox="0 0 39 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="17" width="4" height="54" rx="2" fill="#718096"/>
+                  <rect y="21" width="11" height="39" rx="2" transform="rotate(-90 0 21)" fill="#718096"/>
+                  <rect x="6" y="44" width="11" height="27" rx="2" transform="rotate(-90 6 44)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Right"
+                @click="alignObject('left', (currentVariant.printable_area['front'].width) - (activeObject.bounds.width / 2))"
+                v-tippy>
+                <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="4" height="54" rx="2" transform="matrix(-1 0 0 1 51 0)" fill="#718096"/>
+                  <rect width="11" height="39" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 21)" fill="#718096"/>
+                  <rect width="11" height="27" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 44)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Top"
+                @click="alignObject('top', activeObject.bounds.height / 2)"
+                v-tippy>
+                <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="54.5" y="0.5" width="4" height="54" rx="2" transform="rotate(90 54.5 0.5)" fill="#718096"/>
+                  <rect x="33.5" y="12.5" width="11" height="39" rx="2" fill="#718096"/>
+                  <rect x="10.5" y="12.5" width="11" height="27" rx="2" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Vertical Center"
+                @click="alignObject('top', (currentVariant.printable_area['front'].height / 2))"
+                v-tippy>
+                <svg width="13" height="13" viewBox="0 0 55 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0.5" y="22.5" width="4" height="54" rx="2" transform="rotate(-90 0.5 22.5)" fill="#718096"/>
+                  <rect x="21.5" y="39.5" width="11" height="39" rx="2" transform="rotate(180 21.5 39.5)" fill="#718096"/>
+                  <rect x="44.5" y="33.5" width="11" height="27" rx="2" transform="rotate(180 44.5 33.5)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Bottom"
+                @click="alignObject('top', (currentVariant.printable_area['front'].height) - (activeObject.bounds.height / 2))"
+                v-tippy>
+                <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="4" height="54" rx="2" transform="matrix(1.19249e-08 -1 -1 -1.19249e-08 54.5 51.5)" fill="#718096"/>
+                  <rect width="11" height="39" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 33.5 39.5)" fill="#718096"/>
+                  <rect width="11" height="27" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 10.5 39.5)" fill="#718096"/>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -286,21 +411,21 @@
                 :src="currentVariant.placeholder">
             </div>
             <div class="printable-area-surface absolute"
-              :style="{ left: `${currentVariant.printable_area.front.left}px`, top: `${currentVariant.printable_area.front.top}px`, width: `${currentVariant.printable_area.front.width}px`, height: `${currentVariant.printable_area.front.height}px`, zIndex: 2 }"
+              :style="{ left: `${currentVariant.printable_area['front'].left}px`, top: `${currentVariant.printable_area['front'].top}px`, width: `${currentVariant.printable_area['front'].width}px`, height: `${currentVariant.printable_area['front'].height}px`, zIndex: 2 }"
               @mouseenter="printableAreaZ = 3"></div>
             <div class="printable-area absolute"
-              :style="{ left: `${currentVariant.printable_area.front.left}px`, top: `${currentVariant.printable_area.front.top}px`, width: `${currentVariant.printable_area.front.width}px`, height: `${currentVariant.printable_area.front.height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
-              :class="{ '-has-outline': isPrintableAreaHovered }"
+              :style="{ left: `${currentVariant.printable_area['front'].left}px`, top: `${currentVariant.printable_area['front'].top}px`, width: `${currentVariant.printable_area['front'].width}px`, height: `${currentVariant.printable_area['front'].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
+              :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
               @mouseenter="isPrintableAreaHovered = true"
               @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
               <div class="h-full w-full z-10 relative">
                 <drr v-for="(obj, index) in currentVariant.objects"
                   :key="index"
                   :aspectRatio="obj.editorData.aspectRatio"
-                  :w="obj.bounds.width || 1"
-                  :h="obj.bounds.height || 1"
-                  :x="obj.bounds.left || 1"
-                  :y="obj.bounds.top || 1"
+                  :w="obj.bounds.width || 50"
+                  :h="obj.bounds.height || 50"
+                  :x="obj.bounds.left || 0"
+                  :y="obj.bounds.top || 0"
                   @select="activated(obj)"
                   @deselect="deactivated(obj)"
                   @dragstop="transformStop($event, obj)"
@@ -328,6 +453,8 @@
                   </div>
                   <div v-if="obj.type == 'svg'"
                   v-html="obj.value"
+                  class="svg-object"
+                  :ref="`svgContainer_${obj.id}`"
                   :style="{ fill: obj.style.color }"></div>
                   <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image'">
                     <img width="100%" :src="obj.value"/>
@@ -352,7 +479,7 @@
             </div>
             <div class="printable-area-label"
               v-if="isPrintableAreaHovered"
-              :style="{ top: `${currentVariant.printable_area.front.top + currentVariant.printable_area.front.height + 5}px`, color: getCorrectColor(currentVariant.color) }">
+              :style="{ top: `${currentVariant.printable_area['front'].top + currentVariant.printable_area['front'].height + 5}px`, color: getCorrectColor(currentVariant.color) }">
               Printable Area
             </div>
           </div>
@@ -409,6 +536,8 @@ import VueTailwindModal from '@/components/VueTailwindModal'
 import ArtsList from '@/components/Designer/ArtsList'
 import ColorRegulator from '~/plugins/color-regulator.js'
 import { mapGetters } from 'vuex'
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css'
 let WebFontLoader = null
 if(process.client){
   WebFontLoader = require('webfontloader')
@@ -420,7 +549,8 @@ export default {
     Tabs,
     Select,
     VueTailwindModal,
-    ArtsList
+    ArtsList,
+    vSelect
   },
   created(){
     WebFontLoader.load({
@@ -431,6 +561,7 @@ export default {
   },
   data(){
     return {
+      arrowKeysTimeout: null,
       isPrintableAreaHovered: false,
       canvasScale: 1.0,
       selectedFont: null,
@@ -494,6 +625,31 @@ export default {
     })
 
     this.canvasSection.addEventListener('keydown', (evt) => {
+      // Left
+      if(evt.which == 37 && this.activeObject){
+        this._updateActiveObjectProps('bounds.left', (this.activeObject.bounds.left - 1))
+        this.isMoving = true
+        return
+      }
+      // Up
+      if(evt.which == 38 && this.activeObject){
+        this._updateActiveObjectProps('bounds.top', (this.activeObject.bounds.top - 1))
+        this.isMoving = true
+        return
+      }
+      // Right
+      if(evt.which == 39 && this.activeObject){
+        this._updateActiveObjectProps('bounds.left', (this.activeObject.bounds.left + 1))
+        this.isMoving = true
+        return
+      }
+      // Down
+      if(evt.which == 40 && this.activeObject){
+        this._updateActiveObjectProps('bounds.top', (this.activeObject.bounds.top + 1))
+        this.isMoving = true
+        return
+      }
+
       if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
         evt.preventDefault()
         this.zoomTo(0.1)
@@ -512,6 +668,14 @@ export default {
     })
 
     this.canvasSection.addEventListener('keyup', (evt) => {
+      if(_.includes([37, 38, 39, 40], evt.which) && this.activeObject){
+        clearTimeout(this.arrowKeysTimeout)
+        this.arrowKeysTimeout = setTimeout(() => {
+          this.isMoving = false
+        }, 1000)
+        return
+      }
+
       if (evt.which == 32) {
         this.isHoldingSpace = false
         this.stageCursor = 'initial'
@@ -522,6 +686,11 @@ export default {
     })
   },
   methods: {
+    alignObject(pos, val){
+      if(!this.activeObject) return
+      this._updateActiveObjectProps(`bounds.${pos}`, val)
+      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
+    },
     async moveObjectPosition(newIndex){
       if(!this.activeObject || (this.activeObjectIndex == newIndex)) return
       const newObjects = await this.$store.dispatch('designer/moveObjectPosition', {
@@ -553,7 +722,10 @@ export default {
       }
     },
     showAvailableProducts(){
-
+      this.$refs.availableProductsModal.show()
+    },
+    hideAvailableProducts(){
+      this.$refs.availableProductsModal.hide()
     },
     async addVariant(variant){
       if(_.find(this.currentProduct.variants, { color: variant.color }) && this.currentProduct.variants.length == 1) return
@@ -575,7 +747,6 @@ export default {
       return _.find(product.variants, (variant) => variant.color.toLowerCase() == color.toLowerCase())
     },
     artAdded(file, res){
-      console.log(res)
       let type = 'image'
       let value = file.dataURL
       if(file.type == 'image/svg+xml'){
@@ -603,8 +774,8 @@ export default {
             newObject.bounds.height = i.height * ratio
           }
 
-          newObject.bounds.left = newObject.bounds.width / 2
-          newObject.bounds.top = newObject.bounds.height / 2
+          newObject.bounds.left = (newObject.bounds.width / 2) || 20
+          newObject.bounds.top = (newObject.bounds.height / 2) || 20
           this.currentVariant.objects.push(newObject)
           this.activated(newObject)
           this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
@@ -612,7 +783,7 @@ export default {
         i.src = value
         return
       }
-      if(type == 'text'){
+      if(type == 'text' || type == 'svg'){
         let el = document.createElement('div')
         el.innerHTML = value
         el.style.position = 'absolute'
@@ -622,6 +793,21 @@ export default {
         document.body.appendChild(el)
         newObject.bounds.width = el.offsetWidth
         newObject.bounds.height = el.offsetHeight
+        let ratio = 0
+        if(el.offsetWidth > this.currentVariant.printable_area['front'].width){
+          ratio = this.currentVariant.printable_area['front'].width / el.offsetWidth
+          newObject.bounds.width = el.offsetWidth * ratio
+          newObject.bounds.height = el.offsetHeight * ratio
+        }
+        if(newObject.bounds.height > this.currentVariant.printable_area['front'].height){
+          ratio = this.currentVariant.printable_area['front'].height / el.offsetHeight
+          newObject.bounds.width = el.offsetWidth * ratio
+          newObject.bounds.height = el.offsetHeight * ratio
+        }
+
+        newObject.bounds.left = (newObject.bounds.width / 2) || 20
+        newObject.bounds.top = (newObject.bounds.height / 2) || 20
+
         document.body.removeChild(el)
         el = null
       }
@@ -632,6 +818,7 @@ export default {
     async removeObject(obj){
       let index = await this.$store.dispatch('designer/removeObject', obj)
       this.currentVariant.objects.splice(index, 1)
+      this.activeObject = null
     },
     hasTextDecoration(decoration){
       return _.includes(this.activeObject.style.textDecoration, decoration)
@@ -719,8 +906,8 @@ export default {
       this._updateActiveObjectProps('editorData.isActive', false)
     },
     transforming({x, y, w, h, angle}, obj){
-      // let gridX = (this.currentVariant.printable_area.front.width / 2) - (w / 2)
-      // let gridY = (this.currentVariant.printable_area.front.height / 2) - (h / 2)
+      // let gridX = (this.currentVariant.printable_area['front'].width / 2) - (w / 2)
+      // let gridY = (this.currentVariant.printable_area['front'].height / 2) - (h / 2)
       // this.highlightRuler.vertical = (gridX == x) || ((x - (w / 2)) == gridX) || ((x + (w / 2)) == gridX)
       // this.highlightRuler.horizontal = (gridY == y) || ((y - (h / 2)) == gridY) || ((y + (h / 2)) == gridY)
       this._updateActiveObjectProps('bounds.left', x)

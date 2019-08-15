@@ -31,7 +31,7 @@
               <div v-if="!$slots.default">
                 <span>{{ item.label }}</span>
               </div>
-              <slot v-else name="item" :item="item"></slot>
+              <slot v-else :item="item"></slot>
               <font-awesome-icon v-if="model && item.value == model.value" :icon="['fas', 'check']"/>
             </div>
           </RecycleScroller>

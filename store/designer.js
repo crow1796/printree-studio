@@ -242,7 +242,7 @@ const state = () => ({
         angle: 0
       },
       style: {
-        fontFamily: 'Arial',
+        fontFamily: 'Lobster',
         fontWeight: 'normal',
         fontStyle: 'normal',
         textDecoration: '',
