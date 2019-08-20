@@ -104,8 +104,10 @@
   height: 100%;
 }
 
-.select-product{
-  &:hover .select-icon{
-    border-color: #a0aec0;
-  }
+.cursor-help{
+  cursor: help;
+}
+
+.parent:hover .parent\:hover\:visible{
+  @apply .visible;
 }

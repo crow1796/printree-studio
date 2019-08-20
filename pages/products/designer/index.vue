@@ -1,5 +1,6 @@
 <template>
   <div class="flex h-full w-full">
+    <AreaLoader v-if="isLoading" fullscreen/>
     <VueTailwindModal ref="availableProductsModal"
       width="80%"
       content-class="rounded-none shadow-none text-gray-600">
@@ -19,42 +20,17 @@
           </div>
         </div>
         <div class="flex modal-body" style="height: 36rem">
-          <simplebar class="h-full w-full">
-            <div class="flex flex-wrap p-4">
-              <div class="flex w-1/3 p-1">
-                <div class="select-product flex border rounded cursor-pointer select-none hover:border-gray-500">
-                  <div class="flex flex-shrink-0 w-1/3 product-thumb p-4">
-                    <img src="~/assets/images/shirtplaceholder.png"
-                      class="w-full"/>
-                  </div>
-                  <div class="flex flex-grow flex-col product-desc p-4 relative">
-                    <div class="font-bold text-lg mb-4">
-                      Premium Unisex Tee
-                    </div>
-                    <div class="flex flex-col">
-                      <div class="flex py-1 items-center">
-                        <font-awesome-icon :icon="['fas', 'tag']"/>
-                        <div class="pl-2">
-                          Sizes - XS to XL
-                        </div>
-                      </div>
-                      <div class="flex py-1 items-center">
-                        <font-awesome-icon :icon="['far', 'circle']"/>
-                        <div class="pl-2">
-                          4 Colors
-                        </div>
-                      </div>
-                    </div>
-                    <div class="absolute outline-none focus:outline-none bg-white select-icon rounded-full border w-10 flex h-10 items-center justify-center"
-                      style="right: 10px; bottom: 10px;">
-                      <font-awesome-icon :icon="['fas', 'plus']"/>
-                      <!-- <font-awesome-icon :icon="['fas', 'check']"/> -->
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </simplebar>
+          <AvailableProducts @selected="storeTmpProducts"/>
+        </div>
+        <div class="flex modal-footer justify-between p-4 border-t items-center">
+          <a href="#" class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400">
+            {{ selectedProducts.length }} Products Selected
+          </a>
+          <button type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="manageProducts">
+            CONTINUE
+          </button>
         </div>
       </div>
     </VueTailwindModal>
@@ -100,17 +76,16 @@
                 @click="showAvailableProducts">
               <font-awesome-icon :icon="['fas', 'cubes']"
                 class="mr-2 text-lg"/>
-              <span class="font-bold">ADD PRODUCTS</span>
+              <span class="font-bold">MANAGE PRODUCTS</span>
             </div>
             <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded"
               v-for="(product, index) in selectedProducts"
               :key="index"
               :class="{ 'bg-gray-100': index == currentProductIndex }"
               @click="selectProduct(index)">
-              <div class="flex">
-                <div class="w-1/5">
-                  <img :src="index == currentProductIndex ? currentVariant.placeholder : product.variants[0].placeholder"
-                    :style="{ 'background-color': index == currentProductIndex ? currentVariant.color : product.variants[0].color }">
+              <div class="flex w-full">
+                <div class="flex justify-center items-center w-1/5">
+                  <img :src="product.variants[0].printable_area[currentSide].placeholder">
                 </div>
                 <div class="flex-grow flex flex-col px-4 py-2">
                   <div class="font-bold text-gray-600" style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -129,11 +104,11 @@
                   </div>
                 </div>
               </div>
-              <div v-if="selectedProducts.length > 1"
+              <!-- <div v-if="selectedProducts.length > 1"
                 class="absolute hover:text-gray-700"
                 style="top: 15px; right: 15px;">
                 <font-awesome-icon :icon="['fas', 'trash']"/>
-              </div>
+              </div> -->
               <div class="absolute hover:text-gray-700"
                 style="top: 50px; right: 15px;"
                 v-popover="{ name: `availableVariants_${product.id}` }">
@@ -243,7 +218,7 @@
               <button type="button"
                 class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                 title="Align Horizontal Center"
-                @click="alignObject('left', (currentVariant.printable_area['front'].width / 2))"
+                @click="alignObject('left', (currentVariant.printable_area[currentSide].width / 2))"
                 v-tippy>
                 <svg width="13" height="13" viewBox="0 0 39 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="17" width="4" height="54" rx="2" fill="#718096"/>
@@ -254,7 +229,7 @@
               <button type="button"
                 class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                 title="Align Right"
-                @click="alignObject('left', (currentVariant.printable_area['front'].width) - (activeObject.bounds.width / 2))"
+                @click="alignObject('left', (currentVariant.printable_area[currentSide].width) - (activeObject.bounds.width / 2))"
                 v-tippy>
                 <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect width="4" height="54" rx="2" transform="matrix(-1 0 0 1 51 0)" fill="#718096"/>
@@ -276,7 +251,7 @@
               <button type="button"
                 class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                 title="Align Vertical Center"
-                @click="alignObject('top', (currentVariant.printable_area['front'].height / 2))"
+                @click="alignObject('top', (currentVariant.printable_area[currentSide].height / 2))"
                 v-tippy>
                 <svg width="13" height="13" viewBox="0 0 55 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="0.5" y="22.5" width="4" height="54" rx="2" transform="rotate(-90 0.5 22.5)" fill="#718096"/>
@@ -287,7 +262,7 @@
               <button type="button"
                 class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                 title="Align Bottom"
-                @click="alignObject('top', (currentVariant.printable_area['front'].height) - (activeObject.bounds.height / 2))"
+                @click="alignObject('top', (currentVariant.printable_area[currentSide].height) - (activeObject.bounds.height / 2))"
                 v-tippy>
                 <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect width="4" height="54" rx="2" transform="matrix(1.19249e-08 -1 -1 -1.19249e-08 54.5 51.5)" fill="#718096"/>
@@ -312,7 +287,7 @@
                   class="justify-center items-center mx-4 my-1 mb-0 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="To Front"
                   v-tippy
-                  @click="moveObjectPosition(currentVariant.objects.length - 1)">
+                  @click="moveObjectPosition(currentVariant.printable_area[currentSide].objects.length - 1)">
                   <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                     <rect x="11" y="11" width="32" height="32" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
@@ -322,7 +297,7 @@
                   class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Forward"
                   v-tippy
-                  @click="moveObjectPosition(activeObjectIndex < (currentVariant.objects.length - 1) ? activeObjectIndex + 1 : activeObjectIndex)">
+                  @click="moveObjectPosition(activeObjectIndex < (currentVariant.printable_area[currentSide].objects.length - 1) ? activeObjectIndex + 1 : activeObjectIndex)">
                   <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="20" y="18" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                     <rect x="1" y="1" width="36" height="36" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
@@ -355,13 +330,9 @@
           <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded shadow-xl border">
               <div class="flex p-4 pr-0">
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100">
-                  <font-awesome-icon :icon="['fas', 'sync-alt']" class="text-xs"/>
-                  <span class="ml-2 text-xs">
-                    SHOW BACK
-                  </span>
-                </button>
+                <ToggleSwitch :options="currentVariantSides"
+                  class="mx-1"
+                  @change="(option) => $store.dispatch('designer/switchSideTo', option.value)"/>
               </div>
               <div class="flex item-center p-4 pl-0">
                 <button type="button"
@@ -408,24 +379,25 @@
               <img draggable="false"
                 class="relative"
                 style="z-index: 2"
-                :src="currentVariant.placeholder">
+                :src="currentVariant.printable_area[currentSide].placeholder">
             </div>
             <div class="printable-area-surface absolute"
-              :style="{ left: `${currentVariant.printable_area['front'].left}px`, top: `${currentVariant.printable_area['front'].top}px`, width: `${currentVariant.printable_area['front'].width}px`, height: `${currentVariant.printable_area['front'].height}px`, zIndex: 2 }"
+              :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: 2 }"
               @mouseenter="printableAreaZ = 3"></div>
             <div class="printable-area absolute"
-              :style="{ left: `${currentVariant.printable_area['front'].left}px`, top: `${currentVariant.printable_area['front'].top}px`, width: `${currentVariant.printable_area['front'].width}px`, height: `${currentVariant.printable_area['front'].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
+              :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
               :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
               @mouseenter="isPrintableAreaHovered = true"
               @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
               <div class="h-full w-full z-10 relative">
-                <drr v-for="(obj, index) in currentVariant.objects"
+                <drr v-for="(obj, index) in currentVariant.printable_area[currentSide].objects"
                   :key="index"
                   :aspectRatio="obj.editorData.aspectRatio"
                   :w="obj.bounds.width || 50"
                   :h="obj.bounds.height || 50"
                   :x="obj.bounds.left || 0"
                   :y="obj.bounds.top || 0"
+                  :angle="obj.bounds.angle || 0"
                   @select="activated(obj)"
                   @deselect="deactivated(obj)"
                   @dragstop="transformStop($event, obj)"
@@ -479,7 +451,7 @@
             </div>
             <div class="printable-area-label"
               v-if="isPrintableAreaHovered"
-              :style="{ top: `${currentVariant.printable_area['front'].top + currentVariant.printable_area['front'].height + 5}px`, color: getCorrectColor(currentVariant.color) }">
+              :style="{ top: `${currentVariant.printable_area[currentSide].top + currentVariant.printable_area[currentSide].height + 5}px`, color: getCorrectColor(currentVariant.color) }">
               Printable Area
             </div>
           </div>
@@ -533,11 +505,13 @@ import panzoom from 'panzoom'
 import Tabs from '@/components/Tabs'
 import Select from '@/components/Select'
 import VueTailwindModal from '@/components/VueTailwindModal'
+import ToggleSwitch from '@/components/ToggleSwitch'
 import ArtsList from '@/components/Designer/ArtsList'
 import ColorRegulator from '~/plugins/color-regulator.js'
 import { mapGetters } from 'vuex'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
+import AvailableProducts from '@/components/Designer/AvailableProducts'
 let WebFontLoader = null
 if(process.client){
   WebFontLoader = require('webfontloader')
@@ -549,18 +523,26 @@ export default {
     Tabs,
     Select,
     VueTailwindModal,
+    ToggleSwitch,
     ArtsList,
-    vSelect
+    vSelect,
+    AvailableProducts
   },
-  created(){
+  async created(){
     WebFontLoader.load({
       google: {
         families: _.map(this.webfonts, 'value')
       }
     })
+    this.$store.commit('designer/CURRENT_DESIGN_ID', localStorage.getItem('ptree_current_design_id'))
+    this.isLoading = true
+    await this.$store.dispatch('designer/fetchDesignData', this.currentDesignId)
+    this.isLoading = false
   },
   data(){
     return {
+      isLoading: false,
+      tmpProducts: [],
       arrowKeysTimeout: null,
       isPrintableAreaHovered: false,
       canvasScale: 1.0,
@@ -590,11 +572,16 @@ export default {
       currentProductIndex: 'designer/currentProductIndex',
       currentVariantIndex: 'designer/currentVariantIndex',
       fontSizes: 'designer/fontSizes',
-      webfonts: 'designer/webfonts'
+      webfonts: 'designer/webfonts',
+      currentSide: 'designer/currentSide',
+      currentDesignId: 'designer/currentDesignId'
     }),
     activeObjectCanBeColored(){
       if(!this.activeObject) return false
       return _.includes(['text', 'svg'], this.activeObject.type)
+    },
+    currentVariantSides(){
+      return _.map(_.keys(this.currentVariant.printable_area), (key) => ({ label: key.toUpperCase(), value: key}))
     }
   },
   mounted(){
@@ -686,6 +673,21 @@ export default {
     })
   },
   methods: {
+    storeTmpProducts(products){
+      this.tmpProducts = products
+    },
+    manageProducts(){
+      let selectedProductIds = _.map(this.selectedProducts, 'product_id')
+      _.map(this.tmpProducts, (product) => {
+        if(_.includes(selectedProductIds, product.id)){
+          let index = _.indexOf(selectedProductIds, product.id)
+          product = JSON.parse(JSON.stringify(this.selectedProducts[index]))
+          return
+        }
+      })
+      this.$store.dispatch('designer/setSelectedProducts', this.tmpProducts)
+      this.$refs.availableProductsModal.hide()
+    },
     alignObject(pos, val){
       if(!this.activeObject) return
       this._updateActiveObjectProps(`bounds.${pos}`, val)
@@ -697,12 +699,12 @@ export default {
         obj: this.activeObject,
         newIndex
       })
-      this.currentVariant.objects = JSON.parse(JSON.stringify(newObjects))
+      this.currentVariant.printable_area[this.currentSide].objects = JSON.parse(JSON.stringify(newObjects))
     },
     async duplicate(){
       if(!this.activeObject) return
       let newObject = await this.$store.dispatch('designer/duplicate', JSON.parse(JSON.stringify(this.activeObject)))
-      this.currentVariant.objects.push(newObject)
+      this.currentVariant.printable_area[this.currentSide].objects.push(newObject)
       this.activated(newObject)
       this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
     },
@@ -736,7 +738,7 @@ export default {
         return
       }
       let newVariant = await this.$store.dispatch('designer/addVariant', variant)
-      this.currentProduct.variants.push(newVariant)
+      this.currentProduct.variants.push(JSON.parse(JSON.stringify(newVariant)))
       this.selectVariant((this.currentProduct.variants.length - 1), this.currentProductIndex)
     },
     zoomTo(scale){
@@ -763,20 +765,19 @@ export default {
         let i = new Image()
         i.onload = () => {
           let ratio = 0
-          if(i.width > this.currentVariant.printable_area['front'].width){
-            ratio = this.currentVariant.printable_area['front'].width / i.width
+          if(i.width > this.currentVariant.printable_area[this.currentSide].width){
+            ratio = this.currentVariant.printable_area[this.currentSide].width / i.width
             newObject.bounds.width = i.width * ratio
             newObject.bounds.height = i.height * ratio
           }
-          if(newObject.bounds.height > this.currentVariant.printable_area['front'].height){
-            ratio = this.currentVariant.printable_area['front'].height / i.height
+          if(newObject.bounds.height > this.currentVariant.printable_area[this.currentSide].height){
+            ratio = this.currentVariant.printable_area[this.currentSide].height / i.height
             newObject.bounds.width = i.width * ratio
             newObject.bounds.height = i.height * ratio
           }
-
           newObject.bounds.left = (newObject.bounds.width / 2) || 20
           newObject.bounds.top = (newObject.bounds.height / 2) || 20
-          this.currentVariant.objects.push(newObject)
+          this.currentVariant.printable_area[this.currentSide].objects.push(newObject)
           this.activated(newObject)
           this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
         }
@@ -794,13 +795,13 @@ export default {
         newObject.bounds.width = el.offsetWidth
         newObject.bounds.height = el.offsetHeight
         let ratio = 0
-        if(el.offsetWidth > this.currentVariant.printable_area['front'].width){
-          ratio = this.currentVariant.printable_area['front'].width / el.offsetWidth
+        if(el.offsetWidth > this.currentVariant.printable_area[this.currentSide].width){
+          ratio = this.currentVariant.printable_area[this.currentSide].width / el.offsetWidth
           newObject.bounds.width = el.offsetWidth * ratio
           newObject.bounds.height = el.offsetHeight * ratio
         }
-        if(newObject.bounds.height > this.currentVariant.printable_area['front'].height){
-          ratio = this.currentVariant.printable_area['front'].height / el.offsetHeight
+        if(newObject.bounds.height > this.currentVariant.printable_area[this.currentSide].height){
+          ratio = this.currentVariant.printable_area[this.currentSide].height / el.offsetHeight
           newObject.bounds.width = el.offsetWidth * ratio
           newObject.bounds.height = el.offsetHeight * ratio
         }
@@ -811,13 +812,13 @@ export default {
         document.body.removeChild(el)
         el = null
       }
-      this.currentVariant.objects.push(newObject)
+      this.currentVariant.printable_area[this.currentSide].objects.push(newObject)
       this.activated(newObject)
       this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
     },
     async removeObject(obj){
       let index = await this.$store.dispatch('designer/removeObject', obj)
-      this.currentVariant.objects.splice(index, 1)
+      this.currentVariant.printable_area[this.currentSide].objects.splice(index, 1)
       this.activeObject = null
     },
     hasTextDecoration(decoration){
@@ -886,8 +887,8 @@ export default {
     },
     activated(obj){
       this.activeObject = obj
-      this.activeObjectIndex = _.findIndex(this.currentVariant.objects, { id: obj.id })
-      _.map(this.currentVariant.objects, (ob) => {
+      this.activeObjectIndex = _.findIndex(this.currentVariant.printable_area[this.currentSide].objects, { id: obj.id })
+      _.map(this.currentVariant.printable_area[this.currentSide].objects, (ob) => {
         this._updateActiveObjectProps('editorData.isActive', false, ob)
       })
       this._updateActiveObjectProps('editorData.isActive', true)
@@ -906,19 +907,19 @@ export default {
       this._updateActiveObjectProps('editorData.isActive', false)
     },
     transforming({x, y, w, h, angle}, obj){
-      // let gridX = (this.currentVariant.printable_area['front'].width / 2) - (w / 2)
-      // let gridY = (this.currentVariant.printable_area['front'].height / 2) - (h / 2)
+      // let gridX = (this.currentVariant.printable_area[currentSide].width / 2) - (w / 2)
+      // let gridY = (this.currentVariant.printable_area[currentSide].height / 2) - (h / 2)
       // this.highlightRuler.vertical = (gridX == x) || ((x - (w / 2)) == gridX) || ((x + (w / 2)) == gridX)
       // this.highlightRuler.horizontal = (gridY == y) || ((y - (h / 2)) == gridY) || ((y + (h / 2)) == gridY)
+      this.isMoving = true
+    },
+    transformStop({x, y, w, h, angle}, obj){
       this._updateActiveObjectProps('bounds.left', x)
       this._updateActiveObjectProps('bounds.top', y)
       this._updateActiveObjectProps('bounds.width', w)
       this._updateActiveObjectProps('bounds.height', h)
       this._updateActiveObjectProps('bounds.angle', angle)
       this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
-      this.isMoving = true
-    },
-    transformStop(e, obj){
       this.isMoving = false
     },
     setColorTo(color){
@@ -933,6 +934,7 @@ export default {
       immediate: true,
       handler(to){
         this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[to]))
+        this.currentVariant = this.currentProduct.variants[0]
         this.deactivated()
         this.activeObject = null
         this.activeObjectIndex = null

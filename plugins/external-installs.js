@@ -6,8 +6,10 @@ import 'simplebar/dist/simplebar.min.css'
 import VueLazyload from 'vue-lazyload'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
+import AreaLoader from '@/components/AreaLoader'
 
 Vue.component('simplebar', simplebar)
+Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
 Vue.use(VueVirtualScroller)
 Vue.use(VueLazyload, {
