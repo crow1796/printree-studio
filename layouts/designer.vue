@@ -13,7 +13,7 @@
           </span>
           &nbsp;
           <span class="parent text-gray-600 cursor-pointer hover:underline hover:text-gray-700">
-            Product Name
+            Design Name
             <span class="text-xs ml-1 parent:hover:visible invisible">
               <font-awesome-icon :icon="['fas', 'edit']"/>
             </span>

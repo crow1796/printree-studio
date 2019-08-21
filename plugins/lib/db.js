@@ -9,18 +9,23 @@ export default {
       const availableVariants = await Promise.all(_.map(product.available_variants, async (variantRef) => {
         let variantSnap = await variantRef.get()
         let variant = variantSnap.data()
+        let printableArea = JSON.parse(JSON.stringify(variant.printable_area))
+        _.map(_.keys(printableArea), (key) => printableArea[key].objects = [])
         return JSON.parse(JSON.stringify({
           id: variantSnap.id,
           base_cost: variant.base_cost,
           color: variant.color,
-          printable_area: variant.printable_area,
+          printable_area: printableArea,
           sizes: variant.sizes
         }))
       }))
       return JSON.parse(JSON.stringify({
         id: doc.id,
         name: product.name,
-        availableVariants
+        availableVariants,
+        variants: [
+          JSON.parse(JSON.stringify(availableVariants[0]))
+        ]
       }))
     })))
     return products
@@ -37,13 +42,21 @@ export default {
     design.name = designSnap.data().name
     const products = await Promise.all(_.map(designSnap.data().products, async (productRef) => {
       let productSnap = await productRef.product.get()
-      const variants = await Promise.all(_.map(productRef.variants, async (variantRef) => {
+      const availableVariants = await Promise.all(_.map(productSnap.data().available_variants, async (variantRef) => {
         let variantSnap = await variantRef.get()
+        let variant = variantSnap.data()
+        return JSON.parse(JSON.stringify({
+          id: variantSnap.id,
+          base_cost: variant.base_cost,
+          color: variant.color,
+          printable_area: variant.printable_area,
+          sizes: variant.sizes
+        }))
+      }))
+      const variants = await Promise.all(_.map(productRef.variants, async (variantRef) => {
+        let variantSnap = await variantRef.variant.get()
         let printableArea = variantSnap.data().printable_area
-        _.map(printableArea, (side) => {
-          // TODO: Get objects
-          // Printable area (front,back, etc.)
-        })
+        _.map(_.keys(printableArea), (key) => printableArea[key].objects = variantRef.objects[key])
         return {
           id: variantSnap.id,
           base_cost: variantSnap.data().base_cost,
@@ -55,11 +68,11 @@ export default {
       return {
         id: productSnap.id,
         name: productSnap.data().name,
+        availableVariants,
         variants
       }
     }))
     design.products = products
-    console.log(design)
     return design
   }
 }

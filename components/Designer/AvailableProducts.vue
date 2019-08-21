@@ -9,8 +9,8 @@
         <div class="select-product flex border flex-grow rounded cursor-pointer select-none"
           :class="{ 'border-primary hover:border-primary-lighter': _hasBeenSelected(product), 'hover:border-gray-500': !_hasBeenSelected(product) }">
           <div class="flex w-1/3 product-thumb p-4 items-center justify-center">
-            <img v-lazy="_firstVariantPlaceholderOf(product)"
-              class="w-full thumbnail"/>
+            <img :src="_firstVariantPlaceholderOf(product)"
+              class="w-full"/>
           </div>
           <div class="flex flex-grow flex-col product-desc p-4 relative"
             :class="{ 'text-primary hover:text-primary-lighter': _hasBeenSelected(product) }">
@@ -71,15 +71,12 @@ export default {
     toggleProduct(product){
       if(this._hasBeenSelected(product)){
         if(this.tmpProducts.length == 1) return
-        let index = _.findIndex(this.tmpProducts, { product_id: product.id })
+        let index = _.findIndex(this.tmpProducts, { id: product.id })
         this.tmpProducts.splice(index, 1)
         this.$emit('selected', this.tmpProducts)
         return
       }
       product = JSON.parse(JSON.stringify(product))
-      product.product_id = product.id
-      let id = '_' + Math.random().toString(36).substr(2, 9)
-      product.id = id
       this.tmpProducts.push(product)
       this.$emit('selected', this.tmpProducts)
     },
@@ -94,14 +91,14 @@ export default {
       return sizeNames.join(', ')
     },
     _hasBeenSelected(product){
-      return _.find(this.tmpProducts, { product_id: product.id })
+      return _.find(this.tmpProducts, { id: product.id })
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-  .thumbnail[lazy="loading"]{
+  .thumbnail:not([lazy="loaded"]){
     width: 16px;
     height: 16px;
   }

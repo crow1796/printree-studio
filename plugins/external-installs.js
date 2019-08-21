@@ -13,7 +13,7 @@ Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
 Vue.use(VueVirtualScroller)
 Vue.use(VueLazyload, {
-  preLoad: 1.3,
+  preLoad: 1,
   error: require('~/assets/images/logo.png'),
   loading: require('~/assets/images/loader.gif'),
   attempt: 1

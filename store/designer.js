@@ -12,52 +12,6 @@ const state = () => ({
       name: 'Classic Tee',
       availableVariants: [
         {
-          id: 1,
-          printable_area: {
-            front: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            },
-            back: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
-              left: 175,
-              top: 60,
-              width: 175,
-              height: 420,
-              objects: []
-            }
-          },
-          base_cost: null,
-          color: '#FEFEFE'
-        },
-        {
-          id: 2,
-          printable_area: {
-            front: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            },
-            back: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            }
-          },
-          base_cost: null,
-          color: '#012F56'
-        },
-        {
           id: 3,
           printable_area: {
             front: {
@@ -618,7 +572,6 @@ const actions = {
   },
   async fetchDesignData(context, id){
     const design = await db.getDesign(id)
-    console.log(design.products)
     context.commit('SELECTED_PRODUCTS', design.products)
   }
 }
