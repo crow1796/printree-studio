@@ -76,3 +76,38 @@
     bottom: 0;
   }
 }
+
+.bottom-actions{
+  width: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+}
+
+.bottom-tips{
+  right: 50px;
+  bottom: 100px;
+
+  .tips-list{
+    list-style: outside;
+    margin-left: 20px;
+  }
+}
+
+.left-actions{
+  left: 20px;
+  top: 100px;
+}
+
+.svg-object > svg{
+  width: 100%;
+  height: 100%;
+}
+
+.cursor-help{
+  cursor: help;
+}
+
+.parent:hover .parent\:hover\:visible{
+  @apply .visible;
+}

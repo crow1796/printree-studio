@@ -9,7 +9,14 @@
         </div>
         <div class="flex w-1/3 justify-center items-center font-bold">
           <span class="text-gray-600 uppercase">
-            Designer
+            Studio /
+          </span>
+          &nbsp;
+          <span class="parent text-gray-600 cursor-pointer hover:underline hover:text-gray-700">
+            Design Name
+            <span class="text-xs ml-1 parent:hover:visible invisible">
+              <font-awesome-icon :icon="['fas', 'edit']"/>
+            </span>
           </span>
         </div>
         <div class="flex w-1/3 items-center justify-end">

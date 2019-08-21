@@ -1,116 +1,85 @@
-import ColorRegulator from '~/plugins/color-regulator.js'
+import ColorRegulator from '~/plugins/color-regulator'
+import db from '~/plugins/lib/db'
 
 const state = () => ({
+  currentSide: 'front',
+  currentDesignId: null,
+  availableProducts: [],
   selectedProducts: [
     {
       id: 1,
+      product_id: 1,
       name: 'Classic Tee',
       availableVariants: [
         {
-          id: null,
+          id: 3,
           printable_area: {
             front: {
-              left: 170,
+              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
+              left: 160,
               top: 105,
-              width: 190,
-              height: 280
+              width: 200,
+              height: 280,
+              objects: []
             },
             back: {
-              left: 170,
+              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
+              left: 160,
               top: 105,
-              width: 190,
-              height: 280
+              width: 200,
+              height: 280,
+              objects: []
             }
           },
           base_cost: null,
-          color: '#FEFEFE',
-          placeholder: require('~/assets/images/shirtplaceholder.png'),
-          objects: []
+          color: '#FE8474'
         },
         {
-          id: null,
+          id: 4,
           printable_area: {
             front: {
-              left: 170,
+              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
+              left: 160,
               top: 105,
-              width: 190,
-              height: 280
+              width: 200,
+              height: 280,
+              objects: []
             },
             back: {
-              left: 170,
+              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
+              left: 160,
               top: 105,
-              width: 190,
-              height: 280
+              width: 200,
+              height: 280,
+              objects: []
             }
           },
           base_cost: null,
-          color: '#012F56',
-          placeholder: require('~/assets/images/shirtplaceholder.png'),
-          objects: []
-        },
-        {
-          id: null,
-          printable_area: {
-            front: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
-            },
-            back: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
-            }
-          },
-          base_cost: null,
-          color: '#FE8474',
-          placeholder: require('~/assets/images/shirtplaceholder.png'),
-          objects: []
-        },
-        {
-          id: null,
-          printable_area: {
-            front: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
-            },
-            back: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
-            }
-          },
-          base_cost: null,
-          color: '#3A5DAB',
-          placeholder: require('~/assets/images/shirtplaceholder.png'),
-          objects: []
+          color: '#3A5DAB'
         }
       ],
       variants: [
         {
           printable_area: {
             front: {
-              left: 170,
+              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
+              left: 160,
               top: 105,
-              width: 190,
-              height: 280
+              width: 200,
+              height: 280,
+              objects: []
             },
             back: {
-              left: 170,
-              top: 105,
-              width: 190,
-              height: 280
+              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
+              left: 175,
+              top: 60,
+              width: 175,
+              height: 420,
+              objects: []
             }
           },
           base_cost: 499,
-          color: '#FEFEFE',
-          placeholder: require('~/assets/images/shirtplaceholder.png'),
-          objects: []
+          color: '#FEFEFE'
         }
       ]
     }
@@ -125,11 +94,10 @@ const state = () => ({
         top: 0,
         width: 80,
         height: 20,
-        zIndex: 0,
         angle: 0
       },
       style: {
-        fontFamily: 'Arial',
+        fontFamily: 'Lobster',
         fontWeight: 'normal',
         fontStyle: 'normal',
         textDecoration: '',
@@ -157,7 +125,6 @@ const state = () => ({
         top: 0,
         width: 40,
         height: 40,
-        zIndex: 1,
         angle: 0
       },
       style: {
@@ -181,7 +148,6 @@ const state = () => ({
         top: 0,
         width: 40,
         height: 40,
-        zIndex: 1,
         angle: 0
       },
       style: {},
@@ -327,63 +293,63 @@ const state = () => ({
   ],
   fontSizes: [
     {
-      label: '9',
+      label: '9px',
       value: '9px'
     },
     {
-      label: '10',
+      label: '10px',
       value: '10px'
     },
     {
-      label: '11',
+      label: '11px',
       value: '11px'
     },
     {
-      label: '12',
+      label: '12px',
       value: '12px'
     },
     {
-      label: '13',
+      label: '13px',
       value: '13px'
     },
     {
-      label: '14',
+      label: '14px',
       value: '14px'
     },
     {
-      label: '18',
+      label: '18px',
       value: '18px'
     },
     {
-      label: '24',
+      label: '24px',
       value: '24px'
     },
     {
-      label: '36',
+      label: '36px',
       value: '36px'
     },
     {
-      label: '48',
+      label: '48px',
       value: '48px'
     },
     {
-      label: '64',
+      label: '64px',
       value: '64px'
     },
     {
-      label: '72',
+      label: '72px',
       value: '72px'
     },
     {
-      label: '96',
+      label: '96px',
       value: '96px'
     },
     {
-      label: '144',
+      label: '144px',
       value: '144px'
     },
     {
-      label: '288',
+      label: '288px',
       value: '288px'
     }
   ],
@@ -445,6 +411,15 @@ const getters = {
   },
   arts(state){
     return state.arts
+  },
+  currentSide(state){
+    return state.currentSide
+  },
+  availableProducts(state){
+    return state.availableProducts
+  },
+  currentDesignId(state){
+    return state.currentDesignId
   }
 }
 
@@ -459,24 +434,24 @@ const mutations = {
     state.currentVariantIndex = index
   },
   OBJECT_PROPERTIES(state, data){
-    let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].objects, { id: data.id })
-    _.set(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].objects[objectIndex], data.path, data.value)
+    let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].printable_area[state.currentSide].objects, { id: data.id })
+    _.set(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].printable_area[state.currentSide].objects[objectIndex], data.path, data.value)
   },
   ADD_OBJECT(state, obj){
     _.map(state.selectedProducts[state.currentProductIndex].variants, (variant) => {
       obj = JSON.parse(JSON.stringify(obj))
       obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
-      variant.objects.push(obj)
+      variant.printable_area[state.currentSide].objects.push(obj)
     })
   },
   REMOVE_OBJECT_BY_INDEX(state, index) {
     _.map(state.selectedProducts[state.currentProductIndex].variants, (variant) => {
-      variant.objects.splice(index, 1)
+      variant.printable_area[state.currentSide].objects.splice(index, 1)
     })
   },
   OBJECT_FROM_VARIANT_INDEX(state, {index, obj}){
-    let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[index].objects, { id: obj.id })
-    state.selectedProducts[state.currentProductIndex].variants[index].objects[objectIndex] = obj
+    let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[index].printable_area[state.currentSide].objects, { id: obj.id })
+    state.selectedProducts[state.currentProductIndex].variants[index].printable_area[state.currentSide].objects[objectIndex] = obj
   },
   ADD_VARIANT(state, variant){
     state.selectedProducts[state.currentProductIndex].variants.push(variant)
@@ -486,23 +461,38 @@ const mutations = {
   },
   WEBFONTS(state, webfonts){
     state.webfonts = webfonts
+  },
+  SWAP_OBJECT_INDEX(state, { currentIndex, newIndex }){
+    let variant = state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex]
+    let tmp = variant.printable_area[state.currentSide].objects[currentIndex];
+    variant.printable_area[state.currentSide].objects[currentIndex] = variant.printable_area[state.currentSide].objects[newIndex];
+    variant.printable_area[state.currentSide].objects[newIndex] = tmp
+  },
+  CURRENT_SIDE(state, side){
+    state.currentSide = side
+  },
+  AVAILABLE_PRODUCTS(state, products){
+    state.availableProducts = products
+  },
+  ADD_AVAILABLE_PRODUCT(state, product){
+    state.availableProducts.push(product)
+  },
+  CURRENT_DESIGN_ID(state, id){
+    state.currentDesignId = id
   }
 }
 
 const actions = {
-  addSelectedProduct(context, product){
-    let selectedProducts = JSON.parse(JSON.stringify(context.state.selectedProducts))
-    selectedProducts.push(product)
-    context.commit('SELECTED_PRODUCTS', selectedProducts)
-  },
   addVariant(context, variant){
     let id = '_' + Math.random().toString(36).substr(2, 9)
     variant = {
       ...variant,
       id,
-      objects: JSON.parse(JSON.stringify(context.state.selectedProducts[context.state.currentProductIndex].variants[0].objects))
+      printable_area: JSON.parse(JSON.stringify(context.state.selectedProducts[context.state.currentProductIndex].variants[0].printable_area))
     }
-    _.map(variant.objects, (obj) => obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' }))
+    _.map(variant.printable_area, (area) => {
+      _.map(area.objects, (obj) => obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' }))
+    })
     context.commit('ADD_VARIANT', variant)
     return variant
   },
@@ -514,24 +504,25 @@ const actions = {
   addObject(context, {type, value}){
     let id = '_' + Math.random().toString(36).substr(2, 9)
     let obj = JSON.parse(JSON.stringify(context.getters.objectBoilerplates[type]))
+    let variant = context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex]
     obj.id = id
     obj.value = value
     obj.bounds.left = obj.bounds.width / 2
     obj.bounds.top = obj.bounds.height / 2
-    obj.style.color = ColorRegulator.getContrastOf(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].color, { dark: '#012F56', light: '#FEFEFE' })
+    obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
+    obj.style.color = ColorRegulator.getContrastOf(variant.color, { dark: '#012F56', light: '#FEFEFE' })
     context.commit('ADD_OBJECT', obj)
     return obj
   },
   removeObject(context, obj){
-    let index = _.findIndex(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].objects, { id: obj.id })
+    let index = _.findIndex(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].printable_area[context.getters.currentSide].objects, { id: obj.id })
     if(index === -1) return
     context.commit('REMOVE_OBJECT_BY_INDEX', index)
     return index
   },
   copyPropsToAllVariantsFrom(context, obj){
     _.map(context.state.selectedProducts[context.state.currentProductIndex].variants, (variant, i) => {
-      if(i == context.state.currentVariantIndex) return
-      _.map(variant.objects, (ob) => {
+      _.map(variant.printable_area[context.getters.currentSide].objects, (ob) => {
         if (ob.id == obj.id) context.commit('OBJECT_FROM_VARIANT_INDEX', {
           obj: JSON.parse(JSON.stringify({
             ...obj,
@@ -546,6 +537,42 @@ const actions = {
           })), index: i})
       })
     })
+  },
+  duplicate(context, obj){
+    let id = '_' + Math.random().toString(36).substr(2, 9)
+    let newObject = {
+      ...obj,
+      id
+    }
+    context.commit('ADD_OBJECT', newObject)
+    return newObject
+  },
+  moveObjectPosition(context, { obj, newIndex }){
+    let currentIndex = _.findIndex(context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].printable_area[context.getters.currentSide].objects, { id: obj.id })
+    context.commit('SWAP_OBJECT_INDEX', { currentIndex, newIndex })
+    return context.state.selectedProducts[context.state.currentProductIndex].variants[context.state.currentVariantIndex].printable_area[context.getters.currentSide].objects
+  },
+  switchSideTo(context, side){
+    if(side == context.getters.currentSide) return
+    context.commit('CURRENT_SIDE', side)
+  },
+  setSelectedProducts(context, products){
+    _.map(products, (product) => {
+      if(!product.product_id){
+        product.product_id = product.id
+        product.id = '_' + Math.random().toString(36).substr(2, 9)
+      }
+    })
+    context.commit('SELECTED_PRODUCTS', products)
+  },
+  async fetchAvailableProducts(context, data){
+    const products = await db.fetchAvailableProducts()
+    context.commit('AVAILABLE_PRODUCTS', products)
+    return products
+  },
+  async fetchDesignData(context, id){
+    const design = await db.getDesign(id)
+    context.commit('SELECTED_PRODUCTS', design.products)
   }
 }
 

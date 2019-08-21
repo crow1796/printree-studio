@@ -32,6 +32,7 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~/plugins/firebase.js',
     '~/plugins/external-installs.js'
   ],
   /*
@@ -59,7 +60,8 @@ module.exports = {
     }],
     ['nuxt-env', {
       keys: [
-        { key: 'GOOGLE_API', default: null }
+        { key: 'GOOGLE_API', default: null },
+        { key: 'FIREBASE_DB', default: 'printree-52ca8' }
       ]
     }]
   ],
