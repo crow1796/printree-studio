@@ -1,12 +1,13 @@
 <template>
-    <div class="fixed inset-0 z-50 overflow-auto bg-smoke-light flex"
+    <div class="fixed inset-0 z-50 overflow-hidden bg-smoke-light flex"
         v-if="isShown"
-        @click="hide">
+        @click="() => backdrop ? hide() : makeBounce()">
         <transition name="slide"
             enter-active-class="slideInDown"
             leave-active-class="slideOutUp">
-            <div class="relative bg-white m-auto flex-col flex rounded shadow" @click.stop v-if="isContentShown"
-                :class="contentClass"
+            <div class="relative bg-white m-auto flex-col flex rounded shadow overflow-hidden"
+              @click.stop v-if="isContentShown"
+                :class="[{ '-bounce': bounce },contentClass]"
                 :style="{ 'width': width }">
                 <slot/>
             </div>
@@ -16,34 +17,60 @@
 
 <script>
 export default {
-    props: {
-        contentClass: {
-            default: 'p-4'
-        },
-        width: {
-            default: '50%'
-        }
+  props: {
+    contentClass: {
+      default: 'p-4'
     },
-    data(){
-        return {
-            isShown: false,
-            isContentShown: false
-        }
+    width: {
+      default: '50%'
     },
-    methods: {
-        show(){
-            this.isShown = true
-            setTimeout(() => {
-                this.isContentShown = true
-            }, 300)
-        },
-        hide(){
-            this.isContentShown = false
-            setTimeout(() => {
-                this.isShown = false
-            }, 300)
-        }
+    backdrop: {
+      type: Boolean,
+      default: true
     }
+  },
+  data(){
+    return {
+      isShown: false,
+      isContentShown: false,
+      bounce: false,
+      bounceTimeout: null
+    }
+  },
+  methods: {
+    makeBounce(){
+      clearTimeout(this.bounceTimeout)
+      this.bounce = true
+      this.bounceTimeout = setTimeout(() => {
+        this.bounce = false
+      }, 300)
+    },
+    show(){
+      this.isShown = true
+      setTimeout(() => {
+          this.isContentShown = true
+      }, 300)
+    },
+    hide(){
+      this.isContentShown = false
+      setTimeout(() => {
+          this.isShown = false
+      }, 300)
+    }
+  }
 }
 </script>
 
+<style lang="scss" scoped>
+.-bounce{
+  animation: bounce .5s ease;
+}
+
+@keyframes bounce {
+  0% { transform: scale(1) rotateZ(0deg); }
+  50% { transform: scale(1.02) rotateZ(1deg); }
+  60% { transform: scale(0.99) rotateZ(-1deg); }
+  80% { transform: scale(1.01) rotateZ(1deg); }
+  100% { transform: scale(1) rotateZ(0deg); }
+}
+</style>

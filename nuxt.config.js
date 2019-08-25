@@ -33,6 +33,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/firebase.js',
+    '~/plugins/check_user.js',
     '~/plugins/external-installs.js'
   ],
   /*
@@ -63,8 +64,17 @@ module.exports = {
         { key: 'GOOGLE_API', default: null },
         { key: 'FIREBASE_DB', default: 'printree-52ca8' }
       ]
-    }]
+    }],
+    '@nuxtjs/universal-storage'
   ],
+  storage: {
+    cookie: {
+      prefix: 'printree:'
+    },
+    localStorage: {
+      prefix: 'printree:'
+    }
+  },
   /*
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options

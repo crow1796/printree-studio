@@ -8,11 +8,14 @@
             class="w-10">
         </div>
         <div class="flex w-1/2 items-center justify-end">
-          <a href="#" class="text-blue-400 mx-4 hover:text-blue-600 font-bold">
+          <a href="#"
+            class="text-blue-400 mx-4 hover:text-blue-600 font-bold">
             SHOP
           </a>
-          <a href="#" class="text-blue-400 mx-4 hover:text-blue-600 font-bold">
-            LOGIN
+          <a href="#"
+            class="text-blue-400 mx-4 hover:text-blue-600 font-bold"
+            @click.prevent="signOut">
+            {{ isLoggedIn ? 'LOGOUT' : 'LOGIN' }}
           </a>
           <div class="w-4"></div>
         </div>
@@ -23,3 +26,24 @@
     </div>
   </div>
 </template>
+
+<script>
+import { mapGetters } from 'vuex'
+
+export default {
+  head: {
+    title: 'Printree'
+  },
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'user/isLoggedIn',
+      user: 'user/user'
+    })
+  },
+  methods: {
+    signOut(){
+      this.$store.dispatch('user/signOut')
+    }
+  }
+}
+</script>
