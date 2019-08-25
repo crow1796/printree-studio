@@ -19,19 +19,23 @@
           </div>
         </div>
         <div class="flex modal-body flex-grow h-full">
-          <!-- <AvailableProducts @selected="storeTmpProducts"/> -->
+          <AvailableProducts @selected="storeTmpProducts"/>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <a href="#" class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400">
-            4 Products Selected
+            {{ tmpSelectedProducts.length || 'No' }} Products Selected
           </a>
           <button type="button"
-            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter">
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="createNewDesign">
             CONTINUE
           </button>
         </div>
       </div>
     </VueTailwindModal>
+    <AuthModal ref="authModal"
+      @login-success="createNewDesign"/>
+    <AreaLoader v-if="isLoading" fullscreen/>
     <div class="hero flex relative w-full">
       <div id="screen" class="z-10 overflow-hidden "></div>
       <div class="flex z-20 relative mt-32 w-3/5 pl-32 flex-col">
@@ -46,7 +50,7 @@
         <div class="flex mt-5">
           <button type="button"
             class="shadow-xl border border-white bg-primary px-8 py-4 font-bold rounded text-white hover:bg-primary-lighter"
-            @click="$refs.availableProductsModal.show()">
+            @click="showAvailableProducts">
             START DESIGNING
           </button>
         </div>
@@ -67,11 +71,27 @@
 <script>
 import VueTailwindModal from '@/components/VueTailwindModal'
 import AvailableProducts from '@/components/Designer/AvailableProducts'
+import AuthModal from '@/components/Auth/AuthModal'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
     VueTailwindModal,
-    AvailableProducts
+    AvailableProducts,
+    AuthModal
+  },
+  data(){
+    return {
+      isLoading: false,
+      tmpSelectedProducts: []
+    }
+  },
+  computed: {
+    ...mapGetters({
+      isLoggedIn: 'user/isLoggedIn',
+      user: 'user/user',
+      designMeta: 'designer/designMeta'
+    })
   },
   mounted(){
     let minBoxSize = 63
@@ -99,6 +119,36 @@ export default {
         boxContainer.appendChild(box)
         screenEl.appendChild(boxContainer)
         boxCount++
+    }
+  },
+  methods: {
+    async showAvailableProducts(){
+      if(this.$storage.getLocalStorage('current_design_id')){
+        this.isLoading = true
+        const design = await this.$store.dispatch('designer/fetchDesignData', this.$storage.getLocalStorage('current_design_id'))
+        if(design.user_id == this.user.uid) return this.$router.push('/products/designer')
+      }
+      this.isLoading = false
+      this.$refs.availableProductsModal.show()
+    },
+    storeTmpProducts(products){
+      this.tmpSelectedProducts = products
+    },
+    async createNewDesign(){
+      if(!this.tmpSelectedProducts.length) return
+      if(!this.isLoggedIn){
+        this.$refs.authModal.show()
+        return
+      }
+      this.$refs.authModal.hide()
+      this.isLoading = true
+      let design = await this.$store.dispatch('designer/createNewDesign', {
+        user: this.user,
+        products: this.tmpSelectedProducts
+      })
+      this.tmpSelectedProducts = []
+      this.$storage.setLocalStorage('current_design_id', design.id)
+      this.$router.push('/products/designer')
     }
   }
 }

@@ -1,7 +1,7 @@
 import { fireDb } from '~/plugins/firebase'
 
 export default {
-  async fetchAvailableProducts(){
+  async fetchAvailableProducts() {
     const productsRef = await fireDb.collection('available_products')
     let productsSnap = await productsRef.get()
     const products = await Promise.all(_.map(productsSnap.docs, (async (doc) => {
@@ -30,16 +30,18 @@ export default {
     })))
     return products
   },
-  async getDesign(id){
+  async getDesign(id) {
     let design = {
       id: null,
       name: null,
+      user_id: null,
       products: []
     }
     const designRef = await fireDb.collection('user_designs').doc(id)
     let designSnap = await designRef.get()
     design.id = designSnap.id
     design.name = designSnap.data().name
+    design.user_id = designSnap.data().user_id
     const products = await Promise.all(_.map(designSnap.data().products, async (productRef) => {
       let productSnap = await productRef.product.get()
       const availableVariants = await Promise.all(_.map(productSnap.data().available_variants, async (variantRef) => {
@@ -74,5 +76,31 @@ export default {
     }))
     design.products = products
     return design
+  },
+  async createDesignFor(user, products){
+    let design = {
+      name: 'Untitled Design',
+      user_id: user.uid,
+      products: _.map(products, (product) => {
+        let objects = {}
+        _.map(product.availableVariants[0].printable_area, (v, k) => {
+          objects[k] = []
+        })
+        return {
+          product: fireDb.collection('available_products').doc(product.id),
+          variants: [
+            {
+              objects,
+              variant: fireDb.collection('product_variants').doc(product.availableVariants[0].id)
+            }
+          ]
+        }
+      })
+    }
+    let designRef = await fireDb.collection('user_designs').add(design)
+    return {
+      ...design,
+      id: designRef.id
+    }
   }
 }

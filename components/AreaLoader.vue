@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full top-0 left-0 h-full bg-white z-20 items-center justify-center flex"
+  <div class="w-full top-0 left-0 h-full bg-white z-50 items-center justify-center flex"
     :class="{ 'absolute': !fullscreen, 'fixed': fullscreen }">
     <div class="flex">
       <svg class="lds-blocks" width="80px"  height="80px"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="background: none;"><rect x="19" y="19" width="20" height="20" fill="#e1274e">

@@ -7,7 +7,9 @@ import VueLazyload from 'vue-lazyload'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AreaLoader from '@/components/AreaLoader'
+import VeeValidate from 'vee-validate'
 
+Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
 Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
@@ -26,9 +28,11 @@ if (process.client) {
   const vue2Dropzone = require('vue2-dropzone')
   const Popover = require('vue-js-popover').default
   require('vue2-dropzone/dist/vue2Dropzone.min.css')
+  const ToggleButton = require('vue-js-toggle-button').default
 
   Vue.component('vue-dropzone', vue2Dropzone)
   Vue.component('drr', drr)
+  Vue.use(ToggleButton)
   Vue.use(Popover)
   Vue.use(vClickOutside)
   Vue.use(VueKonva)

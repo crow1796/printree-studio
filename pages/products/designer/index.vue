@@ -4,7 +4,7 @@
     <div class="flex h-full w-full" v-else>
       <VueTailwindModal ref="availableProductsModal"
         width="80%"
-        content-class="rounded-none shadow-none text-gray-600">
+        content-class="text-gray-600">
         <div class="flex flex-col">
           <div class="modal-heading border-b w-full p-4">
             <div class="flex justify-between w-full items-center">
@@ -70,23 +70,24 @@
           </div>
         </div>
       </VueTailwindModal>
-      <simplebar class="flex w-1/4 border-r h-full">
-        <div class="p-4 w-full h-full overflow-auto">
-            <div class="w-full">
-              <div class="px-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded border-dashed"
-                  @click="showAvailableProducts">
-                <font-awesome-icon :icon="['fas', 'cubes']"
-                  class="mr-2 text-lg"/>
-                <span class="font-bold">MANAGE PRODUCTS</span>
-              </div>
-              <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-full justify-center items-center flex border rounded"
+      <div class="flex w-1/4 border-r h-full flex-col">
+        <div class="flex overflow-hidden w-full h-full flex-col overflow-auto flex-grow">
+          <div class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
+              @click="showAvailableProducts">
+            <font-awesome-icon :icon="['fas', 'cubes']"
+              class="mr-2 text-lg"/>
+            <span class="font-bold">MANAGE PRODUCTS</span>
+          </div>
+          <div class="flex h-full w-full flex flex-col">
+            <simplebar class="h-full overflow-auto px-4 pb-4">
+              <div class="px-4 relative mt-4 h-24 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded"
                 v-for="(product, index) in selectedProducts"
                 :key="index"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
                 @click="selectProduct(index)">
                 <div class="flex w-full">
                   <div class="flex justify-center items-center w-1/5">
-                    <img :src="product.variants[0].printable_area[currentSide].placeholder">
+                    <img :src="product.variants[0].printable_area[_firstPrintableArea(product.variants[0])].placeholder">
                   </div>
                   <div class="flex-grow flex flex-col px-4 py-2">
                     <div class="font-bold text-gray-600" style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
@@ -111,20 +112,93 @@
                     </div>
                   </div>
                 </div>
-                <!-- <div v-if="selectedProducts.length > 1"
-                  class="absolute hover:text-gray-700"
-                  style="top: 15px; right: 15px;">
-                  <font-awesome-icon :icon="['fas', 'trash']"/>
-                </div> -->
-                <!-- <div class="absolute outline-none text-xs focus:outline-none bg-white select-icon rounded-full border w-6 flex h-6 items-center justify-center hover:text-gray-700 hover:border-gray-700"
-                  style="bottom: 25px; right: 15px;"
-                  v-popover="{ name: `availableVariants_${product.id}` }">
-                  <font-awesome-icon :icon="['fas', 'plus']"/>
-                </div> -->
+              </div>
+            </simplebar>
+          </div>
+        </div>
+        <div class="flex flex-col overflow-hidden w-full border-t text-gray-600 flex-grow"
+          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? '50rem' : '77px' }">
+          <div class="flex border-b p-4 justify-between cursor-pointer hover:text-gray-700 hover:bg-gray-100"
+            @click="isMarketPlanCollapsed = !isMarketPlanCollapsed">
+            <div class="flex flex-col">
+              <div class="flex items-center mb-1">
+                <span class="font-bold mr-1">
+                  I WANT TO
+                </span>
+                <div @click.stop>
+                  <toggle-button v-model="marketPlan"
+                    :labels="{checked: 'SELL', unchecked: 'BUY'}"
+                    :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
+                    :width="60"/>
+                </div>
+              </div>
+              <div class="text-xs">
+                {{ marketPlan ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
               </div>
             </div>
+            <div class="flex justify-center items-center">
+              <font-awesome-icon :icon="['fas', !isMarketPlanCollapsed ? 'caret-down' : 'caret-up']"/>
+            </div>
+          </div>
+          <div class="flex h-full w-full flex flex-col">
+            <simplebar class="h-full overflow-auto px-4 pb-4">
+              <div class="flex flex-col py-4 relative mt-4 hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center border rounded"
+                v-for="(product, index) in selectedProducts"
+                :key="index"
+                @click="selectProduct(index)">
+                <div class="flex w-full px-4">
+                  <div class="flex justify-center items-center w-1/5">
+                    <img :src="product.variants[0].printable_area[_firstPrintableArea(product.variants[0])].placeholder">
+                  </div>
+                  <div class="flex-grow flex flex-col px-4 py-2">
+                    <div class="font-bold text-gray-600"
+                      style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      {{ product.name }}
+                    </div>
+                    <div class="flex">
+                      <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
+                        v-for="(variant, variantIndex) in product.variants"
+                        :key="variantIndex"
+                        @click.stop="selectVariant(variantIndex, index)"
+                        :class="{ 'border-gray-300 bg-white': index == currentProductIndex && variantIndex == currentVariantIndex }">
+                        <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
+                          :style="{ 'background-color': variant.color }">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex border-t px-4 pt-4 w-full mt-4">
+                  <div class="flex mx-1 flex-col">
+                    <div class="flex flex-col">
+                      <div class="text-center font-bold text-xs mb-1">XS</div>
+                      <input type="number"
+                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
+                    </div>
+                    <div class="flex flex-col mt-1">
+                      <div class="text-center font-bold text-xs mb-1">Price (₱)</div>
+                      <input type="number"
+                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
+                    </div>
+                  </div>
+                  <div class="flex mx-1 flex-col">
+                    <div class="flex flex-col">
+                      <div class="text-center font-bold text-xs mb-1">S</div>
+                      <input type="number"
+                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
+                    </div>
+                    <div class="flex flex-col mt-1">
+                      <div class="text-center font-bold text-xs mb-1">Price (₱)</div>
+                      <input type="number"
+                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </simplebar>
+          </div>
         </div>
-      </simplebar>
+      </div>
       <div class="flex flex-grow h-full flex-col">
         <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
           <div class="canvas-section outline-none select-none relative w-full h-full text-center">
@@ -393,7 +467,7 @@
                 @mouseenter="printableAreaZ = 3"></div>
               <div class="printable-area absolute"
                 :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
-                :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
+                :class="{ '-has-outline': isPrintableAreaHovered || isMoving, 'overflow-hidden': !(isPrintableAreaHovered || isMoving) }"
                 @mouseenter="isPrintableAreaHovered = true"
                 @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
                 <div class="h-full w-full z-10 relative">
@@ -542,7 +616,7 @@ export default {
         families: _.map(this.webfonts, 'value')
       }
     })
-    this.$store.commit('designer/CURRENT_DESIGN_ID', localStorage.getItem('ptree_current_design_id'))
+    this.$store.commit('designer/CURRENT_DESIGN_ID', this.$storage.getLocalStorage('current_design_id'))
     this.isLoading = true
     await this.$store.dispatch('designer/fetchDesignData', this.currentDesignId)
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]))
@@ -554,6 +628,8 @@ export default {
   },
   data(){
     return {
+      isMarketPlanCollapsed: true,
+      marketPlan: true,
       isLoading: false,
       tmpProducts: [],
       arrowKeysTimeout: null,
@@ -598,6 +674,10 @@ export default {
     }
   },
   methods: {
+    _firstPrintableArea(variant){
+      let areas = _.keys(variant.printable_area)
+      return _.includes(areas, 'front') ? 'front' : _.head()
+    },
     _registerCanvasEvents(){
       document.firstElementChild.style.zoom = "reset"
       this.stageContainer = document.querySelector('.panzoom-container')
@@ -605,7 +685,15 @@ export default {
       this.canvasSection.tabIndex = 1
       this.canvasSection.focus()
 
-      this.panzoomController = panzoom(document.querySelector('.product-section'))
+      this.panzoomController = panzoom(document.querySelector('.product-section'), {
+        beforeWheel(e){
+          let shouldIgnore = !e.altKey
+          return shouldIgnore
+        },
+        onDoubleClick(e) {
+          return false
+        }
+      })
       this.panzoomController.pause()
 
       this.canvasSection.addEventListener('keypress', (evt) => {
@@ -946,6 +1034,7 @@ export default {
     currentProductIndex: {
       immediate: true,
       handler(to){
+        if(!this.selectedProducts.length) return
         this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[to]))
         this.currentVariant = this.currentProduct.variants[0]
         this.deactivated()
@@ -956,6 +1045,7 @@ export default {
     currentVariantIndex: {
       immediate: true,
       handler(to){
+        if(!this.selectedProducts.length) return
         this.currentVariant = JSON.parse(JSON.stringify(this.selectedProducts[this.currentProductIndex].variants[to]))
         this.deactivated()
         this.activeObject = null

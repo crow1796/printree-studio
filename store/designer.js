@@ -1,89 +1,15 @@
 import ColorRegulator from '~/plugins/color-regulator'
-import db from '~/plugins/lib/db'
+import db from '~/plugins/lib/db/index'
 
 const state = () => ({
   currentSide: 'front',
-  currentDesignId: null,
+  designMeta: {
+    id: null,
+    name: null,
+    uid: null
+  },
   availableProducts: [],
-  selectedProducts: [
-    {
-      id: 1,
-      product_id: 1,
-      name: 'Classic Tee',
-      availableVariants: [
-        {
-          id: 3,
-          printable_area: {
-            front: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            },
-            back: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            }
-          },
-          base_cost: null,
-          color: '#FE8474'
-        },
-        {
-          id: 4,
-          printable_area: {
-            front: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            },
-            back: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            }
-          },
-          base_cost: null,
-          color: '#3A5DAB'
-        }
-      ],
-      variants: [
-        {
-          printable_area: {
-            front: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/front.png'),
-              left: 160,
-              top: 105,
-              width: 200,
-              height: 280,
-              objects: []
-            },
-            back: {
-              placeholder: require('~/assets/images/products/placeholders/type_1/id1/back.png'),
-              left: 175,
-              top: 60,
-              width: 175,
-              height: 420,
-              objects: []
-            }
-          },
-          base_cost: 499,
-          color: '#FEFEFE'
-        }
-      ]
-    }
-  ],
+  selectedProducts: [],
   objectBoilerplates: {
     'text': {
       id: null,
@@ -419,7 +345,13 @@ const getters = {
     return state.availableProducts
   },
   currentDesignId(state){
-    return state.currentDesignId
+    return state.designMeta.id
+  },
+  currentDesignName(state){
+    return state.designMeta.name
+  },
+  designMeta(state) {
+    return state.designMeta
   }
 }
 
@@ -478,7 +410,13 @@ const mutations = {
     state.availableProducts.push(product)
   },
   CURRENT_DESIGN_ID(state, id){
-    state.currentDesignId = id
+    state.designMeta.id = id
+  },
+  CURRENT_DESIGN_NAME(state, name){
+    state.designMeta.name = name
+  },
+  DESIGN_META(state, meta){
+    state.designMeta = meta
   }
 }
 
@@ -572,7 +510,22 @@ const actions = {
   },
   async fetchDesignData(context, id){
     const design = await db.getDesign(id)
+    context.commit('DESIGN_META', {
+      id: design.id,
+      name: design.name,
+      user_id: design.user_id
+    })
     context.commit('SELECTED_PRODUCTS', design.products)
+    return design
+  },
+  async createNewDesign(context, {user, products}){
+    const design = await db.createDesignFor(user, products)
+    context.commit('DESIGN_META', {
+      id: design.id,
+      name: design.name,
+      user_id: design.user_id
+    })
+    return design
   }
 }
 
