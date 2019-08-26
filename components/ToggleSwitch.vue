@@ -7,7 +7,8 @@
         v-for="(option, index) in options"
         :key="index"
         @click="toggle(option)">
-          {{ option[labelKey] }}
+          <span v-if="$slots.default">{{ option[labelKey] }}</span>
+          <slot v-bind:option="option"/>
       </button>
     </div>
   </div>
@@ -29,6 +30,9 @@ export default {
     value: {
       default: null
     }
+  },
+  created(){
+    console.log(this.$slots, this.$scopedSlots)
   },
   methods: {
     toggle(option){

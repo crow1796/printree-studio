@@ -25,7 +25,7 @@ module.exports = {
   */
   css: [
     '~/assets/css/tailwind.css',
-    '~/assets/fonts/ubuntu.css',
+    '~/assets/fonts/lato.css',
     '~/resources/scss/main.scss'
   ],
   /*

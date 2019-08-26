@@ -87,7 +87,7 @@ export default {
     },
     _availableSizesOf(product){
       if(!product.availableVariants.length) return
-      let sizeNames = _.map(product.availableVariants[0].sizes, 'name')
+      let sizeNames = _.map(product.availableVariants[0].available_sizes, 'name')
       return sizeNames.join(', ')
     },
     _hasBeenSelected(product){

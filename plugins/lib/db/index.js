@@ -16,7 +16,7 @@ export default {
           base_cost: variant.base_cost,
           color: variant.color,
           printable_area: printableArea,
-          sizes: variant.sizes
+          available_sizes: variant.available_sizes
         }))
       }))
       return JSON.parse(JSON.stringify({
@@ -52,7 +52,7 @@ export default {
           base_cost: variant.base_cost,
           color: variant.color,
           printable_area: variant.printable_area,
-          sizes: variant.sizes
+          available_sizes: variant.available_sizes
         }))
       }))
       const variants = await Promise.all(_.map(productRef.variants, async (variantRef) => {
@@ -64,7 +64,8 @@ export default {
           base_cost: variantSnap.data().base_cost,
           color: variantSnap.data().color,
           printable_area: printableArea,
-          sizes: variantSnap.data().sizes
+          available_sizes: variantSnap.data().available_sizes,
+          sizes: variantRef.sizes
         }
       }))
       return {

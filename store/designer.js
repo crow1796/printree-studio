@@ -30,7 +30,7 @@ const state = () => ({
         color: '#FEFEFE',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '16px',
+        fontSize: 16,
         textAlign: 'center'
       },
       editorData: {

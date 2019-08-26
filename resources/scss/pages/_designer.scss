@@ -111,3 +111,17 @@
 .parent:hover .parent\:hover\:visible{
   @apply .visible;
 }
+
+.vue-numeric-input .numeric-input.no-control{
+  padding: 0px 5px !important;
+}
+
+.vue-numeric-input .numeric-input{
+  height: 100%;
+  outline: none !important;
+  border-color: #e2e8f0 !important;
+}
+
+.vue-numeric-input .btn{
+  background: transparent !important;
+}
