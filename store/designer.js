@@ -365,6 +365,9 @@ const mutations = {
   CURRENT_VARIANT_INDEX(state, index) {
     state.currentVariantIndex = index
   },
+  CURRENT_VARIANT_PROPERTIES(state, data){
+    _.set(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex], data.path, data.value)
+  },
   OBJECT_PROPERTIES(state, data){
     let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].printable_area[state.currentSide].objects, { id: data.id })
     _.set(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].printable_area[state.currentSide].objects[objectIndex], data.path, data.value)

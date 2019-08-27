@@ -117,7 +117,7 @@
           </div>
         </div>
         <div class="flex flex-col overflow-hidden w-full border-t text-gray-600 flex-grow"
-          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? '50rem' : '77px' }">
+          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? '55rem' : '77px' }">
           <div class="flex border-b p-4 justify-between cursor-pointer hover:text-gray-700 hover:bg-gray-100"
             @click="togglePlanSection">
             <div class="flex flex-col">
@@ -131,6 +131,9 @@
                     :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
                     :width="60"/>
                 </div>
+                <span class="font-bold ml-1">
+                  THE PRODUCT(S) ABOVE
+                </span>
               </div>
               <div class="text-xs">
                 {{ marketPlan ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
@@ -141,66 +144,60 @@
             </div>
           </div>
           <div class="flex h-full w-full flex flex-col">
-            <simplebar class="h-full overflow-auto px-4 pb-4">
-              <div class="flex flex-col py-4 relative mt-4 text-gray-600 w-auto justify-center items-center border rounded"
-                v-for="(product, index) in selectedProducts"
-                :key="index">
-                <div class="flex w-full px-4">
-                  <div class="flex justify-center items-center w-1/5">
-                    <img :src="product.variants[0].printable_area[_firstPrintableArea(product.variants[0])].placeholder">
-                  </div>
-                  <div class="flex-grow flex flex-col px-4 py-2">
-                    <div class="font-bold text-gray-600"
-                      style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      {{ product.name }}
-                    </div>
-                    <div class="flex">
-                      <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-                        v-for="(variant, variantIndex) in product.variants"
-                        :key="variantIndex"
-                        @click.stop="setVariantToEditQtyAndPrice(variant)"
-                        :class="{ 'border-gray-300 bg-white': index == currentProductIndex && variantIndex == currentVariantIndex }">
-                        <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
-                          :style="{ 'background-color': variant.color }">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex border-t px-4 pt-4 w-full mt-4">
+            <div class="flex px-4 py-2 border-b">
+              <div class="w-2/12 font-bold px-1">
+                Size
+              </div>
+              <div class="w-3/12 font-bold px-1">
+                Base Cost
+              </div>
+              <div class="w-4/12 font-bold px-1">
+                Quantity
+              </div>
+              <div class="w-3/12 font-bold px-1">
+                Price (₱)
+              </div>
+            </div>
+            <simplebar class="h-full overflow-auto px-4 pb-3">
+              <div class="flex px-4 w-full">
                   <div class="flex flex-col w-full">
-                    <div class="flex">
-                      <div class="w-2/12 font-bold px-1">
-                        Size
-                      </div>
-                      <div class="w-3/12 font-bold px-1">
-                        Base Cost
-                      </div>
-                      <div class="w-4/12 font-bold px-1">
-                        Quantity
-                      </div>
-                      <div class="w-3/12 font-bold px-1">
-                        Price (₱)
-                      </div>
-                    </div>
-                    <div class="flex mt-3 items-center">
+                    <div class="flex mt-3 items-center"
+                      v-for="(size, index) in currentVariant.available_sizes"
+                      :key="index">
                       <div class="flex w-2/12 px-1">
-                        XS
+                        {{ size.name }}
                       </div>
                       <div class="flex w-3/12 px-1">
-                        ₱ 399.99
+                        {{ size.base_cost.formatMoney('₱ ') }}
                       </div>
                       <div class="flex w-4/12 px-1">
-                        <VueNumericInput class="h-8" align="center" :min="0"/>
+                        <VueNumericInput class="h-8"
+                          align="center"
+                          :min="0"
+                          v-model="currentVariant.sizes[size.name].quantity"
+                          @input="calculateEstProfit(size.name, 'quantity', $event)"/>
                       </div>
                       <div class="flex w-3/12 px-1">
-                        <VueNumericInput class="h-8" align="center" :precision="2" :min="0" :controls="false"/>
+                        <VueNumericInput class="h-8"
+                          align="center"
+                          :precision="2"
+                          :min="size.base_cost"
+                          :controls="false"
+                          v-model="currentVariant.sizes[size.name].price"
+                          @input="calculateEstProfit(size.name, 'price', $event)"/>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
             </simplebar>
+            <div class="flex justify-between border-t p-4 items-center">
+              <span class="font-bold ml-1">
+                ESTIMATED PROFIT
+              </span>
+              <span class="font-bold ml-1">
+                {{ estimatedProfit[0] ? estimatedProfit[0].formatMoney('₱ ') + ' - ' : '' }} {{ estimatedProfit[1].formatMoney('₱ ') }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -649,6 +646,7 @@ export default {
   },
   data(){
     return {
+      estimatedProfit: [0, 0],
       fontSizeTimeout: null,
       isMarketPlanCollapsed: this.$storage.getLocalStorage('is_plan_collapsed') == undefined ? true : this.$storage.getLocalStorage('is_plan_collapsed'),
       marketPlan: true,
@@ -696,6 +694,28 @@ export default {
     }
   },
   methods: {
+    calculateEstProfit(n, p, v){
+      let totalProfit = 0
+      this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
+        path: `sizes.${n}.${p}`,
+        value: v
+      })
+      _.map(this.selectedProducts, (product) => {
+        _.map(product.variants, (variant) => {
+          _.map(variant.sizes, (size, k) => {
+            let baseCost = (_.find(variant.available_sizes, (s) => s.name == k)).base_cost
+            let totalForPrintree = baseCost * size.quantity
+            let totalWithCustomerPrice = size.price * size.quantity
+            let totalNet = totalWithCustomerPrice - totalForPrintree
+            totalProfit += totalNet
+          })
+        })
+      })
+      let minProfit = totalProfit - (totalProfit * .10)
+      let maxProfit = totalProfit + (totalProfit * .10)
+      this.estimatedProfit[0] = minProfit
+      this.estimatedProfit[1] = maxProfit
+    },
     togglePlanSection(){
       this.isMarketPlanCollapsed = !this.isMarketPlanCollapsed
       this.$storage.setLocalStorage('is_plan_collapsed', this.isMarketPlanCollapsed)
