@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 
 module.exports = {
+  buildDir: './functions/nuxt',
   mode: 'universal',
   /*
   ** Headers of the page
@@ -86,6 +87,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    publicPath: '/',
     postcss: {
       plugins: {
         tailwindcss: './tailwind.config.js'

@@ -1,17 +1,19 @@
 {
-  "name": "printree-studio",
-  "version": "1.0.0",
-  "description": "Printree Studio",
-  "author": "Joshua Tundag",
-  "private": true,
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
   "scripts": {
-    "test": "jest",
-    "dev": "cross-env NODE_ENV=development nodemon server/index.js --watch server",
-    "build": "nuxt build",
-    "start": "cross-env NODE_ENV=production node server/index.js",
-    "generate": "nuxt generate"
+    "serve": "firebase serve --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "8"
   },
   "dependencies": {
+    "firebase-admin": "^8.0.0",
+    "firebase-functions": "^3.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-brands-svg-icons": "^5.9.0",
     "@fortawesome/free-regular-svg-icons": "^5.9.0",
@@ -48,6 +50,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
+    "firebase-functions-test": "^0.1.6",
     "@vue/test-utils": "^1.0.0-beta.27",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^24.1.0",
@@ -60,5 +63,6 @@
     "sass-loader": "^7.1.0",
     "tailwindcss": "^1.0.0",
     "vue-jest": "^3.0.3"
-  }
+  },
+  "private": true
 }

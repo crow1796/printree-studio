@@ -9,9 +9,18 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "nuxtApp"
+      }
     ]
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "public/functions"
   }
 }

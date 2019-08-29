@@ -8,12 +8,15 @@ import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AreaLoader from '@/components/AreaLoader'
 import VeeValidate from 'vee-validate'
+import VueNumber from 'vue-number-animation'
 
 Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
 Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
 Vue.use(VueVirtualScroller)
+
+Vue.use(VueNumber)
 Vue.use(VueLazyload, {
   preLoad: 1,
   error: require('~/assets/images/logo.png'),

@@ -132,7 +132,7 @@
                     :width="60"/>
                 </div>
                 <span class="font-bold ml-1">
-                  THE PRODUCT(S) ABOVE
+                  THE PRODUCT<span v-if="selectedProducts.length > 1">S</span> ABOVE
                 </span>
               </div>
               <div class="text-xs">
@@ -163,7 +163,7 @@
                   <div class="flex flex-col w-full">
                     <div class="flex mt-3 items-center"
                       v-for="(size, index) in currentVariant.available_sizes"
-                      :key="index">
+                      :key="`${currentVariant.id}_${index}`">
                       <div class="flex w-2/12 px-1">
                         {{ size.name }}
                       </div>
@@ -174,7 +174,7 @@
                         <VueNumericInput class="h-8"
                           align="center"
                           :min="0"
-                          v-model="currentVariant.sizes[size.name].quantity"
+                          :value="currentVariant.sizes[size.name].quantity"
                           @input="calculateEstProfit(size.name, 'quantity', $event)"/>
                       </div>
                       <div class="flex w-3/12 px-1">
@@ -183,8 +183,8 @@
                           :precision="2"
                           :min="size.base_cost"
                           :controls="false"
-                          v-model="currentVariant.sizes[size.name].price"
-                          @input="calculateEstProfit(size.name, 'price', $event)"/>
+                          :value="currentVariant.sizes[size.name].price"
+                          @blur="calculateEstProfit(size.name, 'price', $event)"/>
                       </div>
                     </div>
                   </div>
@@ -194,8 +194,20 @@
               <span class="font-bold ml-1">
                 ESTIMATED PROFIT
               </span>
-              <span class="font-bold ml-1">
-                {{ estimatedProfit[0] ? estimatedProfit[0].formatMoney('₱ ') + ' - ' : '' }} {{ estimatedProfit[1].formatMoney('₱ ') }}
+              <span class="font-bold ml-1 text-primary">
+                <number v-if="estimatedMinProfit"
+                  animationPaused
+                  ref="estMinProfit"
+                  :to="estimatedMinProfit"
+                  :format="(num) => num.formatMoney('₱ ')"
+                  :duration=".4"/>
+                <font-awesome-icon v-if="estimatedMinProfit" :icon="['fas', 'minus']"/>
+                <number
+                  animationPaused
+                  ref="estMaxProfit"
+                  :to="estimatedMaxProfit"
+                  :format="(num) => num.formatMoney('₱ ')"
+                  :duration=".4"/>
               </span>
             </div>
           </div>
@@ -439,7 +451,7 @@
                     @change="(option) => $store.dispatch('designer/switchSideTo', option.value)">
                     <template v-slot:default="{ option }">
                       <div class="flex flex-col">
-                        <img :src="option.label" width="60"/>
+                        <img :src="option.label" width="50"/>
                         <div class="text-center mt-1 text-xs">
                           {{ option.value.toUpperCase() }}
                         </div>
@@ -610,7 +622,7 @@ import { mapGetters } from 'vuex'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 import AvailableProducts from '@/components/Designer/AvailableProducts'
-import VueNumericInput from 'vue-numeric-input'
+import VueNumericInput from '@/components/VueNumericInput'
 let WebFontLoader = null
 if(process.client){
   WebFontLoader = require('webfontloader')
@@ -646,7 +658,8 @@ export default {
   },
   data(){
     return {
-      estimatedProfit: [0, 0],
+      estimatedMinProfit: 0,
+      estimatedMaxProfit: 0,
       fontSizeTimeout: null,
       isMarketPlanCollapsed: this.$storage.getLocalStorage('is_plan_collapsed') == undefined ? true : this.$storage.getLocalStorage('is_plan_collapsed'),
       marketPlan: true,
@@ -706,15 +719,19 @@ export default {
             let baseCost = (_.find(variant.available_sizes, (s) => s.name == k)).base_cost
             let totalForPrintree = baseCost * size.quantity
             let totalWithCustomerPrice = size.price * size.quantity
-            let totalNet = totalWithCustomerPrice - totalForPrintree
-            totalProfit += totalNet
+            let net = totalWithCustomerPrice - totalForPrintree
+            totalProfit += net
           })
         })
       })
-      let minProfit = totalProfit - (totalProfit * .10)
-      let maxProfit = totalProfit + (totalProfit * .10)
-      this.estimatedProfit[0] = minProfit
-      this.estimatedProfit[1] = maxProfit
+      let minProfit = totalProfit - (totalProfit * .05)
+      let maxProfit = totalProfit + (totalProfit * .05)
+      this.estimatedMinProfit = minProfit
+      this.estimatedMaxProfit = maxProfit
+      this.$nextTick(() => {
+        if(this.$refs.estMinProfit) this.$refs.estMinProfit.play()
+        this.$refs.estMaxProfit.play()
+      })
     },
     togglePlanSection(){
       this.isMarketPlanCollapsed = !this.isMarketPlanCollapsed

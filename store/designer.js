@@ -425,10 +425,16 @@ const mutations = {
 
 const actions = {
   addVariant(context, variant){
-    let id = '_' + Math.random().toString(36).substr(2, 9)
+    let sizes = {}
+    _.map(variant.available_sizes, (size) => {
+      sizes[size.name] = {
+        quantity: 0,
+        base_cost: size.base_cost
+      }
+    })
     variant = {
       ...variant,
-      id,
+      sizes,
       printable_area: JSON.parse(JSON.stringify(context.state.selectedProducts[context.state.currentProductIndex].variants[0].printable_area))
     }
     _.map(variant.printable_area, (area) => {
@@ -498,12 +504,6 @@ const actions = {
     context.commit('CURRENT_SIDE', side)
   },
   setSelectedProducts(context, products){
-    _.map(products, (product) => {
-      if(!product.product_id){
-        product.product_id = product.id
-        product.id = '_' + Math.random().toString(36).substr(2, 9)
-      }
-    })
     context.commit('SELECTED_PRODUCTS', products)
   },
   async fetchAvailableProducts(context, data){
