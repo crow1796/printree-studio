@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 
 module.exports = {
+  buildDir: './functions/nuxt',
   mode: 'universal',
   /*
   ** Headers of the page
@@ -25,7 +26,7 @@ module.exports = {
   */
   css: [
     '~/assets/css/tailwind.css',
-    '~/assets/fonts/ubuntu.css',
+    '~/assets/fonts/lato.css',
     '~/resources/scss/main.scss'
   ],
   /*
@@ -34,6 +35,7 @@ module.exports = {
   plugins: [
     '~/plugins/firebase.js',
     '~/plugins/check_user.js',
+    '~/plugins/prototypes.js',
     '~/plugins/external-installs.js'
   ],
   /*
@@ -85,6 +87,7 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    publicPath: '/',
     postcss: {
       plugins: {
         tailwindcss: './tailwind.config.js'

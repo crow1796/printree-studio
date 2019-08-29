@@ -126,7 +126,7 @@ export default {
       if(this.$storage.getLocalStorage('current_design_id')){
         this.isLoading = true
         const design = await this.$store.dispatch('designer/fetchDesignData', this.$storage.getLocalStorage('current_design_id'))
-        if(design.user_id == this.user.uid) return this.$router.push('/products/designer')
+        if(design.user_id == (this.user && this.user.uid)) return this.$router.push('/products/designer')
       }
       this.isLoading = false
       this.$refs.availableProductsModal.show()

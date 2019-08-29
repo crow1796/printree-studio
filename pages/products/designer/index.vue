@@ -117,9 +117,9 @@
           </div>
         </div>
         <div class="flex flex-col overflow-hidden w-full border-t text-gray-600 flex-grow"
-          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? '50rem' : '77px' }">
+          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? '55rem' : '77px' }">
           <div class="flex border-b p-4 justify-between cursor-pointer hover:text-gray-700 hover:bg-gray-100"
-            @click="isMarketPlanCollapsed = !isMarketPlanCollapsed">
+            @click="togglePlanSection">
             <div class="flex flex-col">
               <div class="flex items-center mb-1">
                 <span class="font-bold mr-1">
@@ -131,6 +131,9 @@
                     :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
                     :width="60"/>
                 </div>
+                <span class="font-bold ml-1">
+                  THE PRODUCT<span v-if="selectedProducts.length > 1">S</span> ABOVE
+                </span>
               </div>
               <div class="text-xs">
                 {{ marketPlan ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
@@ -141,61 +144,72 @@
             </div>
           </div>
           <div class="flex h-full w-full flex flex-col">
-            <simplebar class="h-full overflow-auto px-4 pb-4">
-              <div class="flex flex-col py-4 relative mt-4 hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center border rounded"
-                v-for="(product, index) in selectedProducts"
-                :key="index"
-                @click="selectProduct(index)">
-                <div class="flex w-full px-4">
-                  <div class="flex justify-center items-center w-1/5">
-                    <img :src="product.variants[0].printable_area[_firstPrintableArea(product.variants[0])].placeholder">
-                  </div>
-                  <div class="flex-grow flex flex-col px-4 py-2">
-                    <div class="font-bold text-gray-600"
-                      style="width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                      {{ product.name }}
-                    </div>
-                    <div class="flex">
-                      <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-                        v-for="(variant, variantIndex) in product.variants"
-                        :key="variantIndex"
-                        @click.stop="selectVariant(variantIndex, index)"
-                        :class="{ 'border-gray-300 bg-white': index == currentProductIndex && variantIndex == currentVariantIndex }">
-                        <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
-                          :style="{ 'background-color': variant.color }">
-                        </div>
+            <div class="flex px-4 py-2 border-b">
+              <div class="w-2/12 font-bold px-1">
+                Size
+              </div>
+              <div class="w-3/12 font-bold px-1">
+                Base Cost
+              </div>
+              <div class="w-4/12 font-bold px-1">
+                Quantity
+              </div>
+              <div class="w-3/12 font-bold px-1">
+                Price (₱)
+              </div>
+            </div>
+            <simplebar class="h-full overflow-auto px-4 pb-3">
+              <div class="flex px-4 w-full">
+                  <div class="flex flex-col w-full">
+                    <div class="flex mt-3 items-center"
+                      v-for="(size, index) in currentVariant.available_sizes"
+                      :key="`${currentVariant.id}_${index}`">
+                      <div class="flex w-2/12 px-1">
+                        {{ size.name }}
+                      </div>
+                      <div class="flex w-3/12 px-1">
+                        {{ size.base_cost.formatMoney('₱ ') }}
+                      </div>
+                      <div class="flex w-4/12 px-1">
+                        <VueNumericInput class="h-8"
+                          align="center"
+                          :min="0"
+                          :value="currentVariant.sizes[size.name].quantity"
+                          @input="calculateEstProfit(size.name, 'quantity', $event)"/>
+                      </div>
+                      <div class="flex w-3/12 px-1">
+                        <VueNumericInput class="h-8"
+                          align="center"
+                          :precision="2"
+                          :min="size.base_cost"
+                          :controls="false"
+                          :value="currentVariant.sizes[size.name].price"
+                          @blur="calculateEstProfit(size.name, 'price', $event)"/>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="flex border-t px-4 pt-4 w-full mt-4">
-                  <div class="flex mx-1 flex-col">
-                    <div class="flex flex-col">
-                      <div class="text-center font-bold text-xs mb-1">XS</div>
-                      <input type="number"
-                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
-                    </div>
-                    <div class="flex flex-col mt-1">
-                      <div class="text-center font-bold text-xs mb-1">Price (₱)</div>
-                      <input type="number"
-                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
-                    </div>
-                  </div>
-                  <div class="flex mx-1 flex-col">
-                    <div class="flex flex-col">
-                      <div class="text-center font-bold text-xs mb-1">S</div>
-                      <input type="number"
-                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
-                    </div>
-                    <div class="flex flex-col mt-1">
-                      <div class="text-center font-bold text-xs mb-1">Price (₱)</div>
-                      <input type="number"
-                        class="w-12 text-center border rounded outline focus:outline-none focus:border-gray-500 p-1 text-xs"/>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </simplebar>
+            <div class="flex justify-between border-t p-4 items-center">
+              <span class="font-bold ml-1">
+                ESTIMATED PROFIT
+              </span>
+              <span class="font-bold ml-1 text-primary">
+                <number v-if="estimatedMinProfit"
+                  animationPaused
+                  ref="estMinProfit"
+                  :to="estimatedMinProfit"
+                  :format="(num) => num.formatMoney('₱ ')"
+                  :duration=".4"/>
+                <font-awesome-icon v-if="estimatedMinProfit" :icon="['fas', 'minus']"/>
+                <number
+                  animationPaused
+                  ref="estMaxProfit"
+                  :to="estimatedMaxProfit"
+                  :format="(num) => num.formatMoney('₱ ')"
+                  :duration=".4"/>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -276,11 +290,12 @@
                     v-tippy>
                     <font-awesome-icon :icon="['fas', 'strikethrough']"/>
                   </button>
-                  <Select :placeholder="activeObject.style.fontSize"
-                    class="flex-grow text-xs h-8"
-                    @change="changeFontSize"
-                    :options="fontSizes"
-                    flexible/>
+                  <VueNumericInput :min="0"
+                    @input="changeFontSize({value: $event})"
+                    v-model="activeObject.style.fontSize"
+                    align="center"
+                    style="width: 90px"
+                    class="ml-1"/>
                 </div>
               </div>
               <div class="flex bg-white ml-2 mt-4 p-4 rounded shadow-xl border"
@@ -354,7 +369,7 @@
               </div>
             </div>
 
-            <div class="left-actions absolute z-10 flex flex-shrink justify-center">
+            <div class="left-actions absolute z-10 flex flex-shrink justify-center flex-col">
               <div class="flex bg-white rounded shadow-xl border">
                 <div class="flex flex-col py-4">
                   <button type="button"
@@ -406,33 +421,43 @@
                   </button>
                 </div>
               </div>
+
+              <div class="flex bg-white mt-4 rounded shadow-xl border justify-center">
+                <div class="flex flex-col py-4">
+                  <button type="button"
+                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    title="Zoom In"
+                    @click="zoomTo(0.1)"
+                    v-tippy>
+                    <font-awesome-icon :icon="['fas', 'search-plus']" class="text-xs"/>
+                  </button>
+                  <button type="button"
+                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    title="Zoom Out"
+                    @click="zoomTo(-0.1)"
+                    v-tippy>
+                    <font-awesome-icon :icon="['fas', 'search-minus']" class="text-xs"/>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
               <div class="flex bg-white mt-4 rounded shadow-xl border">
-                <div class="flex p-4 pr-0">
+                <div class="flex p-4">
                   <ToggleSwitch :options="currentVariantSides"
                     class="mx-1"
-                    @change="(option) => $store.dispatch('designer/switchSideTo', option.value)"/>
-                </div>
-                <div class="flex item-center p-4 pl-0">
-                  <button type="button"
-                    class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="Zoom Out"
-                    @click="zoomTo(-0.1)"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'minus']" class="text-xs"/>
-                  </button>
-                  <span class="flex items-center font-bold text-gray-600 mx-2">
-                    {{ parseInt(canvasScale * 100) }}%
-                  </span>
-                  <button type="button"
-                    class="w-10 flex justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                    title="Zoom In"
-                    @click="zoomTo(0.1)"
-                    v-tippy>
-                    <font-awesome-icon :icon="['fas', 'plus']" class="text-xs"/>
-                  </button>
+                    :value="currentSide"
+                    @change="(option) => $store.dispatch('designer/switchSideTo', option.value)">
+                    <template v-slot:default="{ option }">
+                      <div class="flex flex-col">
+                        <img :src="option.label" width="50"/>
+                        <div class="text-center mt-1 text-xs">
+                          {{ option.value.toUpperCase() }}
+                        </div>
+                      </div>
+                    </template>
+                  </ToggleSwitch>
                 </div>
               </div>
             </div>
@@ -467,7 +492,7 @@
                 @mouseenter="printableAreaZ = 3"></div>
               <div class="printable-area absolute"
                 :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
-                :class="{ '-has-outline': isPrintableAreaHovered || isMoving, 'overflow-hidden': !(isPrintableAreaHovered || isMoving) }"
+                :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
                 @mouseenter="isPrintableAreaHovered = true"
                 @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
                 <div class="h-full w-full z-10 relative">
@@ -496,7 +521,10 @@
                     :ref="`obj_${obj.id}_drr`">
                     <div class="flex flex-wrap w-full h-full relative z-1"
                       v-if="obj.type == 'text'"
-                      :style="obj.style"
+                      :style="{
+                        ...obj.style,
+                        fontSize: `${obj.style.fontSize}px`
+                      }"
                       @click.stop>
                       <pre class="w-auto h-auto outline-none focus:outline-none"
                         :ref="`textContainer_${obj.id}`"
@@ -594,6 +622,7 @@ import { mapGetters } from 'vuex'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 import AvailableProducts from '@/components/Designer/AvailableProducts'
+import VueNumericInput from '@/components/VueNumericInput'
 let WebFontLoader = null
 if(process.client){
   WebFontLoader = require('webfontloader')
@@ -608,7 +637,8 @@ export default {
     ToggleSwitch,
     ArtsList,
     vSelect,
-    AvailableProducts
+    AvailableProducts,
+    VueNumericInput
   },
   async created(){
     WebFontLoader.load({
@@ -628,7 +658,10 @@ export default {
   },
   data(){
     return {
-      isMarketPlanCollapsed: true,
+      estimatedMinProfit: 0,
+      estimatedMaxProfit: 0,
+      fontSizeTimeout: null,
+      isMarketPlanCollapsed: this.$storage.getLocalStorage('is_plan_collapsed') == undefined ? true : this.$storage.getLocalStorage('is_plan_collapsed'),
       marketPlan: true,
       isLoading: false,
       tmpProducts: [],
@@ -670,10 +703,40 @@ export default {
       return _.includes(['text', 'svg'], this.activeObject.type)
     },
     currentVariantSides(){
-      return _.map(_.keys(this.currentVariant.printable_area), (key) => ({ label: key.toUpperCase(), value: key}))
+      return _.map(this.currentVariant.printable_area, (area, key) => ({ label: area.placeholder, value: key }))
     }
   },
   methods: {
+    calculateEstProfit(n, p, v){
+      let totalProfit = 0
+      this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
+        path: `sizes.${n}.${p}`,
+        value: v
+      })
+      _.map(this.selectedProducts, (product) => {
+        _.map(product.variants, (variant) => {
+          _.map(variant.sizes, (size, k) => {
+            let baseCost = (_.find(variant.available_sizes, (s) => s.name == k)).base_cost
+            let totalForPrintree = baseCost * size.quantity
+            let totalWithCustomerPrice = size.price * size.quantity
+            let net = totalWithCustomerPrice - totalForPrintree
+            totalProfit += net
+          })
+        })
+      })
+      let minProfit = totalProfit - (totalProfit * .05)
+      let maxProfit = totalProfit + (totalProfit * .05)
+      this.estimatedMinProfit = minProfit
+      this.estimatedMaxProfit = maxProfit
+      this.$nextTick(() => {
+        if(this.$refs.estMinProfit) this.$refs.estMinProfit.play()
+        this.$refs.estMaxProfit.play()
+      })
+    },
+    togglePlanSection(){
+      this.isMarketPlanCollapsed = !this.isMarketPlanCollapsed
+      this.$storage.setLocalStorage('is_plan_collapsed', this.isMarketPlanCollapsed)
+    },
     _firstPrintableArea(variant){
       let areas = _.keys(variant.printable_area)
       return _.includes(areas, 'front') ? 'front' : _.head()
@@ -961,12 +1024,18 @@ export default {
       })
     },
     changeFontSize(fontSize){
-      this._updateActiveObjectProps('style.fontSize', fontSize.value)
-      this.$nextTick(() => {
-        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
-        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
-        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
-      })
+      clearTimeout(this.fontSizeTimeout)
+
+      this.activeObject.bounds.width = this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth
+      this.activeObject.bounds.height = this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight
+      let tmpObj = JSON.parse(JSON.stringify(this.activeObject))
+
+      this.fontSizeTimeout = setTimeout(() => {
+        this._updateActiveObjectProps('style.fontSize', fontSize.value, tmpObj)
+        this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth, tmpObj)
+        this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight, tmpObj)
+        this.$store.dispatch('designer/copyPropsToAllVariantsFrom', tmpObj)
+      }, 800)
     },
     changeText(e){
       this._updateActiveObjectProps('value', e.target.innerText)

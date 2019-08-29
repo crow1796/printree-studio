@@ -11,12 +11,20 @@ export default {
         let variant = variantSnap.data()
         let printableArea = JSON.parse(JSON.stringify(variant.printable_area))
         _.map(_.keys(printableArea), (key) => printableArea[key].objects = [])
+        let sizes = {}
+        _.map(variant.available_sizes, (size) => {
+          sizes[size.name] = {
+            quantity: 0,
+            base_cost: size.base_cost
+          }
+        })
+
         return JSON.parse(JSON.stringify({
           id: variantSnap.id,
-          base_cost: variant.base_cost,
           color: variant.color,
           printable_area: printableArea,
-          sizes: variant.sizes
+          available_sizes: variant.available_sizes,
+          sizes
         }))
       }))
       return JSON.parse(JSON.stringify({
@@ -49,10 +57,9 @@ export default {
         let variant = variantSnap.data()
         return JSON.parse(JSON.stringify({
           id: variantSnap.id,
-          base_cost: variant.base_cost,
           color: variant.color,
           printable_area: variant.printable_area,
-          sizes: variant.sizes
+          available_sizes: variant.available_sizes
         }))
       }))
       const variants = await Promise.all(_.map(productRef.variants, async (variantRef) => {
@@ -61,10 +68,10 @@ export default {
         _.map(_.keys(printableArea), (key) => printableArea[key].objects = variantRef.objects[key])
         return {
           id: variantSnap.id,
-          base_cost: variantSnap.data().base_cost,
           color: variantSnap.data().color,
           printable_area: printableArea,
-          sizes: variantSnap.data().sizes
+          available_sizes: variantSnap.data().available_sizes,
+          sizes: variantRef.sizes
         }
       }))
       return {
@@ -79,18 +86,26 @@ export default {
   },
   async createDesignFor(user, products){
     let design = {
-      name: 'Untitled Design',
+      name: 'Untitled',
       user_id: user.uid,
       products: _.map(products, (product) => {
         let objects = {}
+        let sizes = {}
         _.map(product.availableVariants[0].printable_area, (v, k) => {
           objects[k] = []
+        })
+        _.map(product.availableVariants[0].available_sizes, (v, k) => {
+          sizes[v.name] = {
+            quantity: 0,
+            price: v.base_cost
+          }
         })
         return {
           product: fireDb.collection('available_products').doc(product.id),
           variants: [
             {
               objects,
+              sizes,
               variant: fireDb.collection('product_variants').doc(product.availableVariants[0].id)
             }
           ]

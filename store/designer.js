@@ -30,7 +30,7 @@ const state = () => ({
         color: '#FEFEFE',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '16px',
+        fontSize: 16,
         textAlign: 'center'
       },
       editorData: {
@@ -365,6 +365,9 @@ const mutations = {
   CURRENT_VARIANT_INDEX(state, index) {
     state.currentVariantIndex = index
   },
+  CURRENT_VARIANT_PROPERTIES(state, data){
+    _.set(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex], data.path, data.value)
+  },
   OBJECT_PROPERTIES(state, data){
     let objectIndex = _.findIndex(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].printable_area[state.currentSide].objects, { id: data.id })
     _.set(state.selectedProducts[state.currentProductIndex].variants[state.currentVariantIndex].printable_area[state.currentSide].objects[objectIndex], data.path, data.value)
@@ -422,10 +425,16 @@ const mutations = {
 
 const actions = {
   addVariant(context, variant){
-    let id = '_' + Math.random().toString(36).substr(2, 9)
+    let sizes = {}
+    _.map(variant.available_sizes, (size) => {
+      sizes[size.name] = {
+        quantity: 0,
+        base_cost: size.base_cost
+      }
+    })
     variant = {
       ...variant,
-      id,
+      sizes,
       printable_area: JSON.parse(JSON.stringify(context.state.selectedProducts[context.state.currentProductIndex].variants[0].printable_area))
     }
     _.map(variant.printable_area, (area) => {
@@ -495,12 +504,6 @@ const actions = {
     context.commit('CURRENT_SIDE', side)
   },
   setSelectedProducts(context, products){
-    _.map(products, (product) => {
-      if(!product.product_id){
-        product.product_id = product.id
-        product.id = '_' + Math.random().toString(36).substr(2, 9)
-      }
-    })
     context.commit('SELECTED_PRODUCTS', products)
   },
   async fetchAvailableProducts(context, data){
