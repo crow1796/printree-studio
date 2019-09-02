@@ -54,6 +54,7 @@ export default {
     await this.$store.dispatch('designer/fetchAvailableProducts')
     this.isLoading = false
     this.tmpProducts = JSON.parse(JSON.stringify(this.selectedProducts))
+    this.$emit('input', this.tmpProducts)
   },
   data(){
     return {
@@ -73,12 +74,12 @@ export default {
         if(this.tmpProducts.length == 1) return
         let index = _.findIndex(this.tmpProducts, { id: product.id })
         this.tmpProducts.splice(index, 1)
-        this.$emit('selected', this.tmpProducts)
+        this.$emit('input', this.tmpProducts)
         return
       }
       product = JSON.parse(JSON.stringify(product))
       this.tmpProducts.push(product)
-      this.$emit('selected', this.tmpProducts)
+      this.$emit('input', this.tmpProducts)
     },
     _firstVariantPlaceholderOf(product){
       if(!product.availableVariants.length) return

@@ -1,46 +1,45 @@
 <template>
   <no-ssr>
     <div class="w-full h-full flex flex-col text-sm">
+      <AreaLoader v-if="isLoading" fullscreen/>
       <AuthModal ref="authModal"/>
-      <VueTailwindModal ref="productsQuantitiesModal"
-        width="50%">
-        <div class="flex buy-sell-content overflow-hidden" style="height: 30rem">
-          <div class="buy w-1/2 h-full rounded border mr-2 cursor-pointer hover:border-gray-500 flex justify-center items-center">
-
-          </div>
-          <div class="sell w-1/2 h-full rounded border ml-2 cursor-pointer hover:border-gray-500 flex justify-center items-center">
-
-          </div>
-        </div>
-      </VueTailwindModal>
       <div class="w-full p-4 flex border-b">
         <div class="flex w-1/3">
           <img src="~/assets/images/logo-nav.png"
             alt="Printree"
             class="w-10">
         </div>
-        <div class="flex w-1/3 justify-center items-center font-bold">
-          <span class="text-gray-600 uppercase">
-            Studio /
-          </span>
-          &nbsp;
-          <span class="parent text-gray-600 cursor-pointer hover:underline hover:text-gray-700">
-            {{ currentDesignName }}
-            <span class="text-xs ml-1 parent:hover:visible invisible">
-              <font-awesome-icon :icon="['fas', 'edit']"/>
+        <div class="flex w-1/3 justify-center items-center">
+          <div class="flex" v-if="!isEditingDesignName"
+              style="animation-duration: 0.2s">
+            <span class="text-gray-600 uppercase">
+              Drafts
             </span>
-          </span>
+            <span class="mx-1">/</span>
+            <span class="font-normal text-gray-600 hover:underline hover:text-gray-700"
+              @click="startEditingName">
+              {{ currentDesignName }}
+            </span>
+          </div>
+          <div class="flex" v-if="isEditingDesignName"
+              style="animation-duration: 0.2s">
+            <input type="text"
+              ref="designNameField"
+              class="text-center text-gray-600 outline-none focus:outline-none"
+              :value="currentDesignName"
+              @blur="updateDesignName($event.target.value)"
+              @keyup.enter="updateDesignName($event.target.value)"/>
+          </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
           <a href="#" class="text-blue-400">
             Continue Later
           </a>
           <div class="w-4"></div>
-          <button type="button"
-            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter outline-none focus:outline-none"
+          <PTButton color="primary"
             @click="nextStep">
             NEXT
-          </button>
+          </PTButton>
         </div>
       </div>
       <nuxt/>
@@ -69,16 +68,40 @@ export default {
       currentDesignName: 'designer/currentDesignName'
     })
   },
+  mounted(){
+    window.onbeforeunload = (e) => {
+      e = e || window.event
+      // For IE and Firefox prior to version 4
+      if (e) {
+        e.returnValue = 'Sure?'
+      }
+      // For Safari
+      return 'Sure?'
+    }
+  },
+  data(){
+    return {
+      isLoading: false,
+      isEditingDesignName: false
+    }
+  },
   methods: {
+    startEditingName(){
+      this.isEditingDesignName = true
+      this.$nextTick(() => {
+        this.$refs.designNameField.focus()
+        this.$refs.designNameField.setSelectionRange(0, this.$refs.designNameField.value.length)
+      })
+    },
+    updateDesignName(newName){
+      if(!newName.trim()) return
+      this.$store.commit('designer/DESIGN_NAME', newName)
+      this.isEditingDesignName = false
+    },
     nextStep(){
       if(!this.isLoggedIn) return this.$refs.authModal.show()
+      this.isLoading = true
     }
   }
 }
 </script>
-
-
-<style lang="scss" scoped>
-.buy-sell-content{
-}
-</style>

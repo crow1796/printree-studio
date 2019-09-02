@@ -86,7 +86,6 @@ export default {
         return
       }
       if (evt.ctrlKey && evt.which == 43) {
-        console.log('zoom')
         return
       }
       this.isHoldingSpace = false

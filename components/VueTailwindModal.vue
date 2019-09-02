@@ -63,14 +63,14 @@ export default {
 
 <style lang="scss" scoped>
 .-bounce{
-  animation: bounce .5s ease;
+  animation: bounce .3s ease;
 }
 
 @keyframes bounce {
   0% { transform: scale(1) rotateZ(0deg); }
-  50% { transform: scale(1.02) rotateZ(1deg); }
-  60% { transform: scale(0.99) rotateZ(-1deg); }
-  80% { transform: scale(1.01) rotateZ(1deg); }
-  100% { transform: scale(1) rotateZ(0deg); }
+  50% { transform: scale(1.01) rotateZ(.5deg); }
+  60% { transform: scale(0.99) rotateZ(-.5deg); }
+  80% { transform: scale(1.01) rotateZ(.5deg); }
+  100% { transform: scale(0.99) rotateZ(-.5deg); }
 }
 </style>

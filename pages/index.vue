@@ -123,6 +123,7 @@ export default {
   },
   methods: {
     async showAvailableProducts(){
+      this.$refs.authModal.show()
       if(this.$storage.getLocalStorage('current_design_id')){
         this.isLoading = true
         const design = await this.$store.dispatch('designer/fetchDesignData', this.$storage.getLocalStorage('current_design_id'))
