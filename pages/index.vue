@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="flex modal-body flex-grow h-full">
-          <AvailableProducts @selected="storeTmpProducts"/>
+          <AvailableProducts v-model="tmpSelectedProducts"/>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <a href="#" class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400">
@@ -123,7 +123,6 @@ export default {
   },
   methods: {
     async showAvailableProducts(){
-      this.$refs.authModal.show()
       if(this.$storage.getLocalStorage('current_design_id')){
         this.isLoading = true
         const design = await this.$store.dispatch('designer/fetchDesignData', this.$storage.getLocalStorage('current_design_id'))
@@ -131,9 +130,6 @@ export default {
       }
       this.isLoading = false
       this.$refs.availableProductsModal.show()
-    },
-    storeTmpProducts(products){
-      this.tmpSelectedProducts = products
     },
     async createNewDesign(){
       if(!this.tmpSelectedProducts.length) return

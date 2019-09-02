@@ -470,8 +470,8 @@
                     v-tippy="{ arrow: true }"
                     @click="moveObjectPosition(activeObject, activeObjectIndex > 0 ? activeObjectIndex - 1 : activeObjectIndex)">
                     <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                       <rect x="19" y="17" width="38" height="38" rx="3" fill="#718096"/>
+                      <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                     </svg>
                   </button>
                   <button type="button"
@@ -569,7 +569,7 @@
                 :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: 2 }"
                 @mouseenter="printableAreaZ = 3"></div>
               <div class="printable-area absolute"
-                :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
+                :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: 3 /*printableAreaZ*/, outlineColor: getCorrectColor(currentVariant.color) }"
                 :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
                 @mouseenter="isPrintableAreaHovered = true"
                 @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
@@ -668,13 +668,14 @@
           </div>
           <div class="flex flex-grow">
             <simplebar class="h-full w-full">
-              <div class="flex flex-col w-full">
-                <draggable v-model="currentVariant.printable_area[currentSide].objects" @end="layerDragged">
+              <div class="flex flex-col-reverse w-full">
+                <draggable v-model="currentVariant.printable_area[currentSide].objects"
+                  @end="layerDragged">
                   <transition-group>
                     <div class="layer items-center py-2 px-4 h-12 select-none flex border"
-                      v-for="(obj, i) in currentVariant.printable_area[currentSide].objects"
+                      v-for="obj in currentVariant.printable_area[currentSide].objects"
                       :key="obj.id"
-                      :class="{ 'bg-gray-100': obj.id == activeObject.id }"
+                      :class="{ 'bg-gray-100': activeObject && obj.id == activeObject.id }"
                       @click="activated(obj)"
                       @dblclick="(e) => obj.type == 'text' ? activateContent(obj) : false">
                       <div class="flex flex-grow items-center">
@@ -879,6 +880,9 @@ export default {
     }
   },
   methods: {
+    _reverseObjects(objects){
+      return (JSON.parse(JSON.stringify(objects))).reverse()
+    },
     layerDragged(e){
       this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', this.currentVariant.printable_area[this.currentSide].objects)
       this.$nextTick(() => {
@@ -898,6 +902,7 @@ export default {
       let res = await this.$validator.validate()
       if(!res) return
       this.$store.commit('designer/CURRENT_PRODUCT_META', this.tmpProductMetadata)
+      this.$refs.productMetaDrawer.hide()
     },
     toggleDrawer(drawer){
       if(this.$refs[drawer].isShown){
@@ -987,7 +992,7 @@ export default {
         }
       })
 
-      this.canvasSection.addEventListener('keydown', (evt) => {
+      document.addEventListener('keydown', (evt) => {
         // Left
         if(evt.which == 37 && this.activeObject){
           this._updateActiveObjectProps('bounds.left', (this.activeObject.bounds.left - 1))
@@ -1012,7 +1017,27 @@ export default {
           this.isMoving = true
           return
         }
+      })
 
+      document.addEventListener('keyup', (evt) => {
+        if(_.includes([37, 38, 39, 40], evt.which) && this.activeObject){
+          clearTimeout(this.arrowKeysTimeout)
+          this.arrowKeysTimeout = setTimeout(() => {
+            this.$nextTick(() => {
+              this.isMoving = false
+            })
+          }, 1000)
+          return
+        }
+
+        if (evt.which == 46) {
+          if(!this.activeObject) return
+          this.removeObject(this.activeObject)
+          return
+        }
+      })
+
+      this.canvasSection.addEventListener('keydown', (evt) => {
         if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
           evt.preventDefault()
           this.zoomTo(0.1)
@@ -1055,14 +1080,6 @@ export default {
       })
 
       this.canvasSection.addEventListener('keyup', (evt) => {
-        if(_.includes([37, 38, 39, 40], evt.which) && this.activeObject){
-          clearTimeout(this.arrowKeysTimeout)
-          this.arrowKeysTimeout = setTimeout(() => {
-            this.isMoving = false
-          }, 1000)
-          return
-        }
-
         if (evt.which == 32) {
           this.isHoldingSpace = false
           this.stageCursor = 'initial'
@@ -1348,7 +1365,7 @@ export default {
     currentProduct: {
       immediate: true,
       handler(to){
-        if(!to || (to && to.meta)) return
+        if(!to || (to && !to.meta)) return
         this.tmpProductMetadata = JSON.parse(JSON.stringify(to.meta))
       }
     },

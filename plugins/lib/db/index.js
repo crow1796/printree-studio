@@ -103,7 +103,7 @@ export default {
   },
   async createDesignFor(user, products){
     let design = {
-      name: 'Untitled',
+      name: 'Untitled Campaign',
       user_id: user.uid,
       plan: 'sell',
       products: _.map(products, (product) => {
@@ -120,6 +120,11 @@ export default {
         })
         return {
           product: fireDb.collection('available_products').doc(product.id),
+          meta: {
+            name: '',
+            description: '',
+            tags: ''
+          },
           variants: [
             {
               objects,
@@ -135,5 +140,36 @@ export default {
       ...design,
       id: designRef.id
     }
+  },
+  async updateDesignName(id, name){
+    const designRef = fireDb.collection('user_designs').doc(id)
+    await designRef.update({name})
+  },
+  async saveCampaign({ id, selectedProducts, plan }){
+    const products = _.map(selectedProducts, (product) => {
+      let variants = _.map(product.variants, variant => {
+        let objects = {}
+        _.map(variant.printable_area, (side, key) => {
+          objects[key] = side.objects
+        })
+
+        return {
+          variant: fireDb.collection('product_variants').doc(variant.id),
+          objects,
+          sizes: variant.sizes
+        }
+      })
+
+      return {
+        meta: product.meta,
+        product: fireDb.collection('available_products').doc(product.id),
+        variants
+      }
+    })
+    const designRef = fireDb.collection('user_designs').doc(id)
+    await designRef.update({
+      plan,
+      products
+    })
   }
 }
