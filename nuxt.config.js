@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 
 module.exports = {
-  buildDir: './functions/nuxt',
   mode: 'universal',
   /*
   ** Headers of the page
@@ -87,7 +86,6 @@ module.exports = {
   ** Build configuration
   */
   build: {
-    publicPath: '/',
     postcss: {
       plugins: {
         tailwindcss: './tailwind.config.js'
@@ -96,7 +94,14 @@ module.exports = {
     /*
     ** You can extend webpack config here
     */
-    extend(config, ctx) {
+    extend(config, { isDev, isClient }) {
+      if (isClient) {
+        config.module.rules.push({
+          test: /\.worker\.js$/,
+          use: { loader: 'worker-loader' },
+          exclude: /(node_modules)/
+        })
+      }
     },
     plugins: [
       new webpack.ProvidePlugin({

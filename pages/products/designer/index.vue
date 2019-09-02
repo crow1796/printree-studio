@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full w-full">
     <AreaLoader v-if="isLoading" fullscreen/>
-    <div class="flex h-full w-full" v-else>
+    <div class="flex h-full w-full relative" v-else>
       <VueTailwindModal ref="availableProductsModal"
         width="80%"
         content-class="text-gray-600">
@@ -21,14 +21,14 @@
             </div>
           </div>
           <div class="flex modal-body" style="height: 36rem">
-            <AvailableProducts @selected="storeTmpProducts"/>
+            <AvailableProducts v-model="tmpProducts"/>
           </div>
           <div class="flex modal-footer justify-between p-4 border-t items-center">
             <a href="#" class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400">
               {{ selectedProducts.length }} Products Selected
             </a>
             <button type="button"
-              class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+              class="border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
               @click="manageProducts">
               CONTINUE
             </button>
@@ -66,7 +66,7 @@
             <div class="uppercase font-bold text-gray-600 pb-2 px-1">
               Choose an Art
             </div>
-            <ArtsList @selected="addObject('svg', $event.value); $refs.artsModal.hide()"/>
+            <ArtsList @selected="addObject('svg', $event.value, $event.label); $refs.artsModal.hide()"/>
           </div>
         </div>
       </VueTailwindModal>
@@ -94,12 +94,35 @@
                       {{ product.name }}
                     </div>
                     <div class="flex">
-                      <div class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700">
-                        <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 bg-white"
-                          v-popover.right="{ name: `availableVariants_${product.id}` }">
-                          <font-awesome-icon :icon="['fas', 'plus']" class="text-xs"/>
+                      <v-popover class="flex">
+                        <div class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700"
+                          v-if="product.availableVariants.length > 1">
+                          <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 bg-white">
+                            <font-awesome-icon :icon="['fas', 'plus']" class="text-xs"/>
+                          </div>
                         </div>
-                      </div>
+                        <template slot="popover">
+                          <div class="bg-white w-64 border rounded shadow-xl">
+                            <div class="flex flex-col w-full">
+                              <div class="font-bold text-gray-600 p-2 border-b">Choose a color</div>
+                              <div class="flex p-2">
+                                <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
+                                  v-for="(variant, variantIndex) in currentProduct.availableVariants"
+                                  :key="variantIndex"
+                                  :class="{ 'border-gray-300 bg-white': _colorIsInVariantsOf(currentProduct, variant.color) }"
+                                  @click="addVariant(variant)">
+                                  <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
+                                    :style="{ 'background-color': variant.color }">
+                                    <font-awesome-icon :icon="['fas', 'check']"
+                                      :style="{ color: getCorrectColor(variant.color), fontSize: '.8em' }"
+                                      v-if="_colorIsInVariantsOf(currentProduct, variant.color)"/>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </template>
+                      </v-popover>
                       <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
                         v-for="(variant, variantIndex) in product.variants"
                         :key="variantIndex"
@@ -116,8 +139,8 @@
             </simplebar>
           </div>
         </div>
-        <div class="flex flex-col overflow-hidden w-full border-t text-gray-600 flex-grow"
-          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? '55rem' : '77px' }">
+        <div class="flex flex-shrink flex-grow-0 flex-col overflow-hidden w-full border-t text-gray-600"
+          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? (designMeta.plan == 'sell' ? '55rem' : '41rem') : '77px' }">
           <div class="flex border-b p-4 justify-between cursor-pointer hover:text-gray-700 hover:bg-gray-100"
             @click="togglePlanSection">
             <div class="flex flex-col">
@@ -126,17 +149,18 @@
                   I WANT TO
                 </span>
                 <div @click.stop>
-                  <toggle-button v-model="marketPlan"
+                  <toggle-button :value="designMeta.plan == 'sell'"
                     :labels="{checked: 'SELL', unchecked: 'BUY'}"
                     :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
-                    :width="60"/>
+                    :width="60"
+                    @change="changeCurrentProductPlan"/>
                 </div>
                 <span class="font-bold ml-1">
                   THE PRODUCT<span v-if="selectedProducts.length > 1">S</span> ABOVE
                 </span>
               </div>
               <div class="text-xs">
-                {{ marketPlan ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
+                {{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
               </div>
             </div>
             <div class="flex justify-center items-center">
@@ -145,39 +169,40 @@
           </div>
           <div class="flex h-full w-full flex flex-col">
             <div class="flex px-4 py-2 border-b">
-              <div class="w-2/12 font-bold px-1">
+              <div class="w-2/12 flex-shrink-0 font-bold px-1">
                 Size
               </div>
-              <div class="w-3/12 font-bold px-1">
-                Base Cost
+              <div class="w-3/12 flex-shrink-0 font-bold px-1">
+                {{ designMeta.plan == 'sell' ? 'Base Cost' : 'Price (₱)' }}
               </div>
-              <div class="w-4/12 font-bold px-1">
+              <div class="font-bold flex-grow px-1">
                 Quantity
               </div>
-              <div class="w-3/12 font-bold px-1">
+              <div class="w-3/12 flex-shrink-0 font-bold px-1" v-if="designMeta.plan == 'sell'">
                 Price (₱)
               </div>
             </div>
             <simplebar class="h-full overflow-auto px-4 pb-3">
-              <div class="flex px-4 w-full">
+              <div class="flex w-full">
                   <div class="flex flex-col w-full">
                     <div class="flex mt-3 items-center"
                       v-for="(size, index) in currentVariant.available_sizes"
                       :key="`${currentVariant.id}_${index}`">
-                      <div class="flex w-2/12 px-1">
+                      <div class="flex flex-shrink-0 w-2/12 px-1">
                         {{ size.name }}
                       </div>
-                      <div class="flex w-3/12 px-1">
+                      <div class="flex flex-shrink-0 w-3/12 px-1">
                         {{ size.base_cost.formatMoney('₱ ') }}
                       </div>
-                      <div class="flex w-4/12 px-1">
+                      <div class="flex flex-grow px-1">
                         <VueNumericInput class="h-8"
                           align="center"
                           :min="0"
                           :value="currentVariant.sizes[size.name].quantity"
-                          @input="calculateEstProfit(size.name, 'quantity', $event)"/>
+                          @input="calculateEstProfit(size.name, 'quantity', $event)"
+                          style="width: 80%"/>
                       </div>
-                      <div class="flex w-3/12 px-1">
+                      <div class="flex flex-shrink-0 w-3/12 px-1" v-if="designMeta.plan == 'sell'">
                         <VueNumericInput class="h-8"
                           align="center"
                           :precision="2"
@@ -190,7 +215,7 @@
                   </div>
                 </div>
             </simplebar>
-            <div class="flex justify-between border-t p-4 items-center">
+            <div class="flex justify-between border-t p-4 items-center" v-if="designMeta.plan == 'sell'">
               <span class="font-bold ml-1">
                 ESTIMATED PROFIT
               </span>
@@ -217,34 +242,35 @@
         <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
           <div class="canvas-section outline-none select-none relative w-full h-full text-center">
             <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
-              <div class="flex bg-white mt-4 p-4 rounded shadow-xl border">
-                <button type="button"
-                  class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="addObject('text', 'TEXT')"
-                  title="Add a Text"
-                  v-tippy>
-                  <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center h-8 items-center focus:outline-none mx-1 outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-                  @click="$refs.artsModal.show()"
-                  title="Add an Art"
-                  v-tippy>
-                  <font-awesome-icon :icon="['fas', 'image']"/>
-                </button>
-              </div>
-              <div class="flex bg-white ml-2 mt-4 p-4 rounded shadow-xl border items-center"
+              <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border items-center"
                 v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
-                  :style="{ backgroundColor: activeObject.style.color }"
-                  title="Color"
-                  v-if="activeObjectCanBeColored"
-                  v-tippy
-                  v-popover="{ name: 'availableTextColors' }">
-                </button>
+                <v-popover class="flex">
+                  <button type="button"
+                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
+                    :style="{ backgroundColor: activeObject.style.color }"
+                    title="Color"
+                    v-if="activeObjectCanBeColored"
+                    v-tippy="{ arrow: true }">
+                  </button>
+                  <template slot="popover">
+                    <div class="bg-white w-64 border rounded shadow-xl">
+                      <div class="colors flex flex-wrap">
+                        <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
+                          v-for="(color, index) in textColors"
+                          :key="index"
+                          @click="setColorTo(color)"
+                          :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
+                          <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
+                            :style="{ 'background-color': color.code }">
+                            <font-awesome-icon :icon="['fas', 'check']"
+                              :style="{ color: getCorrectColor(color.code) }"
+                              v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </v-popover>
                 <div class="flex" v-if="activeObject && activeObject.type == 'text'">
                   <div class="w-48 px-1 h-8 z-10 items-center">
                     <v-select :options="webfonts"
@@ -262,32 +288,32 @@
                     class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
                     @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
-                    title="Bold"
-                    v-tippy>
+                    title="Bold (Ctrl + B)"
+                    v-tippy="{ arrow: true }">
                     <font-awesome-icon :icon="['fas', 'bold']"/>
                   </button>
                   <button type="button"
                     class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
                     @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
-                    title="Italic"
-                    v-tippy>
+                    title="Italic (Ctrl + I)"
+                    v-tippy="{ arrow: true }">
                     <font-awesome-icon :icon="['fas', 'italic']"/>
                   </button>
                   <button type="button"
                     class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
                     @click="toggleTextDecoration('underline')"
-                    title="Underline"
-                    v-tippy>
+                    title="Underline (Ctrl + U)"
+                    v-tippy="{ arrow: true }">
                     <font-awesome-icon :icon="['fas', 'underline']"/>
                   </button>
                   <button type="button"
                     class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
                     @click="toggleTextDecoration('line-through')"
-                    title="Strikethrough"
-                    v-tippy>
+                    title="Strikethrough (Ctrl + K)"
+                    v-tippy="{ arrow: true }">
                     <font-awesome-icon :icon="['fas', 'strikethrough']"/>
                   </button>
                   <VueNumericInput :min="0"
@@ -298,13 +324,13 @@
                     class="ml-1"/>
                 </div>
               </div>
-              <div class="flex bg-white ml-2 mt-4 p-4 rounded shadow-xl border"
+              <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border"
                 v-if="activeObject">
                 <button type="button"
                   class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Align Left"
                   @click="alignObject('left', activeObject.bounds.width / 2)"
-                  v-tippy>
+                  v-tippy="{ arrow: true }">
                   <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="4" height="54" rx="2" fill="#718096"/>
                     <rect x="12" y="21" width="11" height="39" rx="2" transform="rotate(-90 12 21)" fill="#718096"/>
@@ -315,7 +341,7 @@
                   class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Align Horizontal Center"
                   @click="alignObject('left', (currentVariant.printable_area[currentSide].width / 2))"
-                  v-tippy>
+                  v-tippy="{ arrow: true }">
                   <svg width="13" height="13" viewBox="0 0 39 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="17" width="4" height="54" rx="2" fill="#718096"/>
                     <rect y="21" width="11" height="39" rx="2" transform="rotate(-90 0 21)" fill="#718096"/>
@@ -326,7 +352,7 @@
                   class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Align Right"
                   @click="alignObject('left', (currentVariant.printable_area[currentSide].width) - (activeObject.bounds.width / 2))"
-                  v-tippy>
+                  v-tippy="{ arrow: true }">
                   <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="4" height="54" rx="2" transform="matrix(-1 0 0 1 51 0)" fill="#718096"/>
                     <rect width="11" height="39" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 21)" fill="#718096"/>
@@ -337,7 +363,7 @@
                   class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Align Top"
                   @click="alignObject('top', activeObject.bounds.height / 2)"
-                  v-tippy>
+                  v-tippy="{ arrow: true }">
                   <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="54.5" y="0.5" width="4" height="54" rx="2" transform="rotate(90 54.5 0.5)" fill="#718096"/>
                     <rect x="33.5" y="12.5" width="11" height="39" rx="2" fill="#718096"/>
@@ -348,7 +374,7 @@
                   class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Align Vertical Center"
                   @click="alignObject('top', (currentVariant.printable_area[currentSide].height / 2))"
-                  v-tippy>
+                  v-tippy="{ arrow: true }">
                   <svg width="13" height="13" viewBox="0 0 55 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect x="0.5" y="22.5" width="4" height="54" rx="2" transform="rotate(-90 0.5 22.5)" fill="#718096"/>
                     <rect x="21.5" y="39.5" width="11" height="39" rx="2" transform="rotate(180 21.5 39.5)" fill="#718096"/>
@@ -359,7 +385,7 @@
                   class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                   title="Align Bottom"
                   @click="alignObject('top', (currentVariant.printable_area[currentSide].height) - (activeObject.bounds.height / 2))"
-                  v-tippy>
+                  v-tippy="{ arrow: true }">
                   <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="4" height="54" rx="2" transform="matrix(1.19249e-08 -1 -1 -1.19249e-08 54.5 51.5)" fill="#718096"/>
                     <rect width="11" height="39" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 33.5 39.5)" fill="#718096"/>
@@ -370,50 +396,89 @@
             </div>
 
             <div class="left-actions absolute z-10 flex flex-shrink justify-center flex-col">
-              <div class="flex bg-white rounded shadow-xl border">
-                <div class="flex flex-col py-4">
+              <div class="flex bg-white mb-4 rounded border">
+                <div class="flex flex-col py-1">
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 mt-0 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    @click="addObject('text', 'Your Text Here', 'Your Text Here')"
+                    title="Add a Text"
+                    v-tippy="{ arrow: true }">
+                    <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
+                    </svg>
+                  </button>
+                  <button type="button"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    @click="$refs.artsModal.show()"
+                    title="Add an Art"
+                    v-tippy="{ arrow: true }">
+                    <font-awesome-icon :icon="['fas', 'image']"/>
+                  </button>
+                </div>
+              </div>
+              <div class="flex bg-white mb-4 rounded border" v-if="designMeta.plan == 'sell'">
+                <div class="flex flex-col py-1">
+                  <button type="button"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    title="Edit Metadata"
+                    @click="toggleDrawer('productMetaDrawer')"
+                    v-tippy="{ arrow: true }">
+                    <font-awesome-icon :icon="['fas', 'tags']" class="text-xs"/>
+                  </button>
+                  <button type="button"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    title="Objects"
+                    @click="toggleDrawer('layersDrawer')"
+                    v-tippy="{ arrow: true }">
+                    <font-awesome-icon :icon="['fas', 'layer-group']" class="text-xs"/>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex bg-white rounded border">
+                <div class="flex flex-col py-1">
+                  <button type="button"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="Duplicate"
-                    v-tippy
+                    v-tippy="{ arrow: true }"
                     @click="duplicate">
                     <font-awesome-icon :icon="['fas', 'clone']" class="text-xs"/>
                   </button>
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 mb-0 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="To Front"
-                    v-tippy
-                    @click="moveObjectPosition(currentVariant.printable_area[currentSide].objects.length - 1)">
+                    v-tippy="{ arrow: true }"
+                    @click="moveObjectPosition(activeObject, currentVariant.printable_area[currentSide].objects.length - 1)">
                     <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                       <rect x="11" y="11" width="32" height="32" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
                     </svg>
                   </button>
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="Forward"
-                    v-tippy
-                    @click="moveObjectPosition(activeObjectIndex < (currentVariant.printable_area[currentSide].objects.length - 1) ? activeObjectIndex + 1 : activeObjectIndex)">
+                    v-tippy="{ arrow: true }"
+                    @click="moveObjectPosition(activeObject, activeObjectIndex < (currentVariant.printable_area[currentSide].objects.length - 1) ? activeObjectIndex + 1 : activeObjectIndex)">
                     <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <rect x="20" y="18" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                       <rect x="1" y="1" width="36" height="36" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
                     </svg>
                   </button>
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="Backward"
-                    v-tippy
-                    @click="moveObjectPosition(activeObjectIndex > 0 ? activeObjectIndex - 1 : activeObjectIndex)">
+                    v-tippy="{ arrow: true }"
+                    @click="moveObjectPosition(activeObject, activeObjectIndex > 0 ? activeObjectIndex - 1 : activeObjectIndex)">
                     <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                       <rect x="19" y="17" width="38" height="38" rx="3" fill="#718096"/>
                     </svg>
                   </button>
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="To Back"
-                    v-tippy
-                    @click="moveObjectPosition(0)">
+                    v-tippy="{ arrow: true }"
+                    @click="moveObjectPosition(activeObject, 0)">
                     <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                       <rect x="11" y="11" width="32" height="32" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
@@ -422,28 +487,60 @@
                 </div>
               </div>
 
-              <div class="flex bg-white mt-4 rounded shadow-xl border justify-center">
-                <div class="flex flex-col py-4">
+              <div class="flex bg-white mt-4 rounded border justify-center">
+                <div class="flex flex-col py-1">
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="Zoom In"
                     @click="zoomTo(0.1)"
-                    v-tippy>
+                    v-tippy="{ arrow: true }">
                     <font-awesome-icon :icon="['fas', 'search-plus']" class="text-xs"/>
                   </button>
                   <button type="button"
-                    class="justify-center items-center mx-4 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="Zoom Out"
                     @click="zoomTo(-0.1)"
-                    v-tippy>
+                    v-tippy="{ arrow: true }">
                     <font-awesome-icon :icon="['fas', 'search-minus']" class="text-xs"/>
                   </button>
+                </div>
+              </div>
+
+              <div class="flex bg-white mt-4 rounded border justify-center">
+                <div class="flex flex-col py-1">
+                  <v-popover class="flex">
+                    <button type="button"
+                      class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                      title="Tips"
+                      v-tippy="{ arrow: true }">
+                      <font-awesome-icon :icon="['fas', 'question-circle']" class="text-xs"/>
+                    </button>
+                    <template slot="popover">
+                      <div class="bg-gray-900 text-xs text-white rounded border p-4 text-left">
+                        <div class="font-bold mb-2">Tips:</div>
+                        <ul class="tips-list list-disc ml-4">
+                          <li>
+                            Hold space + drag to start panning
+                          </li>
+                          <li>
+                            Ctrl + "+" to zoom in
+                          </li>
+                          <li>
+                            Ctrl + "-" to zoom out
+                          </li>
+                          <li>
+                            Ctrl + "0" to reset zoom
+                          </li>
+                        </ul>
+                      </div>
+                    </template>
+                  </v-popover>
                 </div>
               </div>
             </div>
 
             <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
-              <div class="flex bg-white mt-4 rounded shadow-xl border">
+              <div class="flex bg-white mt-4 rounded border">
                 <div class="flex p-4">
                   <ToggleSwitch :options="currentVariantSides"
                     class="mx-1"
@@ -459,25 +556,6 @@
                     </template>
                   </ToggleSwitch>
                 </div>
-              </div>
-            </div>
-            <div class="bottom-tips absolute z-10 flex flex-shrink">
-              <div class="bg-gray-900 text-xs text-white mt-4 rounded shadow-xl border p-4 text-left">
-                <div class="font-bold mb-2">Tips:</div>
-                <ul class="tips-list">
-                  <li>
-                    Hold space + drag to start panning
-                  </li>
-                  <li>
-                    Ctrl + "+" to zoom in
-                  </li>
-                  <li>
-                    Ctrl + "-" to zoom out
-                  </li>
-                  <li>
-                    Ctrl + "0" to reset zoom
-                  </li>
-                </ul>
               </div>
             </div>
             <div class="inline-block product-section relative w-auto h-auto">
@@ -568,44 +646,122 @@
         </div>
       </div>
 
-      <popover :name="`availableVariants_${currentProduct.id}`"
-        :width="300">
-        <div class="flex flex-col w-full">
-          <div class="font-bold text-gray-600 m-2">Choose a color</div>
-          <div class="flex">
-            <div class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-              v-for="(variant, variantIndex) in currentProduct.availableVariants"
-              :key="variantIndex"
-              :class="{ 'border-gray-300 bg-white': _colorIsInVariantsOf(currentProduct, variant.color) }"
-              @click="addVariant(variant)">
-              <div class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
-                :style="{ 'background-color': variant.color }">
-                <font-awesome-icon :icon="['fas', 'check']"
-                  :style="{ color: getCorrectColor(variant.color), fontSize: '.8em' }"
-                  v-if="_colorIsInVariantsOf(currentProduct, variant.color)"/>
+      <VueTailwindDrawer position="right"
+        ref="layersDrawer"
+        :backdrop="false"
+        @hidden="rightDrawerHidden"
+        width="20%">
+        <div class="flex flex-grow flex-col text-gray-600">
+          <div class="modal-heading border-b w-full p-4">
+            <div class="flex justify-between w-full items-center">
+              <div class="flex uppercase">
+                <strong>Layers</strong>
+              </div>
+              <div class="flex text-right">
+                <div class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
+                    @click="toggleDrawer('layersDrawer')">
+                  <font-awesome-icon :icon="['fas', 'times']"
+                    class="text-xs"/>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </popover>
-
-      <popover name="availableTextColors"
-        :width="310">
-        <div class="colors mt-2 flex flex-wrap">
-          <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
-            v-for="(color, index) in textColors"
-            :key="index"
-            @click="setColorTo(color)"
-            :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
-            <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
-              :style="{ 'background-color': color.code }">
-              <font-awesome-icon :icon="['fas', 'check']"
-                :style="{ color: getCorrectColor(color.code) }"
-                v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
-            </div>
+          <div class="flex flex-grow">
+            <simplebar class="h-full w-full">
+              <div class="flex flex-col w-full">
+                <draggable v-model="currentVariant.printable_area[currentSide].objects" @end="layerDragged">
+                  <transition-group>
+                    <div class="layer items-center py-2 px-4 h-12 select-none flex border"
+                      v-for="(obj, i) in currentVariant.printable_area[currentSide].objects"
+                      :key="obj.id"
+                      :class="{ 'bg-gray-100': obj.id == activeObject.id }"
+                      @click="activated(obj)"
+                      @dblclick="(e) => obj.type == 'text' ? activateContent(obj) : false">
+                      <div class="flex flex-grow items-center">
+                        <div class="flex">
+                          <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg"
+                            v-if="obj.type == 'text'">
+                            <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
+                          </svg>
+                          <font-awesome-icon :icon="['far', 'image']"
+                            v-if="obj.type == 'image' || obj.type == 'svg'"/>
+                        </div>
+                        <div class="flex pl-3">
+                          {{ obj.name }}
+                        </div>
+                      </div>
+                    </div>
+                  </transition-group>
+                </draggable>
+              </div>
+            </simplebar>
           </div>
         </div>
-      </popover>
+      </VueTailwindDrawer>
+
+      <VueTailwindDrawer position="right"
+        ref="productMetaDrawer"
+        @hidden="rightDrawerHidden"
+        v-if="designMeta.plan == 'sell'">
+        <div class="flex flex-grow flex-col text-gray-600">
+          <div class="flex border-b w-full p-4">
+            <div class="flex justify-between w-full items-center">
+              <div class="flex uppercase">
+                <strong>Product Metadata</strong>
+              </div>
+              <div class="flex text-right">
+                <div class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
+                    @click="toggleDrawer('productMetaDrawer')">
+                  <font-awesome-icon :icon="['fas', 'times']"
+                    class="text-xs"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-grow">
+            <simplebar class="h-full w-full">
+              <div class="flex p-4">
+                <div class="w-full">
+                  <div class="mb-3">
+                    <label for="product_name" class="font-bold">Product Name</label>
+                    <div class="mt-2">
+                      <input name="product_name"
+                        class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                        type="text"
+                        :class="{ 'border-red-400': errors.has('product_name'), 'focus:border-gray-600': !errors.has('name') }"
+                        placeholder="Product Name"
+                        data-vv-as="Product Name"
+                        v-validate="'required'"
+                        v-model="tmpProductMetadata.name"/>
+                    </div>
+                    <span class="text-red-700 text-xs pt-1 font-bold inline-block"
+                      v-if="errors.has('product_name')">
+                      {{ errors.first('product_name') }}
+                    </span>
+                  </div>
+                  <div>
+                    <label for="product_description" class="font-bold">Product Description</label>
+                    <div>
+                      <WrappedEditor v-model="tmpProductMetadata.description"/>
+                    </div>
+                    <span class="text-red-700 text-xs pt-1 font-bold inline-block"
+                      v-if="errors.has('product_description')">
+                      {{ errors.first('product_description') }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </simplebar>
+          </div>
+          <div class="flex p-4 justify-end border-t">
+            <PTButton color="primary"
+              @click="saveProductMetadata">
+              SAVE
+            </PTButton>
+          </div>
+        </div>
+      </VueTailwindDrawer>
+
     </div>
   </div>
 </template>
@@ -623,6 +779,11 @@ import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 import AvailableProducts from '@/components/Designer/AvailableProducts'
 import VueNumericInput from '@/components/VueNumericInput'
+import VueTailwindDrawer from '@/components/VueTailwindDrawer'
+import VueTailwindAccordion from '@/components/VueTailwindAccordion'
+import WrappedEditor from '@/components/WrappedEditor'
+import draggable from 'vuedraggable'
+
 let WebFontLoader = null
 if(process.client){
   WebFontLoader = require('webfontloader')
@@ -638,7 +799,11 @@ export default {
     ArtsList,
     vSelect,
     AvailableProducts,
-    VueNumericInput
+    VueNumericInput,
+    WrappedEditor,
+    VueTailwindDrawer,
+    VueTailwindAccordion,
+    draggable
   },
   async created(){
     WebFontLoader.load({
@@ -658,6 +823,8 @@ export default {
   },
   data(){
     return {
+      isLayersCollapsed: false,
+      productDescriptionEditor: null,
       estimatedMinProfit: 0,
       estimatedMaxProfit: 0,
       fontSizeTimeout: null,
@@ -684,7 +851,12 @@ export default {
       panzoomController: null,
       canvasSection: null,
       isPanning: false,
-      activeObjectIndex: 0
+      activeObjectIndex: 0,
+      tmpProductMetadata: {
+        name: '',
+        description: '',
+        tags: ''
+      }
     }
   },
   computed: {
@@ -693,10 +865,10 @@ export default {
       selectedProducts: 'designer/selectedProducts',
       currentProductIndex: 'designer/currentProductIndex',
       currentVariantIndex: 'designer/currentVariantIndex',
-      fontSizes: 'designer/fontSizes',
       webfonts: 'designer/webfonts',
       currentSide: 'designer/currentSide',
-      currentDesignId: 'designer/currentDesignId'
+      currentDesignId: 'designer/currentDesignId',
+      designMeta: 'designer/designMeta'
     }),
     activeObjectCanBeColored(){
       if(!this.activeObject) return false
@@ -707,16 +879,51 @@ export default {
     }
   },
   methods: {
+    layerDragged(e){
+      this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', this.currentVariant.printable_area[this.currentSide].objects)
+      this.$nextTick(() => {
+        this.activated(this.currentVariant.printable_area[this.currentSide].objects[e.newIndex])
+      })
+    },
+    rightDrawerHidden(){
+      this.$nextTick(() => {
+        this.tmpProductMetadata = {
+          name: '',
+          description: '',
+          tags: ''
+        }
+      })
+    },
+    async saveProductMetadata(){
+      let res = await this.$validator.validate()
+      if(!res) return
+      this.$store.commit('designer/CURRENT_PRODUCT_META', this.tmpProductMetadata)
+    },
+    toggleDrawer(drawer){
+      if(this.$refs[drawer].isShown){
+        this.$refs[drawer].hide()
+        return
+      }
+      this.$refs[drawer].show()
+    },
+    changeCurrentProductPlan({value}){
+      let plan = 'buy'
+      if(value) plan = 'sell'
+      this.$store.commit('designer/DESIGN_PLAN', plan)
+    },
     calculateEstProfit(n, p, v){
-      let totalProfit = 0
       this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
         path: `sizes.${n}.${p}`,
         value: v
       })
+      if(this.designMeta.plan == 'buy') return
+      let totalProfit = 0
       _.map(this.selectedProducts, (product) => {
         _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
-            let baseCost = (_.find(variant.available_sizes, (s) => s.name == k)).base_cost
+            let availableSize = _.find(variant.available_sizes, (s) => s.name == k)
+            if(!availableSize) return
+            let baseCost = (availableSize).base_cost
             let totalForPrintree = baseCost * size.quantity
             let totalWithCustomerPrice = size.price * size.quantity
             let net = totalWithCustomerPrice - totalForPrintree
@@ -758,6 +965,10 @@ export default {
         }
       })
       this.panzoomController.pause()
+
+      this.canvasSection.addEventListener('dblclick', (evt) => {
+        this.panzoomController.pause()
+      })
 
       this.canvasSection.addEventListener('keypress', (evt) => {
         if (evt.which == 32) {
@@ -817,6 +1028,30 @@ export default {
           this.zoomTo('reset')
           return
         }
+        if (evt.ctrlKey && evt.which == 66) {
+          evt.preventDefault()
+          if(this.activeObject.type != 'text') return
+          this.toggleFontWeight(this.activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')
+          return
+        }
+        if (evt.ctrlKey && evt.which == 73) {
+          evt.preventDefault()
+          if(this.activeObject.type != 'text') return
+          this.toggleFontStyle(this.activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')
+          return
+        }
+        if (evt.ctrlKey && evt.which == 85) {
+          evt.preventDefault()
+          if(this.activeObject.type != 'text') return
+          this.toggleTextDecoration('underline')
+          return
+        }
+        if (evt.ctrlKey && evt.which == 75) {
+          evt.preventDefault()
+          if(this.activeObject.type != 'text') return
+          this.toggleTextDecoration('line-through')
+          return
+        }
       })
 
       this.canvasSection.addEventListener('keyup', (evt) => {
@@ -837,19 +1072,27 @@ export default {
         }
       })
     },
-    storeTmpProducts(products){
-      this.tmpProducts = products
-    },
     manageProducts(){
       let selectedProductIds = _.map(this.selectedProducts, 'id')
-      _.map(this.tmpProducts, (product) => {
+      let tmpProductIds = _.map(this.tmpProducts, 'id')
+      this.tmpProducts = _.map(this.tmpProducts, (product) => {
         if(_.includes(selectedProductIds, product.id)){
           let index = _.indexOf(selectedProductIds, product.id)
           product = JSON.parse(JSON.stringify(this.selectedProducts[index]))
-          return
         }
+        if(!product.meta) product.meta = {
+          name: '',
+          description: '',
+          tags: ''
+        }
+        return product
       })
       this.$store.dispatch('designer/setSelectedProducts', this.tmpProducts)
+      let productIndex = this.currentProductIndex
+      if(!this.selectedProducts[productIndex]) productIndex = 0
+      this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[productIndex]))
+      this.currentVariant = this.currentProduct.variants[0]
+      this.tmpProducts = []
       this.$refs.availableProductsModal.hide()
     },
     alignObject(pos, val){
@@ -857,10 +1100,10 @@ export default {
       this._updateActiveObjectProps(`bounds.${pos}`, val)
       this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
     },
-    async moveObjectPosition(newIndex){
-      if(!this.activeObject || (this.activeObjectIndex == newIndex)) return
+    async moveObjectPosition(obj, newIndex){
+      if(!obj) return
       const newObjects = await this.$store.dispatch('designer/moveObjectPosition', {
-        obj: this.activeObject,
+        obj: obj,
         newIndex
       })
       this.currentVariant.printable_area[this.currentSide].objects = JSON.parse(JSON.stringify(newObjects))
@@ -919,12 +1162,13 @@ export default {
         type = 'svg'
         value = res.files.file
       }
-      this.addObject(type, value)
+      this.addObject(type, value, file.name)
       this.$refs.artsModal.hide()
     },
-    async addObject(type, value = ''){
+    async addObject(type, value = '', name = null){
       let newObject = await this.$store.dispatch('designer/addObject', {type, value})
       newObject = JSON.parse(JSON.stringify(newObject))
+      newObject.name = name
       if(type == 'image'){
         let i = new Image()
         i.onload = () => {
@@ -1038,6 +1282,7 @@ export default {
       }, 800)
     },
     changeText(e){
+      this._updateActiveObjectProps('name', e.target.innerText)
       this._updateActiveObjectProps('value', e.target.innerText)
       this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
       this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
@@ -1100,6 +1345,13 @@ export default {
     }
   },
   watch: {
+    currentProduct: {
+      immediate: true,
+      handler(to){
+        if(!to || (to && to.meta)) return
+        this.tmpProductMetadata = JSON.parse(JSON.stringify(to.meta))
+      }
+    },
     currentProductIndex: {
       immediate: true,
       handler(to){

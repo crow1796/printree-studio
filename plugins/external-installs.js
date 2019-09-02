@@ -7,16 +7,16 @@ import VueLazyload from 'vue-lazyload'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AreaLoader from '@/components/AreaLoader'
+import PTForm from '@/components/PTForm'
 import VeeValidate from 'vee-validate'
-import VueNumber from 'vue-number-animation'
 
 Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
 Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
+Vue.use(PTForm)
 Vue.use(VueVirtualScroller)
 
-Vue.use(VueNumber)
 Vue.use(VueLazyload, {
   preLoad: 1,
   error: require('~/assets/images/logo.png'),
@@ -29,14 +29,16 @@ if (process.client) {
   const VueKonva = require('vue-konva')
   const vClickOutside = require('v-click-outside')
   const vue2Dropzone = require('vue2-dropzone')
-  const Popover = require('vue-js-popover').default
+  const VTooltip = require('v-tooltip').default
   require('vue2-dropzone/dist/vue2Dropzone.min.css')
   const ToggleButton = require('vue-js-toggle-button').default
+  const VueNumber = require('vue-number-animation').default
 
   Vue.component('vue-dropzone', vue2Dropzone)
   Vue.component('drr', drr)
+  Vue.use(VueNumber)
   Vue.use(ToggleButton)
-  Vue.use(Popover)
+  Vue.use(VTooltip)
   Vue.use(vClickOutside)
   Vue.use(VueKonva)
 }

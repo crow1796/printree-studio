@@ -15,7 +15,7 @@ export default {
         _.map(variant.available_sizes, (size) => {
           sizes[size.name] = {
             quantity: 0,
-            base_cost: size.base_cost
+            price: size.base_cost
           }
         })
 
@@ -43,6 +43,7 @@ export default {
       id: null,
       name: null,
       user_id: null,
+      plan: null,
       products: []
     }
     const designRef = await fireDb.collection('user_designs').doc(id)
@@ -50,6 +51,7 @@ export default {
     design.id = designSnap.id
     design.name = designSnap.data().name
     design.user_id = designSnap.data().user_id
+    design.plan = designSnap.data().plan
     const products = await Promise.all(_.map(designSnap.data().products, async (productRef) => {
       let productSnap = await productRef.product.get()
       const availableVariants = await Promise.all(_.map(productSnap.data().available_variants, async (variantRef) => {
@@ -77,6 +79,7 @@ export default {
       return {
         id: productSnap.id,
         name: productSnap.data().name,
+        meta: productRef.meta,
         availableVariants,
         variants
       }
@@ -84,10 +87,25 @@ export default {
     design.products = products
     return design
   },
+  async getArts(){
+    const artsRef = await fireDb.collection('available_arts')
+    let artsSnap = await artsRef.get()
+    const arts = await Promise.all(_.map(artsSnap.docs, async (doc) => {
+      const art = doc.data()
+      return JSON.parse(JSON.stringify({
+        id: doc.id,
+        label: art.label,
+        value: art.value,
+        type: art.type
+      }))
+    }))
+    return arts
+  },
   async createDesignFor(user, products){
     let design = {
       name: 'Untitled',
       user_id: user.uid,
+      plan: 'sell',
       products: _.map(products, (product) => {
         let objects = {}
         let sizes = {}

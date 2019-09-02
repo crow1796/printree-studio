@@ -31,9 +31,6 @@ export default {
       default: null
     }
   },
-  created(){
-    console.log(this.$slots, this.$scopedSlots)
-  },
   methods: {
     toggle(option){
       this.$emit('change', option)
