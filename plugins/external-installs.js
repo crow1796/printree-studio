@@ -33,7 +33,9 @@ if (process.client) {
   require('vue2-dropzone/dist/vue2Dropzone.min.css')
   const ToggleButton = require('vue-js-toggle-button').default
   const VueNumber = require('vue-number-animation').default
+  const Toasted = require('vue-toasted').default
 
+  Vue.use(Toasted)
   Vue.component('vue-dropzone', vue2Dropzone)
   Vue.component('drr', drr)
   Vue.use(VueNumber)

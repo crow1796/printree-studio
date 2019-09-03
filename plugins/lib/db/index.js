@@ -6,6 +6,11 @@ export default {
     let productsSnap = await productsRef.get()
     const products = await Promise.all(_.map(productsSnap.docs, (async (doc) => {
       let product = doc.data()
+      let categorySnap = await product.category.get()
+      let category = {
+        ...categorySnap.data(),
+        id: categorySnap.id
+      }
       const availableVariants = await Promise.all(_.map(product.available_variants, async (variantRef) => {
         let variantSnap = await variantRef.get()
         let variant = variantSnap.data()
@@ -27,14 +32,16 @@ export default {
           sizes
         }))
       }))
-      return JSON.parse(JSON.stringify({
+      const availableProducts = JSON.parse(JSON.stringify({
         id: doc.id,
+        category,
         name: product.name,
         availableVariants,
         variants: [
           JSON.parse(JSON.stringify(availableVariants[0]))
         ]
       }))
+      return availableProducts
     })))
     return products
   },
@@ -54,6 +61,11 @@ export default {
     design.plan = designSnap.data().plan
     const products = await Promise.all(_.map(designSnap.data().products, async (productRef) => {
       let productSnap = await productRef.product.get()
+      let categorySnap = await productSnap.data().category.get()
+      let category = {
+        ...categorySnap.data(),
+        id: categorySnap.id
+      }
       const availableVariants = await Promise.all(_.map(productSnap.data().available_variants, async (variantRef) => {
         let variantSnap = await variantRef.get()
         let variant = variantSnap.data()
@@ -78,6 +90,7 @@ export default {
       }))
       return {
         id: productSnap.id,
+        category,
         name: productSnap.data().name,
         meta: productRef.meta,
         availableVariants,
@@ -103,7 +116,7 @@ export default {
   },
   async createDesignFor(user, products){
     let design = {
-      name: 'Untitled',
+      name: 'Untitled Campaign',
       user_id: user.uid,
       plan: 'sell',
       products: _.map(products, (product) => {
@@ -120,6 +133,11 @@ export default {
         })
         return {
           product: fireDb.collection('available_products').doc(product.id),
+          meta: {
+            name: '',
+            description: '',
+            tags: ''
+          },
           variants: [
             {
               objects,
@@ -135,5 +153,36 @@ export default {
       ...design,
       id: designRef.id
     }
+  },
+  async updateDesignName(id, name){
+    const designRef = fireDb.collection('user_designs').doc(id)
+    await designRef.update({name})
+  },
+  async saveCampaign({ id, selectedProducts, plan }){
+    const products = _.map(selectedProducts, (product) => {
+      let variants = _.map(product.variants, variant => {
+        let objects = {}
+        _.map(variant.printable_area, (side, key) => {
+          objects[key] = side.objects
+        })
+
+        return {
+          variant: fireDb.collection('product_variants').doc(variant.id),
+          objects,
+          sizes: variant.sizes
+        }
+      })
+
+      return {
+        meta: product.meta,
+        product: fireDb.collection('available_products').doc(product.id),
+        variants
+      }
+    })
+    const designRef = fireDb.collection('user_designs').doc(id)
+    await designRef.update({
+      plan,
+      products
+    })
   }
 }

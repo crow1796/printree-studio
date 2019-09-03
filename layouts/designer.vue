@@ -28,7 +28,7 @@
               class="text-center text-gray-600 outline-none focus:outline-none"
               :value="currentDesignName"
               @blur="updateDesignName($event.target.value)"
-              @keyup.enter="updateDesignName($event.target.value)"/>
+              @keyup.enter="$event.target.blur()"/>
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
@@ -69,15 +69,15 @@ export default {
     })
   },
   mounted(){
-    window.onbeforeunload = (e) => {
-      e = e || window.event
-      // For IE and Firefox prior to version 4
-      if (e) {
-        e.returnValue = 'Sure?'
-      }
-      // For Safari
-      return 'Sure?'
-    }
+    // window.onbeforeunload = (e) => {
+    //   e = e || window.event
+    //   // For IE and Firefox prior to version 4
+    //   if (e) {
+    //     e.returnValue = 'Sure?'
+    //   }
+    //   // For Safari
+    //   return 'Sure?'
+    // }
   },
   data(){
     return {
@@ -95,12 +95,14 @@ export default {
     },
     updateDesignName(newName){
       if(!newName.trim()) return
-      this.$store.commit('designer/DESIGN_NAME', newName)
+      this.$store.dispatch('designer/updateDesignName', newName)
       this.isEditingDesignName = false
     },
-    nextStep(){
+    async nextStep(){
       if(!this.isLoggedIn) return this.$refs.authModal.show()
       this.isLoading = true
+      await this.$store.dispatch('designer/saveData')
+      this.isLoading = false
     }
   }
 }

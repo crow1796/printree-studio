@@ -2,11 +2,10 @@
   <div class="flex h-full w-full">
     <AreaLoader v-if="isLoading" fullscreen/>
     <div class="flex h-full w-full relative" v-else>
-      <VueTailwindModal ref="availableProductsModal"
-        width="80%"
-        content-class="text-gray-600">
-        <div class="flex flex-col">
-          <div class="modal-heading border-b w-full p-4">
+      <VueTailwindDrawer ref="availableProductsModal"
+        width="85%">
+        <div class="flex flex-col h-full">
+          <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
               <div class="flex uppercase">
                 <strong>Select Products</strong>
@@ -20,12 +19,12 @@
               </div>
             </div>
           </div>
-          <div class="flex modal-body" style="height: 36rem">
+          <div class="flex modal-body flex-grow">
             <AvailableProducts v-model="tmpProducts"/>
           </div>
           <div class="flex modal-footer justify-between p-4 border-t items-center">
             <a href="#" class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400">
-              {{ selectedProducts.length }} Products Selected
+              {{ tmpProducts.length }} Products Selected
             </a>
             <button type="button"
               class="border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
@@ -34,10 +33,10 @@
             </button>
           </div>
         </div>
-      </VueTailwindModal>
-      <VueTailwindModal ref="artsModal"
-        width="70%">
-        <div class="flex">
+      </VueTailwindDrawer>
+      <VueTailwindDrawer ref="artsModal"
+        width="85%">
+        <div class="flex p-4">
           <div class="flex w-1/3 flex-col">
             <div class="uppercase font-bold text-gray-600 pb-2 px-1">
               Upload an Image
@@ -69,7 +68,7 @@
             <ArtsList @selected="addObject('svg', $event.value, $event.label); $refs.artsModal.hide()"/>
           </div>
         </div>
-      </VueTailwindModal>
+      </VueTailwindDrawer>
       <div class="flex w-1/4 border-r h-full flex-col">
         <div class="flex overflow-hidden w-full h-full flex-col overflow-auto flex-grow">
           <div class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
@@ -199,7 +198,7 @@
                           align="center"
                           :min="0"
                           :value="currentVariant.sizes[size.name].quantity"
-                          @input="calculateEstProfit(size.name, 'quantity', $event)"
+                          @input="setQuantityAndPrice(size.name, 'quantity', $event)"
                           style="width: 80%"/>
                       </div>
                       <div class="flex flex-shrink-0 w-3/12 px-1" v-if="designMeta.plan == 'sell'">
@@ -209,7 +208,7 @@
                           :min="size.base_cost"
                           :controls="false"
                           :value="currentVariant.sizes[size.name].price"
-                          @blur="calculateEstProfit(size.name, 'price', $event)"/>
+                          @blur="setQuantityAndPrice(size.name, 'price', $event)"/>
                       </div>
                     </div>
                   </div>
@@ -241,6 +240,13 @@
       <div class="flex flex-grow h-full flex-col">
         <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
           <div class="canvas-section outline-none select-none relative w-full h-full text-center">
+            <transition name="fade">
+              <div class="auto-save uppercase font-bold absolute rounded top-0 right-0 w-24 py-1 mt-4 mr-4 text-gray-600 text-xs border"
+                v-if="autoSaving"
+                style="animation-duration: .3s;">
+                {{ autoSavingText }}
+              </div>
+            </transition>
             <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
               <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border items-center"
                 v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
@@ -470,8 +476,8 @@
                     v-tippy="{ arrow: true }"
                     @click="moveObjectPosition(activeObject, activeObjectIndex > 0 ? activeObjectIndex - 1 : activeObjectIndex)">
                     <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                       <rect x="19" y="17" width="38" height="38" rx="3" fill="#718096"/>
+                      <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
                     </svg>
                   </button>
                   <button type="button"
@@ -668,13 +674,14 @@
           </div>
           <div class="flex flex-grow">
             <simplebar class="h-full w-full">
-              <div class="flex flex-col w-full">
-                <draggable v-model="currentVariant.printable_area[currentSide].objects" @end="layerDragged">
+              <div class="flex flex-col-reverse w-full">
+                <draggable v-model="currentVariant.printable_area[currentSide].objects"
+                  @end="layerDragged">
                   <transition-group>
                     <div class="layer items-center py-2 px-4 h-12 select-none flex border"
-                      v-for="(obj, i) in currentVariant.printable_area[currentSide].objects"
+                      v-for="obj in currentVariant.printable_area[currentSide].objects"
                       :key="obj.id"
-                      :class="{ 'bg-gray-100': obj.id == activeObject.id }"
+                      :class="{ 'bg-gray-100': activeObject && obj.id == activeObject.id }"
                       @click="activated(obj)"
                       @dblclick="(e) => obj.type == 'text' ? activateContent(obj) : false">
                       <div class="flex flex-grow items-center">
@@ -770,7 +777,6 @@
 import panzoom from 'panzoom'
 import Tabs from '@/components/Tabs'
 import Select from '@/components/Select'
-import VueTailwindModal from '@/components/VueTailwindModal'
 import ToggleSwitch from '@/components/ToggleSwitch'
 import ArtsList from '@/components/Designer/ArtsList'
 import ColorRegulator from '~/plugins/color-regulator.js'
@@ -794,7 +800,6 @@ export default {
   components: {
     Tabs,
     Select,
-    VueTailwindModal,
     ToggleSwitch,
     ArtsList,
     vSelect,
@@ -816,6 +821,7 @@ export default {
     await this.$store.dispatch('designer/fetchDesignData', this.currentDesignId)
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]))
     this.currentVariant = this.currentProduct.variants[0]
+    this._calculateEstProfit()
     this.isLoading = false
     this.$nextTick(() => {
       this._registerCanvasEvents()
@@ -823,6 +829,9 @@ export default {
   },
   data(){
     return {
+      autoSavingText: 'Saving...',
+      autoSaving: false,
+      autoSaveTimeout: null,
       isLayersCollapsed: false,
       productDescriptionEditor: null,
       estimatedMinProfit: 0,
@@ -879,6 +888,9 @@ export default {
     }
   },
   methods: {
+    _reverseObjects(objects){
+      return (JSON.parse(JSON.stringify(objects))).reverse()
+    },
     layerDragged(e){
       this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', this.currentVariant.printable_area[this.currentSide].objects)
       this.$nextTick(() => {
@@ -898,6 +910,7 @@ export default {
       let res = await this.$validator.validate()
       if(!res) return
       this.$store.commit('designer/CURRENT_PRODUCT_META', this.tmpProductMetadata)
+      this.$refs.productMetaDrawer.hide()
     },
     toggleDrawer(drawer){
       if(this.$refs[drawer].isShown){
@@ -911,12 +924,15 @@ export default {
       if(value) plan = 'sell'
       this.$store.commit('designer/DESIGN_PLAN', plan)
     },
-    calculateEstProfit(n, p, v){
+    setQuantityAndPrice(n, p, v){
       this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
         path: `sizes.${n}.${p}`,
         value: v
       })
       if(this.designMeta.plan == 'buy') return
+      this._calculateEstProfit()
+    },
+    _calculateEstProfit(){
       let totalProfit = 0
       _.map(this.selectedProducts, (product) => {
         _.map(product.variants, (variant) => {
@@ -987,7 +1003,7 @@ export default {
         }
       })
 
-      this.canvasSection.addEventListener('keydown', (evt) => {
+      document.addEventListener('keydown', (evt) => {
         // Left
         if(evt.which == 37 && this.activeObject){
           this._updateActiveObjectProps('bounds.left', (this.activeObject.bounds.left - 1))
@@ -1012,7 +1028,27 @@ export default {
           this.isMoving = true
           return
         }
+      })
 
+      document.addEventListener('keyup', (evt) => {
+        if(_.includes([37, 38, 39, 40], evt.which) && this.activeObject){
+          clearTimeout(this.arrowKeysTimeout)
+          this.arrowKeysTimeout = setTimeout(() => {
+            this.$nextTick(() => {
+              this.isMoving = false
+            })
+          }, 1000)
+          return
+        }
+
+        if (evt.which == 46) {
+          if(!this.activeObject) return
+          this.removeObject(this.activeObject)
+          return
+        }
+      })
+
+      this.canvasSection.addEventListener('keydown', (evt) => {
         if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
           evt.preventDefault()
           this.zoomTo(0.1)
@@ -1055,14 +1091,6 @@ export default {
       })
 
       this.canvasSection.addEventListener('keyup', (evt) => {
-        if(_.includes([37, 38, 39, 40], evt.which) && this.activeObject){
-          clearTimeout(this.arrowKeysTimeout)
-          this.arrowKeysTimeout = setTimeout(() => {
-            this.isMoving = false
-          }, 1000)
-          return
-        }
-
         if (evt.which == 32) {
           this.isHoldingSpace = false
           this.stageCursor = 'initial'
@@ -1348,7 +1376,7 @@ export default {
     currentProduct: {
       immediate: true,
       handler(to){
-        if(!to || (to && to.meta)) return
+        if(!to || (to && !to.meta)) return
         this.tmpProductMetadata = JSON.parse(JSON.stringify(to.meta))
       }
     },
@@ -1386,6 +1414,21 @@ export default {
       let offsetX = 0.1 + deltaX
       let offsetY = 0.1 + deltaY
       this.panzoomController.zoomAbs(offsetX, offsetY, newScale)
+    },
+    selectedProducts: {
+      deep: true,
+      handler(to){
+        clearTimeout(this.autoSaveTimeout)
+        this.autoSaveTimeout = setTimeout(async () => {
+          this.autoSaving = true
+          this.autoSavingText = 'Saving...'
+          await this.$store.dispatch('designer/saveData')
+          this.autoSavingText = 'Saved!'
+          setTimeout(() => {
+            this.autoSaving = false
+          }, 1000)
+        }, 3000)
+      }
     }
   }
 }

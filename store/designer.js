@@ -478,6 +478,17 @@ const actions = {
       plan: design.plan
     })
     return design
+  },
+  async saveData(context){
+    await db.saveCampaign({
+      id: context.getters.currentDesignId,
+      plan: context.getters.designMeta.plan,
+      selectedProducts: context.getters.selectedProducts
+    })
+  },
+  async updateDesignName(context, name){
+    await db.updateDesignName(context.getters.currentDesignId, name)
+    context.commit('DESIGN_NAME', name)
   }
 }
 
