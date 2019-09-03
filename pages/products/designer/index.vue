@@ -2,11 +2,10 @@
   <div class="flex h-full w-full">
     <AreaLoader v-if="isLoading" fullscreen/>
     <div class="flex h-full w-full relative" v-else>
-      <VueTailwindModal ref="availableProductsModal"
-        width="80%"
-        content-class="text-gray-600">
-        <div class="flex flex-col">
-          <div class="modal-heading border-b w-full p-4">
+      <VueTailwindDrawer ref="availableProductsModal"
+        width="85%">
+        <div class="flex flex-col h-full">
+          <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
               <div class="flex uppercase">
                 <strong>Select Products</strong>
@@ -20,12 +19,12 @@
               </div>
             </div>
           </div>
-          <div class="flex modal-body" style="height: 36rem">
+          <div class="flex modal-body flex-grow">
             <AvailableProducts v-model="tmpProducts"/>
           </div>
           <div class="flex modal-footer justify-between p-4 border-t items-center">
             <a href="#" class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400">
-              {{ selectedProducts.length }} Products Selected
+              {{ tmpProducts.length }} Products Selected
             </a>
             <button type="button"
               class="border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
@@ -34,10 +33,10 @@
             </button>
           </div>
         </div>
-      </VueTailwindModal>
-      <VueTailwindModal ref="artsModal"
-        width="70%">
-        <div class="flex">
+      </VueTailwindDrawer>
+      <VueTailwindDrawer ref="artsModal"
+        width="85%">
+        <div class="flex p-4">
           <div class="flex w-1/3 flex-col">
             <div class="uppercase font-bold text-gray-600 pb-2 px-1">
               Upload an Image
@@ -69,7 +68,7 @@
             <ArtsList @selected="addObject('svg', $event.value, $event.label); $refs.artsModal.hide()"/>
           </div>
         </div>
-      </VueTailwindModal>
+      </VueTailwindDrawer>
       <div class="flex w-1/4 border-r h-full flex-col">
         <div class="flex overflow-hidden w-full h-full flex-col overflow-auto flex-grow">
           <div class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
@@ -199,7 +198,7 @@
                           align="center"
                           :min="0"
                           :value="currentVariant.sizes[size.name].quantity"
-                          @input="calculateEstProfit(size.name, 'quantity', $event)"
+                          @input="setQuantityAndPrice(size.name, 'quantity', $event)"
                           style="width: 80%"/>
                       </div>
                       <div class="flex flex-shrink-0 w-3/12 px-1" v-if="designMeta.plan == 'sell'">
@@ -209,7 +208,7 @@
                           :min="size.base_cost"
                           :controls="false"
                           :value="currentVariant.sizes[size.name].price"
-                          @blur="calculateEstProfit(size.name, 'price', $event)"/>
+                          @blur="setQuantityAndPrice(size.name, 'price', $event)"/>
                       </div>
                     </div>
                   </div>
@@ -241,6 +240,13 @@
       <div class="flex flex-grow h-full flex-col">
         <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
           <div class="canvas-section outline-none select-none relative w-full h-full text-center">
+            <transition name="fade">
+              <div class="auto-save uppercase font-bold absolute rounded top-0 right-0 w-24 py-1 mt-4 mr-4 text-gray-600 text-xs border"
+                v-if="autoSaving"
+                style="animation-duration: .3s;">
+                {{ autoSavingText }}
+              </div>
+            </transition>
             <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
               <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border items-center"
                 v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
@@ -569,7 +575,7 @@
                 :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: 2 }"
                 @mouseenter="printableAreaZ = 3"></div>
               <div class="printable-area absolute"
-                :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: 3 /*printableAreaZ*/, outlineColor: getCorrectColor(currentVariant.color) }"
+                :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
                 :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
                 @mouseenter="isPrintableAreaHovered = true"
                 @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
@@ -771,7 +777,6 @@
 import panzoom from 'panzoom'
 import Tabs from '@/components/Tabs'
 import Select from '@/components/Select'
-import VueTailwindModal from '@/components/VueTailwindModal'
 import ToggleSwitch from '@/components/ToggleSwitch'
 import ArtsList from '@/components/Designer/ArtsList'
 import ColorRegulator from '~/plugins/color-regulator.js'
@@ -795,7 +800,6 @@ export default {
   components: {
     Tabs,
     Select,
-    VueTailwindModal,
     ToggleSwitch,
     ArtsList,
     vSelect,
@@ -817,6 +821,7 @@ export default {
     await this.$store.dispatch('designer/fetchDesignData', this.currentDesignId)
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]))
     this.currentVariant = this.currentProduct.variants[0]
+    this._calculateEstProfit()
     this.isLoading = false
     this.$nextTick(() => {
       this._registerCanvasEvents()
@@ -824,6 +829,9 @@ export default {
   },
   data(){
     return {
+      autoSavingText: 'Saving...',
+      autoSaving: false,
+      autoSaveTimeout: null,
       isLayersCollapsed: false,
       productDescriptionEditor: null,
       estimatedMinProfit: 0,
@@ -916,12 +924,15 @@ export default {
       if(value) plan = 'sell'
       this.$store.commit('designer/DESIGN_PLAN', plan)
     },
-    calculateEstProfit(n, p, v){
+    setQuantityAndPrice(n, p, v){
       this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
         path: `sizes.${n}.${p}`,
         value: v
       })
       if(this.designMeta.plan == 'buy') return
+      this._calculateEstProfit()
+    },
+    _calculateEstProfit(){
       let totalProfit = 0
       _.map(this.selectedProducts, (product) => {
         _.map(product.variants, (variant) => {
@@ -1403,6 +1414,21 @@ export default {
       let offsetX = 0.1 + deltaX
       let offsetY = 0.1 + deltaY
       this.panzoomController.zoomAbs(offsetX, offsetY, newScale)
+    },
+    selectedProducts: {
+      deep: true,
+      handler(to){
+        clearTimeout(this.autoSaveTimeout)
+        this.autoSaveTimeout = setTimeout(async () => {
+          this.autoSaving = true
+          this.autoSavingText = 'Saving...'
+          await this.$store.dispatch('designer/saveData')
+          this.autoSavingText = 'Saved!'
+          setTimeout(() => {
+            this.autoSaving = false
+          }, 1000)
+        }, 3000)
+      }
     }
   }
 }

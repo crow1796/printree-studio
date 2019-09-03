@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute h-full z-10"
+  <div class="absolute h-full z-20"
     v-if="isShown"
     @click="() => backdrop ? hide() : false"
     :class="{
@@ -11,8 +11,8 @@
       width: backdrop ? '100%' : width
     }">
     <transition name="slide"
-      enter-active-class="slideInRight"
-      leave-active-class="slideOutRight">
+      :enter-active-class="position == 'right' ? 'slideInRight' : 'slideInLeft'"
+      :leave-active-class="position == 'right' ? 'slideOutRight' : 'slideOutLeft'">
       <div class="flex h-full flex-col z-10 bg-white absolute"
         :class="{
           'border-l right-0': position == 'right',
