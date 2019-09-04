@@ -9,11 +9,11 @@
         </div>
         <div class="flex w-1/2 items-center justify-end">
           <a href="#"
-            class="text-blue-400 mx-4 hover:text-blue-600 font-bold">
+            class="text-blue-400 mx-4 hover:text-blue-600">
             SHOP
           </a>
           <a href="#"
-            class="text-blue-400 mx-4 hover:text-blue-600 font-bold"
+            class="text-blue-400 mx-4 hover:text-blue-600"
             @click.prevent="signOut">
             {{ isLoggedIn ? 'LOGOUT' : 'LOGIN' }}
           </a>

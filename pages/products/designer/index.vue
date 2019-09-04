@@ -3,7 +3,7 @@
     <AreaLoader v-if="isLoading" fullscreen/>
     <div class="flex h-full w-full relative" v-else>
       <VueTailwindDrawer ref="availableProductsModal"
-        width="85%">
+        width="70%">
         <div class="flex flex-col h-full">
           <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
@@ -35,8 +35,8 @@
         </div>
       </VueTailwindDrawer>
       <VueTailwindDrawer ref="artsModal"
-        width="85%">
-        <div class="flex p-4">
+        width="60%">
+        <div class="flex p-4 h-full">
           <div class="flex w-1/3 flex-col">
             <div class="uppercase font-bold text-gray-600 pb-2 px-1">
               Upload an Image
@@ -46,7 +46,7 @@
                 <vue-dropzone class="h-full border-0 flex items-center justify-center"
                   ref="myVueDropzone"
                   id="dropzone"
-                  :style="{border: 0, height: '550px'}"
+                  :style="{border: 0}"
                   :options="{
                     url: 'https://httpbin.org/post',
                     thumbnailWidth: 150,
@@ -564,7 +564,8 @@
                 </div>
               </div>
             </div>
-            <div class="inline-block product-section relative w-auto h-auto">
+            <div class="inline-block product-section relative w-auto h-auto"
+              id="product-canvas">
               <div class="inline-block relative w-auto h-auto" :style="{ 'background-color': currentVariant.color }">
                 <img draggable="false"
                   class="relative"
@@ -575,6 +576,7 @@
                 :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: 2 }"
                 @mouseenter="printableAreaZ = 3"></div>
               <div class="printable-area absolute"
+                id="printable-area"
                 :style="{ left: `${currentVariant.printable_area[currentSide].left}px`, top: `${currentVariant.printable_area[currentSide].top}px`, width: `${currentVariant.printable_area[currentSide].width}px`, height: `${currentVariant.printable_area[currentSide].height}px`, zIndex: printableAreaZ, outlineColor: getCorrectColor(currentVariant.color) }"
                 :class="{ '-has-outline': isPrintableAreaHovered || isMoving }"
                 @mouseenter="isPrintableAreaHovered = true"
@@ -620,7 +622,7 @@
                     v-html="obj.value"
                     class="svg-object"
                     :ref="`svgContainer_${obj.id}`"
-                    :style="{ fill: obj.style.color }"></div>
+                    :style="{ fill: obj.style.color }"/>
                     <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image'">
                       <img width="100%" :src="obj.value"/>
                     </div>
@@ -789,10 +791,14 @@ import VueTailwindDrawer from '@/components/VueTailwindDrawer'
 import VueTailwindAccordion from '@/components/VueTailwindAccordion'
 import WrappedEditor from '@/components/WrappedEditor'
 import draggable from 'vuedraggable'
+let Canvas2Image
+let html2canvas
 
 let WebFontLoader = null
 if(process.client){
   WebFontLoader = require('webfontloader')
+  Canvas2Image = require('~/plugins/canvas2image').default
+  html2canvas = require('html2canvas')
 }
 
 export default {
@@ -816,9 +822,6 @@ export default {
         families: _.map(this.webfonts, 'value')
       }
     })
-    this.$store.commit('designer/CURRENT_DESIGN_ID', this.$storage.getLocalStorage('current_design_id'))
-    this.isLoading = true
-    await this.$store.dispatch('designer/fetchDesignData', this.currentDesignId)
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]))
     this.currentVariant = this.currentProduct.variants[0]
     this._calculateEstProfit()
@@ -962,7 +965,7 @@ export default {
     },
     _firstPrintableArea(variant){
       let areas = _.keys(variant.printable_area)
-      return _.includes(areas, 'front') ? 'front' : _.head()
+      return _.includes(areas, 'front') ? 'front' : _.head(areas)
     },
     _registerCanvasEvents(){
       document.firstElementChild.style.zoom = "reset"
@@ -1152,11 +1155,17 @@ export default {
         this.$refs[`textContainer_${obj.id}`][0].focus()
       }
     },
-    deactivateContentOf(obj, e){
+    async deactivateContentOf(obj, e){
       if(obj.type == 'text'){
         this.$refs[`textContainer_${obj.id}`][0].contentEditable = false
         this.$refs[`obj_${obj.id}_drr`][0].$emit('content-inactive')
       }
+
+      html2canvas(document.getElementById('printable-area'))
+        .then((canvas) => {
+          let img = Canvas2Image.convertToPNG(canvas)
+          document.body.appendChild(img)
+        })
     },
     showAvailableProducts(){
       this.$refs.availableProductsModal.show()

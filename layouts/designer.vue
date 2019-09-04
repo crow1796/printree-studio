@@ -42,7 +42,7 @@
           </PTButton>
         </div>
       </div>
-      <nuxt/>
+      <nuxt v-if="!isLoading"/>
     </div>
   </no-ssr>
 </template>
@@ -52,6 +52,11 @@
 import VueTailwindModal from '@/components/VueTailwindModal'
 import AuthModal from '@/components/Auth/AuthModal'
 import { mapGetters } from 'vuex'
+let html2canvas
+
+if(process.client){
+  html2canvas = require('html2canvas')
+}
 
 export default {
   head: {
@@ -65,8 +70,16 @@ export default {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',
       user: 'user/user',
-      currentDesignName: 'designer/currentDesignName'
+      currentDesignName: 'designer/currentDesignName',
+      currentDesignId: 'designer/currentDesignId'
     })
+  },
+  async created(){
+    if(process.client){
+      this.$store.commit('designer/CURRENT_DESIGN_ID', this.$storage.getLocalStorage('current_design_id'))
+      await this.$store.dispatch('designer/fetchDesignData', this.currentDesignId)
+      this.isLoading = false
+    }
   },
   mounted(){
     // window.onbeforeunload = (e) => {
@@ -81,7 +94,7 @@ export default {
   },
   data(){
     return {
-      isLoading: false,
+      isLoading: true,
       isEditingDesignName: false
     }
   },
@@ -103,6 +116,11 @@ export default {
       this.isLoading = true
       await this.$store.dispatch('designer/saveData')
       this.isLoading = false
+      // printable-content
+      const canvas = await html2canvas(document.getElementById('product-canvas'), {
+        allowTaint: true
+      })
+        document.body.appendChild(canvas)
     }
   }
 }
