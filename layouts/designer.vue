@@ -52,11 +52,6 @@
 import VueTailwindModal from '@/components/VueTailwindModal'
 import AuthModal from '@/components/Auth/AuthModal'
 import { mapGetters } from 'vuex'
-let html2canvas
-
-if(process.client){
-  html2canvas = require('html2canvas')
-}
 
 export default {
   head: {
@@ -116,11 +111,7 @@ export default {
       this.isLoading = true
       await this.$store.dispatch('designer/saveData')
       this.isLoading = false
-      // printable-content
-      const canvas = await html2canvas(document.getElementById('product-canvas'), {
-        allowTaint: true
-      })
-        document.body.appendChild(canvas)
+      // TODO: Generate thumbnails in the backend
     }
   }
 }

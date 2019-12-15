@@ -7,7 +7,7 @@
       <div class="text-center mt-2 text-gray-600">
         {{ art.label }}
       </div>
-      <div class="flex w-full h-full px-4 pb-4 pt-2 items-center justify-center"
+      <div class="flex w-full h-full px-4 pb-4 pt-2 items-center justify-center overflow-hidden"
         v-html="art.value"></div>
     </div>
   </div>
