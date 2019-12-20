@@ -1139,13 +1139,11 @@ import VueTailwindAccordion from '@/components/VueTailwindAccordion'
 import WrappedEditor from '@/components/WrappedEditor'
 import draggable from 'vuedraggable'
 let Canvas2Image
-let html2canvas
 
 let WebFontLoader = null
 if (process.client) {
   WebFontLoader = require('webfontloader')
   Canvas2Image = require('~/plugins/canvas2image').default
-  html2canvas = require('html2canvas')
 }
 
 export default {
@@ -1564,11 +1562,6 @@ export default {
         this.$refs[`textContainer_${obj.id}`][0].contentEditable = false
         this.$refs[`obj_${obj.id}_drr`][0].$emit('content-inactive')
       }
-
-      html2canvas(document.getElementById('printable-area')).then(canvas => {
-        let img = Canvas2Image.convertToPNG(canvas)
-        document.body.appendChild(img)
-      })
     },
     showAvailableProducts() {
       this.$refs.availableProductsModal.show()

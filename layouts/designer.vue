@@ -111,7 +111,6 @@ export default {
       this.isLoading = true
       await this.$store.dispatch('designer/saveData')
       this.isLoading = false
-      // TODO: Generate thumbnails in the backend
     }
   }
 }
