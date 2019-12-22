@@ -1,6 +1,6 @@
 <template>
   <VueTailwindDrawer ref="drawer" width="100%">
-    <div class="flex h-full w-full text-gray-600">
+    <div class="flex h-full w-full text-gray-600 overflow-hidden">
       <div class="flex flex-col w-full h-full">
         <div class="flex items-center justify-between border-b p-4">
           <div class="flex uppercase">
@@ -16,17 +16,19 @@
           </div>
         </div>
         <div class="flex flex-grow">
-          <div class="flex flex-grow flex-col p-2"></div>
+          <div class="flex flex-grow flex-col p-2 overflow-auto"></div>
           <div class="flex border-l w-3/12">
             <div class="flex flex-col w-full">
               <div class="flex p-4 uppercase border-b">
                 <strong>My Products</strong>
               </div>
-              <div class="flex p-4 flex-wrap">
-                <div class="flex w-6/12 p-1" v-for="product in products" :key="product.id">
-                  <div class="flex flex-col border rounded w-full">
-                    <div class="px-2 pt-2" v-html="_placeholderOfFirstVariantOf(product)"></div>
-                    <div class="px-2 pb-2 font-bold">{{ product.meta.name }}</div>
+              <div class="overflow-auto h-full">
+                <div class="flex p-4 flex-wrap">
+                  <div class="flex w-6/12 p-1" v-for="product in products" :key="product.id">
+                    <div class="flex flex-col border rounded w-full">
+                      <div class="px-2 pt-2" v-html="_placeholderOfFirstVariantOf(product)"></div>
+                      <div class="px-2 pb-2 font-bold">{{ product.meta.name }}</div>
+                    </div>
                   </div>
                 </div>
               </div>
