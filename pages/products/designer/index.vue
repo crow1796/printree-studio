@@ -635,7 +635,7 @@
                     type="button"
                     class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
                     title="Edit Metadata"
-                    @click="toggleDrawer('productMetaDrawer')"
+                    @click="startEditingMetadata"
                     v-tippy="{ arrow: true }"
                   >
                     <font-awesome-icon :icon="['fas', 'tags']" class="text-xs" />
@@ -1242,6 +1242,12 @@ export default {
     }
   },
   methods: {
+    startEditingMetadata() {
+      this.toggleDrawer('productMetaDrawer')
+      this.tmpProductMetadata = JSON.parse(
+        JSON.stringify(this.selectedProducts[this.currentProductIndex].meta)
+      )
+    },
     _reverseObjects(objects) {
       return JSON.parse(JSON.stringify(objects)).reverse()
     },

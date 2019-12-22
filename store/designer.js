@@ -244,7 +244,7 @@ const state = () => ({
     { label: 'Press Start 2P', value: 'Press Start 2P' },
     { label: 'Fugaz One', value: 'Fugaz One' },
     { label: 'Fredericka the Great', value: 'Fredericka the Great' },
-    { label: 'Patua', value: 'Patua' },
+    { label: 'Patua One', value: 'Patua One' },
     { label: 'Bubblegum Sans', value: 'Bubblegum Sans' },
     { label: 'Shojumaru', value: 'Shojumaru' },
     { label: 'Bungee Inline', value: 'Bungee Inline' }
@@ -306,7 +306,7 @@ const mutations = {
   CURRENT_VARIANT_PROPERTIES(state, data) {
     _.set(
       state.selectedProducts[state.currentProductIndex].variants[
-        state.currentVariantIndex
+      state.currentVariantIndex
       ],
       data.path,
       data.value
@@ -373,7 +373,7 @@ const mutations = {
   SWAP_OBJECT_INDEX(state, { currentIndex, newIndex }) {
     let variant =
       state.selectedProducts[state.currentProductIndex].variants[
-        state.currentVariantIndex
+      state.currentVariantIndex
       ]
     let tmp = variant.printable_area[state.currentSide].objects[currentIndex]
     variant.printable_area[state.currentSide].objects[currentIndex] =
@@ -579,23 +579,24 @@ const actions = {
     return design
   },
   async saveData(context) {
+    let generatedImages = []
     try {
-      console.log(JSON.parse(JSON.stringify(context.getters.selectedProducts)))
       const res = await this.$axios.post(
         'http://localhost:8080/create-images',
         {
           products: context.getters.selectedProducts
         }
       )
-      console.log(res)
-      // await db.saveCampaign({
-      //   id: context.getters.currentDesignId,
-      //   plan: context.getters.designMeta.plan,
-      //   selectedProducts: context.getters.selectedProducts
-      // })
+      generatedImages = res.data
+      await db.saveCampaign({
+        id: context.getters.currentDesignId,
+        plan: context.getters.designMeta.plan,
+        selectedProducts: context.getters.selectedProducts
+      })
     } catch (error) {
       console.log(error)
     }
+    return generatedImages;
   },
   async updateDesignName(context, name) {
     await db.updateDesignName(context.getters.currentDesignId, name)
