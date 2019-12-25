@@ -1958,7 +1958,7 @@ export default {
         this.autoSaveTimeout = setTimeout(async () => {
           this.autoSaving = true
           this.autoSavingText = 'Saving...'
-          await this.$store.dispatch('designer/saveData')
+          await this.$store.dispatch('designer/saveData', {shouldGenerateImages: false})
           this.autoSavingText = 'Saved!'
           setTimeout(() => {
             this.autoSaving = false

@@ -578,16 +578,24 @@ const actions = {
     })
     return design
   },
-  async saveData(context) {
+  async saveData(context, params) {
+    const defaultParams = {
+      shouldGenerateImages: true
+    }
+
+    const newParams = {
+      ...defaultParams,
+      ...params
+    }
     let generatedImages = []
     try {
-      const res = await this.$axios.post(
+      const res = newParams.shouldGenerateImages ? await this.$axios.post(
         'http://localhost:8080/create-images',
         {
           products: context.getters.selectedProducts
         }
-      )
-      generatedImages = res.data
+      ) : []
+      generatedImages = res.data || res
       await db.saveCampaign({
         id: context.getters.currentDesignId,
         plan: context.getters.designMeta.plan,
