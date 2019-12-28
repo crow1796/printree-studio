@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="font-body">
     <div class="w-full flex navbar flex-col text-sm border-b">
       <div class="w-full px-32 py-2 flex">
         <div class="flex w-1/2">

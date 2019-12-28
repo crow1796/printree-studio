@@ -1,6 +1,6 @@
 <template>
   <no-ssr>
-    <div class="w-full h-full flex flex-col text-sm">
+    <div class="w-full h-full flex flex-col text-sm font-body">
       <AreaLoader v-if="isLoading" fullscreen />
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">
@@ -9,7 +9,7 @@
         </div>
         <div class="flex w-1/3 justify-center items-center">
           <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">
-            <span class="text-gray-600 uppercase">Drafts</span>
+            <span class="text-primary uppercase font-bold">Designer</span>
             <span class="mx-1">/</span>
             <span
               class="font-normal text-gray-600 hover:underline hover:text-gray-700"

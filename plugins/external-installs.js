@@ -1,4 +1,3 @@
-
 import Vue from 'vue'
 import VueTippy from 'vue-tippy'
 import simplebar from 'simplebar-vue'
