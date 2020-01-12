@@ -1,7 +1,7 @@
 <template>
   <div class="tabs flex flex-col h-full w-full">
-    <div class="tabs-head flex text-gray-400">
-      <button type="button" class="outline-none focus:outline-none border mx-1 px-8 py-2 font-bold rounded"
+    <div class="tabs-head flex text-gray-400 flex-wrap">
+      <button type="button" class="outline-none focus:outline-none border m-1 px-8 py-2 font-bold rounded"
         :class="[{ 'bg-gray-900 shadow-xl bg-primary border-white text-white hover:bg-primary-lighter': _isActive(tab), 'text-gray-600 border-grey-lightest hover:bg-gray-100': !_isActive(tab) }/*, `w-1/${tabs.length}`*/]"
         v-for="tab in tabs"
         :key="`title${tab.name}`"

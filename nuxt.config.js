@@ -1,36 +1,41 @@
-const webpack = require('webpack');
+const webpack = require('webpack')
 
 module.exports = {
   mode: 'universal',
   /*
-  ** Headers of the page
-  */
+   ** Headers of the page
+   */
   head: {
     title: process.env.npm_package_name || '',
     meta: [
       { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width,initial-scale=1,viewport-fit=cover' },
-      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
+      {
+        name: 'viewport',
+        content: 'width=device-width,initial-scale=1,viewport-fit=cover'
+      },
+      {
+        hid: 'description',
+        name: 'description',
+        content: process.env.npm_package_description || ''
+      }
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
   /*
-  ** Customize the progress-bar color
-  */
+   ** Customize the progress-bar color
+   */
   loading: { color: '#fff' },
   /*
-  ** Global CSS
-  */
+   ** Global CSS
+   */
   css: [
     '~/assets/css/tailwind.css',
     '~/assets/fonts/lato.css',
     '~/resources/scss/main.scss'
   ],
   /*
-  ** Plugins to load before mounting the App
-  */
+   ** Plugins to load before mounting the App
+   */
   plugins: [
     '~/plugins/firebase.js',
     '~/plugins/check_user.js',
@@ -38,34 +43,41 @@ module.exports = {
     '~/plugins/external-installs.js'
   ],
   /*
-  ** Nuxt.js modules
-  */
+   ** Nuxt.js modules
+   */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    ['nuxt-fontawesome', {
-      imports: [
-        {
-          set: '@fortawesome/free-solid-svg-icons',
-          icons: ['fas']
-        },,
-        {
-          set: '@fortawesome/free-regular-svg-icons',
-          icons: ['far']
-        },
-        {
-          set: '@fortawesome/free-brands-svg-icons',
-          icons: ['fab']
-        }
-      ]
-    }],
-    ['nuxt-env', {
-      keys: [
-        { key: 'GOOGLE_API', default: null },
-        { key: 'FIREBASE_DB', default: 'printree-52ca8' }
-      ]
-    }],
+    [
+      'nuxt-fontawesome',
+      {
+        imports: [
+          {
+            set: '@fortawesome/free-solid-svg-icons',
+            icons: ['fas']
+          },
+          ,
+          {
+            set: '@fortawesome/free-regular-svg-icons',
+            icons: ['far']
+          },
+          {
+            set: '@fortawesome/free-brands-svg-icons',
+            icons: ['fab']
+          }
+        ]
+      }
+    ],
+    [
+      'nuxt-env',
+      {
+        keys: [
+          { key: 'GOOGLE_API', default: null },
+          { key: 'FIREBASE_DB', default: 'printree-52ca8' }
+        ]
+      }
+    ],
     '@nuxtjs/universal-storage'
   ],
   storage: {
@@ -77,14 +89,13 @@ module.exports = {
     }
   },
   /*
-  ** Axios module configuration
-  ** See https://axios.nuxtjs.org/options
-  */
-  axios: {
-  },
+   ** Axios module configuration
+   ** See https://axios.nuxtjs.org/options
+   */
+  axios: {},
   /*
-  ** Build configuration
-  */
+   ** Build configuration
+   */
   build: {
     postcss: {
       plugins: {
@@ -92,8 +103,8 @@ module.exports = {
       }
     },
     /*
-    ** You can extend webpack config here
-    */
+     ** You can extend webpack config here
+     */
     extend(config, { isDev, isClient }) {
       if (isClient) {
         config.module.rules.push({
@@ -105,12 +116,9 @@ module.exports = {
     },
     plugins: [
       new webpack.ProvidePlugin({
-        '$': 'jquery',
-        '_': 'lodash'
+        $: 'jquery',
+        _: 'lodash'
       })
     ]
-  },
-  serverMiddleware: [
-    '~/server/api/index.js'
-  ]
+  }
 }

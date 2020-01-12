@@ -35,7 +35,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="absolute outline-none focus:outline-none bg-white select-icon rounded-full border w-10 flex h-10 items-center justify-center"
+                <div class="absolute outline-none focus:outline-none bg-white select-icon rounded-full border w-8 flex h-8 items-center justify-center"
                   :class="{ 'border-primary hover:border-primary-lighter hover:text-primary-lighter text-primary': _hasBeenSelected(product) }"
                   style="right: 10px; bottom: 10px;">
                   <font-awesome-icon :icon="['fas', _hasBeenSelected(product) ? 'check' : 'plus']"/>
@@ -124,7 +124,6 @@ export default {
         }
       })
     ]
-    console.log(this.categories)
     this.$emit('input', this.tmpProducts)
   },
   data(){

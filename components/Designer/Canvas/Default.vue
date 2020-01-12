@@ -1,37 +1,42 @@
 <template>
   <div>
-    <VueTailwindDrawer ref="artsModal"
-      width="85%">
-      <div class="flex p-4 flex-grow">
-        <div class="flex w-1/3 flex-col">
+    <VueTailwindDrawer ref="artsModal" width="40%">
+      <div class="flex p-4 h-full flex-col w-full">
+        <div class="flex w-1/3 flex-col w-full">
           <div class="uppercase font-bold text-gray-600 pb-2 px-1">
             Upload an Image
           </div>
           <div class="flex h-full w-full my-1">
             <div class="relative h-full w-full border border-dashed">
-              <vue-dropzone class="h-full border-0 flex items-center justify-center"
+              <vue-dropzone
+                class="h-full border-0 flex items-center justify-center"
                 ref="myVueDropzone"
                 id="dropzone"
-                :style="{border: 0, height: '550px'}"
+                :style="{ border: 0 }"
                 :options="{
                   url: 'https://httpbin.org/post',
                   thumbnailWidth: 150,
                   maxFiles: 1,
-                  acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp'
+                  acceptedFiles:
+                    'image/svg+xml, image/png, image/jpeg, image/bmp'
                 }"
-                @vdropzone-success="artAdded"/>
-            </div>
-
-            <div class="relative h-full ml-3 mr-2 or-divider">
-              <span class="text-gray-400">OR</span>
+                @vdropzone-success="artAdded"
+              />
             </div>
           </div>
         </div>
-        <div class="flex flex-col w-2/3">
+        <div class="flex flex-col w-2/3 w-full">
           <div class="uppercase font-bold text-gray-600 pb-2 px-1">
             Choose an Art
           </div>
-          <ArtsList @selected="addObject('svg', $event.value, $event.label); $refs.artsModal.hide()"/>
+          <div class="overflow-auto">
+            <ArtsList
+              @selected="
+                addObject('svg', $event.value, $event.label)
+                $refs.artsModal.hide()
+              "
+            />
+          </div>
         </div>
       </div>
     </VueTailwindDrawer>

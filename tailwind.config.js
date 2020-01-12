@@ -20,6 +20,10 @@ module.exports = {
       },
       maxWidth: {
         '1/5': '20%'
+      },
+      fontFamily: {
+        display: ['Montserrat'],
+        body: ['Roboto']
       }
     }
   },
