@@ -8,7 +8,8 @@
             class="w-10">
         </div>
         <div class="flex w-1/2 items-center justify-end">
-          <a href="#"
+          <a href="//shop.printree.com/"
+            target="_blank"
             class="text-blue-400 mx-4 hover:text-blue-600 font-bold">
             SHOP
           </a>

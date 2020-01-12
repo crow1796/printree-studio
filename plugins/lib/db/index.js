@@ -116,7 +116,7 @@ export default {
   },
   async createDesignFor(user, products){
     let design = {
-      name: 'Untitled Campaign',
+      name: 'Untitled Collection',
       user_id: user.uid,
       plan: 'sell',
       products: _.map(products, (product) => {
@@ -158,7 +158,7 @@ export default {
     const designRef = fireDb.collection('user_designs').doc(id)
     await designRef.update({name})
   },
-  async saveCampaign({ id, selectedProducts, plan }){
+  async saveCollection({ id, selectedProducts, plan }){
     const products = _.map(selectedProducts, (product) => {
       let variants = _.map(product.variants, variant => {
         let objects = {}

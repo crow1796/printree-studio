@@ -480,7 +480,7 @@ const actions = {
     return design
   },
   async saveData(context){
-    await db.saveCampaign({
+    await db.saveCollection({
       id: context.getters.currentDesignId,
       plan: context.getters.designMeta.plan,
       selectedProducts: context.getters.selectedProducts

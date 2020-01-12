@@ -40,7 +40,7 @@ export default {
 }
 /* :checked - resize to full height */
 .tab input:checked ~ .tab-content {
-  max-height: 100vh;
+  max-height: 100%;
 }
 
 /* Icon */

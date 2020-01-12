@@ -34,43 +34,9 @@
           </div>
         </div>
       </VueTailwindDrawer>
-      <VueTailwindDrawer ref="artsModal"
-        width="85%">
-        <div class="flex p-4">
-          <div class="flex w-1/3 flex-col">
-            <div class="uppercase font-bold text-gray-600 pb-2 px-1">
-              Upload an Image
-            </div>
-            <div class="flex h-full w-full my-1">
-              <div class="relative h-full w-full border border-dashed">
-                <vue-dropzone class="h-full border-0 flex items-center justify-center"
-                  ref="myVueDropzone"
-                  id="dropzone"
-                  :style="{border: 0, height: '550px'}"
-                  :options="{
-                    url: 'https://httpbin.org/post',
-                    thumbnailWidth: 150,
-                    maxFiles: 1,
-                    acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp'
-                  }"
-                  @vdropzone-success="artAdded"/>
-              </div>
 
-              <div class="relative h-full ml-3 mr-2 or-divider">
-                <span class="text-gray-400">OR</span>
-              </div>
-            </div>
-          </div>
-          <div class="flex flex-col w-2/3">
-            <div class="uppercase font-bold text-gray-600 pb-2 px-1">
-              Choose an Art
-            </div>
-            <ArtsList @selected="addObject('svg', $event.value, $event.label); $refs.artsModal.hide()"/>
-          </div>
-        </div>
-      </VueTailwindDrawer>
-      <div class="flex w-1/4 border-r h-full flex-col">
-        <div class="flex overflow-hidden w-full h-full flex-col overflow-auto flex-grow">
+      <div class="flex w-1/4 border-r flex-grow flex-col">
+        <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
               @click="showAvailableProducts">
             <font-awesome-icon :icon="['fas', 'cubes']"
@@ -138,8 +104,8 @@
             </simplebar>
           </div>
         </div>
-        <div class="flex flex-shrink flex-grow-0 flex-col overflow-hidden w-full border-t text-gray-600"
-          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? (designMeta.plan == 'sell' ? '55rem' : '41rem') : '77px' }">
+        <div class="flex flex-shrink flex-col overflow-hidden w-full border-t text-gray-600"
+          :style="{ transition: 'all .3s ease', height: !isMarketPlanCollapsed ? (designMeta.plan == 'sell' ? '25rem' : '22rem') : '77px' }">
           <div class="flex border-b p-4 justify-between cursor-pointer hover:text-gray-700 hover:bg-gray-100"
             @click="togglePlanSection">
             <div class="flex flex-col">
@@ -155,7 +121,7 @@
                     @change="changeCurrentProductPlan"/>
                 </div>
                 <span class="font-bold ml-1">
-                  THE PRODUCT<span v-if="selectedProducts.length > 1">S</span> ABOVE
+                  THIS PRODUCT<span v-if="selectedProducts.length > 1">S</span>
                 </span>
               </div>
               <div class="text-xs">
@@ -181,7 +147,7 @@
                 Price (₱)
               </div>
             </div>
-            <simplebar class="h-full overflow-auto px-4 pb-3">
+            <simplebar class="overflow-auto px-4 pb-3">
               <div class="flex w-full">
                   <div class="flex flex-col w-full">
                     <div class="flex mt-3 items-center"
@@ -237,334 +203,196 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-grow h-full flex-col">
-        <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
-          <div class="canvas-section outline-none select-none relative w-full h-full text-center">
-            <transition name="fade">
-              <div class="auto-save uppercase font-bold absolute rounded top-0 right-0 w-24 py-1 mt-4 mr-4 text-gray-600 text-xs border"
-                v-if="autoSaving"
-                style="animation-duration: .3s;">
-                {{ autoSavingText }}
-              </div>
-            </transition>
-            <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
-              <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border items-center"
-                v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
-                <v-popover class="flex">
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
-                    :style="{ backgroundColor: activeObject.style.color }"
-                    title="Color"
-                    v-if="activeObjectCanBeColored"
-                    v-tippy="{ arrow: true }">
-                  </button>
-                  <template slot="popover">
-                    <div class="bg-white w-64 border rounded shadow-xl">
-                      <div class="colors flex flex-wrap">
-                        <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
-                          v-for="(color, index) in textColors"
-                          :key="index"
-                          @click="setColorTo(color)"
-                          :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
-                          <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
-                            :style="{ 'background-color': color.code }">
-                            <font-awesome-icon :icon="['fas', 'check']"
-                              :style="{ color: getCorrectColor(color.code) }"
-                              v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
-                          </div>
+
+      <div class="flex flex-grow h-full flex-col w-3/4">
+        <DesignerTabs v-model="selectedTab"/>
+        <PanzoomContainer :class="{'bg-gray-300': selectedTab === 'designer'}" :isEnabled="selectedTab === 'designer'" ref="panzoomController">
+          <transition name="fade" v-if="selectedTab === 'designer'">
+            <div class="auto-save uppercase font-bold absolute rounded top-0 right-0 w-24 py-1 mt-4 mr-4 text-gray-600 text-xs border bg-white"
+              v-if="autoSaving"
+              style="animation-duration: .3s;">
+              {{ autoSavingText }}
+            </div>
+          </transition>
+
+          <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full" v-if="selectedTab === 'designer'">
+            <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border items-center"
+              v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
+              <v-popover class="flex">
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
+                  :style="{ backgroundColor: activeObject.style.color }"
+                  title="Color"
+                  v-if="activeObjectCanBeColored"
+                  v-tippy="{ arrow: true }">
+                </button>
+                <template slot="popover">
+                  <div class="bg-white w-64 border rounded shadow-xl">
+                    <div class="colors flex flex-wrap">
+                      <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
+                        v-for="(color, index) in textColors"
+                        :key="index"
+                        @click="setColorTo(color)"
+                        :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
+                        <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
+                          :style="{ 'background-color': color.code }">
+                          <font-awesome-icon :icon="['fas', 'check']"
+                            :style="{ color: getCorrectColor(color.code) }"
+                            v-if="activeObject && activeObject.style.color.toLowerCase() == color.code.toLowerCase()"/>
                         </div>
                       </div>
                     </div>
-                  </template>
-                </v-popover>
-                <div class="flex" v-if="activeObject && activeObject.type == 'text'">
-                  <div class="w-48 px-1 h-8 z-10 items-center">
-                    <v-select :options="webfonts"
-                      class="flex-grow h-full text-sm"
-                      :value="activeObject.style.fontFamily"
-                      @input="changeFontFamily">
-                      <template slot="option" slot-scope="item">
-                        <span :style="{ fontFamily: item.value }">
-                          {{ item.label }}
-                        </span>
-                      </template>
-                    </v-select>
                   </div>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
-                    @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
-                    title="Bold (Ctrl + B)"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'bold']"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
-                    @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
-                    title="Italic (Ctrl + I)"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'italic']"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
-                    @click="toggleTextDecoration('underline')"
-                    title="Underline (Ctrl + U)"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'underline']"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
-                    @click="toggleTextDecoration('line-through')"
-                    title="Strikethrough (Ctrl + K)"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'strikethrough']"/>
-                  </button>
-                  <VueNumericInput :min="0"
-                    @input="changeFontSize({value: $event})"
-                    v-model="activeObject.style.fontSize"
-                    align="center"
-                    style="width: 90px"
-                    class="ml-1"/>
-                </div>
-              </div>
-              <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border"
-                v-if="activeObject">
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  title="Align Left"
-                  @click="alignObject('left', activeObject.bounds.width / 2)"
-                  v-tippy="{ arrow: true }">
-                  <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="4" height="54" rx="2" fill="#718096"/>
-                    <rect x="12" y="21" width="11" height="39" rx="2" transform="rotate(-90 12 21)" fill="#718096"/>
-                    <rect x="12" y="44" width="11" height="27" rx="2" transform="rotate(-90 12 44)" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  title="Align Horizontal Center"
-                  @click="alignObject('left', (currentVariant.printable_area[currentSide].width / 2))"
-                  v-tippy="{ arrow: true }">
-                  <svg width="13" height="13" viewBox="0 0 39 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="17" width="4" height="54" rx="2" fill="#718096"/>
-                    <rect y="21" width="11" height="39" rx="2" transform="rotate(-90 0 21)" fill="#718096"/>
-                    <rect x="6" y="44" width="11" height="27" rx="2" transform="rotate(-90 6 44)" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  title="Align Right"
-                  @click="alignObject('left', (currentVariant.printable_area[currentSide].width) - (activeObject.bounds.width / 2))"
-                  v-tippy="{ arrow: true }">
-                  <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="4" height="54" rx="2" transform="matrix(-1 0 0 1 51 0)" fill="#718096"/>
-                    <rect width="11" height="39" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 21)" fill="#718096"/>
-                    <rect width="11" height="27" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 44)" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  title="Align Top"
-                  @click="alignObject('top', activeObject.bounds.height / 2)"
-                  v-tippy="{ arrow: true }">
-                  <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="54.5" y="0.5" width="4" height="54" rx="2" transform="rotate(90 54.5 0.5)" fill="#718096"/>
-                    <rect x="33.5" y="12.5" width="11" height="39" rx="2" fill="#718096"/>
-                    <rect x="10.5" y="12.5" width="11" height="27" rx="2" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  title="Align Vertical Center"
-                  @click="alignObject('top', (currentVariant.printable_area[currentSide].height / 2))"
-                  v-tippy="{ arrow: true }">
-                  <svg width="13" height="13" viewBox="0 0 55 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="0.5" y="22.5" width="4" height="54" rx="2" transform="rotate(-90 0.5 22.5)" fill="#718096"/>
-                    <rect x="21.5" y="39.5" width="11" height="39" rx="2" transform="rotate(180 21.5 39.5)" fill="#718096"/>
-                    <rect x="44.5" y="33.5" width="11" height="27" rx="2" transform="rotate(180 44.5 33.5)" fill="#718096"/>
-                  </svg>
-                </button>
-                <button type="button"
-                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                  title="Align Bottom"
-                  @click="alignObject('top', (currentVariant.printable_area[currentSide].height) - (activeObject.bounds.height / 2))"
-                  v-tippy="{ arrow: true }">
-                  <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="4" height="54" rx="2" transform="matrix(1.19249e-08 -1 -1 -1.19249e-08 54.5 51.5)" fill="#718096"/>
-                    <rect width="11" height="39" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 33.5 39.5)" fill="#718096"/>
-                    <rect width="11" height="27" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 10.5 39.5)" fill="#718096"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            <div class="left-actions absolute z-10 flex flex-shrink justify-center flex-col">
-              <div class="flex bg-white mb-4 rounded border">
-                <div class="flex flex-col py-1">
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    @click="addObject('text', 'Your Text Here', 'Your Text Here')"
-                    title="Add a Text"
-                    v-tippy="{ arrow: true }">
-                    <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M36.6309 0V9.74805H31.5449L31.0908 4.69238H21.3125V39.416L26.2471 40.2637V44.0781H10.4141V40.2637L15.3486 39.416V4.69238H5.54004L5.11621 9.74805H0V0H36.6309Z" fill="#718096"/>
-                    </svg>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    @click="$refs.artsModal.show()"
-                    title="Add an Art"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'image']"/>
-                  </button>
-                </div>
-              </div>
-              <div class="flex bg-white mb-4 rounded border" v-if="designMeta.plan == 'sell'">
-                <div class="flex flex-col py-1">
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Edit Metadata"
-                    @click="toggleDrawer('productMetaDrawer')"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'tags']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Objects"
-                    @click="toggleDrawer('layersDrawer')"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'layer-group']" class="text-xs"/>
-                  </button>
-                </div>
-              </div>
-
-              <div class="flex bg-white rounded border">
-                <div class="flex flex-col py-1">
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Duplicate"
-                    v-tippy="{ arrow: true }"
-                    @click="duplicate">
-                    <font-awesome-icon :icon="['fas', 'clone']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="To Front"
-                    v-tippy="{ arrow: true }"
-                    @click="moveObjectPosition(activeObject, currentVariant.printable_area[currentSide].objects.length - 1)">
-                    <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
-                      <rect x="11" y="11" width="32" height="32" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
-                    </svg>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Forward"
-                    v-tippy="{ arrow: true }"
-                    @click="moveObjectPosition(activeObject, activeObjectIndex < (currentVariant.printable_area[currentSide].objects.length - 1) ? activeObjectIndex + 1 : activeObjectIndex)">
-                    <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="20" y="18" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
-                      <rect x="1" y="1" width="36" height="36" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
-                    </svg>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Backward"
-                    v-tippy="{ arrow: true }"
-                    @click="moveObjectPosition(activeObject, activeObjectIndex > 0 ? activeObjectIndex - 1 : activeObjectIndex)">
-                    <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="19" y="17" width="38" height="38" rx="3" fill="#718096"/>
-                      <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
-                    </svg>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="To Back"
-                    v-tippy="{ arrow: true }"
-                    @click="moveObjectPosition(activeObject, 0)">
-                    <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
-                      <rect x="11" y="11" width="32" height="32" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <div class="flex bg-white mt-4 rounded border justify-center">
-                <div class="flex flex-col py-1">
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Zoom In"
-                    @click="zoomTo(0.1)"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'search-plus']" class="text-xs"/>
-                  </button>
-                  <button type="button"
-                    class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                    title="Zoom Out"
-                    @click="zoomTo(-0.1)"
-                    v-tippy="{ arrow: true }">
-                    <font-awesome-icon :icon="['fas', 'search-minus']" class="text-xs"/>
-                  </button>
-                </div>
-              </div>
-
-              <div class="flex bg-white mt-4 rounded border justify-center">
-                <div class="flex flex-col py-1">
-                  <v-popover class="flex">
-                    <button type="button"
-                      class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-                      title="Tips"
-                      v-tippy="{ arrow: true }">
-                      <font-awesome-icon :icon="['fas', 'question-circle']" class="text-xs"/>
-                    </button>
-                    <template slot="popover">
-                      <div class="bg-gray-900 text-xs text-white rounded border p-4 text-left">
-                        <div class="font-bold mb-2">Tips:</div>
-                        <ul class="tips-list list-disc ml-4">
-                          <li>
-                            Hold space + drag to start panning
-                          </li>
-                          <li>
-                            Ctrl + "+" to zoom in
-                          </li>
-                          <li>
-                            Ctrl + "-" to zoom out
-                          </li>
-                          <li>
-                            Ctrl + "0" to reset zoom
-                          </li>
-                        </ul>
-                      </div>
+                </template>
+              </v-popover>
+              <div class="flex" v-if="activeObject && activeObject.type == 'text'">
+                <div class="w-48 px-1 h-8 z-10 items-center">
+                  <v-select :options="webfonts"
+                    class="flex-grow h-full text-sm"
+                    :value="activeObject.style.fontFamily"
+                    @input="changeFontFamily">
+                    <template slot="option" slot-scope="item">
+                      <span :style="{ fontFamily: item.value }">
+                        {{ item.label }}
+                      </span>
                     </template>
-                  </v-popover>
+                  </v-select>
                 </div>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
+                  @click="toggleFontWeight(activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')"
+                  title="Bold (Ctrl + B)"
+                  v-tippy="{ arrow: true }">
+                  <font-awesome-icon :icon="['fas', 'bold']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
+                  @click="toggleFontStyle(activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')"
+                  title="Italic (Ctrl + I)"
+                  v-tippy="{ arrow: true }">
+                  <font-awesome-icon :icon="['fas', 'italic']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
+                  @click="toggleTextDecoration('underline')"
+                  title="Underline (Ctrl + U)"
+                  v-tippy="{ arrow: true }">
+                  <font-awesome-icon :icon="['fas', 'underline']"/>
+                </button>
+                <button type="button"
+                  class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                  :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
+                  @click="toggleTextDecoration('line-through')"
+                  title="Strikethrough (Ctrl + K)"
+                  v-tippy="{ arrow: true }">
+                  <font-awesome-icon :icon="['fas', 'strikethrough']"/>
+                </button>
+                <VueNumericInput :min="0"
+                  @input="changeFontSize({value: $event})"
+                  v-model="activeObject.style.fontSize"
+                  align="center"
+                  style="width: 90px"
+                  class="ml-1"/>
               </div>
             </div>
+            <div class="flex bg-white ml-2 mt-4 py-2 px-1 rounded border"
+              v-if="activeObject">
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Left"
+                @click="alignObject('left', activeObject.bounds.width / 2)"
+                v-tippy="{ arrow: true }">
+                <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="4" height="54" rx="2" fill="#718096"/>
+                  <rect x="12" y="21" width="11" height="39" rx="2" transform="rotate(-90 12 21)" fill="#718096"/>
+                  <rect x="12" y="44" width="11" height="27" rx="2" transform="rotate(-90 12 44)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Horizontal Center"
+                @click="alignObject('left', (currentVariant.printable_area[currentSide].width / 2))"
+                v-tippy="{ arrow: true }">
+                <svg width="13" height="13" viewBox="0 0 39 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="17" width="4" height="54" rx="2" fill="#718096"/>
+                  <rect y="21" width="11" height="39" rx="2" transform="rotate(-90 0 21)" fill="#718096"/>
+                  <rect x="6" y="44" width="11" height="27" rx="2" transform="rotate(-90 6 44)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Right"
+                @click="alignObject('left', (currentVariant.printable_area[currentSide].width) - (activeObject.bounds.width / 2))"
+                v-tippy="{ arrow: true }">
+                <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="4" height="54" rx="2" transform="matrix(-1 0 0 1 51 0)" fill="#718096"/>
+                  <rect width="11" height="39" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 21)" fill="#718096"/>
+                  <rect width="11" height="27" rx="2" transform="matrix(4.37114e-08 -1 -1 -4.37114e-08 39 44)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Top"
+                @click="alignObject('top', activeObject.bounds.height / 2)"
+                v-tippy="{ arrow: true }">
+                <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="54.5" y="0.5" width="4" height="54" rx="2" transform="rotate(90 54.5 0.5)" fill="#718096"/>
+                  <rect x="33.5" y="12.5" width="11" height="39" rx="2" fill="#718096"/>
+                  <rect x="10.5" y="12.5" width="11" height="27" rx="2" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Vertical Center"
+                @click="alignObject('top', (currentVariant.printable_area[currentSide].height / 2))"
+                v-tippy="{ arrow: true }">
+                <svg width="13" height="13" viewBox="0 0 55 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="0.5" y="22.5" width="4" height="54" rx="2" transform="rotate(-90 0.5 22.5)" fill="#718096"/>
+                  <rect x="21.5" y="39.5" width="11" height="39" rx="2" transform="rotate(180 21.5 39.5)" fill="#718096"/>
+                  <rect x="44.5" y="33.5" width="11" height="27" rx="2" transform="rotate(180 44.5 33.5)" fill="#718096"/>
+                </svg>
+              </button>
+              <button type="button"
+                class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+                title="Align Bottom"
+                @click="alignObject('top', (currentVariant.printable_area[currentSide].height) - (activeObject.bounds.height / 2))"
+                v-tippy="{ arrow: true }">
+                <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="4" height="54" rx="2" transform="matrix(1.19249e-08 -1 -1 -1.19249e-08 54.5 51.5)" fill="#718096"/>
+                  <rect width="11" height="39" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 33.5 39.5)" fill="#718096"/>
+                  <rect width="11" height="27" rx="2" transform="matrix(1 5.56363e-08 5.56363e-08 -1 10.5 39.5)" fill="#718096"/>
+                </svg>
+              </button>
+            </div>
+          </div>
 
-            <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
-              <div class="flex bg-white mt-4 rounded border">
-                <div class="flex p-4">
-                  <ToggleSwitch :options="currentVariantSides"
-                    class="mx-1"
-                    :value="currentSide"
-                    @change="(option) => $store.dispatch('designer/switchSideTo', option.value)">
-                    <template v-slot:default="{ option }">
-                      <div class="flex flex-col">
-                        <img :src="option.label" width="50"/>
-                        <div class="text-center mt-1 text-xs">
-                          {{ option.value.toUpperCase() }}
-                        </div>
+          <LeftActions v-if="selectedTab === 'designer'" @actionClicked="leftActionClicked"/>
+
+          <div class="bottom-actions absolute z-10 flex flex-shrink justify-center" v-if="selectedTab === 'preview'">
+            <div class="flex bg-white mt-4 rounded border">
+              <div class="flex p-4">
+                <ToggleSwitch :options="currentVariantSides"
+                  class="mx-1"
+                  :value="currentSide"
+                  @change="(option) => $store.dispatch('designer/switchSideTo', option.value)">
+                  <template v-slot:default="{ option }">
+                    <div class="flex flex-col">
+                      <img :src="option.label" width="50"/>
+                      <div class="text-center mt-1 text-xs">
+                        {{ option.value.toUpperCase() }}
                       </div>
-                    </template>
-                  </ToggleSwitch>
-                </div>
+                    </div>
+                  </template>
+                </ToggleSwitch>
               </div>
             </div>
-            <div class="inline-block product-section relative w-auto h-auto">
+          </div>
+
+          <div class="inline-block product-section outline-none relative w-auto h-auto">
+            <div class="relative w-auto h-full" v-if="selectedTab === 'preview'">
               <div class="inline-block relative w-auto h-auto" :style="{ 'background-color': currentVariant.color }">
                 <img draggable="false"
                   class="relative"
@@ -580,66 +408,7 @@
                 @mouseenter="isPrintableAreaHovered = true"
                 @mouseleave="printableAreaZ = 1; isPrintableAreaHovered = false">
                 <div class="h-full w-full z-10 relative">
-                  <drr v-for="(obj, index) in currentVariant.printable_area[currentSide].objects"
-                    :key="index"
-                    :aspectRatio="obj.editorData.aspectRatio"
-                    :w="obj.bounds.width || 50"
-                    :h="obj.bounds.height || 50"
-                    :x="obj.bounds.left || 0"
-                    :y="obj.bounds.top || 0"
-                    :angle="obj.bounds.angle || 0"
-                    @select="activated(obj)"
-                    @deselect="deactivated(obj)"
-                    @dragstop="transformStop($event, obj)"
-                    @resizestop="transformStop($event, obj)"
-                    @rotatestop="transformStop($event, obj)"
-                    @drag="transforming($event, obj)"
-                    @resize="transforming($event, obj)"
-                    @rotate="transforming($event, obj)"
-                    @mouseenter="printableAreaZ = 3"
-                    :selected="obj.editorData.isActive"
-                    :hasActiveContent="obj.editorData.hasActiveContent"
-                    @content-active="activateContent(obj)"
-                    :resizable="obj.editorData.isResizable"
-                    :style="{ zIndex: (index + 1) }"
-                    :ref="`obj_${obj.id}_drr`">
-                    <div class="flex flex-wrap w-full h-full relative z-1"
-                      v-if="obj.type == 'text'"
-                      :style="{
-                        ...obj.style,
-                        fontSize: `${obj.style.fontSize}px`
-                      }"
-                      @click.stop>
-                      <pre class="w-auto h-auto outline-none focus:outline-none"
-                        :ref="`textContainer_${obj.id}`"
-                        :style="{ fontFamily: obj.style.fontFamily }"
-                        @input="changeText"
-                        @blur="deactivateContentOf(obj, $event)">{{ obj.value || '' }}</pre>
-                    </div>
-                    <div v-if="obj.type == 'svg'"
-                    v-html="obj.value"
-                    class="svg-object"
-                    :ref="`svgContainer_${obj.id}`"
-                    :style="{ fill: obj.style.color }"></div>
-                    <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image'">
-                      <img width="100%" :src="obj.value"/>
-                    </div>
-                    <div v-if="obj.editorData.isActive" class="absolute flex rounded-full bg-white w-5 h-5 items-center justify-center"
-                      :style="{ fontSize: '.7em', top: '-10px', right: '-10px', zIndex: 1 }"
-                      @click="removeObject(obj)">
-                      <font-awesome-icon :icon="['fas', 'times']"
-                        class="text-red-600"/>
-                    </div>
-                  </drr>
-                </div>
-                <div class="absolute top-0 z-1 ruler w-full h-full"
-                  v-show="isMoving">
-                  <div class="horiz absolute w-full"
-                    :style="{ backgroundColor: getCorrectColor(currentVariant.color) }"
-                    :class="{ '-highlighted': highlightRuler.horizontal }"></div>
-                  <div class="vert absolute h-full"
-                    :style="{ backgroundColor: getCorrectColor(currentVariant.color) }"
-                    :class="{ '-highlighted': highlightRuler.vertical }"></div>
+                  <!-- TODO: Output here -->
                 </div>
               </div>
               <div class="printable-area-label"
@@ -648,8 +417,12 @@
                 Printable Area
               </div>
             </div>
+            <div class="relative w-auto h-full" v-if="selectedTab === 'designer'">
+              <DefaultCanvas ref="canvas" v-model="currentVariant.printable_area[currentSide].objects" :width="currentVariant.printable_area[currentSide].width"
+              :height="currentVariant.printable_area[currentSide].height"/>
+            </div>
           </div>
-        </div>
+        </PanzoomContainer>
       </div>
 
       <VueTailwindDrawer position="right"
@@ -774,11 +547,9 @@
 </template>
 
 <script>
-import panzoom from 'panzoom'
 import Tabs from '@/components/Tabs'
 import Select from '@/components/Select'
 import ToggleSwitch from '@/components/ToggleSwitch'
-import ArtsList from '@/components/Designer/ArtsList'
 import ColorRegulator from '~/plugins/color-regulator.js'
 import { mapGetters } from 'vuex'
 import vSelect from 'vue-select'
@@ -788,7 +559,12 @@ import VueNumericInput from '@/components/VueNumericInput'
 import VueTailwindDrawer from '@/components/VueTailwindDrawer'
 import VueTailwindAccordion from '@/components/VueTailwindAccordion'
 import WrappedEditor from '@/components/WrappedEditor'
+import DesignerTabs from '@/components/Designer/DesignerTabs'
 import draggable from 'vuedraggable'
+import Konva from '@/components/Designer/Canvas/Konva'
+import DefaultCanvas from '@/components/Designer/Canvas/Default'
+import PanzoomContainer from '@/components/Designer/Canvas/PanzoomContainer'
+import LeftActions from '@/components/Designer/Canvas/Actions/Left'
 
 let WebFontLoader = null
 if(process.client){
@@ -801,14 +577,18 @@ export default {
     Tabs,
     Select,
     ToggleSwitch,
-    ArtsList,
     vSelect,
     AvailableProducts,
     VueNumericInput,
     WrappedEditor,
     VueTailwindDrawer,
     VueTailwindAccordion,
-    draggable
+    draggable,
+    DesignerTabs,
+    Konva,
+    PanzoomContainer,
+    LeftActions,
+    DefaultCanvas
   },
   async created(){
     WebFontLoader.load({
@@ -829,6 +609,7 @@ export default {
   },
   data(){
     return {
+      selectedTab: 'preview',
       autoSavingText: 'Saving...',
       autoSaving: false,
       autoSaveTimeout: null,
@@ -843,7 +624,6 @@ export default {
       tmpProducts: [],
       arrowKeysTimeout: null,
       isPrintableAreaHovered: false,
-      canvasScale: 1.0,
       selectedFont: null,
       currentProduct: null,
       currentVariant: null,
@@ -854,12 +634,6 @@ export default {
         horizontal: false
       },
       printableAreaZ: 2,
-      isHoldingSpace: false,
-      stageCursor: 'initial',
-      stageContainer: null,
-      panzoomController: null,
-      canvasSection: null,
-      isPanning: false,
       activeObjectIndex: 0,
       tmpProductMetadata: {
         name: '',
@@ -888,6 +662,43 @@ export default {
     }
   },
   methods: {
+    leftActionClicked(action){
+      switch(action){
+        case 'add_text':
+          this.$refs.canvas.addObject('text', 'Your Text Here', 'Your Text Here')
+          break;
+        case 'add_art':
+          this.$refs.canvas.showDrawer('artsModal')
+          break;
+        case 'edit_meta':
+          this.toggleDrawer('productMetaDrawer')
+          break;
+        case 'layers':
+          this.toggleDrawer('layersDrawer')
+          break;
+        case 'duplicate':
+          this.duplicate();
+          break;
+        case 'move_to_front':
+          this.moveObjectPosition(this.activeObject, this.currentVariant.printable_area[this.currentSide].objects.length - 1)
+          break;
+        case 'move_forward':
+          this.moveObjectPosition(this.activeObject, this.activeObjectIndex < (this.currentVariant.printable_area[this.currentSide].objects.length - 1) ? this.activeObjectIndex + 1 : this.activeObjectIndex)
+          break;
+        case 'move_backward':
+          this.moveObjectPosition(this.activeObject, this.activeObjectIndex > 0 ? this.activeObjectIndex - 1 : this.activeObjectIndex)
+          break;
+        case 'move_to_back':
+          this.moveObjectPosition(this.activeObject, 0)
+          break;
+        case 'zoom_in':
+          this.$refs.panzoomController.zoomTo(0.1)
+          break;
+        case 'zoom_out':
+          this.$refs.panzoomController.zoomTo(0.1)
+          break;
+      }
+    },
     _reverseObjects(objects){
       return (JSON.parse(JSON.stringify(objects))).reverse()
     },
@@ -965,44 +776,6 @@ export default {
       return _.includes(areas, 'front') ? 'front' : _.head()
     },
     _registerCanvasEvents(){
-      document.firstElementChild.style.zoom = "reset"
-      this.stageContainer = document.querySelector('.panzoom-container')
-      this.canvasSection = document.querySelector('.canvas-section')
-      this.canvasSection.tabIndex = 1
-      this.canvasSection.focus()
-
-      this.panzoomController = panzoom(document.querySelector('.product-section'), {
-        beforeWheel(e){
-          let shouldIgnore = !e.altKey
-          return shouldIgnore
-        },
-        onDoubleClick(e) {
-          return false
-        }
-      })
-      this.panzoomController.pause()
-
-      this.canvasSection.addEventListener('dblclick', (evt) => {
-        this.panzoomController.pause()
-      })
-
-      this.canvasSection.addEventListener('keypress', (evt) => {
-        if (evt.which == 32) {
-          this.isHoldingSpace = true
-          this.stageCursor = 'grab'
-          return
-        }
-        this.isHoldingSpace = false
-      })
-
-      this.canvasSection.addEventListener('mousemove', (e) => {
-        if(this.isHoldingSpace){
-          this.isPanning = true
-          this.panzoomController.resume()
-          return
-        }
-      })
-
       document.addEventListener('keydown', (evt) => {
         // Left
         if(evt.which == 37 && this.activeObject){
@@ -1044,58 +817,6 @@ export default {
         if (evt.which == 46) {
           if(!this.activeObject) return
           this.removeObject(this.activeObject)
-          return
-        }
-      })
-
-      this.canvasSection.addEventListener('keydown', (evt) => {
-        if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
-          evt.preventDefault()
-          this.zoomTo(0.1)
-          return
-        }
-        if (evt.ctrlKey && (evt.which == 109 || evt.which == 189)) {
-          evt.preventDefault()
-          this.zoomTo(-0.1)
-          return
-        }
-        if (evt.ctrlKey && (evt.which == 48 || evt.which == 96)) {
-          evt.preventDefault()
-          this.zoomTo('reset')
-          return
-        }
-        if (evt.ctrlKey && evt.which == 66) {
-          evt.preventDefault()
-          if(this.activeObject.type != 'text') return
-          this.toggleFontWeight(this.activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold')
-          return
-        }
-        if (evt.ctrlKey && evt.which == 73) {
-          evt.preventDefault()
-          if(this.activeObject.type != 'text') return
-          this.toggleFontStyle(this.activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic')
-          return
-        }
-        if (evt.ctrlKey && evt.which == 85) {
-          evt.preventDefault()
-          if(this.activeObject.type != 'text') return
-          this.toggleTextDecoration('underline')
-          return
-        }
-        if (evt.ctrlKey && evt.which == 75) {
-          evt.preventDefault()
-          if(this.activeObject.type != 'text') return
-          this.toggleTextDecoration('line-through')
-          return
-        }
-      })
-
-      this.canvasSection.addEventListener('keyup', (evt) => {
-        if (evt.which == 32) {
-          this.isHoldingSpace = false
-          this.stageCursor = 'initial'
-          this.isPanning = false
-          this.panzoomController.pause()
           return
         }
       })
@@ -1176,86 +897,8 @@ export default {
       this.currentProduct.variants.push(JSON.parse(JSON.stringify(newVariant)))
       this.selectVariant((this.currentProduct.variants.length - 1), this.currentProductIndex)
     },
-    zoomTo(scale){
-      if(scale == 'reset') return this.canvasScale = 1.0
-      this.canvasScale += scale
-    },
     _colorIsInVariantsOf(product, color){
       return _.find(product.variants, (variant) => variant.color.toLowerCase() == color.toLowerCase())
-    },
-    artAdded(file, res){
-      let type = 'image'
-      let value = file.dataURL
-      if(file.type == 'image/svg+xml'){
-        type = 'svg'
-        value = res.files.file
-      }
-      this.addObject(type, value, file.name)
-      this.$refs.artsModal.hide()
-    },
-    async addObject(type, value = '', name = null){
-      let newObject = await this.$store.dispatch('designer/addObject', {type, value})
-      newObject = JSON.parse(JSON.stringify(newObject))
-      newObject.name = name
-      if(type == 'image'){
-        let i = new Image()
-        i.onload = () => {
-          let ratio = 0
-          if(i.width > this.currentVariant.printable_area[this.currentSide].width){
-            ratio = this.currentVariant.printable_area[this.currentSide].width / i.width
-            newObject.bounds.width = i.width * ratio
-            newObject.bounds.height = i.height * ratio
-          }
-          if(newObject.bounds.height > this.currentVariant.printable_area[this.currentSide].height){
-            ratio = this.currentVariant.printable_area[this.currentSide].height / i.height
-            newObject.bounds.width = i.width * ratio
-            newObject.bounds.height = i.height * ratio
-          }
-          newObject.bounds.left = (newObject.bounds.width / 2) || 20
-          newObject.bounds.top = (newObject.bounds.height / 2) || 20
-          this.currentVariant.printable_area[this.currentSide].objects.push(newObject)
-          this.activated(newObject)
-          this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
-        }
-        i.src = value
-        return
-      }
-      if(type == 'text' || type == 'svg'){
-        let el = document.createElement('div')
-        el.innerHTML = value
-        el.style.position = 'absolute'
-        el.style.visibility = 'hidden'
-        el.style.display = 'block'
-
-        document.body.appendChild(el)
-        newObject.bounds.width = el.offsetWidth
-        newObject.bounds.height = el.offsetHeight
-        let ratio = 0
-        if(el.offsetWidth > this.currentVariant.printable_area[this.currentSide].width){
-          ratio = this.currentVariant.printable_area[this.currentSide].width / el.offsetWidth
-          newObject.bounds.width = el.offsetWidth * ratio
-          newObject.bounds.height = el.offsetHeight * ratio
-        }
-        if(newObject.bounds.height > this.currentVariant.printable_area[this.currentSide].height){
-          ratio = this.currentVariant.printable_area[this.currentSide].height / el.offsetHeight
-          newObject.bounds.width = el.offsetWidth * ratio
-          newObject.bounds.height = el.offsetHeight * ratio
-        }
-
-        newObject.bounds.left = (newObject.bounds.width / 2) || 20
-        newObject.bounds.top = (newObject.bounds.height / 2) || 20
-
-        document.body.removeChild(el)
-        el = null
-      }
-      this.currentVariant.printable_area[this.currentSide].objects.push(newObject)
-      this.activated(newObject)
-      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', newObject)
-    },
-    async removeObject(obj){
-      let index = await this.$store.dispatch('designer/removeObject', obj)
-      this.currentVariant.printable_area[this.currentSide].objects.splice(index, 1)
-      this.activeObject = null
     },
     hasTextDecoration(decoration){
       return _.includes(this.activeObject.style.textDecoration, decoration)
@@ -1308,13 +951,6 @@ export default {
         this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight, tmpObj)
         this.$store.dispatch('designer/copyPropsToAllVariantsFrom', tmpObj)
       }, 800)
-    },
-    changeText(e){
-      this._updateActiveObjectProps('name', e.target.innerText)
-      this._updateActiveObjectProps('value', e.target.innerText)
-      this._updateActiveObjectProps('bounds.width', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetWidth)
-      this._updateActiveObjectProps('bounds.height', this.$refs[`textContainer_${this.activeObject.id}`][0].offsetHeight)
-      this.$store.dispatch('designer/copyPropsToAllVariantsFrom', this.activeObject)
     },
     selectProduct(index){
       if(index == this.currentProductIndex) return
@@ -1373,6 +1009,20 @@ export default {
     }
   },
   watch: {
+    selectedTab:{
+      immediate: true,
+      handler(to, from){
+        if(!this.$refs.panzoomController) return
+        if(to === 'preview'){
+          this.$refs.panzoomController.zoomTo('reset')
+          this.$refs.panzoomController.moveTo(0, 0)
+          this.$refs.panzoomController.pause()
+          return
+        }
+        if(to !== from && !this.$refs.panzoomController.isHoldingSpace) return
+        this.$refs.panzoomController.resume()
+      }
+    },
     currentProduct: {
       immediate: true,
       handler(to){
@@ -1400,20 +1050,6 @@ export default {
         this.activeObject = null
         this.activeObjectIndex = 0
       }
-    },
-    stageCursor(newCursor){
-      if(!this.stageContainer) return
-      this.canvasSection .style.cursor = newCursor
-    },
-    canvasScale(newScale){
-      if(!this.stageContainer) return
-      let transform = this.panzoomController.getTransform()
-      let deltaX = transform.x
-      let deltaY = transform.y
-      let oldScale = transform.scale
-      let offsetX = 0.1 + deltaX
-      let offsetY = 0.1 + deltaY
-      this.panzoomController.zoomAbs(offsetX, offsetY, newScale)
     },
     selectedProducts: {
       deep: true,

@@ -42,7 +42,9 @@
           </PTButton>
         </div>
       </div>
-      <nuxt/>
+      <div class="flex flex-grow" id="right-content">
+        <nuxt/>
+      </div>
     </div>
   </no-ssr>
 </template>

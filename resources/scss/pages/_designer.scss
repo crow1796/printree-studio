@@ -96,8 +96,7 @@
 
 .left-actions{
   left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 20px;
 }
 
 .svg-object > svg{
@@ -107,10 +106,6 @@
 
 .cursor-help{
   cursor: help;
-}
-
-.parent:hover .parent\:hover\:visible{
-  @apply .visible;
 }
 
 .vue-numeric-input .numeric-input.no-control{
@@ -198,4 +193,8 @@
   &:hover{
     border-color: #c3dafe;
   }
+}
+
+#right-content{
+  height: calc(100vh - 78.2px);
 }
