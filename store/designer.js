@@ -596,7 +596,7 @@ const actions = {
         }
       ) : []
       generatedImages = res.data || res
-      await db.saveCampaign({
+      await db.saveCollection({
         id: context.getters.currentDesignId,
         plan: context.getters.designMeta.plan,
         selectedProducts: context.getters.selectedProducts

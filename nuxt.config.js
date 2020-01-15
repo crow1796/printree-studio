@@ -30,7 +30,7 @@ module.exports = {
    */
   css: [
     '~/assets/css/tailwind.css',
-    '~/assets/fonts/lato.css',
+    '~/assets/fonts/poppins.css',
     '~/resources/scss/main.scss'
   ],
   /*
