@@ -1,7 +1,7 @@
 <template>
-  <simplebar class="h-full w-full relative">
+  <div class="relative flex flex-grow flex-wrap overflow-auto">
     <AreaLoader v-if="isLoading"/>
-    <div class="flex flex-wrap p-4 text-gray-600">
+    <div class="flex flex-wrap flex-grow p-4 text-gray-600">
       <Tabs :tabs="categories">
         <template v-slot:all>
           <div class="flex w-1/3 p-1"
@@ -92,7 +92,7 @@
         </template>
       </Tabs>
     </div>
-  </simplebar>
+  </div>
 </template>
 
 <script>

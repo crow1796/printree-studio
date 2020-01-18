@@ -4,7 +4,7 @@
       <div class="flex flex-col py-1">
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          @click="$emit('actionClicked', 'add_text')"
+          @click="$emit('actionClicked', {action: 'add_text'})"
           title="Add a Text"
           v-tippy="{ arrow: true }">
           <svg width="12" height="12" viewBox="0 0 37 45" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,7 +13,7 @@
         </button>
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          @click="$emit('actionClicked', 'add_art')"
+          @click="$emit('actionClicked', {action: 'add_art'})"
           title="Add an Art"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'image']"/>
@@ -25,14 +25,14 @@
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Edit Metadata"
-          @click="$emit('actionClicked', 'edit_meta')"
+          @click="$emit('actionClicked', {action: 'edit_meta'})"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'tags']" class="text-xs"/>
         </button>
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Objects"
-          @click="$emit('actionClicked', 'layers')"
+          @click="$emit('actionClicked', {action: 'layers'})"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'layer-group']" class="text-xs"/>
         </button>
@@ -45,14 +45,14 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Duplicate"
           v-tippy="{ arrow: true }"
-          @click="$emit('actionClicked', 'duplicate')">
+          @click="$emit('actionClicked', {action: 'duplicate'})">
           <font-awesome-icon :icon="['fas', 'clone']" class="text-xs"/>
         </button>
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="To Front"
           v-tippy="{ arrow: true }"
-          @click="$emit('actionClicked', 'move_to_front')">
+          @click="$emit('actionClicked', {action: 'move_position', args: 'front'})">
           <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
             <rect x="11" y="11" width="32" height="32" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
@@ -62,7 +62,7 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Forward"
           v-tippy="{ arrow: true }"
-          @click="$emit('actionClicked', 'move_forward')">
+          @click="$emit('actionClicked', {action: 'move_position', args: 'forward'})">
           <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="20" y="18" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
             <rect x="1" y="1" width="36" height="36" rx="2" fill="#718096" stroke="#718096" stroke-width="2"/>
@@ -72,7 +72,7 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Backward"
           v-tippy="{ arrow: true }"
-          @click="$emit('actionClicked', 'move_backward')">
+          @click="$emit('actionClicked', {action: 'move_position', args: 'backward'})">
           <svg width="13" height="13" viewBox="0 0 57 55" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="19" y="17" width="38" height="38" rx="3" fill="#718096"/>
             <rect x="1" y="1" width="36" height="36" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
@@ -82,7 +82,7 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="To Back"
           v-tippy="{ arrow: true }"
-          @click="$emit('actionClicked', 'move_to_back')">
+          @click="$emit('actionClicked', {action: 'move_position', args: 'back'})">
           <svg width="13" height="13" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="1" y="1" width="52" height="52" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
             <rect x="11" y="11" width="32" height="32" rx="2" fill="white" stroke="#718096" stroke-width="2"/>
@@ -96,14 +96,14 @@
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Zoom In"
-          @click="$emit('actionClicked', 'zoom_in')"
+          @click="$emit('actionClicked', {action: 'zoom_in'})"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'search-plus']" class="text-xs"/>
         </button>
         <button type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Zoom Out"
-          @click="$emit('actionClicked', 'zoom_out')"
+          @click="$emit('actionClicked', {action: 'zoom_out'})"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'search-minus']" class="text-xs"/>
         </button>
@@ -146,6 +146,6 @@
 
 <script>
 export default {
-  
+
 }
 </script>

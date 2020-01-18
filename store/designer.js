@@ -458,8 +458,11 @@ const actions = {
         .variants[context.state.currentVariantIndex]
     obj.id = id
     obj.value = value
-    obj.bounds.left = obj.bounds.width / 2
-    obj.bounds.top = obj.bounds.height / 2
+    obj.bounds.left = (obj.bounds.width / 2) * 3
+    obj.bounds.top = (obj.bounds.height / 2) * 3
+    obj.bounds.width = obj.bounds.width * 3
+    obj.bounds.height = obj.bounds.height * 3
+    if(obj.style.fontSize) obj.style.fontSize = obj.style.fontSize * 3
     obj.style.color = ColorRegulator.getContrastOf(variant.color, {
       dark: '#012F56',
       light: '#FEFEFE'

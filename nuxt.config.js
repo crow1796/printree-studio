@@ -2,6 +2,9 @@ const webpack = require('webpack')
 
 module.exports = {
   mode: 'universal',
+  server: {
+    port: 3333
+  },
   /*
    ** Headers of the page
    */
@@ -30,7 +33,6 @@ module.exports = {
    */
   css: [
     '~/assets/css/tailwind.css',
-    '~/assets/fonts/poppins.css',
     '~/resources/scss/main.scss'
   ],
   /*
@@ -42,6 +44,11 @@ module.exports = {
     '~/plugins/prototypes.js',
     '~/plugins/external-installs.js'
   ],
+  webfontloader: {
+    google: {
+      families: ['Poppins:400,700'] //Loads Lato font with weights 400 and 700
+    }
+  },
   /*
    ** Nuxt.js modules
    */
@@ -49,6 +56,7 @@ module.exports = {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
+    'nuxt-webfontloader',
     [
       'nuxt-fontawesome',
       {

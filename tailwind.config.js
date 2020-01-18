@@ -24,6 +24,9 @@ module.exports = {
       fontFamily: {
         display: ['Montserrat'],
         body: ['Roboto']
+      },
+      zIndex: {
+        '1': 1
       }
     }
   },
