@@ -58,74 +58,61 @@
                     placeholder="What's the name of this product?"
                   />
                 </div>
-                <div
-                  class="text-3xl leading-none font-bold text-primary py-4 flex items-center"
-                >
-                  <span>₱</span>&nbsp;<input
-                    type="text"
-                    class="font-bold"
-                    placeholder="0.00"
-                  />
+                <div class="text-3xl leading-none font-bold text-primary py-4">
+                  <currency-input currency="PHP"/>
                 </div>
                 <div>
-                  <div class="font-bold">Available Sizes</div>
+                  <div class="font-bold">Size & Quantity</div>
                   <div class="flex flex-wrap">
                     <div
-                      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
+                      class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-2"
                       v-for="({ price, quantity }, i) in selectedProduct
                         .variants[selectedVariantKey].sizes"
                       :key="i"
                     >
-                      <span>
-                        {{ i }}
-                      </span>
+                      <div class="flex flex-col">
+                        <div class="text-center mb-2">{{ i }}</div>
+                        <div>
+                          <VueNumericInput
+                            :min="0"
+                            align="center"
+                            style="width: 90px"
+                            class="ml-1"
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div class="font-bold mt-2">
-                    <span>Stock(s):</span>&nbsp;<input
-                      type="text"
-                      class="font-bold"
-                      placeholder="0"
-                    />
                   </div>
                   <div class="font-bold mt-2">Printing Options</div>
                   <div class="flex flex-wrap">
                     <div
                       class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >
-                      Screen Printing
-                    </div>
+                    >Screen Printing</div>
                     <div
                       class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >
-                      Direct To Garments(DTG)
-                    </div>
+                    >Direct To Garments(DTG)</div>
                     <div
                       class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >
-                      Dye Sublimation
-                    </div>
+                    >Dye Sublimation</div>
                     <div
                       class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >
-                      Heat Press
-                    </div>
+                    >Heat Press</div>
                     <div
                       class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >
-                      Vinyl Cutting
-                    </div>
+                    >Vinyl Cutting</div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="flex justify-end p-4 border-t">
-              <button type="button" class="border px-8 py-2 font-bold rounded outline-none focus:outline-none bg-white hover:bg-gray-100 mr-2">
-                Previous
-              </button>
-              <button type="button" class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter">
-                Next
-              </button>
+              <button
+                type="button"
+                class="border px-8 py-2 font-bold rounded outline-none focus:outline-none bg-white hover:bg-gray-100 mr-2"
+              >Previous</button>
+              <button
+                type="button"
+                class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+              >Next</button>
             </div>
           </div>
           <div class="flex border-l w-3/12">
@@ -135,11 +122,7 @@
               </div>
               <div class="overflow-auto h-full">
                 <div class="flex p-4 flex-wrap">
-                  <div
-                    class="flex w-6/12 p-1"
-                    v-for="product in products"
-                    :key="product.id"
-                  >
+                  <div class="flex w-6/12 p-1" v-for="product in products" :key="product.id">
                     <div
                       class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500"
                       :class="{
@@ -148,10 +131,7 @@
                       }"
                       @click="selectProduct(product)"
                     >
-                      <div
-                        class="px-2 pt-2"
-                        v-html="_placeholderOfFirstVariantOf(product)"
-                      ></div>
+                      <div class="px-2 pt-2" v-html="_placeholderOfFirstVariantOf(product)"></div>
                     </div>
                   </div>
                 </div>
@@ -166,11 +146,13 @@
 
 <script>
 import VueTailwindDrawer from '@/components/VueTailwindDrawer'
+import VueNumericInput from '@/components/VueNumericInput'
 
 export default {
   props: ['products'],
   components: {
-    VueTailwindDrawer
+    VueTailwindDrawer,
+    VueNumericInput
   },
   created() {},
   data() {

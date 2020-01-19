@@ -8,6 +8,7 @@ import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AreaLoader from '@/components/AreaLoader'
 import PTForm from '@/components/PTForm'
 import VeeValidate from 'vee-validate'
+import VueCurrencyInput from 'vue-currency-input'
 
 Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
@@ -15,7 +16,10 @@ Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
 Vue.use(PTForm)
 Vue.use(VueVirtualScroller)
-
+const pluginOptions = {
+  globalOptions: { currency: 'PHP' }
+}
+Vue.use(VueCurrencyInput, pluginOptions)
 Vue.use(VueLazyload, {
   preLoad: 1,
   error: require('~/assets/images/logo.png'),
