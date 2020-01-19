@@ -50,11 +50,11 @@
               class="p-1 w-6/12"
               v-for="(product, index) in selectedProducts"
               :key="index"
-              @click="selectProduct(index)"
             >
               <div
                 class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
+                @click="selectProduct(index)"
               >
                 <div class="flex w-full flex-col justify-center items-center">
                   <div class="flex justify-center items-center w-full">
@@ -70,7 +70,7 @@
                   <div class="flex-grow flex flex-col pt-2">
                     <div class="font-bold text-gray-600">{{ product.name }}</div>
                     <div class="flex">
-                      <v-popover class="flex">
+                      <v-popover class="flex" placement="right">
                         <div
                           class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700"
                           v-if="product.availableVariants.length > 1"
@@ -250,8 +250,8 @@
 
         <Canvas
           v-model="currentVariant.printable_area[currentSide].objects"
-          :width="currentVariant.printable_area[currentSide].width"
-          :height="currentVariant.printable_area[currentSide].height"
+          :width="currentVariant.printable_area[currentSide].width * 3"
+          :height="currentVariant.printable_area[currentSide].height * 3"
           v-if="selectedTab === 'designer'"
         />
       </div>

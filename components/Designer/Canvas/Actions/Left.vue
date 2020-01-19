@@ -20,24 +20,6 @@
         </button>
       </div>
     </div>
-    <div class="flex bg-white mb-4 rounded border">
-      <div class="flex flex-col py-1">
-        <button type="button"
-          class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          title="Edit Metadata"
-          @click="$emit('actionClicked', {action: 'edit_meta'})"
-          v-tippy="{ arrow: true }">
-          <font-awesome-icon :icon="['fas', 'tags']" class="text-xs"/>
-        </button>
-        <button type="button"
-          class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          title="Objects"
-          @click="$emit('actionClicked', {action: 'layers'})"
-          v-tippy="{ arrow: true }">
-          <font-awesome-icon :icon="['fas', 'layer-group']" class="text-xs"/>
-        </button>
-      </div>
-    </div>
 
     <div class="flex bg-white rounded border">
       <div class="flex flex-col py-1">

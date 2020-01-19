@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed h-full z-20 vt-drawer"
+  <div class="fixed h-full z-20 vt-drawer top-0"
     v-if="isShown"
     @click="() => backdrop ? hide() : false"
     :class="{

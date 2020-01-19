@@ -1,5 +1,6 @@
 import ColorRegulator from '~/plugins/color-regulator'
 import db from '~/plugins/lib/db/index'
+import { scaleUp } from '~/plugins/scaler'
 
 const state = () => ({
   currentSide: 'front',
@@ -20,8 +21,8 @@ const state = () => ({
       bounds: {
         left: 0,
         top: 0,
-        width: 80,
-        height: 20,
+        width: scaleUp(80),
+        height: scaleUp(20),
         angle: 0
       },
       style: {
@@ -32,7 +33,7 @@ const state = () => ({
         color: '#FEFEFE',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 16,
+        fontSize: scaleUp(16),
         textAlign: 'center'
       },
       editorData: {
@@ -52,8 +53,8 @@ const state = () => ({
       bounds: {
         left: 0,
         top: 0,
-        width: 40,
-        height: 40,
+        width: scaleUp(40),
+        height: scaleUp(40),
         angle: 0
       },
       style: {
@@ -76,8 +77,8 @@ const state = () => ({
       bounds: {
         left: 0,
         top: 0,
-        width: 40,
-        height: 40,
+        width: scaleUp(40),
+        height: scaleUp(40),
         angle: 0
       },
       style: {},
@@ -306,7 +307,7 @@ const mutations = {
   CURRENT_VARIANT_PROPERTIES(state, data) {
     _.set(
       state.selectedProducts[state.currentProductIndex].variants[
-      state.currentVariantIndex
+        state.currentVariantIndex
       ],
       data.path,
       data.value
@@ -373,7 +374,7 @@ const mutations = {
   SWAP_OBJECT_INDEX(state, { currentIndex, newIndex }) {
     let variant =
       state.selectedProducts[state.currentProductIndex].variants[
-      state.currentVariantIndex
+        state.currentVariantIndex
       ]
     let tmp = variant.printable_area[state.currentSide].objects[currentIndex]
     variant.printable_area[state.currentSide].objects[currentIndex] =
@@ -458,11 +459,8 @@ const actions = {
         .variants[context.state.currentVariantIndex]
     obj.id = id
     obj.value = value
-    obj.bounds.left = (obj.bounds.width / 2) * 3
-    obj.bounds.top = (obj.bounds.height / 2) * 3
-    obj.bounds.width = obj.bounds.width * 3
-    obj.bounds.height = obj.bounds.height * 3
-    if(obj.style.fontSize) obj.style.fontSize = obj.style.fontSize * 3
+    obj.bounds.left = obj.bounds.width / 2
+    obj.bounds.top = obj.bounds.height / 2
     obj.style.color = ColorRegulator.getContrastOf(variant.color, {
       dark: '#012F56',
       light: '#FEFEFE'
@@ -592,12 +590,11 @@ const actions = {
     }
     let generatedImages = []
     try {
-      const res = newParams.shouldGenerateImages ? await this.$axios.post(
-        'http://localhost:8080/create-images',
-        {
-          products: context.getters.selectedProducts
-        }
-      ) : []
+      const res = newParams.shouldGenerateImages
+        ? await this.$axios.post('http://localhost:8080/create-images', {
+            products: context.getters.selectedProducts
+          })
+        : []
       generatedImages = res.data || res
       await db.saveCollection({
         id: context.getters.currentDesignId,
@@ -607,7 +604,7 @@ const actions = {
     } catch (error) {
       console.log(error)
     }
-    return generatedImages;
+    return generatedImages
   },
   async updateDesignName(context, name) {
     await db.updateDesignName(context.getters.currentDesignId, name)

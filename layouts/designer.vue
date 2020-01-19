@@ -1,6 +1,6 @@
 <template>
   <no-ssr>
-    <div class="flex-grow flex flex-col text-sm font-body">
+    <div class="flex-grow flex flex-col text-sm">
       <AreaLoader v-if="isLoading" fullscreen />
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">

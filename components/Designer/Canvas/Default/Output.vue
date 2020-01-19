@@ -1,13 +1,13 @@
 <template>
-  <div class="h-full w-full z-10 relative">
+  <div class="h-full w-full z-10 relative overflow-hidden">
     <div
       v-for="(obj, index) in objects"
       :key="index"
       :style="{
-        left: `${obj.bounds.left - (obj.bounds.width / 2)}px`,
-        top: `${obj.bounds.top - (obj.bounds.height / 2)}px`,
-        width: `${obj.bounds.width}px`,
-        height: `${obj.bounds.height}px`,
+        left: `${scaleDown(obj.bounds.left - (obj.bounds.width / 2))}px`,
+        top: `${scaleDown(obj.bounds.top - (obj.bounds.height / 2))}px`,
+        width: `${scaleDown(obj.bounds.width)}px`,
+        height: `${scaleDown(obj.bounds.height)}px`,
         transform: `rotate(${obj.bounds.angle}deg)`,
         zIndex: (index + 1),
         position: 'absolute'
@@ -18,7 +18,7 @@
         v-if="obj.type == 'text'"
         :style="{
           ...obj.style,
-          fontSize: `${(obj.style.fontSize)}px`
+          fontSize: `${scaleDown(obj.style.fontSize)}px`
         }"
       >
         <pre
@@ -40,7 +40,14 @@
 </template>
 
 <script>
+import { scaleDown } from '~/plugins/scaler'
+
 export default {
-  props: ['objects', 'width', 'height']
+  props: ['objects', 'width', 'height'],
+  methods: {
+    scaleDown(b) {
+      return scaleDown(b)
+    }
+  }
 }
 </script>

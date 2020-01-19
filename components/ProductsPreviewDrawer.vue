@@ -4,7 +4,7 @@
       <div class="flex flex-col w-full h-full">
         <div class="flex items-center justify-between border-b p-4">
           <div class="flex uppercase">
-            <strong>Campaign Preview</strong>
+            <strong>Collection Preview</strong>
           </div>
           <div class="flex text-right">
             <div
@@ -54,7 +54,7 @@
                   <!-- {{ selectedProduct.meta.name }} -->
                   <input
                     type="text"
-                    class="font-bold font-body w-full"
+                    class="font-bold w-full"
                     placeholder="What's the name of this product?"
                   />
                 </div>
@@ -63,7 +63,7 @@
                 >
                   <span>₱</span>&nbsp;<input
                     type="text"
-                    class="font-bold font-body"
+                    class="font-bold"
                     placeholder="0.00"
                   />
                 </div>
@@ -84,7 +84,7 @@
                   <div class="font-bold mt-2">
                     <span>Stock(s):</span>&nbsp;<input
                       type="text"
-                      class="font-bold font-body"
+                      class="font-bold"
                       placeholder="0"
                     />
                   </div>

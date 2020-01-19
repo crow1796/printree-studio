@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-grow w-full h-full justify-center overflow-hidden bg-gray-100">
+  <div class="flex flex-grow w-full h-full justify-center overflow-hidden bg-gray-200">
     <VueTailwindDrawer ref="artsModal" width="40%">
       <div class="flex p-4 h-full flex-col w-full">
         <div class="flex w-1/3 flex-col w-full">
@@ -62,7 +62,7 @@
             <div class="relative w-auto h-full">
               <div
                 class="printable-area absolute bg-white"
-                :style="{ width: `${scale(width)}px`, height: `${scale(height)}px` }"
+                :style="{ width: `${width}px`, height: `${height}px` }"
               >
                 <div class="h-full w-full z-10 relative">
                   <drr
@@ -146,8 +146,6 @@ import LeftActions from '@/components/Designer/Canvas/Actions/Left'
 import TopActions from '@/components/Designer/Canvas/Actions/Top'
 import DesignerActions from '@/components/Designer/Canvas/Actions/index'
 
-const SCALE = 3
-
 export default {
   props: {
     width: {
@@ -199,9 +197,6 @@ export default {
           break
         case 'add_art':
           this.showDrawer('artsModal')
-          break
-        case 'edit_meta':
-          this.toggleDrawer('productMetaDrawer')
           break
         case 'layers':
           this.toggleDrawer('layersDrawer')
@@ -362,9 +357,6 @@ export default {
         this.activeObject
       )
     },
-    scale(b) {
-      return b * SCALE
-    },
     showDrawer(modal) {
       this.$refs[modal].show()
     },
@@ -415,8 +407,8 @@ export default {
         el.style.visibility = 'hidden'
         el.style.display = 'block'
         el.style.fontSize = `${newObject.style.fontSize}px`
-
         document.body.appendChild(el)
+
         newObject.bounds.width = el.offsetWidth
         newObject.bounds.height = el.offsetHeight
         let ratio = 0
@@ -618,7 +610,7 @@ export default {
           }
         }
       )
-      this.moveTo(-(this.scale(this.width / 2)), 0)
+      this.moveTo(-(this.width / 2), 0)
       this.panzoomController.pause()
 
       this.canvasSection.addEventListener('dblclick', evt => {
@@ -743,6 +735,12 @@ export default {
       let offsetX = 0.1 + deltaX
       let offsetY = 0.1 + deltaY
       this.panzoomController.zoomAbs(offsetX, offsetY, newScale)
+    },
+    objects: {
+      deep: true,
+      handler(to){
+        this.$emit('input', to)
+      }
     }
   }
 }
