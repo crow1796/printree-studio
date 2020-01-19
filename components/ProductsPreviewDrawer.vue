@@ -59,7 +59,7 @@
                   />
                 </div>
                 <div class="text-3xl leading-none font-bold text-primary py-4">
-                  <currency-input currency="PHP"/>
+                  <currency-input currency="PHP" placeholder="How much would this cost?"/>
                 </div>
                 <div>
                   <div class="font-bold">Size & Quantity</div>
@@ -70,8 +70,8 @@
                         .variants[selectedVariantKey].sizes"
                       :key="i"
                     >
-                      <div class="flex flex-col">
-                        <div class="text-center mb-2">{{ i }}</div>
+                      <div class="flex items-center">
+                        <div class="text-center mr-2">{{ i }}:</div>
                         <div>
                           <VueNumericInput
                             :min="0"
