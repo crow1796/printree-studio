@@ -3,10 +3,27 @@
     <div class="flex h-full w-full text-gray-600 overflow-hidden">
       <div class="flex flex-col w-full h-full">
         <div class="flex items-center justify-between border-b p-4">
-          <div class="flex uppercase">
-            <strong>Collection Preview</strong>
+          <div class="flex w-4/12 uppercase flex-col">
+            <div class="font-bold">
+              <span class="font-bold mr-1">I WANT TO</span>
+              <toggle-button
+                :value="designMeta.plan == 'sell'"
+                :labels="{checked: 'SELL', unchecked: 'BUY'}"
+                :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
+                :width="60"
+                @change="changeCurrentProductPlan"
+              />
+              <span class="font-bold ml-1">
+                {{products.length > 1 ? "THESE" : "THIS"}} PRODUCT
+                <span v-if="products.length > 1">S</span>
+              </span>
+            </div>
+            <div class="text-xs mt-1">
+              {{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
+            </div>
           </div>
-          <div class="flex text-right">
+          <div class="flex w-4/12 uppercase justify-center font-bold">COLLECTION PREVIEW</div>
+          <div class="flex w-4/12 justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
               @click="hide"
@@ -38,7 +55,7 @@
                     :key="variant.id"
                     @click="() => (selectedVariantKey = vid)"
                   >
-                    <div class="flex flex-col">
+                    <div class="flex flex-col w-full">
                       <div
                         v-html="
                           variant[_firstPrintableAreaOf(variant)]
@@ -51,15 +68,21 @@
               </div>
               <div class="flex flex-col mt-5 w-full ml-4">
                 <div class="text-4xl">
-                  <!-- {{ selectedProduct.meta.name }} -->
                   <input
                     type="text"
                     class="font-bold w-full"
                     placeholder="What's the name of this product?"
+                    v-model="selectedProduct.meta.name"
                   />
                 </div>
-                <div class="text-3xl leading-none font-bold text-primary py-4">
-                  <currency-input currency="PHP" placeholder="How much would this cost?"/>
+                <div class="text-3xl leading-none py-4 flex items-center">
+                  <div>PHP 199.00 +</div>&nbsp;
+                  <div>
+                    <currency-input currency="PHP" placeholder="Your Profit" style="width: 215px" />
+                  </div>
+                  <div class="text-primary">
+                    <div>= PHP 299.00</div>
+                  </div>
                 </div>
                 <div>
                   <div class="font-bold">Size & Quantity</div>
@@ -147,6 +170,7 @@
 <script>
 import VueTailwindDrawer from '@/components/VueTailwindDrawer'
 import VueNumericInput from '@/components/VueNumericInput'
+import { mapGetters } from 'vuex'
 
 export default {
   props: ['products'],
@@ -161,6 +185,11 @@ export default {
       selectedVariantKey: _.first(_.keys(this.products[0].variants)),
       selectedSize: null
     }
+  },
+  computed: {
+    ...mapGetters({
+      designMeta: 'designer/designMeta'
+    })
   },
   methods: {
     _placeholderOfFirstVariantOf(product) {
@@ -180,9 +209,20 @@ export default {
       this.$refs.drawer.hide()
     },
     selectProduct(product) {
-      this.selectedProduct = product
-      const firstKey = _.first(_.keys(product.variants))
-      this.selectedVariantKey = firstKey
+      try {
+        this.$store.commit('designer/CURRENT_PRODUCT_META', {
+          id: this.selectedProduct.id,
+          meta: this.selectedProduct.meta
+        })
+        this.selectedProduct = product
+        const firstKey = _.first(_.keys(product.variants))
+        this.selectedVariantKey = firstKey
+      } catch (error) {}
+    },
+    changeCurrentProductPlan({ value }) {
+      let plan = 'buy'
+      if (value) plan = 'sell'
+      this.$store.commit('designer/DESIGN_PLAN', plan)
     }
   }
 }
