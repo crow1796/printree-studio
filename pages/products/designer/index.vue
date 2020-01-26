@@ -584,6 +584,7 @@ export default {
     },
     selectProduct(index) {
       if (index == this.currentProductIndex) return
+      this.selectedTab = 'preview'
       this.$store.commit('designer/CURRENT_PRODUCT_INDEX', index)
       this.$store.commit('designer/CURRENT_VARIANT_INDEX', 0)
     },

@@ -650,7 +650,7 @@
         };
 
         if (this.resized) {
-          this.$emit('resizestop', this.rect, this.startRect);  // TODO
+          this.$emit('resizestop', this.rect, this.startRect);
           this.$emit('change', this.rect);
         }
 
@@ -665,7 +665,6 @@
 </script>
 
 <style scoped>
-  /*TODO less */
 
   .drr {
     position: absolute;
@@ -758,6 +757,6 @@
   }
 
   .content-active {
-    border: 2px solid lightskyblue; /*TODO*/
+    border: 2px solid lightskyblue;
   }
 </style>

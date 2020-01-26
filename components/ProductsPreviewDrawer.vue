@@ -18,9 +18,9 @@
                 <span v-if="products.length > 1">S</span>
               </span>
             </div>
-            <div class="text-xs mt-1">
-              {{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}
-            </div>
+            <div
+              class="text-xs mt-1"
+            >{{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
           </div>
           <div class="flex w-4/12 uppercase justify-center font-bold">COLLECTION PREVIEW</div>
           <div class="flex w-4/12 justify-end">
@@ -36,15 +36,11 @@
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
-                <div
-                  v-html="
-                    selectedProduct.variants[selectedVariantKey][
+                <div><img :src="selectedProduct.variants[selectedVariantKey][
                       _firstPrintableAreaOf(
                         selectedProduct.variants[selectedVariantKey]
                       )
-                    ].with_placeholder
-                  "
-                ></div>
+                    ].with_placeholder"/></div>
                 <div class="variants flex">
                   <div
                     class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
@@ -56,12 +52,8 @@
                     @click="() => (selectedVariantKey = vid)"
                   >
                     <div class="flex flex-col w-full">
-                      <div
-                        v-html="
-                          variant[_firstPrintableAreaOf(variant)]
-                            .with_placeholder
-                        "
-                      ></div>
+                      <div><img :src="variant[_firstPrintableAreaOf(variant)]
+                            .with_placeholder"/></div>
                     </div>
                   </div>
                 </div>
@@ -70,7 +62,7 @@
                 <div class="text-4xl">
                   <input
                     type="text"
-                    class="font-bold w-full"
+                    class="font-bold w-full outline-none"
                     placeholder="What's the name of this product?"
                     v-model="selectedProduct.meta.name"
                   />
@@ -78,7 +70,7 @@
                 <div class="text-3xl leading-none py-4 flex items-center">
                   <div>PHP 199.00 +</div>&nbsp;
                   <div>
-                    <currency-input currency="PHP" placeholder="Your Profit" style="width: 215px" />
+                    <currency-input currency="PHP" placeholder="Your Profit" style="width: 215px" v-model="profit"/>
                   </div>
                   <div class="text-primary">
                     <div>= PHP 299.00</div>
@@ -107,22 +99,17 @@
                     </div>
                   </div>
                   <div class="font-bold mt-2">Printing Options</div>
-                  <div class="flex flex-wrap">
-                    <div
-                      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >Screen Printing</div>
-                    <div
-                      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >Direct To Garments(DTG)</div>
-                    <div
-                      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >Dye Sublimation</div>
-                    <div
-                      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >Heat Press</div>
-                    <div
-                      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
-                    >Vinyl Cutting</div>
+                  <OptionButtons :options="optionButtons" v-model="printingOption" />
+                  <div class="mt-2">
+                    <textarea
+                      name="product_description"
+                      id="product_description"
+                      cols="30"
+                      rows="5"
+                      class="w-full border rounded p-4 outine-none resize-none"
+                      placeholder="Describe your product (optional)"
+                      v-model="selectedProduct.meta.description"
+                    ></textarea>
                   </div>
                 </div>
               </div>
@@ -130,11 +117,14 @@
             <div class="flex justify-end p-4 border-t">
               <button
                 type="button"
-                class="border px-8 py-2 font-bold rounded outline-none focus:outline-none bg-white hover:bg-gray-100 mr-2"
+                class="px-8 py-2 font-bold rounded outline-none focus:outline-none border hover:border-gray-600 hover:text-gray-700 mr-4"
+                @click="previousProduct"
+                v-if="hasPreviousProduct"
               >Previous</button>
               <button
                 type="button"
                 class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+                @click="validateAndSaveMeta"
               >Next</button>
             </div>
           </div>
@@ -154,7 +144,9 @@
                       }"
                       @click="selectProduct(product)"
                     >
-                      <div class="px-2 pt-2" v-html="_placeholderOfFirstVariantOf(product)"></div>
+                      <div class="px-2 pt-2">
+                        <img :src="_placeholderOfFirstVariantOf(product)"/>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -170,26 +162,60 @@
 <script>
 import VueTailwindDrawer from '@/components/VueTailwindDrawer'
 import VueNumericInput from '@/components/VueNumericInput'
+import OptionButtons from '@/components/OptionButtons'
 import { mapGetters } from 'vuex'
 
 export default {
   props: ['products'],
   components: {
     VueTailwindDrawer,
-    VueNumericInput
+    VueNumericInput,
+    OptionButtons
   },
-  created() {},
+  created() {
+    this.printingOption = this.optionButtons[0]
+    console.log(this.selectedProduct)
+  },
   data() {
     return {
-      selectedProduct: this.products[0],
-      selectedVariantKey: _.first(_.keys(this.products[0].variants)),
-      selectedSize: null
+      selectedProduct: JSON.parse(JSON.stringify(this.products[0])),
+      selectedVariantKey: _.first(
+        _.keys(JSON.parse(JSON.stringify(this.products[0])).variants)
+      ),
+      selectedSize: null,
+      optionButtons: [
+        {
+          label: 'Screen Printing',
+          value: 'screen_printing'
+        },
+        {
+          label: 'Direct To Garments (DTG)',
+          value: 'dtg'
+        },
+        {
+          label: 'Dye Sublimation',
+          value: 'dye_sublimation'
+        },
+        {
+          label: 'Heat Press',
+          value: 'heat_press'
+        },
+        {
+          label: 'Vinyl Cutting',
+          value: 'vinyl_cutting'
+        }
+      ],
+      printingOption: null,
+      profit: 0
     }
   },
   computed: {
     ...mapGetters({
       designMeta: 'designer/designMeta'
-    })
+    }),
+    hasPreviousProduct(){
+      return _.findIndex(this.products, { id: this.selectedProduct.id }) > 0
+    }
   },
   methods: {
     _placeholderOfFirstVariantOf(product) {
@@ -214,8 +240,8 @@ export default {
           id: this.selectedProduct.id,
           meta: this.selectedProduct.meta
         })
-        this.selectedProduct = product
-        const firstKey = _.first(_.keys(product.variants))
+        this.selectedProduct = JSON.parse(JSON.stringify(product))
+        const firstKey = _.first(_.keys(this.selectedProduct.variants))
         this.selectedVariantKey = firstKey
       } catch (error) {}
     },
@@ -223,6 +249,22 @@ export default {
       let plan = 'buy'
       if (value) plan = 'sell'
       this.$store.commit('designer/DESIGN_PLAN', plan)
+    },
+    previousProduct(){
+      const previousProductIndex =
+        _.findIndex(this.products, { id: this.selectedProduct.id }) - 1
+      const previousProduct = this.products[previousProductIndex]
+      this.selectProduct(previousProduct)
+    },
+    validateAndSaveMeta() {
+      const nextProductIndex =
+        _.findIndex(this.products, { id: this.selectedProduct.id }) + 1
+      const nextProduct = this.products[nextProductIndex]
+      if (!nextProduct) {
+        // TODO: Go to next page
+        return
+      }
+      this.selectProduct(nextProduct)
     }
   }
 }

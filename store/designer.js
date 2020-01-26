@@ -316,6 +316,9 @@ const mutations = {
   CURRENT_PRODUCT_META(state, {id, meta}) {
     state.selectedProducts[_.findIndex(state.selectedProducts, { id })].meta = meta
   },
+  PRODUCT_PROPERTIES(state, {id, props}){
+
+  },
   OBJECT_PROPERTIES(state, data) {
     let objectIndex = _.findIndex(
       state.selectedProducts[state.currentProductIndex].variants[

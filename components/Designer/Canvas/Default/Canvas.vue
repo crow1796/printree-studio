@@ -145,6 +145,8 @@ import VueTailwindDrawer from '@/components/VueTailwindDrawer'
 import LeftActions from '@/components/Designer/Canvas/Actions/Left'
 import TopActions from '@/components/Designer/Canvas/Actions/Top'
 import DesignerActions from '@/components/Designer/Canvas/Actions/index'
+import { scaleDown } from '~/plugins/scaler'
+import Canvg from 'canvg'
 
 export default {
   props: {
@@ -364,18 +366,34 @@ export default {
       let type = 'image'
       let value = file.dataURL
       if (file.type == 'image/svg+xml') {
-        type = 'svg'
-        value = res.files.file
+        let el = document.createElement('canvas')
+        let ctx = el.getContext('2d')
+
+        const v = Canvg.fromString(ctx, res.files.file)
+        v.start()
+
+        el.innerHTML = value
+        el.style.position = 'absolute'
+        el.style.visibility = 'hidden'
+        el.style.display = 'block'
+        document.body.appendChild(el)
+
+        value = el.toDataURL('image/png')
+
+        document.body.removeChild(el)
+        el = null
       }
-      this.addObject(type, value, file.name)
+      this.addObject(type, value, file.name, {
+        bounds: { width: scaleDown(file.width), height: scaleDown(file.height) }
+      })
       this.$refs.artsModal.hide()
     },
-    async addObject(type, value = '', name = null) {
+    async addObject(type, value = '', name = null, props = {}) {
       let newObject = await this.$store.dispatch('designer/addObject', {
         type,
         value
       })
-      newObject = JSON.parse(JSON.stringify(newObject))
+      newObject = JSON.parse(JSON.stringify({ ...newObject, ...props }))
       newObject.name = name
       if (type == 'image') {
         let i = new Image()
@@ -383,13 +401,13 @@ export default {
           let ratio = 0
           if (i.width > this.width) {
             ratio = this.width / i.width
-            newObject.bounds.width = i.width * ratio
-            newObject.bounds.height = i.height * ratio
+            newObject.bounds.width *= ratio
+            newObject.bounds.height *= ratio
           }
           if (newObject.bounds.height > this.height) {
             ratio = this.height / i.height
-            newObject.bounds.width = i.width * ratio
-            newObject.bounds.height = i.height * ratio
+            newObject.bounds.width *= ratio
+            newObject.bounds.height *= ratio
           }
           newObject.bounds.left = newObject.bounds.width / 2 || 20
           newObject.bounds.top = newObject.bounds.height / 2 || 20
@@ -400,7 +418,7 @@ export default {
         i.src = value
         return
       }
-      if (type == 'text' || type == 'svg') {
+      if (type == 'text') {
         let el = document.createElement('div')
         el.innerHTML = value
         el.style.position = 'absolute'
@@ -408,7 +426,6 @@ export default {
         el.style.display = 'block'
         el.style.fontSize = `${newObject.style.fontSize}px`
         document.body.appendChild(el)
-
         newObject.bounds.width = el.offsetWidth
         newObject.bounds.height = el.offsetHeight
         let ratio = 0
@@ -738,7 +755,7 @@ export default {
     },
     objects: {
       deep: true,
-      handler(to){
+      handler(to) {
         this.$emit('input', to)
       }
     }
