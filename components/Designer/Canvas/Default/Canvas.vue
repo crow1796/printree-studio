@@ -62,7 +62,7 @@
             <div class="relative w-auto h-full">
               <div
                 class="printable-area absolute bg-white"
-                :style="{ width: `${width}px`, height: `${height}px` }"
+                :style="{ width: `${width}px`, height: `${height}px`, backgroundColor }"
               >
                 <div class="h-full w-full z-10 relative">
                   <drr
@@ -90,7 +90,7 @@
                     :ref="`obj_${obj.id}_drr`"
                   >
                     <div
-                      class="flex flex-wrap w-full h-full relative z-1"
+                      class="flex flex-wrap w-full h-full relative z-1 leading-none"
                       v-if="obj.type == 'text'"
                       :style="{
                         ...obj.style,
@@ -121,7 +121,7 @@
                     </div>
                     <div
                       v-if="obj.editorData.isActive"
-                      class="absolute flex rounded-full bg-white w-5 h-5 items-center justify-center"
+                      class="absolute flex rounded-full bg-white w-6 h-6 items-center justify-center border"
                       :style="{ fontSize: '.7em', top: '-10px', right: '-10px', zIndex: 1 }"
                       @click="removeObject(obj)"
                     >
@@ -154,6 +154,9 @@ export default {
       required: true
     },
     height: {
+      required: true
+    },
+    backgroundColor: {
       required: true
     },
     value: {

@@ -63,16 +63,21 @@
                   <input
                     type="text"
                     class="font-bold w-full outline-none"
-                    placeholder="What's the name of this product?"
+                    placeholder="What's the name of this product?*"
                     v-model="selectedProduct.meta.name"
                   />
                 </div>
-                <div class="text-3xl leading-none py-4 flex items-center">
-                  <div>PHP 199.00 +</div>&nbsp;
-                  <div>
-                    <currency-input currency="PHP" placeholder="Your Profit" style="width: 215px" v-model="profit"/>
+                <div class="text-3xl leading-none py-4 pt-3 flex items-center">
+                  <div class="relative flex flex-col">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Base Price</div>
+                    <div>PHP 199.00 +</div>
+                  </div>&nbsp;
+                  <div class="relative flex flex-col">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Profit*</div>
+                    <currency-input currency="PHP" placeholder="Your Profit" style="width: 215px" v-model="profit" v-tooltip="'Your Profit'"/>
                   </div>
-                  <div class="text-primary">
+                  <div class="text-primary flex flex-col">
+                    <div class="text-xs uppercase font-bold mb-1">Total Price</div>
                     <div>= PHP 299.00</div>
                   </div>
                 </div>

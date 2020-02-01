@@ -76,9 +76,9 @@
                           v-if="product.availableVariants.length > 1"
                         >
                           <div
-                            class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 bg-white"
+                            class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 bg-white"
                           >
-                            <font-awesome-icon :icon="['fas', 'plus']" class="text-xs" />
+                            <font-awesome-icon :icon="['fas', 'plus']" class="text-xs" :style="{fontSize: '.6em'}" />
                           </div>
                         </div>
                         <template slot="popover">
@@ -100,7 +100,7 @@
                                   @click="addVariant(variant)"
                                 >
                                   <div
-                                    class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
+                                    class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
                                     :style="{
                                       'background-color': variant.color
                                     }"
@@ -109,7 +109,7 @@
                                       :icon="['fas', 'check']"
                                       :style="{
                                         color: getCorrectColor(variant.color),
-                                        fontSize: '.8em'
+                                        fontSize: '.4em'
                                       }"
                                       v-if="
                                         _colorIsInVariantsOf(
@@ -137,7 +137,7 @@
                         }"
                       >
                         <div
-                          class="flex justify-center items-center rounded-full cursor-pointer w-6 h-6 border border-gray-200"
+                          class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
                           :style="{ 'background-color': variant.color }"
                         ></div>
                       </div>
@@ -252,6 +252,7 @@
           v-model="currentVariant.printable_area[currentSide].objects"
           :width="currentVariant.printable_area[currentSide].width * 3"
           :height="currentVariant.printable_area[currentSide].height * 3"
+          :backgroundColor="currentVariant.color"
           v-if="selectedTab === 'designer'"
         />
       </div>
