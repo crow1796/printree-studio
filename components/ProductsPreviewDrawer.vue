@@ -1,27 +1,75 @@
 <template>
   <VueTailwindDrawer ref="drawer" width="100%">
+    <VueTailwindModal ref="planModal">
+      <div class="flex flex-grow flex-col text-gray-600">
+        <div class="font-bold">
+          <div class="text-center text-2xl uppercase font-bold mb-4 font-normal">
+            I want to...
+          </div>
+          <div class="flex">
+            <div class="border rounded w-6/12 flex cursor-pointer hover:border-gray-600 items-center justify-center mr-2 relative">
+              <div class="mx-4 my-6 flex flex-col items-center justify-center">
+                <div class="flex items-center justify-center">
+                  <img src="~/assets/images/sell.svg" class="w-10/12" style="width: 200px;"/>
+                </div>
+                <div class="text-4xl flex-justify-center text-primary mt-4">
+                  SELL
+                </div>
+                <div class="flex flex-grow font-normal">
+                  100% FREE ● NO INVENTORY
+                </div>
+              </div>
+            </div>
+            <div class="border rounded w-6/12 flex cursor-pointer hover:border-gray-600 items-center justify-center ml-2 relative">
+              <div class="mx-4 my-6 flex flex-col items-center justify-center">
+                <div class="flex items-center justify-center">
+                  <img src="~/assets/images/buy.svg" class="w-10/12" style="width: 280px;"/>
+                </div>
+                <div class="text-4xl flex-justify-center text-primary mt-4">
+                  BUY
+                </div>
+                <div class="flex flex-grow font-normal">
+                  BULK DISCOUNTS ● FOR YOUR ORGANIZATION
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-between pt-4 mt-4 border-t">
+              <button
+                type="button"
+                class="px-8 py-2 font-bold rounded outline-none focus:outline-none border hover:border-gray-600 hover:text-gray-700 mr-4"
+                @click="$refs.planModal.hide()"
+              >CANCEL</button>
+            <button
+              type="button"
+              class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+            >
+              <span>PROCEED</span>
+              <span class="ml-2">
+                <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+              </span>
+            </button>
+          </div>
+          <!-- <toggle-button
+            :value="designMeta.plan == 'sell'"
+            :labels="{checked: 'SELL', unchecked: 'BUY'}"
+            :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
+            :width="60"
+            @change="changeCurrentProductPlan"
+          />
+          <span class="font-bold ml-1">
+            {{products.length > 1 ? "THESE" : "THIS"}} PRODUCT
+            <span v-if="products.length > 1">S</span>
+          </span> -->
+        </div>
+        <!-- <div
+          class="text-xs mt-1"
+        >{{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div> -->
+      </div>
+    </VueTailwindModal>
     <div class="flex h-full w-full text-gray-600 overflow-hidden">
       <div class="flex flex-col w-full h-full">
-        <div class="flex items-center justify-between border-b p-4">
-          <div class="flex w-4/12 uppercase flex-col">
-            <div class="font-bold">
-              <span class="font-bold mr-1">I WANT TO</span>
-              <toggle-button
-                :value="designMeta.plan == 'sell'"
-                :labels="{checked: 'SELL', unchecked: 'BUY'}"
-                :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
-                :width="60"
-                @change="changeCurrentProductPlan"
-              />
-              <span class="font-bold ml-1">
-                {{products.length > 1 ? "THESE" : "THIS"}} PRODUCT
-                <span v-if="products.length > 1">S</span>
-              </span>
-            </div>
-            <div
-              class="text-xs mt-1"
-            >{{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
-          </div>
+        <div class="flex items-center border-b p-4">
           <div class="flex w-4/12 uppercase justify-center font-bold">COLLECTION PREVIEW</div>
           <div class="flex w-4/12 justify-end">
             <div
@@ -36,11 +84,15 @@
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
-                <div><img :src="selectedProduct.variants[selectedVariantKey][
+                <div>
+                  <img
+                    :src="selectedProduct.variants[selectedVariantKey][
                       _firstPrintableAreaOf(
                         selectedProduct.variants[selectedVariantKey]
                       )
-                    ].with_placeholder"/></div>
+                    ].with_placeholder"
+                  />
+                </div>
                 <div class="variants flex">
                   <div
                     class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
@@ -52,8 +104,12 @@
                     @click="() => (selectedVariantKey = vid)"
                   >
                     <div class="flex flex-col w-full">
-                      <div><img :src="variant[_firstPrintableAreaOf(variant)]
-                            .with_placeholder"/></div>
+                      <div>
+                        <img
+                          :src="variant[_firstPrintableAreaOf(variant)]
+                            .with_placeholder"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -67,18 +123,23 @@
                     v-model="selectedProduct.meta.name"
                   />
                 </div>
-                <div class="text-3xl leading-none py-4 pt-3 flex items-center">
+                <div class="text-3xl leading-none py-4 flex items-center">
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Base Price</div>
                     <div>PHP 199.00 +</div>
                   </div>&nbsp;
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Profit*</div>
-                    <currency-input currency="PHP" placeholder="Your Profit" style="width: 215px" v-model="profit" v-tooltip="'Your Profit'"/>
+                    <currency-input
+                      currency="PHP"
+                      placeholder="Your Profit"
+                      style="width: 215px"
+                      v-model="selectedProductProfit"
+                    />
                   </div>
                   <div class="text-primary flex flex-col">
                     <div class="text-xs uppercase font-bold mb-1">Total Price</div>
-                    <div>= PHP 299.00</div>
+                    <div>= PHP {{ productTotalPrice }}</div>
                   </div>
                 </div>
                 <div>
@@ -86,7 +147,7 @@
                   <div class="flex flex-wrap">
                     <div
                       class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-2"
-                      v-for="({ price, quantity }, i) in selectedProduct
+                      v-for="(variant, i) in selectedProduct
                         .variants[selectedVariantKey].sizes"
                       :key="i"
                     >
@@ -94,7 +155,7 @@
                         <div class="text-center mr-2">{{ i }}:</div>
                         <div>
                           <VueNumericInput
-                            :min="0"
+                            :min="variant.quantity"
                             align="center"
                             style="width: 90px"
                             class="ml-1"
@@ -130,7 +191,7 @@
                 type="button"
                 class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
                 @click="validateAndSaveMeta"
-              >Next</button>
+              >NEXT</button>
             </div>
           </div>
           <div class="flex border-l w-3/12">
@@ -150,7 +211,7 @@
                       @click="selectProduct(product)"
                     >
                       <div class="px-2 pt-2">
-                        <img :src="_placeholderOfFirstVariantOf(product)"/>
+                        <img :src="_placeholderOfFirstVariantOf(product)" />
                       </div>
                     </div>
                   </div>
@@ -169,17 +230,21 @@ import VueTailwindDrawer from '@/components/VueTailwindDrawer'
 import VueNumericInput from '@/components/VueNumericInput'
 import OptionButtons from '@/components/OptionButtons'
 import { mapGetters } from 'vuex'
+import VueTailwindModal from '@/components/VueTailwindModal'
 
 export default {
   props: ['products'],
   components: {
     VueTailwindDrawer,
     VueNumericInput,
-    OptionButtons
+    OptionButtons,
+    VueTailwindModal
   },
   created() {
     this.printingOption = this.optionButtons[0]
-    console.log(this.selectedProduct)
+    this.selectedProductSizes = this.selectedProduct.variants[
+      _.first(_.keys(JSON.parse(JSON.stringify(this.products[0])).variants))
+    ]
   },
   data() {
     return {
@@ -211,15 +276,19 @@ export default {
         }
       ],
       printingOption: null,
-      profit: 0
+      selectedProductProfit: 0,
+      selectedProductSizes: []
     }
   },
   computed: {
     ...mapGetters({
       designMeta: 'designer/designMeta'
     }),
-    hasPreviousProduct(){
+    hasPreviousProduct() {
       return _.findIndex(this.products, { id: this.selectedProduct.id }) > 0
+    },
+    productTotalPrice(){
+      return 
     }
   },
   methods: {
@@ -255,7 +324,7 @@ export default {
       if (value) plan = 'sell'
       this.$store.commit('designer/DESIGN_PLAN', plan)
     },
-    previousProduct(){
+    previousProduct() {
       const previousProductIndex =
         _.findIndex(this.products, { id: this.selectedProduct.id }) - 1
       const previousProduct = this.products[previousProductIndex]
@@ -266,7 +335,7 @@ export default {
         _.findIndex(this.products, { id: this.selectedProduct.id }) + 1
       const nextProduct = this.products[nextProductIndex]
       if (!nextProduct) {
-        // TODO: Go to next page
+        this.$refs.planModal.show()
         return
       }
       this.selectProduct(nextProduct)

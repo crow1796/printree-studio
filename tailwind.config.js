@@ -10,6 +10,7 @@ module.exports = {
         'smoke-light': 'rgba(0, 0, 0, 0.4)',
         'smoke-lighter': 'rgba(0, 0, 0, 0.25)',
         'smoke-lightest': 'rgba(0, 0, 0, 0.1)',
+        'white-smoke': 'rgba(255, 255, 255, 0.7)',
         primary: {
           default: '#E1274E',
           lighter: '#ff446b'
