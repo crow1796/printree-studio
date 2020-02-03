@@ -8,7 +8,8 @@ const state = () => ({
     id: null,
     name: null,
     uid: null,
-    plan: 'sell'
+    plan: 'sell',
+    printing_option: null
   },
   availableProducts: [],
   selectedProducts: [],
@@ -317,7 +318,7 @@ const mutations = {
     state.selectedProducts[_.findIndex(state.selectedProducts, { id })].meta = meta
   },
   PRODUCT_PROPERTIES(state, {id, props}){
-
+    _.set(state.selectedProducts[_.findIndex(state.selectedProducts, { id })], props.path, props.value)
   },
   OBJECT_PROPERTIES(state, data) {
     let objectIndex = _.findIndex(

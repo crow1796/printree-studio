@@ -368,7 +368,6 @@ export default {
     })
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]))
     this.currentVariant = this.currentProduct.variants[0]
-    this._calculateEstProfit()
     this.isLoading = false
   },
   data() {
@@ -376,8 +375,6 @@ export default {
       selectedTab: 'preview',
       isLayersCollapsed: false,
       productDescriptionEditor: null,
-      estimatedMinProfit: 0,
-      estimatedMaxProfit: 0,
       fontSizeTimeout: null,
       isLoading: false,
       tmpProducts: [],
@@ -471,41 +468,6 @@ export default {
       if (value) plan = 'sell'
       this.$store.commit('designer/DESIGN_PLAN', plan)
     },
-    setQuantityAndPrice(n, p, v) {
-      this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
-        path: `sizes.${n}.${p}`,
-        value: v
-      })
-      if (this.designMeta.plan == 'buy') return
-      this._calculateEstProfit()
-    },
-    _calculateEstProfit() {
-      let totalProfit = 0
-      _.map(this.selectedProducts, product => {
-        _.map(product.variants, variant => {
-          _.map(variant.sizes, (size, k) => {
-            let availableSize = _.find(
-              variant.available_sizes,
-              s => s.name == k
-            )
-            if (!availableSize) return
-            let baseCost = availableSize.base_cost
-            let totalForPrintree = baseCost * size.quantity
-            let totalWithCustomerPrice = size.price * size.quantity
-            let net = totalWithCustomerPrice - totalForPrintree
-            totalProfit += net
-          })
-        })
-      })
-      let minProfit = totalProfit - totalProfit * 0.05
-      let maxProfit = totalProfit + totalProfit * 0.05
-      this.estimatedMinProfit = minProfit
-      this.estimatedMaxProfit = maxProfit
-      this.$nextTick(() => {
-        if (this.$refs.estMinProfit) this.$refs.estMinProfit.play()
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play()
-      })
-    },
     togglePlanSection() {
       this.isMarketPlanCollapsed = !this.isMarketPlanCollapsed
       this.$storage.setLocalStorage(
@@ -529,7 +491,8 @@ export default {
           product.meta = {
             name: '',
             description: '',
-            tags: ''
+            tags: '',
+            printing_option: '',
           }
         return product
       })
