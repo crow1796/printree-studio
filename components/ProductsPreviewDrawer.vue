@@ -202,6 +202,7 @@
                       }"
                       @click="selectProduct(product)"
                     >
+                    <!-- TODO: Select only if already validated -->
                       <div class="px-2 pt-2">
                         <img :src="_placeholderOfFirstVariantOf(product)" />
                       </div>
