@@ -1,74 +1,36 @@
 <template>
   <VueTailwindDrawer ref="drawer" width="100%">
-    <VueTailwindModal ref="planModal">
-      <div class="flex flex-grow flex-col text-gray-600">
-        <div class="font-bold">
-          <div class="text-center text-2xl uppercase font-bold mb-4 font-normal">I want to...</div>
-          <div class="flex">
-            <div
-              class="border rounded w-6/12 flex cursor-pointer hover:border-gray-600 items-center justify-center mr-2 relative"
-              @click="changeCurrentProductPlan('sell')"
-              :class="{'border-white hover:border-white text-white bg-primary': designMeta.plan === 'sell'}"
-            >
-              <div class="mx-4 my-6 flex flex-col items-center justify-center">
-                <div class="flex items-center justify-center">
-                  <div class="rounded-full bg-white">
-                    <img src="~/assets/images/sell.svg" class="w-10/12" style="width: 200px;" />
-                  </div>
-                </div>
-                <div
-                  class="text-4xl flex-justify-center mt-4"
-                  :class="{'text-white': designMeta.plan === 'sell', 'text-primary': designMeta.plan !== 'sell'}"
-                >SELL</div>
-                <div class="flex flex-grow font-normal">100% FREE ● NO INVENTORY</div>
-              </div>
-            </div>
-            <div
-              class="border rounded w-6/12 flex cursor-pointer hover:border-gray-600 items-center justify-center ml-2 relative"
-              @click="changeCurrentProductPlan('buy')"
-              :class="{'border-white hover:border-white text-white bg-primary': designMeta.plan === 'buy'}"
-            >
-              <div class="mx-4 my-6 flex flex-col items-center justify-center">
-                <div class="flex items-center justify-center">
-                  <div class="rounded-full bg-white">
-                    <img src="~/assets/images/buy.svg" class="w-10/12" style="width: 280px;" />
-                  </div>
-                </div>
-                <div
-                  class="text-4xl flex-justify-center mt-4"
-                  :class="{'text-white': designMeta.plan === 'buy', 'text-primary': designMeta.plan !== 'buy'}"
-                >BUY</div>
-                <div class="flex flex-grow font-normal">BULK DISCOUNTS ● FOR YOUR ORGANIZATION</div>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-between pt-4 mt-4 border-t">
-            <button
-              type="button"
-              class="px-8 py-2 font-bold rounded outline-none focus:outline-none border hover:border-gray-600 hover:text-gray-700 mr-4"
-              @click="$refs.planModal.hide()"
-            >
-              <span class="mr-2">
-                <font-awesome-icon :icon="['fas', 'arrow-left']" />
-              </span>BACK
-            </button>
-            <button
-              type="button"
-              class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
-            >
-              <span>PROCEED</span>
-              <span class="ml-2">
-                <font-awesome-icon :icon="['fas', 'arrow-right']" />
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </VueTailwindModal>
+    <VueTailwindToast placement="top-center" ref="productValidationToast">
+      <div class="font-bold">Oops! Please fill up the required fields:</div>
+      <ul class="text-sm">
+        <li>What's the name of this product?</li>
+        <li>How much would your profit be?</li>
+        <li>How many of these would you like to {{ designMeta.plan }}?</li>
+        <li>Must have a minimum quantity of 5</li>
+      </ul>
+    </VueTailwindToast>
     <div class="flex h-full w-full text-gray-600 overflow-hidden">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow items-center border-b p-4">
-          <div class="flex w-4/12 uppercase font-bold">COLLECTION PREVIEW</div>
+          <div class="flex w-4/12 uppercase flex-col">
+            <div class="font-bold">
+              <span class="font-bold mr-1">I WANT TO</span>
+              <toggle-button
+                :value="designMeta.plan == 'sell'"
+                :labels="{checked: 'SELL', unchecked: 'BUY'}"
+                :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
+                :width="60"
+                @change="changeCurrentProductPlan"
+              />
+              <span class="font-bold ml-1">
+                {{generatedProducts.length > 1 ? "THESE" : "THIS"}} PRODUCT
+                <span v-if="generatedProducts.length > 1">S</span>
+              </span>
+            </div>
+            <div
+              class="text-xs mt-1"
+            >{{ designMeta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
+          </div>
           <div class="flex w-4/12 uppercase font-bold justify-center">
             <div class="flex flex-col items-center">
               <div>TOTAL ESTIMATED PROFIT</div>
@@ -159,9 +121,9 @@
                       v-model="selectedProductProfit"
                     />
                   </div>
-                  <div class="text-primary flex flex-col font-bold">
-                    <div class="text-xs uppercase font-bold mb-1">= Total Price</div>
-                    <div>= PHP {{ productTotalPrice }}</div>
+                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
+                    <div class="text-xs uppercase font-bold mb-1">Total {{ designMeta.plan === 'sell' ? 'Selling' : 'Buying' }} Price</div>
+                    <div>PHP {{ productTotalPrice }}</div>
                   </div>
                 </div>
                 <div>
@@ -211,7 +173,7 @@
                 type="button"
                 class="px-8 py-2 font-bold rounded outline-none focus:outline-none border hover:border-gray-600 hover:text-gray-700 mr-4"
                 @click="previousProduct"
-                v-if="hasPreviousProduct"
+                v-if="hasPreviousProductOrVariant"
               >Previous</button>
               <button
                 type="button"
@@ -257,6 +219,7 @@
 
 <script>
 import VueTailwindDrawer from '@/components/VueTailwindDrawer'
+import VueTailwindToast from '@/components/VueTailwindToast'
 import VueNumericInput from '@/components/VueNumericInput'
 import OptionButtons from '@/components/OptionButtons'
 import { mapGetters } from 'vuex'
@@ -268,7 +231,8 @@ export default {
     VueTailwindDrawer,
     VueNumericInput,
     OptionButtons,
-    VueTailwindModal
+    VueTailwindModal,
+    VueTailwindToast
   },
   data() {
     return {
@@ -313,12 +277,18 @@ export default {
     ...mapGetters({
       designMeta: 'designer/designMeta'
     }),
-    hasPreviousProduct() {
+    hasPreviousProductOrVariant() {
+      const variationKeys = _.keys(this.selectedProduct.variants)
+      const previousVariationKey = variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+      
       return (
-        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) > 0
+        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) > 0 || previousVariationKey
       )
     },
     productTotalPrice() {
+      if(this.designMeta.plan === 'buy'){
+        return this.selectedProductBasePrice
+      }
       return this.selectedProductBasePrice + this.selectedProductProfit
     }
   },
@@ -342,23 +312,81 @@ export default {
     selectProduct(product) {
       this.selectedProduct = JSON.parse(JSON.stringify(product))
     },
-    changeCurrentProductPlan(plan) {
+    changeCurrentProductPlan({ value }) {
+      let plan = 'buy'
+      if (value) plan = 'sell'
       this.$store.commit('designer/DESIGN_PLAN', plan)
     },
     previousProduct() {
       const previousProductIndex =
         _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) - 1
       const previousProduct = this.generatedProducts[previousProductIndex]
+      const variationKeys = _.keys(this.selectedProduct.variants)
+
+      const previousVariationKey = variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+
+      if(previousVariationKey){
+        this.selectedProductVariantKey = previousVariationKey
+        return
+      }
+      
       this.selectProduct(previousProduct)
+      this.$nextTick(() => {
+        this.selectedProductVariantKey = _.last(_.keys(previousProduct.variants))
+      })
     },
     validateAndSaveMeta() {
+      // TODO: Validate
+      let isDirty = false
+      let errors = []
+
+      if (!this.selectedProduct.meta.name.trim()) {
+        isDirty = true
+        errors.push('Product name is required.')
+      }
+      
+      if(!this.selectedProductProfit && this.designMeta.plan === 'sell'){
+        isDirty = true
+        errors.push('How much would your profit be?')
+      }
+
+      const totalQuantity = _.sum(_.map(this.selectedProduct.variants[this.selectedProductVariantKey].sizes, 'quantity'))
+
+      if(!totalQuantity){
+        isDirty = true
+        errors.push(`How many of this variant would you like to ${this.designMeta.plan}?`)
+      }
+
+      if(totalQuantity < 5){
+        isDirty = true
+        errors.push(`Must have a minimum quantity of 5`)
+      }
+
+      if (isDirty){
+        this.$refs.productValidationToast.show()
+        return
+      }
+      const variationKeys = _.keys(this.selectedProduct.variants)
+      const nextVariationKey = variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) + 1]
+
+      this.$store.commit('designer/CURRENT_PRODUCT_META', {
+        id: this.selectedProduct.id,
+        meta: this.selectedProduct.meta
+      })
+      if(nextVariationKey){
+        this.selectedProductVariantKey = nextVariationKey
+        return
+      }
+
       const nextProductIndex =
         _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) + 1
       const nextProduct = this.generatedProducts[nextProductIndex]
+      
       if (!nextProduct) {
-        this.$refs.planModal.show()
+        // TODO: SHOW NEXT STEP
         return
       }
+
       this.selectProduct(nextProduct)
     },
     setQuantityAndPrice(n, p, v) {
@@ -410,13 +438,6 @@ export default {
     selectedProduct: {
       immediate: true,
       handler(to, from) {
-        if (from) {
-          this.$store.commit('designer/CURRENT_PRODUCT_META', {
-            id: from.id,
-            meta: from.meta
-          })
-        }
-
         const firstVariantKey = _.first(_.keys(to.variants))
         this.selectedProductSizes = to.variants[firstVariantKey].sizes
         this.selectedProductVariantKey = firstVariantKey
@@ -439,6 +460,28 @@ export default {
         ].sizes = this.selectedProductSizes
 
         this._calculateEstProfit()
+      }
+    },
+    selectedProductVariantKey: {
+      immediate: true,
+      handler(to) {
+        this.selectedProductSizes = this.selectedProduct.variants[to].sizes
+        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        this.selectedProductBasePrice = _.first(
+          this.selectedProduct.variants[to].available_sizes
+        ).base_cost
+
+        this.selectedProductProfit = this.selectedProduct.variants[to].sizes[
+          firstSizeKey
+        ].price
+
+        _.keys(this.selectedProductSizes).map(
+          s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
+        )
+
+        this.generatedProducts[
+          _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
+        ].variants[to].sizes = this.selectedProductSizes
       }
     },
     selectedProductProfit: {
