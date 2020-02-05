@@ -1,12 +1,39 @@
 <template>
   <VueTailwindDrawer ref="drawer" width="100%">
+    <VueTailwindModal
+      ref="publishConfirmationModal"
+      width="20%"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase">
+              <strong>Confirmation</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body text-center p-4">
+          {{ designMeta.plan === 'sell' ? 'Would you like to publish these product(s) now?' : 'Are you sure you want to buy all of these product(s)?' }}
+        </div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="() => this.$refs.publishConfirmationModal.hide()"
+          >Cancel</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+          >Yes</button>
+        </div>
+      </div>
+    </VueTailwindModal>
     <VueTailwindToast placement="top-center" ref="productValidationToast">
-      <div class="font-bold">Oops! Please fill up the required fields:</div>
-      <ul class="text-sm">
-        <li>What's the name of this product?</li>
-        <li>How much would your profit be?</li>
-        <li>How many of these would you like to {{ designMeta.plan }}?</li>
-        <li>Must have a minimum quantity of 5</li>
+      <div class="font-bold">Oops! Please fill up the required fields first:</div>
+      <ul class="text-sm list-disc">
+        <li v-for="(error, i) in productErrors" :key="i">{{ error }}</li>
       </ul>
     </VueTailwindToast>
     <div class="flex h-full w-full text-gray-600 overflow-hidden">
@@ -24,7 +51,9 @@
               />
               <span class="font-bold ml-1">
                 {{generatedProducts.length > 1 ? "THESE" : "THIS"}} PRODUCT
-                <span v-if="generatedProducts.length > 1">S</span>
+                <span
+                  v-if="generatedProducts.length > 1"
+                >S</span>
               </span>
             </div>
             <div
@@ -110,20 +139,28 @@
                 <div class="text-3xl leading-none py-4 flex items-center">
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Base Price</div>
-                    <div>PHP {{ selectedProductBasePrice }} +</div>
-                  </div>&nbsp;
+                    <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
+                  </div>
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Profit*</div>
-                    <currency-input
-                      currency="PHP"
-                      placeholder="Your Profit"
-                      style="width: 215px"
-                      v-model="selectedProductProfit"
-                    />
+                    <div class="flex">
+                      <div>PHP&nbsp;</div>
+                      <div
+                        contenteditable="true"
+                        @input="setProductProfit"
+                      >{{ selectedProductProfit }}</div>&nbsp;=&nbsp;
+                    </div>
                   </div>
                   <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
-                    <div class="text-xs uppercase font-bold mb-1">Total {{ designMeta.plan === 'sell' ? 'Selling' : 'Buying' }} Price</div>
+                    <div class="text-xs uppercase font-bold mb-1">Total Selling Price</div>
                     <div>PHP {{ productTotalPrice }}</div>
+                  </div>
+                  <div
+                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded ml-2"
+                    v-if="designMeta.plan === 'buy'"
+                  >
+                    <div class="text-xs uppercase font-bold mb-1">Buying Price</div>
+                    <div>PHP {{ selectedProductBasePrice }}</div>
                   </div>
                 </div>
                 <div>
@@ -178,7 +215,7 @@
               <button
                 type="button"
                 class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
-                @click="validateAndSaveMeta"
+                @click="nextProduct"
               >NEXT</button>
             </div>
           </div>
@@ -200,9 +237,8 @@
                         'border-gray-500 shadow-xl':
                           selectedProduct.id === product.id
                       }"
-                      @click="selectProduct(product)"
+                      @click="validateAndSelectProduct(product)"
                     >
-                    <!-- TODO: Select only if already validated -->
                       <div class="px-2 pt-2">
                         <img :src="_placeholderOfFirstVariantOf(product)" />
                       </div>
@@ -237,6 +273,7 @@ export default {
   },
   data() {
     return {
+      productErrors: [],
       generatedProducts: JSON.parse(JSON.stringify(this.products)),
       selectedProduct: JSON.parse(JSON.stringify(this.products[0])),
       selectedProductVariantKey: _.first(
@@ -280,16 +317,15 @@ export default {
     }),
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants)
-      const previousVariationKey = variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
-      
+      const previousVariationKey =
+        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+
       return (
-        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) > 0 || previousVariationKey
+        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) >
+          0 || previousVariationKey
       )
     },
     productTotalPrice() {
-      if(this.designMeta.plan === 'buy'){
-        return this.selectedProductBasePrice
-      }
       return this.selectedProductBasePrice + this.selectedProductProfit
     }
   },
@@ -324,57 +360,79 @@ export default {
       const previousProduct = this.generatedProducts[previousProductIndex]
       const variationKeys = _.keys(this.selectedProduct.variants)
 
-      const previousVariationKey = variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+      const previousVariationKey =
+        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
 
-      if(previousVariationKey){
+      if (previousVariationKey) {
         this.selectedProductVariantKey = previousVariationKey
         return
       }
-      
+
       this.selectProduct(previousProduct)
       this.$nextTick(() => {
-        this.selectedProductVariantKey = _.last(_.keys(previousProduct.variants))
+        this.selectedProductVariantKey = _.last(
+          _.keys(previousProduct.variants)
+        )
       })
     },
+    validateAndSelectProduct(product) {
+      const isValidated = this.validateAndSaveMeta()
+      if (!isValidated) return
+
+      this.selectProduct(product)
+    },
     validateAndSaveMeta() {
-      // TODO: Validate
       let isDirty = false
-      let errors = []
+      this.productErrors = []
 
       if (!this.selectedProduct.meta.name.trim()) {
         isDirty = true
-        errors.push('Product name is required.')
+        this.productErrors.push('Product name is required.')
       }
-      
-      if(!this.selectedProductProfit && this.designMeta.plan === 'sell'){
+
+      if (!this.selectedProductProfit && this.designMeta.plan === 'sell') {
         isDirty = true
-        errors.push('How much would your profit be?')
+        this.productErrors.push('How much would your profit be?')
       }
 
-      const totalQuantity = _.sum(_.map(this.selectedProduct.variants[this.selectedProductVariantKey].sizes, 'quantity'))
+      const totalQuantity = _.sum(
+        _.map(
+          this.selectedProduct.variants[this.selectedProductVariantKey].sizes,
+          'quantity'
+        )
+      )
 
-      if(!totalQuantity){
+      if (!totalQuantity) {
         isDirty = true
-        errors.push(`How many of this variant would you like to ${this.designMeta.plan}?`)
+        this.productErrors.push(
+          `How many of this variant would you like to ${this.designMeta.plan}?`
+        )
       }
 
-      if(totalQuantity < 5){
+      if (totalQuantity < 5) {
         isDirty = true
-        errors.push(`Must have a minimum quantity of 5`)
+        this.productErrors.push(`Must have a minimum quantity of 5`)
       }
 
-      if (isDirty){
+      if (isDirty) {
         this.$refs.productValidationToast.show()
-        return
+        return false
       }
-      const variationKeys = _.keys(this.selectedProduct.variants)
-      const nextVariationKey = variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) + 1]
 
       this.$store.commit('designer/CURRENT_PRODUCT_META', {
         id: this.selectedProduct.id,
         meta: this.selectedProduct.meta
       })
-      if(nextVariationKey){
+      return true
+    },
+    nextProduct() {
+      const isValidated = this.validateAndSaveMeta()
+      if (!isValidated) return
+
+      const variationKeys = _.keys(this.selectedProduct.variants)
+      const nextVariationKey =
+        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) + 1]
+      if (nextVariationKey) {
         this.selectedProductVariantKey = nextVariationKey
         return
       }
@@ -382,9 +440,11 @@ export default {
       const nextProductIndex =
         _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) + 1
       const nextProduct = this.generatedProducts[nextProductIndex]
-      
+
       if (!nextProduct) {
-        // TODO: SHOW NEXT STEP
+        this.$refs.publishConfirmationModal.show()
+        // TODO: If 'sell' and 'yes', then show an information message that the product will be REVIEWED FIRST before publishing then go to CX dashboard
+        // TODO: If 'buy' then redirect to checkout page
         return
       }
 
@@ -432,7 +492,14 @@ export default {
       this.calculatorTimeout = setTimeout(() => {
         this._calculateEstProfit()
         this.isCalculating = false
-      }, 1000)
+      }, 2000)
+    },
+    setProductProfit(e) {
+      this.selectedProductProfit = parseFloat(e.target.innerHTML)
+
+      _.keys(this.selectedProductSizes).map(
+        s => (this.selectedProductSizes[s].price = e)
+      )
     }
   },
   watch: {
@@ -447,18 +514,15 @@ export default {
           to.variants[firstVariantKey].available_sizes
         ).base_cost
 
+        // TODO: Fix profit bug when navigating through the products
         this.selectedProductProfit =
-          to.variants[firstVariantKey].sizes[firstSizeKey].price
+        to.variants[firstVariantKey].sizes[firstSizeKey].price
 
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
         )
 
-        this.generatedProducts[
-          _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
-        ].variants[
-          this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes
+        this.selectedProduct.variants[this.selectedProductVariantKey].sizes = this.selectedProductSizes
 
         this._calculateEstProfit()
       }
@@ -468,17 +532,6 @@ export default {
       handler(to) {
         this.selectedProductSizes = this.selectedProduct.variants[to].sizes
         const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
-        this.selectedProductBasePrice = _.first(
-          this.selectedProduct.variants[to].available_sizes
-        ).base_cost
-
-        this.selectedProductProfit = this.selectedProduct.variants[to].sizes[
-          firstSizeKey
-        ].price
-
-        _.keys(this.selectedProductSizes).map(
-          s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
-        )
 
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
@@ -497,8 +550,6 @@ export default {
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = to)
         )
-
-        console.log(this.selectedProductSizes)
 
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
