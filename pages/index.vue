@@ -80,6 +80,7 @@ export default {
     AvailableProducts,
     AuthModal
   },
+  middleware: 'authenticated',
   data(){
     return {
       isLoading: false,

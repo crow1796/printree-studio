@@ -35,19 +35,6 @@
             <span>Sign In with Facebook</span>
           </button>
         </div>
-        <div class="my-3 text-center text-xs">
-          OR
-        </div>
-        <div class="my-3">
-          <button class="w-full justify-center items-center focus:outline-none outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
-            @click="signInAsAGuest()">
-            <font-awesome-icon :icon="['fas', 'user']"
-              class="text-xs mr-2"/>
-            <span>Continue as a Guest</span>
-            <font-awesome-icon :icon="['fas', 'arrow-right']"
-              class="text-xs ml-2"/>
-          </button>
-        </div>
       </div>
       <div class="form w-1/2">
         <form @submit.prevent="submitForm">

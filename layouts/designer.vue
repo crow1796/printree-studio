@@ -61,6 +61,7 @@ export default {
     AuthModal,
     ProductsPreviewDrawer
   },
+  middleware: 'authenticated',
   computed: {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',
@@ -83,15 +84,15 @@ export default {
     }
   },
   mounted() {
-    // window.onbeforeunload = (e) => {
-    //   e = e || window.event
-    //   // For IE and Firefox prior to version 4
-    //   if (e) {
-    //     e.returnValue = 'Sure?'
-    //   }
-    //   // For Safari
-    //   return 'Sure?'
-    // }
+    window.onbeforeunload = (e) => {
+      e = e || window.event
+      // For IE and Firefox prior to version 4
+      if (e) {
+        e.returnValue = 'Sure?'
+      }
+      // For Safari
+      return 'Sure?'
+    }
   },
   data() {
     return {

@@ -184,5 +184,8 @@ export default {
       plan,
       products
     })
+  },
+  getUserCollectionsOf(userId){
+    
   }
 }
