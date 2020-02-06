@@ -193,7 +193,7 @@ import { mapGetters } from 'vuex'
 export default {
   layout: 'user_dashboard',
   created(){
-    this.$store.dispatch('dashboard/getUserCollectionsOf', this.user.id)
+    this.$store.dispatch('dashboard/getUserCollectionsOf', this.user.uid)
   },
   computed: {
     ...mapGetters({

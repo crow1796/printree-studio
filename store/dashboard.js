@@ -19,6 +19,8 @@ const mutations = {
 const actions = {
   async getUserCollectionsOf(context, userId){
     const collections = await db.getUserCollectionsOf(userId)
+    console.log(collections)
+    context.commit('USER_COLLECTIONS', collections)
   }
 }
 

@@ -149,9 +149,16 @@ export default {
       })
     }
     let designRef = await fireDb.collection('user_designs').add(design)
-    await fireDb.collection(`user_collections/${user.uid}/collections`).update({
-      collections: FieldValue.arrayUnion(designRef)
-    })
+    try{
+      await fireDb.collection(`user_collections`).doc(user.uid).update({
+        collections: FieldValue.arrayUnion(designRef)
+      })
+    }catch(e){
+      await fireDb.collection(`user_collections`).doc(user.uid).set({
+        collections: [designRef]
+      })
+    }
+
     return {
       ...design,
       id: designRef.id
@@ -188,7 +195,14 @@ export default {
       products
     })
   },
-  getUserCollectionsOf(userId){
-    
+  async getUserCollectionsOf(userId){
+    const userCollectionsRef = await fireDb.collection(`user_collections`).doc(userId)
+    const collectionsSnap = await userCollectionsRef.get()
+    const { collections } = collectionsSnap.data()
+    let collectionsData = await Promise.all(_.map(collections, async (col) => {
+      const colData = await col.get()
+      return colData.data()
+    }))
+    return collectionsData
   }
 }
