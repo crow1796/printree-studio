@@ -1,4 +1,4 @@
-import { fireDb } from '~/plugins/firebase'
+import { fireDb, FieldValue } from '~/plugins/firebase'
 
 export default {
   async fetchAvailableProducts() {
@@ -149,6 +149,9 @@ export default {
       })
     }
     let designRef = await fireDb.collection('user_designs').add(design)
+    await fireDb.collection(`user_collections/${user.uid}/collections`).update({
+      collections: FieldValue.arrayUnion(designRef)
+    })
     return {
       ...design,
       id: designRef.id
