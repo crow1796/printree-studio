@@ -8,15 +8,18 @@
             class="w-10">
         </div>
         <div class="flex w-1/2 items-center justify-end">
-          <a href="//shop.printree.com/"
-            target="_blank"
-            class="text-blue-400 mx-4 hover:text-blue-600 font-bold">
-            SHOP
-          </a>
+          <nuxt-link to="/shop"
+            class="text-primary mx-4 hover:text-primary-lighter">
+            How it works?
+          </nuxt-link>
+          <nuxt-link to="/shop"
+            class="text-primary mx-4 hover:text-primary-lighter">
+            Shop
+          </nuxt-link>
           <a href="#"
-            class="text-blue-400 mx-4 hover:text-blue-600"
+            class="text-primary mx-4 hover:text-primary-lighter"
             @click.prevent="signOut">
-            {{ isLoggedIn ? 'LOGOUT' : 'LOGIN' }}
+            {{ isLoggedIn ? 'Logout' : 'Sign In' }}
           </a>
           <div class="w-4"></div>
         </div>

@@ -17,6 +17,7 @@ export default function({ store }) {
       store.commit('user/IS_LOGGED_IN', true)
       return
     }
+    Cookies.remove('access_token');
     store.commit('user/USER', null)
     store.commit('user/IS_LOGGED_IN', false)
   })

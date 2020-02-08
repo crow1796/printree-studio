@@ -9,7 +9,8 @@ const state = () => ({
     name: null,
     uid: null,
     plan: 'sell',
-    printing_option: null
+    printing_option: null,
+    status: 'draft'
   },
   availableProducts: [],
   selectedProducts: [],
@@ -286,6 +287,9 @@ const getters = {
   },
   currentDesignName(state) {
     return state.designMeta.name
+  },
+  currentDesignStatus(state){
+    return state.designMeta.status
   },
   designMeta(state) {
     return state.designMeta
@@ -567,7 +571,8 @@ const actions = {
       id: design.id,
       name: design.name,
       user_id: design.user_id,
-      plan: design.plan
+      plan: design.plan,
+      status: design.status
     })
     context.commit('SELECTED_PRODUCTS', design.products)
     context.commit('ARTS', arts)
@@ -579,7 +584,8 @@ const actions = {
       id: design.id,
       name: design.name,
       user_id: design.user_id,
-      plan: design.plan
+      plan: design.plan,
+      status: design.status
     })
     return design
   },
@@ -603,7 +609,8 @@ const actions = {
       await db.saveCollection({
         id: context.getters.currentDesignId,
         plan: context.getters.designMeta.plan,
-        selectedProducts: context.getters.selectedProducts
+        selectedProducts: context.getters.selectedProducts,
+        status: context.getters.designMeta.status
       })
     } catch (error) {
       console.log(error)

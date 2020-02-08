@@ -1,4 +1,6 @@
 import auth from '~/plugins/lib/auth/index'
+import { fireAuth } from '~/plugins/firebase'
+import Cookies from 'js-cookie'
 
 const state = () => ({
   user: null,
@@ -23,14 +25,24 @@ const getters = {
   }
 }
 
+const saveAuthToken = async () => {
+  const token = await fireAuth.currentUser.getIdToken();
+  Cookies.set("access_token", token);
+}
+
 const actions = {
   async createAccount(context, data) {
     let res = await auth.createUserWithEmailAndPassword(data)
-    if (res.status) context.dispatch('signIn', data)
+    if (res.status) res = context.dispatch('signIn', data)
     return res
   },
   async signIn(context, data) {
     let res = await auth.signInWithEmailAndPassword(data)
+    if (res.status && res.user) {
+      context.commit('USER', res.user)
+      context.commit('IS_LOGGED_IN', true)
+    }
+    await saveAuthToken()
     return res
   },
   sendPasswordRecovery(context, data) {
@@ -42,13 +54,16 @@ const actions = {
       context.commit('USER', response.user)
       context.commit('IS_LOGGED_IN', true)
     }
+    await saveAuthToken()
     return response
   },
   signOut(context){
+    Cookies.remove('access_token')
     return auth.signOut()
   },
   async signInAsAGuest(context){
     const response = await auth.signInAsAGuest()
+    await saveAuthToken()
     return response
   }
 }

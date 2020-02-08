@@ -12,8 +12,6 @@ export function getUserFromCookie (req) {
 
     const decodedToken = jwtDecode(accessTokenCookie)
     if (!decodedToken) return
-
-    console.log(decodedToken)
     return decodedToken
   }
 }

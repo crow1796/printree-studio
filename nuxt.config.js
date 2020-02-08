@@ -40,7 +40,6 @@ module.exports = {
    */
   plugins: [
     '~/plugins/firebase.js',
-    '~/plugins/check_user.js',
     '~/plugins/prototypes.js',
     '~/plugins/external-installs.js'
   ],

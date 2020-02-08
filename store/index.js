@@ -1,18 +1,17 @@
-import {getUserFromCookie, getUserFromSession} from '@/helpers'
+import {getUserFromCookie } from '@/helpers'
 
 export const actions = {
   async nuxtServerInit ({ commit }, { req }) {
     const user = getUserFromCookie(req)
     if (user) {
       await commit('user/USER', {
-        displayName: user.displayName,
+        displayName: user.name,
         email: user.email,
-        photoUrl: user.photoURL,
-        emailVerified: user.emailVerified,
-        uid: user.uid,
-        isAnonymous: user.isAnonymous
+        emailVerified: user.email_verified,
+        uid: user.user_id
       })
       await commit('user/IS_LOGGED_IN', true)
+      return
     }
   }
 }

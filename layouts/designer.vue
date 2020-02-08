@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <a href="#" class="text-blue-400">Continue Later</a>
+          <nuxt-link to="/dashboard" class="text-blue-400">Go to Dashboard</nuxt-link>
           <div class="w-4"></div>
           <PTButton color="primary" @click="nextStep">NEXT</PTButton>
         </div>
@@ -72,6 +72,9 @@ export default {
   },
   async created() {
     if (process.client) {
+      if(this.$route.query.id){
+        this.$storage.setLocalStorage('current_design_id', this.$route.query.id)
+      }
       this.$store.commit(
         'designer/CURRENT_DESIGN_ID',
         this.$storage.getLocalStorage('current_design_id')

@@ -4,23 +4,23 @@ const state = () => ({
   userCollections: []
 })
 
-const getters = {
-  userCollections(state){
-    return state.userCollections
-  }
-}
-
 const mutations = {
-  USER_COLLECTIONS(state, userCollections){
+  USER_COLLECTIONS(state, userCollections) {
     state.userCollections = userCollections
   }
 }
 
+const getters = {
+  userCollections(state) {
+    return state.userCollections
+  }
+}
+
 const actions = {
-  async getUserCollectionsOf(context, userId){
+  async getUserCollectionsOf(context, userId) {
     const collections = await db.getUserCollectionsOf(userId)
-    console.log(collections)
     context.commit('USER_COLLECTIONS', collections)
+    return collections
   }
 }
 

@@ -1,6 +1,5 @@
 <template>
   <div class="text-gray-800 flex flex-col min-h-screen w-full">
-    <AreaLoader v-if="isLoading" fullscreen />
     <div>
       <div class="border-b">
         <div class="container mx-auto px-4">
@@ -107,12 +106,7 @@ export default {
   head: {
     title: 'Dashboard'
   },
-  middleware: 'authenticated',
-  data() {
-    return {
-      isLoading: false
-    }
-  },
+  middleware: ['authenticated'],
   computed: {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',

@@ -2,7 +2,7 @@
   <VueTailwindDrawer ref="drawer" width="100%">
     <VueTailwindModal
       ref="publishConfirmationModal"
-      width="20%"
+      width="30%"
       content-class="rounded-none shadow-none text-gray-600"
     >
       <div class="flex flex-col">
@@ -13,8 +13,12 @@
             </div>
           </div>
         </div>
-        <div class="modal-body text-center p-4">
+        <div class="modal-body p-4">
           {{ designMeta.plan === 'sell' ? 'Would you like to publish these product(s) now?' : 'Are you sure you want to buy all of these product(s)?' }}
+          <div
+            v-if="designMeta.plan === 'sell'"
+            class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"
+          >The collection will be reviewed first before publishing it into the store, we will be sending you an email once it is approved.</div>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
@@ -26,6 +30,7 @@
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="collectionConfirmed"
           >Yes</button>
         </div>
       </div>
@@ -152,14 +157,16 @@
                     </div>
                   </div>
                   <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
-                    <div class="text-xs uppercase font-bold mb-1">Total Selling Price</div>
+                    <div
+                      class="text-xs uppercase font-bold mb-1"
+                    >{{ designMeta.plan === 'sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
                   </div>
                   <div
                     class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded ml-2"
                     v-if="designMeta.plan === 'buy'"
                   >
-                    <div class="text-xs uppercase font-bold mb-1">Buying Price</div>
+                    <div class="text-xs uppercase font-bold mb-1">Pay Only</div>
                     <div>PHP {{ selectedProductBasePrice }}</div>
                   </div>
                 </div>
@@ -186,7 +193,12 @@
                       </div>
                     </div>
                   </div>
-                  <div class="font-bold mt-2">Printing Options</div>
+                  <div class="font-bold mt-2">
+                    <span>Printing Options</span>
+                    <span title="Quality & Price may vary" v-tippy="{ arrow: true }">
+                      <font-awesome-icon :icon="['fas', 'question-circle']" />
+                    </span>
+                  </div>
                   <OptionButtons
                     :options="printingOptions"
                     v-model="selectedProduct.meta.printing_option"
@@ -330,6 +342,12 @@ export default {
     }
   },
   methods: {
+    collectionConfirmed() {
+      if (this.designMeta.plan === 'sell') {
+        this.$router.replace('/dashboard/collections')
+        return
+      }
+    },
     _placeholderOfFirstVariantOf(product) {
       const firstKey = _.first(_.keys(product.variants))
       return product.variants[firstKey][
@@ -516,13 +534,15 @@ export default {
 
         // TODO: Fix profit bug when navigating through the products
         this.selectedProductProfit =
-        to.variants[firstVariantKey].sizes[firstSizeKey].price
+          to.variants[firstVariantKey].sizes[firstSizeKey].price
 
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
         )
 
-        this.selectedProduct.variants[this.selectedProductVariantKey].sizes = this.selectedProductSizes
+        this.selectedProduct.variants[
+          this.selectedProductVariantKey
+        ].sizes = this.selectedProductSizes
 
         this._calculateEstProfit()
       }

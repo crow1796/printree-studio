@@ -1,5 +1,5 @@
 <template>
-  <div class="top-actions absolute z-10 flex flex-shrink justify-center w-full">
+  <div class="top-actions absolute z-10 flex">
     <div class="flex bg-white ml-2 mt-2 py-2 px-1 rounded border items-center"
       v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')">
       <v-popover class="flex">

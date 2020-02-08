@@ -51,14 +51,16 @@ export default {
       name: null,
       user_id: null,
       plan: null,
+      status: null,
       products: []
     }
-    const designRef = await fireDb.collection('user_designs').doc(id)
+    const designRef = await fireDb.collection('collections').doc(id)
     let designSnap = await designRef.get()
     design.id = designSnap.id
     design.name = designSnap.data().name
     design.user_id = designSnap.data().user_id
     design.plan = designSnap.data().plan
+    design.status = designSnap.data().status
     const products = await Promise.all(_.map(designSnap.data().products, async (productRef) => {
       let productSnap = await productRef.product.get()
       let categorySnap = await productSnap.data().category.get()
@@ -146,9 +148,10 @@ export default {
             }
           ]
         }
-      })
+      }),
+      status: 'draft'
     }
-    let designRef = await fireDb.collection('user_designs').add(design)
+    let designRef = await fireDb.collection('collections').add(design)
     try{
       await fireDb.collection(`user_collections`).doc(user.uid).update({
         collections: FieldValue.arrayUnion(designRef)
@@ -165,10 +168,10 @@ export default {
     }
   },
   async updateDesignName(id, name){
-    const designRef = fireDb.collection('user_designs').doc(id)
+    const designRef = fireDb.collection('collections').doc(id)
     await designRef.update({name})
   },
-  async saveCollection({ id, selectedProducts, plan }){
+  async saveCollection({ id, selectedProducts, plan, status }){
     const products = _.map(selectedProducts, (product) => {
       let variants = _.map(product.variants, variant => {
         let objects = {}
@@ -189,19 +192,32 @@ export default {
         variants
       }
     })
-    const designRef = fireDb.collection('user_designs').doc(id)
+    const designRef = fireDb.collection('collections').doc(id)
     await designRef.update({
       plan,
-      products
+      products,
+      status
     })
   },
   async getUserCollectionsOf(userId){
     const userCollectionsRef = await fireDb.collection(`user_collections`).doc(userId)
     const collectionsSnap = await userCollectionsRef.get()
     const { collections } = collectionsSnap.data()
-    let collectionsData = await Promise.all(_.map(collections, async (col) => {
-      const colData = await col.get()
-      return colData.data()
+    let collectionsData = await Promise.all(_.map(collections, async (collection) => {
+      let collectionData = await collection.get()
+      const collectionId = collectionData.id
+      collectionData = collectionData.data()
+      return JSON.parse(JSON.stringify({
+        id: collectionId,
+        plan: collectionData.plan,
+        name: collectionData.name,
+        status: collectionData.status,
+        products: _.map(collectionData.products, (product) => {
+          return {
+            meta: product.meta
+          }
+        })
+      }))
     }))
     return collectionsData
   }
