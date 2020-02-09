@@ -14,7 +14,7 @@
           </div>
         </div>
         <div class="modal-body p-4">
-          {{ designMeta.plan === 'sell' ? 'Would you like to publish these product(s) now?' : 'Are you sure you want to buy all of these product(s)?' }}
+          {{ designMeta.plan === 'sell' ? 'Would you like to publish these product(s) now?' : 'Are you sure you want to proceed? This collection will be added to your cart.' }}
           <div
             v-if="designMeta.plan === 'sell'"
             class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"

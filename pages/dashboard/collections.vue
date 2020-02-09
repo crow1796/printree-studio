@@ -271,11 +271,11 @@ export default {
       })
       this.tmpSelectedProducts = []
       this.$storage.setLocalStorage('current_design_id', design.id)
-      this.$router.push('/products/designer')
+      this.$router.push('/collection/designer')
     },
     editCollection(collection) {
       this.$storage.setLocalStorage('current_design_id', collection.id)
-      this.$router.replace('/products/designer')
+      this.$router.replace('/collection/designer')
     }
   }
 }

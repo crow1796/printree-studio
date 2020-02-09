@@ -54,7 +54,10 @@ import { mapGetters } from 'vuex'
 
 export default {
   head: {
-    title: 'Printree Studio'
+    title: 'Printree Studio',
+    bodyAttrs: {
+      class: 'no-scroll'
+    }
   },
   components: {
     VueTailwindModal,
