@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto py-16">
+  <div class="container mx-auto pb-16 pt-0">
     <VueTailwindModal
       ref="addedToCartModal"
       width="35%"
@@ -26,13 +26,14 @@
             Continue Shopping
           </button>
 
-          <button
-            type="button"
+          <nuxt-link
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-          >Go to Checkout</button>
+            to="/marketplace/checkout"
+          >Go to Checkout</nuxt-link>
         </div>
       </div>
     </VueTailwindModal>
+    <BreadCrumbs/>
     <div class="flex lg:flex-row sm:flex-col">
       <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2 lg:flex-row sm:flex-col">
         <div class="flex lg:flex-col sm:flex-row lg:w-3/12 sm:w-full lg:px-2 sm:px-0 overflow-auto sm:mb-4">
@@ -125,6 +126,7 @@ import VueNumericInput from '@/components/VueNumericInput'
 import ProductsGrid from '@/components/ProductsGrid'
 import ZoomOnHover from '@/components/ZoomOnHover/index'
 import VueTailwindModal from '@/components/VueTailwindModal'
+import BreadCrumbs from '@/components/BreadCrumbs'
 
 export default {
   layout: 'marketplace',
@@ -132,7 +134,8 @@ export default {
     ProductsGrid,
     VueNumericInput,
     ZoomOnHover,
-    VueTailwindModal
+    VueTailwindModal,
+    BreadCrumbs
   },
   data() {
     return {

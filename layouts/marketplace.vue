@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-grow text-gray-800">
-    <ShoppingCartDrawer ref="shoppingCart"/>
+    <ShoppingCartDrawer ref="shoppingCart" />
     <div class="flex flex-col flex-grow">
       <div class="bg-gray-100 shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -15,7 +15,7 @@
               <div class="w-4/12 hidden sm:flex sm:items-center">
                 <div class="mr-3">
                   <a href="#" class="hover:text-primary text-sm font-bold">
-                    <font-awesome-icon :icon="['fas', 'bars']"/>
+                    <font-awesome-icon :icon="['fas', 'bars']" />
                   </a>
                 </div>
                 <div class="relative w-full">
@@ -34,10 +34,17 @@
                   />
                 </div>
                 <div class="ml-3">
-                  <a href="#" @click.prevent="$refs.shoppingCart.show()" class="flex items-center hover:text-primary text-sm">
+                  <a
+                    href="#"
+                    @click.prevent="$refs.shoppingCart.show()"
+                    class="flex items-center hover:text-primary text-sm"
+                  >
                     <div class="relative">
-                      <font-awesome-icon :icon="['fas', 'shopping-cart']"/>
-                      <div class="absolute bg-primary-lighter rounded-full text-white w-4 h-4 text-xs flex justify-center items-center" style="top: -5px; right: -8px;">2</div>
+                      <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                      <div
+                        class="absolute bg-primary-lighter rounded-full text-white w-4 h-4 text-xs flex justify-center items-center"
+                        style="top: -5px; right: -8px;"
+                      >2</div>
                     </div>
                     <span class="ml-2">Cart</span>
                   </a>
@@ -45,7 +52,8 @@
               </div>
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
-                <a v-if="!isLoggedIn"
+                <a
+                  v-if="!isLoggedIn"
                   href="#"
                   class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mr-4"
                 >Sign in</a>
@@ -56,7 +64,7 @@
                 >
                   <span>{{ isLoggedIn ? user.email : 'Sign In' }}</span>
                   <span v-if="isLoggedIn" class="ml-3">
-                    <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+                    <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </span>
                 </nuxt-link>
               </div>
@@ -108,10 +116,10 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-grow">
+      <div class="flex flex-grow flex-col">
         <nuxt />
       </div>
-      <Footer/>
+      <Footer />
     </div>
   </div>
 </template>
