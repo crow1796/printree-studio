@@ -1,7 +1,8 @@
 <template>
   <div class="flex flex-grow text-gray-800">
+    <ShoppingCartDrawer ref="shoppingCart"/>
     <div class="flex flex-col flex-grow">
-      <div class="bg-gray-100 font-sans w-full m-0">
+      <div class="bg-gray-100 shadow font-sans w-full m-0">
         <div class="bg-white">
           <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-4">
@@ -14,7 +15,7 @@
               <div class="w-4/12 hidden sm:flex sm:items-center">
                 <div class="mr-3">
                   <a href="#" class="hover:text-primary text-sm font-bold">
-                    <font-awesome-icon :icon="['fas', 'filter']"/>
+                    <font-awesome-icon :icon="['fas', 'bars']"/>
                   </a>
                 </div>
                 <div class="relative w-full">
@@ -33,8 +34,12 @@
                   />
                 </div>
                 <div class="ml-3">
-                  <a href="#" class="hover:text-primary text-sm">
-                    <font-awesome-icon :icon="['fas', 'shopping-cart']"/>
+                  <a href="#" @click.prevent="$refs.shoppingCart.show()" class="flex items-center hover:text-primary text-sm">
+                    <div class="relative">
+                      <font-awesome-icon :icon="['fas', 'shopping-cart']"/>
+                      <div class="absolute bg-primary-lighter rounded-full text-white w-4 h-4 text-xs flex justify-center items-center" style="top: -5px; right: -8px;">2</div>
+                    </div>
+                    <span class="ml-2">Cart</span>
                   </a>
                 </div>
               </div>
@@ -113,6 +118,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import ShoppingCartDrawer from '@/components/ShoppingCart/Drawer'
 import Footer from '@/components/Footer'
 
 export default {
@@ -120,6 +126,7 @@ export default {
     title: 'Printree'
   },
   components: {
+    ShoppingCartDrawer,
     Footer
   },
   computed: {

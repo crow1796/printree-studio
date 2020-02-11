@@ -100,6 +100,9 @@ export default {
       return 'Sure?'
     }
   },
+  destroyed(){
+    window.onbeforeunload = null
+  },
   data() {
     return {
       isLoading: true,
