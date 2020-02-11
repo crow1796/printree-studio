@@ -1,5 +1,5 @@
 <template>
-  <nav class="font-bold mt-6 mb-4 text-sm bg-gray-200 rounded px-4 py-3 w-auto inline-block" aria-label="Breadcrumb">
+  <nav class="font-bold mt-6 mb-4 text-sm bg-gray-200 rounded px-6 py-3 w-auto inline-block" aria-label="Breadcrumb">
     <ol class="list-none p-0 inline-flex">
       <li class="flex items-center">
         <a href="#">Marketplace</a>
