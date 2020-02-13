@@ -54,7 +54,7 @@ export default {
       status: null,
       products: []
     }
-    const designRef = await fireDb.collection('collections').doc(id)
+    const designRef = await fireDb.collection('user_collections').doc(id)
     let designSnap = await designRef.get()
     design.id = designSnap.id
     design.name = designSnap.data().name
@@ -151,17 +151,7 @@ export default {
       }),
       status: 'draft'
     }
-    let designRef = await fireDb.collection('collections').add(design)
-    try{
-      await fireDb.collection(`user_collections`).doc(user.uid).update({
-        collections: FieldValue.arrayUnion(designRef)
-      })
-    }catch(e){
-      await fireDb.collection(`user_collections`).doc(user.uid).set({
-        collections: [designRef]
-      })
-    }
-
+    let designRef = await fireDb.collection('user_collections').add(design)
     return {
       ...design,
       id: designRef.id
@@ -200,15 +190,14 @@ export default {
     })
   },
   async getUserCollectionsOf(userId){
-    const userCollectionsRef = await fireDb.collection(`user_collections`).doc(userId)
+    const userCollectionsRef = await fireDb.collection(`user_collections`).where("user_id", "==", userId)
+    
     const collectionsSnap = await userCollectionsRef.get()
-    const { collections } = collectionsSnap.data()
+    const collections = collectionsSnap.docs
     let collectionsData = await Promise.all(_.map(collections, async (collection) => {
-      let collectionData = await collection.get()
-      const collectionId = collectionData.id
-      collectionData = collectionData.data()
+      let collectionData = collection.data()
       return JSON.parse(JSON.stringify({
-        id: collectionId,
+        id: collection.id,
         plan: collectionData.plan,
         name: collectionData.name,
         status: collectionData.status,

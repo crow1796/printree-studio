@@ -10,45 +10,69 @@
           <div class="text-center uppercase font-bold text-primary">
             <span>Added to cart</span>
             <span class="ml-2">
-              <font-awesome-icon :icon="['fas', 'check-circle']"/>
+              <font-awesome-icon :icon="['fas', 'check-circle']" />
             </span>
           </div>
         </div>
-        <div class="modal-body p-4 text-center">
-          This item has been added to your cart successfully.
-        </div>
+        <div class="modal-body p-4 text-center">This item has been added to your cart successfully.</div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
             type="button"
             class="justify-center items-center focus:outline-none outline-none px-3 py-2 font-bold text-blue-400 hover:text-blue-600"
             @click="$refs.addedToCartModal.hide()"
-          >
-            Continue Shopping
-          </button>
+          >Continue Shopping</button>
 
           <nuxt-link
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-            to="/marketplace/checkout"
+            to="/marketplace/checkout/shipping"
           >Go to Checkout</nuxt-link>
         </div>
       </div>
     </VueTailwindModal>
-    <BreadCrumbs/>
+    <BreadCrumbs :items="[{
+      title: 'Products',
+      link: '/marketplace/products'
+    }, {
+      title: 'Category',
+      link: '/marketplace/category'
+    }, {
+      title: 'Product Name',
+      active: true
+    }]"/>
     <div class="flex lg:flex-row sm:flex-col">
       <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2 lg:flex-row sm:flex-col">
-        <div class="flex lg:flex-col sm:flex-row lg:w-3/12 sm:w-full lg:px-2 sm:px-0 overflow-auto sm:mb-4">
-          <div class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2">
-            <img src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png" class="lg:w-24 sm:w-16">
+        <div
+          class="flex lg:flex-col sm:flex-row lg:w-3/12 sm:w-full lg:px-2 sm:px-0 overflow-auto sm:mb-4"
+        >
+          <div
+            class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
+          >
+            <img
+              src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
+              class="lg:w-24 sm:w-16"
+            />
           </div>
-          <div class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2">
-            <img src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png" class="lg:w-24 sm:w-16">
+          <div
+            class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
+          >
+            <img
+              src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
+              class="lg:w-24 sm:w-16"
+            />
           </div>
-          <div class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2">
-            <img src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png" class="lg:w-24 sm:w-16">
+          <div
+            class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
+          >
+            <img
+              src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
+              class="lg:w-24 sm:w-16"
+            />
           </div>
         </div>
         <div class="flex lg:w-9/12 sm:w-full">
-          <ZoomOnHover img="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"/>
+          <ZoomOnHover
+            img="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
+          />
         </div>
       </div>
       <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2">
@@ -179,7 +203,7 @@ export default {
     }
   },
   methods: {
-    addToCart(){
+    addToCart() {
       this.$refs.addedToCartModal.show()
     }
   }

@@ -1,9 +1,12 @@
 <template>
-  <div></div>
+  
 </template>
 
 <script>
 export default {
-  layout: 'marketplace'
+  layout: 'empty',
+  head: {
+    title: 'Admin'
+  }
 }
 </script>

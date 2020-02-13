@@ -1,5 +1,5 @@
 <template>
-  <VueTailwindDrawer ref="drawer" width="40%">
+  <VueTailwindDrawer ref="drawer" width="60%">
     <div class="flex flex-grow flex-col">
       <div class="flex justify-between">
         <span class="font-bold pb-4 border-b flex-grow p-4">SHOPPING CART</span>
@@ -12,6 +12,14 @@
       </div>
       <div class="flex flex-grow flex-col">
         <div class="flex flex-grow-0 border-b px-4 py-6">
+          <div class="flex w-1/12 justify-end items-center">
+            <div>
+              <label class="custom-checkbox block relative cursor-pointer text-xl pl-8">
+                <input class="absolute opacity-0 left-0 top-0 cursor-pointer" type="checkbox" checked="checked">
+                <span class="h-6 w-6 checkmark absolute top-0 left-0 bg-gray-400"></span>
+              </label>
+            </div>
+          </div>
           <div class="w-3/12 flex-justify-between">
             <div>
               <img
@@ -21,14 +29,17 @@
               />
             </div>
           </div>
-          <div class="flex flex-col w-4/12 justify-center">
+          <div class="flex flex-col w-3/12 justify-center">
             <span class="font-bold leading-none">Taskis Shelter</span>
             <span class="text-gray-500 text-sm">#31512</span>
           </div>
-          <div class="w-3/12 flex justify-center items-center">
+          <div class="flex flex-col w-2/12 justify-center">
+            <span class="font-bold leading-none text-center">PHP 2,344.00</span>
+          </div>
+          <div class="flex w-2/12 justify-center items-center">
             <VueNumericInput align="center" style="width: 110px; height: 30px" :min="1" />
           </div>
-          <div class="w-2/12 flex justify-end items-center">
+          <div class="flex w-1/12 justify-end items-center">
             <div>
               <div
                 class="select-none cursor-pointer w-8 h-8 flex justify-center items-center hover:text-primary"
@@ -42,15 +53,13 @@
       <div class="flex justify-between p-4 items-center border-t">
         <div class="flex flex-col">
           <span class="text-xs">Subtotal</span>
-          <span class="font-bold text-primary">₱ 1,234.00</span>
+          <span
+           class="font-bold text-primary">₱ 1,234.00</span>
         </div>
-        <button
-          type="button"
-          class="border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-        >
+        <PTButton color="primary" @click="goToCheckout">
           <span class="mr-2">CHECKOUT</span>
           <font-awesome-icon :icon="['fas', 'arrow-right']" />
-        </button>
+        </PTButton>
       </div>
     </div>
   </VueTailwindDrawer>
@@ -68,6 +77,10 @@ export default {
   methods: {
     show() {
       this.$refs.drawer.show()
+    },
+    goToCheckout(){
+      this.$refs.drawer.hide()
+      this.$router.replace('/marketplace/checkout/shipping')
     }
   }
 }

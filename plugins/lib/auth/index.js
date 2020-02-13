@@ -73,5 +73,16 @@ export default {
       response.message = error.message
     }
     return response
+  },
+  async signInWithCustomToken(secret){
+    let response = {}
+    try{
+      const res = await fireAuth.signInWithCustomToken(secret)
+      console.log(res)
+    }catch(e){
+      response.status = false
+      response.message = error.message
+    }
+    return response
   }
 }

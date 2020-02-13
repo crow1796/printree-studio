@@ -26,6 +26,7 @@ Vue.use(VueLazyload, {
   loading: require('~/assets/images/loader.gif'),
   attempt: 1
 })
+
 if (process.client) {
   require('vue2-animate/dist/vue2-animate.min.css')
   const drr = require('@/components/Designer/drr').default

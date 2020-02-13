@@ -1,7 +1,7 @@
 <template>
   <div class="fixed h-full z-20 vt-drawer top-0"
     v-if="isShown"
-    @click="() => backdrop ? hide() : false"
+    @click="() => backdrop && closeOnBackdropClicked ? hide() : false"
     :class="{
       'bg-smoke-lighter': backdrop,
       'right-0': position == 'right',
@@ -40,6 +40,14 @@ export default {
       default: '25%'
     },
     backdrop: {
+      type: Boolean,
+      default: true
+    },
+    closeOnBackdropClicked: {
+      type: Boolean,
+      default: true
+    },
+    closeOnEscape: {
       type: Boolean,
       default: true
     }
