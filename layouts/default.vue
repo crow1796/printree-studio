@@ -1,11 +1,12 @@
 <template>
   <div class="flex flex-grow flex-col">
+    <AuthModal ref="authModal" @login-success="$router.replace('/dashboard')"/>
     <div class="fixed w-full z-10">
       <div class="flex flex-grow">
         <div class="container mx-auto px-4">
           <div class="flex items-center justify-between py-4">
             <div class="w-4/12">
-              <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-10" />
+              <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-24" />
             </div>
 
             <div class="w-4/12 hidden sm:flex sm:items-center justify-center">
@@ -20,20 +21,24 @@
             </div>
 
             <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
-              <a v-if="!isLoggedIn"
-                href="#"
-                class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mr-4"
-              >Sign in</a>
               <nuxt-link
-                :to="isLoggedIn ? '/dashboard' : '/'"
+                to="/dashboard"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                @click.prevent="signOut"
+                v-if="isLoggedIn"
               >
-                <span>{{ isLoggedIn ? user.email : 'Sign In' }}</span>
+                <span>{{ isLoggedIn ? user.email : 'Get Started' }}</span>
                 <span v-if="isLoggedIn" class="ml-3">
-                  <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+                  <font-awesome-icon :icon="['fas', 'arrow-right']" />
                 </span>
               </nuxt-link>
+              <a
+                href="#"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                @click.prevent="$refs.authModal.show()"
+                v-else
+              >
+                Get Started
+              </a>
             </div>
 
             <div class="sm:hidden cursor-pointer">
@@ -72,10 +77,12 @@
                 <a
                   href="#"
                   class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mr-4"
+                  @click.prevent="$refs.authModal.show()"
                 >Sign in</a>
                 <a
                   href="#"
                   class="text-gray-800 text-sm font-semibold border px-4 py-1 rounded-lg hover:text-primary-lighter hover:border-primary-lighter"
+                  @click.prevent="$refs.authModal.show()"
                 >Sign up</a>
               </div>
             </div>
@@ -86,12 +93,13 @@
     <div class="flex flex-grow">
       <nuxt />
     </div>
-    <Footer/>
+    <Footer />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import AuthModal from '@/components/Auth/AuthModal'
 import Footer from '@/components/Footer'
 
 export default {
@@ -99,7 +107,8 @@ export default {
     title: 'Printree'
   },
   components: {
-    Footer
+    Footer,
+    AuthModal
   },
   computed: {
     ...mapGetters({

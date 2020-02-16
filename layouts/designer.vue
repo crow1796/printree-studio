@@ -5,7 +5,7 @@
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">
         <div class="flex w-1/3">
-          <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-10" />
+          <img src="~/assets/images/logo.png" alt="Printree" class="w-24" />
         </div>
         <div class="flex w-1/3 justify-center items-center">
           <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">
@@ -37,6 +37,7 @@
         <ProductsPreviewDrawer
           ref="productsPreviewDrawer"
           v-if="generatedImages.length"
+          :meta="designMeta"
           :products="generatedImages"
         />
         <nuxt v-if="!isLoading" />
@@ -68,6 +69,7 @@ export default {
   computed: {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',
+      designMeta: 'designer/designMeta',
       user: 'user/user',
       currentDesignName: 'designer/currentDesignName',
       currentDesignId: 'designer/currentDesignId'
@@ -83,8 +85,11 @@ export default {
         this.$storage.getLocalStorage('current_design_id')
       )
       await this.$store.dispatch(
-        'designer/fetchDesignData',
+        'designer/fetchDesignDataAndCommit',
         this.currentDesignId
+      )
+      await this.$store.dispatch(
+        'designer/fetchArts'
       )
       this.isLoading = false
     }

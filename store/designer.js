@@ -322,7 +322,9 @@ const mutations = {
     state.selectedProducts[_.findIndex(state.selectedProducts, { id })].meta = meta
   },
   PRODUCT_PROPERTIES(state, {id, props}){
-    _.set(state.selectedProducts[_.findIndex(state.selectedProducts, { id })], props.path, props.value)
+    let tmpProduct = JSON.parse(JSON.stringify(state.selectedProducts[_.findIndex(state.selectedProducts, { id })]))
+    _.set(tmpProduct, props.path, props.value)
+    state.selectedProducts[_.findIndex(state.selectedProducts, { id })] = tmpProduct
   },
   OBJECT_PROPERTIES(state, data) {
     let objectIndex = _.findIndex(
@@ -409,6 +411,9 @@ const mutations = {
   },
   DESIGN_PLAN(state, plan) {
     state.designMeta.plan = plan
+  },
+  COLLECTION_STATUS(state, status) {
+    state.designMeta.status = status
   }
 }
 
@@ -564,9 +569,16 @@ const actions = {
     context.commit('AVAILABLE_PRODUCTS', products)
     return products
   },
+  async fetchArts(context){
+    const arts = await db.getArts()
+    context.commit('ARTS', arts)
+  },
   async fetchDesignData(context, id) {
     const design = await db.getDesign(id)
-    const arts = await db.getArts()
+    return design
+  },
+  async fetchDesignDataAndCommit(context, id) {
+    const design = await db.getDesign(id)
     context.commit('DESIGN_META', {
       id: design.id,
       name: design.name,
@@ -575,7 +587,6 @@ const actions = {
       status: design.status
     })
     context.commit('SELECTED_PRODUCTS', design.products)
-    context.commit('ARTS', arts)
     return design
   },
   async createNewDesign(context, { user, products }) {
@@ -601,7 +612,7 @@ const actions = {
     let generatedImages = []
     try {
       const res = newParams.shouldGenerateImages
-        ? await this.$axios.post('http://localhost:8080/create-images', {
+        ? await this.$axios.post('/create-images', {
             products: context.getters.selectedProducts
           })
         : []
@@ -617,9 +628,21 @@ const actions = {
     }
     return generatedImages
   },
+  async generatePreview(context, collection){
+    const generatedImages = await this.$axios.post('/create-images', {
+      products: collection.products
+    })
+    return generatedImages
+  },
   async updateDesignName(context, name) {
     await db.updateDesignName(context.getters.currentDesignId, name)
     context.commit('DESIGN_NAME', name)
+  },
+  async publishCollection(context){
+    await db.updateCollection(context.getters.currentDesignId, {status: 'pending'})
+  },
+  async deleteCollection(context){
+    await db.deleteCollection(context.getters.currentDesignId)
   }
 }
 

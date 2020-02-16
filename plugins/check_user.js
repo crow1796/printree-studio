@@ -5,20 +5,9 @@ export default function({ store }) {
   fireAuth.onAuthStateChanged(async user => {
     if (user) {
       const token = await user.getIdToken(true)
-      store.commit('user/USER', {
-        displayName: user.displayName,
-        email: user.email,
-        photoUrl: user.photoURL,
-        emailVerified: user.emailVerified,
-        uid: user.uid,
-        isAnonymous: user.isAnonymous
-      })
       Cookies.set('access_token', token)
-      store.commit('user/IS_LOGGED_IN', true)
       return
     }
-    Cookies.remove('access_token');
-    store.commit('user/USER', null)
-    store.commit('user/IS_LOGGED_IN', false)
+    // Cookies.remove('access_token')
   })
 }

@@ -8,7 +8,8 @@ export default {
       photoUrl: user.photoURL,
       emailVerified: user.emailVerified,
       uid: user.uid,
-      isAnonymous: user.isAnonymous
+      isAnonymous: user.isAnonymous,
+      role: user.role
     }
   },
   async createUserWithEmailAndPassword(formData){
@@ -69,17 +70,6 @@ export default {
         user: this._extractUserdata(res.user)
       }
     } catch (error) {
-      response.status = false
-      response.message = error.message
-    }
-    return response
-  },
-  async signInWithCustomToken(secret){
-    let response = {}
-    try{
-      const res = await fireAuth.signInWithCustomToken(secret)
-      console.log(res)
-    }catch(e){
       response.status = false
       response.message = error.message
     }

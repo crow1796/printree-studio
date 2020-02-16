@@ -158,7 +158,7 @@ export default {
     }
   },
   async updateDesignName(id, name){
-    const designRef = fireDb.collection('collections').doc(id)
+    const designRef = fireDb.collection('user_collections').doc(id)
     await designRef.update({name})
   },
   async saveCollection({ id, selectedProducts, plan, status }){
@@ -182,7 +182,7 @@ export default {
         variants
       }
     })
-    const designRef = fireDb.collection('collections').doc(id)
+    const designRef = fireDb.collection('user_collections').doc(id)
     await designRef.update({
       plan,
       products,
@@ -209,5 +209,13 @@ export default {
       }))
     }))
     return collectionsData
+  },
+  async updateCollection(collectionId, data){
+    const designRef = fireDb.collection('user_collections').doc(collectionId)
+    await designRef.update(data)
+  },
+  async deleteCollection(collectionId){
+    const designRef = fireDb.collection('user_collections').doc(collectionId)
+    await designRef.delete()
   }
 }

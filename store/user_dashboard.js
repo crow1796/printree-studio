@@ -21,6 +21,13 @@ const actions = {
     const collections = await db.getUserCollectionsOf(userId)
     context.commit('USER_COLLECTIONS', collections)
     return collections
+  },
+  removeCollectionById(context, id) {
+    const tmpCollection = JSON.parse(
+      JSON.stringify(context.getters.userCollections)
+    )
+    tmpCollection.splice(_.findIndex(tmpCollection, { id }), 1)
+    context.commit('USER_COLLECTIONS', tmpCollection)
   }
 }
 

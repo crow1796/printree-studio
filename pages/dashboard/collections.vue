@@ -38,83 +38,48 @@
         </div>
       </div>
     </VueTailwindModal>
-    <div class="py-8">
-      <div>
-        <h2 class="text-2xl font-semibold leading-tight">My Collections</h2>
-      </div>
-      <div class="my-2 flex sm:flex-row flex-col">
-        <div class="flex flex-row mb-1 sm:mb-0">
-          <div class="relative">
-            <select
-              class="appearance-none h-full rounded-l border block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-            >
-              <option>5</option>
-              <option>10</option>
-              <option>20</option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-            >
-              <svg
-                class="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                />
-              </svg>
-            </div>
-          </div>
-          <div class="relative">
-            <select
-              class="appearance-none h-full rounded-r border-t sm:rounded-r-none sm:border-r-0 border-r border-b block appearance-none w-full bg-white border-gray-400 text-gray-700 py-2 px-4 pr-8 leading-tight focus:outline-none focus:border-l focus:border-r focus:bg-white focus:border-gray-500"
-            >
-              <option>All</option>
-              <option>Published</option>
-              <option>Sold Out</option>
-              <option>Draft</option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
-            >
-              <svg
-                class="fill-current h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"
-                />
-              </svg>
+    <VueTailwindModal
+      ref="deleteConfirmationModal"
+      width="30%"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase justify-center flex-grow">
+              <strong>Confirmation</strong>
             </div>
           </div>
         </div>
-        <div class="flex justify-between flex-grow">
-          <div class="block relative">
-            <span class="h-full absolute inset-y-0 left-0 flex items-center pl-2">
-              <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current text-gray-500">
-                <path
-                  d="M10 4a6 6 0 100 12 6 6 0 000-12zm-8 6a8 8 0 1114.32 4.906l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387A8 8 0 012 10z"
-                />
-              </svg>
-            </span>
-            <input
-              placeholder="Search"
-              class="appearance-none rounded-r rounded-l sm:rounded-l-none border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-sm placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none"
-            />
-          </div>
-          <div>
-            <button
+        <div class="modal-body p-4 text-center">
+          Are you sure you want to delete this collection?
+        </div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="hideDeleteCollectionConfirmation"
+          >No</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="deleteCollection"
+          >Yes</button>
+        </div>
+      </div>
+    </VueTailwindModal>
+    <div class="py-8">
+      <div class="my-2 flex sm:flex-row justify-between items-center">
+        <h2 class="text-2xl font-semibold leading-tight">My Collections</h2>
+        <button
               type="button"
               class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
               @click="showAvailableProducts"
             >Create New Collection</button>
-          </div>
-        </div>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-        <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+        <div class="inline-block min-w-full border-l border-r overflow-hidden">
           <table class="min-w-full leading-normal table-fixed">
             <thead>
               <tr>
@@ -122,7 +87,7 @@
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Name</th>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Progress</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
@@ -166,7 +131,7 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                  <div class="border p-1 w-full bg-grey-light rounded-full" v-if="col.plan === 'sell'">
+                  <div class="border bg-gray-200 w-full bg-grey-light rounded-full" v-if="col.plan === 'sell'">
                     <div
                       class="bg-primary text-xs rounded-full leading-none py-1 text-center text-white"
                       style="width: 45%"
@@ -191,6 +156,7 @@
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Delete"
                       v-tippy="{arrow: true}"
+                      @click="showDeleteCollectionConfirmation(col)"
                     >
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
@@ -207,19 +173,6 @@
               </tr>
             </tbody>
           </table>
-          <div
-            class="px-5 py-5 bg-white border-t flex flex-col xs:flex-row items-center xs:justify-between"
-          >
-            <span class="text-xs xs:text-sm text-gray-900">Showing 1 to 4 of 50 Entries</span>
-            <div class="inline-flex mt-2 xs:mt-0">
-              <button
-                class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-l"
-              >Prev</button>
-              <button
-                class="text-sm bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-r"
-              >Next</button>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -276,6 +229,22 @@ export default {
     editCollection(collection) {
       this.$storage.setLocalStorage('current_design_id', collection.id)
       this.$router.replace('/collection/designer')
+    },
+    showDeleteCollectionConfirmation(collection){
+      this.collectionToDelete = collection
+      this.$refs.deleteConfirmationModal.show()
+    },
+    hideDeleteCollectionConfirmation(){
+      this.collectionToDelete = null
+      this.$refs.deleteConfirmationModal.hide()
+    },
+    async deleteCollection(){
+      this.isLoading = true
+      this.$refs.deleteConfirmationModal.hide()
+      this.$storage.removeLocalStorage('current_design_id')
+      await this.$store.dispatch('designer/deleteCollection', this.collectionToDelete.id)
+      this.$store.dispatch('user_dashboard/removeCollectionById', this.collectionToDelete.id)
+      this.isLoading = false
     }
   }
 }

@@ -8,7 +8,7 @@
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
-                  <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-10" />
+                  <img src="~/assets/images/logo.png" alt="Printree" class="w-10" />
                 </nuxt-link>
               </div>
 
