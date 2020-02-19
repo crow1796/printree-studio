@@ -68,7 +68,7 @@
                   class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mr-4"
                 >Sign in</a>
                 <nuxt-link
-                  :to="isLoggedIn ? '/dashboard' : '/'"
+                  :to="isLoggedIn ? (['admin'].includes(user.role) ? '/admin/collections' : '/dashboard') : '/'"
                   class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white text-xs"
                   @click.prevent="signOut"
                 >
