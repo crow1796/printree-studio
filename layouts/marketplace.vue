@@ -2,22 +2,31 @@
   <div class="flex flex-grow text-gray-800">
     <ShoppingCartDrawer ref="shoppingCart" />
     <div class="flex flex-col flex-grow">
-      <div class="bg-gray-100 shadow font-sans w-full m-0">
+      <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
           <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
-                  <img src="~/assets/images/logo.png" alt="Printree" class="w-10" />
+                  <img src="~/assets/images/logo.png" alt="Printree" class="w-24"/>
                 </nuxt-link>
               </div>
 
               <div class="w-4/12 hidden sm:flex sm:items-center">
                 <div class="mr-3">
-                  <a href="#" class="hover:text-primary text-sm flex items-center">
-                    <font-awesome-icon :icon="['fas', 'bars']" class="mr-2"/>
-                    <span>Category</span>
-                  </a>
+                  <VueTailwindDropdown>
+                    <template v-slot:trigger>
+                      <a href="#" class="hover:text-primary text-sm flex items-center">
+                        <font-awesome-icon :icon="['fas', 'bars']" class="mr-2" />
+                        <span>Category</span>
+                      </a>
+                    </template>
+                    <template v-slot:content>
+                      <div class="p-4">
+                        
+                      </div>
+                    </template>
+                  </VueTailwindDropdown>
                 </div>
                 <div class="relative w-full">
                   <span
@@ -71,7 +80,7 @@
               </div>
 
               <div class="sm:hidden cursor-pointer">
-                <font-awesome-icon class="w-6 h-6 text-primary-lighter" :icon="['fas', 'bars']"/>
+                <font-awesome-icon class="w-6 h-6 text-primary-lighter" :icon="['fas', 'bars']" />
               </div>
             </div>
 
@@ -120,6 +129,7 @@
 import { mapGetters } from 'vuex'
 import ShoppingCartDrawer from '@/components/ShoppingCart/Drawer'
 import Footer from '@/components/Footer'
+import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 
 export default {
   head: {
@@ -127,7 +137,11 @@ export default {
   },
   components: {
     ShoppingCartDrawer,
-    Footer
+    Footer,
+    VueTailwindDropdown
+  },
+  data() {
+    return {}
   },
   computed: {
     ...mapGetters({

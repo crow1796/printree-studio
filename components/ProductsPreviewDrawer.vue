@@ -104,9 +104,9 @@
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
                 <div
-                  v-html="selectedProduct.variants[selectedProductVariantKey][
+                  v-html="selectedProduct.variants[selectedProductVariantKey].sides[
                       _firstPrintableAreaOf(
-                        selectedProduct.variants[selectedProductVariantKey]
+                        selectedProduct.variants[selectedProductVariantKey].sides
                       )
                     ].with_placeholder"
                 ></div>
@@ -122,7 +122,7 @@
                   >
                     <div class="flex flex-col w-full">
                       <div
-                        v-html="variant[_firstPrintableAreaOf(variant)]
+                        v-html="variant.sides[_firstPrintableAreaOf(variant.sides)]
                             .with_placeholder"
                       ></div>
                     </div>
@@ -359,8 +359,8 @@ export default {
     },
     _placeholderOfFirstVariantOf(product) {
       const firstKey = _.first(_.keys(product.variants))
-      return product.variants[firstKey][
-        this._firstPrintableAreaOf(product.variants[firstKey])
+      return product.variants[firstKey].sides[
+        this._firstPrintableAreaOf(product.variants[firstKey].sides)
       ].with_placeholder
     },
     _firstPrintableAreaOf(variant) {
@@ -541,7 +541,7 @@ export default {
       immediate: true,
       handler(to, from) {
         const firstVariantKey = _.first(_.keys(to.variants))
-        this.selectedProductSizes = to.variants[firstVariantKey].sizes
+        this.selectedProductSizes = JSON.parse(JSON.stringify(to.variants[firstVariantKey].sizes))
         this.selectedProductVariantKey = firstVariantKey
         const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
         this.selectedProductBasePrice = _.first(

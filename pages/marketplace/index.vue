@@ -107,7 +107,7 @@
     <!-- Listing START-->
     <div class="flex flex-col p-24 py-16 pt-6 container mx-auto px-4">
       <div class="flex justify-between lg:px-16 font-bold">
-        <div>FEATURED PRODUCTS</div>
+        <div>PRODUCTS</div>
         <div>
           <nuxt-link class="text-primary hover:text-primary-lighter" to="/marketplace/products">SEE ALL ></nuxt-link>
         </div>

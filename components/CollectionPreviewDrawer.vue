@@ -72,16 +72,33 @@
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
-                <div
-                  v-html="selectedProduct.variants[selectedProductVariantKey][
-                      _firstPrintableAreaOf(
-                        selectedProduct.variants[selectedProductVariantKey]
-                      )
-                    ].with_placeholder"
-                ></div>
+                <div class="relative">
+                  <button
+                    type="button"
+                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
+                    @click="switchSides"
+                    title="Rotate"
+                    v-tippy="{arrow: true}"
+                  >
+                    <font-awesome-icon :icon="['fas', 'sync-alt']" />
+                  </button>
+                  <button
+                    type="button"
+                    class="absolute bottom-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
+                    @click="downloadDesign"
+                    :title="`Download (${selectedProductSide.toUpperCase()})`"
+                    v-tippy="{arrow: true}"
+                    v-if="!selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].is_empty"
+                  >
+                    <font-awesome-icon :icon="['fas', 'download']" />
+                  </button>
+                  <div
+                    v-html="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
+                  ></div>
+                </div>
                 <div class="variants flex">
                   <div
-                    class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
+                    class="flex w-2/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
                     v-for="(variant, vid) in selectedProduct.variants"
                     :class="{
                       'border-gray-500 shadow-xl': selectedProductVariantKey === vid
@@ -89,10 +106,9 @@
                     :key="variant.id"
                     @click="() => (selectedProductVariantKey = vid)"
                   >
-                    <div class="flex flex-col w-full">
+                    <div class="flex w-full" v-for="(side, i) in variant.sides" :key="i">
                       <div
-                        v-html="variant[_firstPrintableAreaOf(variant)]
-                            .with_placeholder"
+                        v-html="side.with_placeholder"
                       ></div>
                     </div>
                   </div>
@@ -216,6 +232,7 @@ export default {
   },
   data() {
     return {
+      selectedProductSide: null,
       confirmationAction: null,
       isLoading: false,
       selectedProduct: null,
@@ -237,6 +254,36 @@ export default {
     }
   },
   methods: {
+    switchSides(){
+      const sides = _.keys(this.selectedProduct.variants[this.selectedProductVariantKey].sides)
+      const sideIndex = sides.indexOf(this.selectedProductSide)
+      const nextSide = sides[sideIndex + 1]
+      if(nextSide){
+        this.selectedProductSide = nextSide
+        return
+      }
+      this.selectedProductSide = _.first(sides)
+    },
+    downloadDesign() {
+      const fileName = `${this.selectedProduct.meta.name}-${this.selectedProduct.id}`
+      const fileType = 'image/svg+xml'
+      let content = this.selectedProduct.variants[
+        this.selectedProductVariantKey
+      ].sides[this.selectedProductSide].design
+      let blob = new Blob([content], { type: fileType })
+
+      let a = document.createElement('a')
+      a.download = `(${this.selectedProductSide.toUpperCase()})${fileName}.svg`
+      a.href = URL.createObjectURL(blob)
+      a.dataset.downloadurl = [fileType, a.download, a.href].join(':')
+      a.style.display = 'none'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(function() {
+        URL.revokeObjectURL(a.href)
+      }, 1500)
+    },
     async publish() {
       this.isLoading = true
       this.$refs.publishConfirmationModal.hide()
@@ -254,8 +301,8 @@ export default {
     },
     _placeholderOfFirstVariantOf(product) {
       const firstKey = _.first(_.keys(product.variants))
-      return product.variants[firstKey][
-        this._firstPrintableAreaOf(product.variants[firstKey])
+      return product.variants[firstKey].sides[
+        this._firstPrintableAreaOf(product.variants[firstKey].sides)
       ].with_placeholder
     },
     _firstPrintableAreaOf(variant) {
@@ -337,6 +384,9 @@ export default {
         this.selectedProductBasePrice = _.first(
           to.variants[firstVariantKey].available_sizes
         ).base_cost
+        this.selectedProductSide = this._firstPrintableAreaOf(
+          to.variants[this.selectedProductVariantKey].sides
+        )
 
         this.selectedProductProfit =
           to.variants[firstVariantKey].sizes[firstSizeKey].price
