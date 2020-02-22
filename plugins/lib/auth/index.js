@@ -1,15 +1,17 @@
 import { fireAuth, authProviderOf } from '~/plugins/firebase'
 
 export default {
-  _extractUserdata(user){
+  async _extractUserdata(user){
+    const { claims, token } = await user.getIdTokenResult()
     return {
-      displayName: user.displayName,
-      email: user.email,
+      displayName: claims.name,
+      email: claims.email,
       photoUrl: user.photoURL,
-      emailVerified: user.emailVerified,
-      uid: user.uid,
+      emailVerified: claims.emailVerified,
+      uid: claims.user_id,
       isAnonymous: user.isAnonymous,
-      role: user.role
+      role: claims.role,
+      token
     }
   },
   async createUserWithEmailAndPassword(formData){
@@ -21,7 +23,7 @@ export default {
       })
       response = {
         status: true,
-        user: this._extractUserdata(res.user)
+        user: await this._extractUserdata(res.user)
       }
     } catch (error) {
       response.status = false
@@ -35,7 +37,7 @@ export default {
       let res = await fireAuth.signInWithEmailAndPassword(formData.email, formData.password)
       response = {
         status: true,
-        user: this._extractUserdata(res.user)
+        user: await this._extractUserdata(res.user)
       }
     } catch (error) {
       response.status = false
@@ -50,7 +52,7 @@ export default {
       let res = await fireAuth.signInWithPopup(provider)
       response = {
         status: true,
-        user: this._extractUserdata(res.user)
+        user: await this._extractUserdata(res.user)
       }
     } catch (error) {
       response.status = false
@@ -67,7 +69,7 @@ export default {
       let res = await fireAuth.signInAnonymously()
       response = {
         status: true,
-        user: this._extractUserdata(res.user)
+        user: await this._extractUserdata(res.user)
       }
     } catch (error) {
       response.status = false

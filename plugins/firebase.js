@@ -1,6 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/firestore'
 import 'firebase/auth'
+import 'firebase/storage'
 if (!firebase.apps.length) {
   const config = {
     apiKey: process.env.firebaseApiKey,
@@ -14,6 +15,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(config)
 }
 const fireDb = firebase.firestore()
+const fireStorage = firebase.storage()
 const fireAuth = firebase.auth()
 const authProviderOf = function(type){
   let provider = null
@@ -30,4 +32,4 @@ const authProviderOf = function(type){
 
 const FieldValue = firebase.firestore.FieldValue
 
-export { fireDb, fireAuth, authProviderOf, FieldValue }
+export { fireDb, fireAuth, authProviderOf, FieldValue, fireStorage }

@@ -21,14 +21,32 @@
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right">
-              <div
-                class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
-              >
-                <span class="text-sm mr-1">{{ user.email }}</span>
-                <div>
-                  <font-awesome-icon :icon="['fas', 'chevron-down']" />
-                </div>
-              </div>
+              <VueTailwindDropdown>
+                <template v-slot:trigger>
+                  <div
+                    class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
+                  >
+                    <span class="text-sm mr-1">{{ user.email }}</span>
+                    <div>
+                      <font-awesome-icon :icon="['fas', 'chevron-down']" />
+                    </div>
+                  </div>
+                </template>
+                <template v-slot:content>
+                  <div class="flex flex-col flex-grow">
+                    <a
+                      href="#"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      @click.prevent="signOut"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                      </span>
+                      <span>Logout</span>
+                    </a>
+                  </div>
+                </template>
+              </VueTailwindDropdown>
             </div>
           </div>
         </div>
@@ -37,20 +55,11 @@
         <div class="container mx-auto px-4">
           <div class="md:flex justify-between items-center">
             <div class="flex">
-              <!-- <div class="flex -mb-px mr-8">
-                <nuxt-link
-                  to="/dashboard"
-                  class="no-underline md:text-blue-dark flex items-center py-4 border-b border-blue-dark"
-                >
-                  <span class="h-6 w-6 fill-current mr-2">
-                    <font-awesome-icon :icon="['fas', 'th-large']" />
-                  </span> Dashboard
-                </nuxt-link>
-              </div>-->
               <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/admin/collections"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'boxes']" />
@@ -61,16 +70,29 @@
                 <nuxt-link
                   to="/admin/users"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'users']" />
                   </span> Users
                 </nuxt-link>
               </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/admin/orders"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="h-6 w-6 fill-current mr-2">
+                    <font-awesome-icon :icon="['fas', 'cubes']" />
+                  </span> ORDERS
+                </nuxt-link>
+              </div>
               <div class="flex -mb-px">
                 <nuxt-link
                   to="/admin/settings"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'cog']" />
@@ -90,12 +112,16 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 
 export default {
   head: {
     title: 'Admin Dashboard'
   },
   middleware: ['admin-auth'],
+  components: {
+    VueTailwindDropdown
+  },
   computed: {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',
@@ -103,8 +129,9 @@ export default {
     })
   },
   methods: {
-    signOut() {
-      this.$store.dispatch('user/signOut')
+    async signOut() {
+      await this.$store.dispatch('user/signOut')
+      this.$router.replace('/')
     }
   }
 }

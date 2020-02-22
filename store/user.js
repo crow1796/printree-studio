@@ -25,12 +25,11 @@ const getters = {
   }
 }
 
-const saveAuthToken = async () => {
-  const token = await fireAuth.currentUser.getIdToken();
-  Cookies.set("access_token", token);
-}
-
 const actions = {
+  async saveAuthToken(context, token){
+    await this.$axios.put('/verify-token', {token})
+    Cookies.set("access_token", token);
+  },
   async createAccount(context, data) {
     let res = await auth.createUserWithEmailAndPassword(data)
     if (res.status) res = context.dispatch('signIn', data)
@@ -41,8 +40,8 @@ const actions = {
     if (res.status && res.user) {
       context.commit('USER', res.user)
       context.commit('IS_LOGGED_IN', true)
+      await context.dispatch('saveAuthToken', res.user.token)
     }
-    await saveAuthToken()
     return res
   },
   sendPasswordRecovery(context, data) {
@@ -53,17 +52,17 @@ const actions = {
     if (response.status && response.user) {
       context.commit('USER', response.user)
       context.commit('IS_LOGGED_IN', true)
+      await context.dispatch('saveAuthToken', response.user.token)
     }
-    await saveAuthToken()
     return response
   },
-  signOut(context){
+  async signOut(context){
+    await auth.signOut()
     Cookies.remove('access_token')
-    return auth.signOut()
   },
   async signInAsAGuest(context){
     const response = await auth.signInAsAGuest()
-    await saveAuthToken()
+    await context.dispatch('saveAuthToken', response.user.token)
     return response
   }
 }

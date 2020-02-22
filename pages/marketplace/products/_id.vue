@@ -167,7 +167,7 @@ export default {
         {
           id: 1,
           name: 'Printree T-Shirt',
-          collection_name: 'Printree Uniforms',
+          collectionName: 'Printree Uniforms',
           price: 499,
           thumbnail:
             'https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png'
@@ -175,7 +175,7 @@ export default {
         {
           id: 2,
           name: 'Printree T-Shirt',
-          collection_name: 'Printree Uniforms',
+          collectionName: 'Printree Uniforms',
           price: 499,
           thumbnail:
             'https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png'
@@ -183,7 +183,7 @@ export default {
         {
           id: 3,
           name: 'Printree T-Shirt',
-          collection_name: 'Printree Uniforms',
+          collectionName: 'Printree Uniforms',
           price: 499,
           thumbnail:
             'https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png'
@@ -191,7 +191,7 @@ export default {
         {
           id: 4,
           name: 'Printree T-Shirt',
-          collection_name: 'Printree Uniforms',
+          collectionName: 'Printree Uniforms',
           price: 499,
           thumbnail:
             'https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png'

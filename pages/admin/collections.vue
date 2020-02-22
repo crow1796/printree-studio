@@ -35,9 +35,9 @@
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center">
                     <div class="ml-3">
-                      <p class="text-gray-900 whitespace-no-wrap">
+                      <p class="text-gray-900 whitespace-no-wrap flex items-center">
                         <span
-                          class="relative text-xs inline-block px-3 py-1 font-semibold leading-tight mr-1"
+                          class="relative text-xs inline-block px-3 py-1 font-semibold leading-tight mr-2"
                           :class="{'text-white': col.plan === 'sell', 'text-blue-800': col.plan === 'buy'}"
                         >
                           <span
@@ -53,6 +53,9 @@
                           @click.prevent="previewCollection(col)"
                         >
                           <span>{{ col.name }}</span>
+                        </a>
+                        <a href="#" class="ml-2 text-gray-400 hover:text-gray-600" title="Feature this Collection" v-tippy="{arrow: true}">
+                          <font-awesome-icon :icon="['fas', 'star']"/>
                         </a>
                       </p>
                     </div>

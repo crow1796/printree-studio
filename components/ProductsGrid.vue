@@ -36,7 +36,7 @@
         />
       </div>
       <div class="relative text-white px-6 pb-6 mt-6">
-        <span class="block opacity-75 -mb-1 w-full truncate">{{product.collection_name}}</span>
+        <span class="block opacity-75 -mb-1 w-full truncate">{{product.collectionName}}</span>
         <div class="flex items-center justify-between">
           <span class="font-semibold text-lg leading-none w-6/12 truncate">{{product.name}}</span>
           <span

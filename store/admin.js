@@ -43,10 +43,6 @@ const getters = {
 }
 
 const actions = {
-  signOut(context){
-    Cookies.remove('access_token')
-    return auth.signOut()
-  },
   async getUsers(context){
     const res = await this.$axios.get('/users')
     context.commit('USERS', res.data.users)

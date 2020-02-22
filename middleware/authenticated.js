@@ -1,4 +1,7 @@
 export default function({store, route, redirect, isServer}){
-  if(!store.getters['user/isLoggedIn']) return redirect('/')
-  // if(route.path === '/') return redirect('/dashboard/collections')
+  const user = store.getters['user/user']
+  const isLoggedIn = store.getters['user/isLoggedIn']
+  if(!isLoggedIn) return redirect('/')
+  const isAdmin = _.includes(['admin'], user.role)
+  if(isLoggedIn && isAdmin && route.path.includes('/dashboard')) return redirect('/admin/collections')
 }

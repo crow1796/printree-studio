@@ -21,14 +21,32 @@
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right">
-              <div
-                class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
-              >
-                <span class="text-sm mr-1">{{ user.email }}</span>
-                <div>
-                  <font-awesome-icon :icon="['fas', 'chevron-down']" />
-                </div>
-              </div>
+              <VueTailwindDropdown>
+                <template v-slot:trigger>
+                  <div
+                    class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
+                  >
+                    <span class="text-sm mr-1">{{ user.email }}</span>
+                    <div>
+                      <font-awesome-icon :icon="['fas', 'chevron-down']" />
+                    </div>
+                  </div>
+                </template>
+                <template v-slot:content>
+                  <div class="flex flex-col flex-grow">
+                    <a
+                      href="#"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      @click.prevent="signOut"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                      </span>
+                      <span>Logout</span>
+                    </a>
+                  </div>
+                </template>
+              </VueTailwindDropdown>
             </div>
           </div>
         </div>
@@ -75,9 +93,9 @@
               >
                 <div class="mr-2 font-bold">PHP</div>
                 <div>15,254.25</div>
-                <div class="ml-1 text-xs bg-primary-darker hover:bg-primary-lighter px-2 rounded-full py-1">
-                  Cash Out
-                </div>
+                <div
+                  class="ml-1 text-xs bg-primary-darker hover:bg-primary-lighter px-2 rounded-full py-1"
+                >Cash Out</div>
               </a>
             </div>
           </div>
@@ -91,6 +109,7 @@
 </template>
 
 <script>
+import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -98,6 +117,9 @@ export default {
     title: 'Dashboard'
   },
   middleware: ['authenticated'],
+  components: {
+    VueTailwindDropdown
+  },
   computed: {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',
@@ -105,8 +127,9 @@ export default {
     })
   },
   methods: {
-    signOut() {
-      this.$store.dispatch('user/signOut')
+    async signOut() {
+      await this.$store.dispatch('user/signOut')
+      this.$router.replace('/')
     }
   }
 }

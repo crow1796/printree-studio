@@ -574,11 +574,11 @@ const actions = {
     context.commit('ARTS', arts)
   },
   async fetchDesignData(context, id) {
-    const design = await db.getDesign(id)
+    const design = await db.getCollection(id)
     return design
   },
   async fetchDesignDataAndCommit(context, id) {
-    const design = await db.getDesign(id)
+    const design = await db.getCollection(id)
     context.commit('DESIGN_META', {
       id: design.id,
       name: design.name,
