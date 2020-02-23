@@ -3,7 +3,7 @@
     <div class="font-bold text-2xl mt-6 px-8">
       All Products
     </div>
-    <div class="relative">
+    <div class="relative min-h-area-loader">
       <AreaLoader v-if="isLoading"/>
       <ProductsGrid :products="products"/>
     </div>
@@ -18,7 +18,7 @@ export default {
   components: {
     ProductsGrid
   },
-  async created(){
+  async mounted(){
     this.products = await this.$store.dispatch('marketplace/getProductsToSell')
     this.isLoading = false
   },

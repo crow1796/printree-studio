@@ -103,13 +103,13 @@
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
-                <div
-                  v-html="selectedProduct.variants[selectedProductVariantKey].sides[
+                <img
+                  :src="selectedProduct.variants[selectedProductVariantKey].sides[
                       _firstPrintableAreaOf(
                         selectedProduct.variants[selectedProductVariantKey].sides
                       )
                     ].with_placeholder"
-                ></div>
+                />
                 <div class="variants flex">
                   <div
                     class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
@@ -121,10 +121,10 @@
                     @click="() => (selectedProductVariantKey = vid)"
                   >
                     <div class="flex flex-col w-full">
-                      <div
-                        v-html="variant.sides[_firstPrintableAreaOf(variant.sides)]
+                      <img
+                        :src="variant.sides[_firstPrintableAreaOf(variant.sides)]
                             .with_placeholder"
-                      ></div>
+                      />
                     </div>
                   </div>
                 </div>
@@ -248,7 +248,9 @@
                       }"
                       @click="validateAndSelectProduct(product)"
                     >
-                      <div class="px-2 pt-2" v-html="_placeholderOfFirstVariantOf(product)"></div>
+                      <div class="px-2 pt-2">
+                        <img :src="_placeholderOfFirstVariantOf(product)"/>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -541,7 +543,9 @@ export default {
       immediate: true,
       handler(to, from) {
         const firstVariantKey = _.first(_.keys(to.variants))
-        this.selectedProductSizes = JSON.parse(JSON.stringify(to.variants[firstVariantKey].sizes))
+        this.selectedProductSizes = JSON.parse(
+          JSON.stringify(to.variants[firstVariantKey].sizes)
+        )
         this.selectedProductVariantKey = firstVariantKey
         const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
         this.selectedProductBasePrice = _.first(

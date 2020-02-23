@@ -1,36 +1,6 @@
 import { fireDb, fireStorage } from '~/plugins/firebase'
 
 export default {
-  async getProductsToSell(query){
-    const collectionsSnap = await fireDb.collection('user_collections').where('plan', '==', 'sell').where('status', '==', 'approved').get()
-    const products = await Promise.all(_.map(collectionsSnap.docs, async doc => {
-      const collectionData = doc.data()
-      return (await Promise.all(_.map(collectionData.products, async productRef => {
-        const productData = (await productRef.get()).data()
-        const firstVariant = _.first(productData.variants)
-        const firstSizeKey = _.first(_.keys(firstVariant.sizes))
-        const price = firstVariant.sizes[firstSizeKey].price
-        // https://firebasestorage.googleapis.com/v0/b/printree-52ca8.appspot.com/o/products%2Fplaceholders%2F1G4DlxcrpSud0G09Z6Zt%2FF8w1lD5sdk8gFcHWa8YR%2Fback.png?alt=media&token=82dbf61d-bf01-49f0-86a8-41aa0b065408
-        const thumbnails = {}
-        const parentVariantData = (await firstVariant.variant.get()).data()
-        
-        _.map(parentVariantData.printable_area, async (area, side) => {
-          console.log(fireStorage.ref(`products/thumbnails/${productData.id}/${side}.svg`))
-          // console.log((await fireStorage.ref(`products/thumbnails/${productData.id}/${side}.svg`).getDownloadURL()))
-          // thumbnails[key] = 
-        })
-        const product = {
-          id: productData.id,
-          name: productData.meta.name,
-          collectionName: collectionData.name,
-          price: price,
-          thumbnails
-        }
-        return product
-      })))
-    }))
-    console.log(products)
-  },
   async fetchAvailableProducts() {
     const productsRef = await fireDb.collection('available_products')
     let productsSnap = await productsRef.get()
