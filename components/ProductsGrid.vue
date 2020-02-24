@@ -4,7 +4,7 @@
       class="flex-shrink-0 my-6 mx-2 relative overflow-hidden hover:shadow-lg border rounded-lg"
       v-for="product in products"
       :key="product.id"
-      :to="`/marketplace/products/${product.id}`"
+      :to="`/marketplace/collections/${product.collectionId}/products/${product.id}`"
       :title="product.name"
     >
       <div class="relative pt-3 px-8 flex items-center justify-center">

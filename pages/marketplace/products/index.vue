@@ -18,7 +18,7 @@ export default {
   components: {
     ProductsGrid
   },
-  async mounted(){
+  async created(){
     this.products = await this.$store.dispatch('marketplace/getProductsToSell')
     this.isLoading = false
   },

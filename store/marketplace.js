@@ -13,6 +13,10 @@ const actions = {
   async getProductsToSell(context, query){
     const res = await this.$axios.get('/products', query)
     return res.data.products
+  },
+  async getProductFromCollection(context, {collection, product}){
+    const res = await this.$axios.get(`/collections/${collection}/products/${product}`)
+    return res.data.product
   }
 }
 
