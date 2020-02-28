@@ -46,7 +46,6 @@ export default {
   },
   watch: {
     value(to){
-      console.log(to)
       this.selected = to
     }
   }

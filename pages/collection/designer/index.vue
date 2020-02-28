@@ -38,19 +38,27 @@
 
       <div class="flex w-1/4 border-r flex-grow flex-col">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
-          <div
+          <!-- <div
             class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
             @click="showAvailableProducts"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
             <span class="font-bold">MANAGE PRODUCTS</span>
-          </div>
-          <div class="flex flex-grow flex-wrap flex mt-4 overflow-auto px-4 pb-4">
-            <div
-              class="p-1 w-6/12"
-              v-for="(product, index) in selectedProducts"
-              :key="index"
-            >
+          </div>-->
+          <div class="flex flex-wrap flex mt-4 overflow-auto px-4 pb-4">
+            <div class="p-1 w-6/12">
+              <div
+                class="px-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
+                style="height: 176.8px"
+                @click="showAvailableProducts"
+              >
+                <div class="flex flex-col items-center justify-center">
+                  <font-awesome-icon :icon="['fas', 'plus-circle']" class="text-5xl" />
+                  <span class="font-bold mt-2 block">ADD PRODUCTS</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
               <div
                 class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
@@ -78,7 +86,11 @@
                           <div
                             class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 bg-white"
                           >
-                            <font-awesome-icon :icon="['fas', 'plus']" class="text-xs" :style="{fontSize: '.6em'}" />
+                            <font-awesome-icon
+                              :icon="['fas', 'plus']"
+                              class="text-xs"
+                              :style="{fontSize: '.6em'}"
+                            />
                           </div>
                         </div>
                         <template slot="popover">
@@ -325,6 +337,7 @@
 </template>
 
 <script>
+import { fireDb } from '~/plugins/firebase'
 import Tabs from '@/components/Tabs'
 import Select from '@/components/Select'
 import ToggleSwitch from '@/components/ToggleSwitch'
@@ -481,22 +494,26 @@ export default {
     },
     manageProducts() {
       let selectedProductIds = _.map(this.selectedProducts, 'id')
-      let tmpProductIds = _.map(this.tmpProducts, 'id')
       this.tmpProducts = _.map(this.tmpProducts, product => {
-        if (_.includes(selectedProductIds, product.id)) {
-          let index = _.indexOf(selectedProductIds, product.id)
-          product = JSON.parse(JSON.stringify(this.selectedProducts[index]))
+        if (!product.parent_id){
+          const ref = fireDb.collection('user_products').doc()
+          product.parent_id = product.id
+          product.id = ref.id
+          product.is_new = true
         }
         if (!product.meta)
           product.meta = {
             name: '',
             description: '',
             tags: '',
-            printing_option: '',
+            printing_option: ''
           }
         return product
       })
-      this.$store.dispatch('designer/setSelectedProducts', this.tmpProducts)
+      this.$store.dispatch('designer/setSelectedProducts', [
+        ...this.selectedProducts,
+        ...this.tmpProducts
+      ])
       let productIndex = this.currentProductIndex
       if (!this.selectedProducts[productIndex]) productIndex = 0
       this.currentProduct = JSON.parse(

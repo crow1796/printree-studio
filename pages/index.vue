@@ -1,13 +1,14 @@
 <template>
   <div class="w-full">
+    <!-- <AreaLoader v-if="isLoading" fullscreen/> -->
     <VueTailwindModal
       ref="availableProductsModal"
       width="100%"
       content-class="rounded-none h-full shadow-none text-gray-600"
     >
-      <div class="flex flex-col h-full">
-        <div class="modal-heading border-b w-full p-4">
-          <div class="flex justify-between w-full items-center">
+      <div class="flex flex-col flex-grow">
+        <div class="modal-heading border-b flex-grow p-4">
+          <div class="flex justify-between flex-grow items-center">
             <div class="flex uppercase">
               <strong>Select Products</strong>
             </div>
@@ -38,20 +39,21 @@
       </div>
     </VueTailwindModal>
     <AuthModal ref="authModal" @login-success="createNewDesign" />
-    <AreaLoader v-if="isLoading" fullscreen />
     <div class="hero flex relative w-full">
       <div id="screen" class="z-10 overflow-hidden"></div>
       <div class="flex z-20 relative mt-32 w-3/5 pl-32 flex-col">
-        <h1 class="w-8/12 mt-10">
+        <div class="w-8/12 mt-10">
           <div class="text-6xl font-bold leading-none">CREATE</div>
           <div class="text-2xl ml-2">your own designs for any product &amp; earn</div>
-        </h1>
+        </div>
         <div class="flex mt-5">
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-4 font-bold rounded text-white hover:bg-primary-lighter"
-            @click="showAvailableProducts"
-          >START DESIGNING</button>
+            @click="() => !isLoading ? showAvailableProducts() : false"
+          >
+            <span>START DESIGNING</span>
+          </button>
         </div>
       </div>
       <div class="flex">
@@ -98,6 +100,7 @@ export default {
         'designer/fetchDesignDataAndCommit',
         this.$storage.getLocalStorage('current_design_id')
       )
+      this.isLoading = false
     }
   },
   mounted() {

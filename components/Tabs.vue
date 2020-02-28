@@ -6,7 +6,7 @@
         v-for="tab in tabs"
         :key="`title${tab.name}`"
         @click="switchTabTo(tab)">
-        <div class="w-full text-center uppercase">{{ tab.title }}</div>
+        <span class="w-full text-center uppercase">{{ tab.title }}</span>
       </button>
     </div>
     <div v-for="tab in tabs" :key="`content${tab.name}`">

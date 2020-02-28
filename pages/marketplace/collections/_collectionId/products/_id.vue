@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
-    <AreaLoader v-if="isLoading" />
+    <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product">
       <VueTailwindModal
         ref="addedToCartModal"
@@ -38,10 +38,13 @@
       title: 'Products',
       link: '/marketplace/products'
     }, {
-      title: 'Category',
-      link: '/marketplace/category'
+      title: product.category,
+      link: `/marketplace/category/${product.categoryId}`
     }, {
-      title: 'Product Name',
+      title: product.collectionName,
+      link: `/marketplace/collections/${product.collectionId}`
+    }, {
+      title: product.name,
       active: true
     }]"
       />
@@ -52,39 +55,24 @@
           >
             <div
               class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
+              :class="{'border-primary': i === selectedThumbnailIndex}"
+              v-for="(thumb, i) in thumbnails"
+              :key="i"
+              @click="selectedThumbnailIndex = i"
             >
-              <img
-                src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
-                class="lg:w-24 sm:w-16"
-              />
-            </div>
-            <div
-              class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
-            >
-              <img
-                src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
-                class="lg:w-24 sm:w-16"
-              />
-            </div>
-            <div
-              class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
-            >
-              <img
-                src="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
-                class="lg:w-24 sm:w-16"
-              />
+              <img :src="thumb[frontOrFirst]" class="lg:w-24 sm:w-16" />
             </div>
           </div>
           <div class="flex lg:w-9/12 sm:w-full">
-            <ZoomOnHover
-              img="https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png"
-            />
+            <ZoomOnHover :img="thumbnails[selectedThumbnailIndex][selectedSide]" />
           </div>
         </div>
         <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2">
           <div class="flex flex-grow flex-col">
             <div class="text-xs mb-2">
-              <span class="bg-primary-lighter rounded px-2 py-1 text-white">Collection Name</span>
+              <span
+                class="bg-primary-lighter rounded px-2 py-1 text-white"
+              >{{ product.collectionName }}</span>
             </div>
             <h1 class="text-3xl font-bold leading-none">{{ product.name }}</h1>
             <h2 class="text-xl">{{ product.price.formatMoney('₱ ') }}</h2>
@@ -96,8 +84,10 @@
                 v-for="variant in product.variants"
                 :key="variant.id"
                 :style="{backgroundColor: variant.color}"
+                @click="selectVariant(variant)"
               >
                 <font-awesome-icon
+                  :style="{color: getContrastOf(variant.color)}"
                   :icon="['fas', 'check']"
                   v-if="selectedVariant.id === variant.id"
                 />
@@ -108,13 +98,23 @@
               <div
                 class="w-10 h-10 rounded flex justify-center items-center font-bold text-xs mr-1 border"
                 v-for="(size, i) in selectedVariant.sizes"
-                :class="{'opacity-50': !size.quantity, 'cursor-pointer hover:border-primary hover:text-primary': size.quantity}"
+                :class="{'opacity-50': !size.quantity, 'cursor-pointer hover:border-primary hover:text-primary': size.quantity, 'text-primary border-primary': i === selectedSize}"
                 :key="i"
+                @click="() => size.quantity ? selectedSize = i : false"
               >{{i}}</div>
             </div>
+            <div
+              class="text-xs text-red-600 font-bold mt-2"
+            >Only {{ selectedVariant.sizes[selectedSize].quantity }} stock(s) left!</div>
             <div class="font-bold mt-3">QUANTITY</div>
             <div class="mt-2 flex">
-              <VueNumericInput align="center" style="width: 90px" :min="1" v-model="quantity" />
+              <VueNumericInput
+                align="center"
+                style="width: 90px; height: 40px;"
+                :min="1"
+                v-model="quantity"
+                :max="selectedVariant.sizes[selectedSize].quantity"
+              />
             </div>
             <div class="mt-3">
               <button
@@ -144,6 +144,7 @@ import ProductsGrid from '@/components/ProductsGrid'
 import ZoomOnHover from '@/components/ZoomOnHover/index'
 import VueTailwindModal from '@/components/VueTailwindModal'
 import BreadCrumbs from '@/components/BreadCrumbs'
+import ColorRegulator from '~/plugins/color-regulator'
 
 export default {
   layout: 'marketplace',
@@ -163,6 +164,15 @@ export default {
       }
     )
     this.selectedVariant = _.first(this.product.variants)
+    this.selectedSize = _.first(
+      _.filter(
+        _.keys(this.selectedVariant.sizes),
+        k => this.selectedVariant.sizes[k].quantity
+      )
+    )
+    this.thumbnails = _.map(this.product.variants, 'thumbnails')
+    this.sides = _.keys(this.selectedVariant.thumbnails)
+    this.selectedSide = this.frontOrFirst
     this.isLoading = false
   },
   data() {
@@ -170,6 +180,11 @@ export default {
       isLoading: true,
       product: null,
       selectedVariant: null,
+      selectedSize: null,
+      thumbnails: [],
+      sides: [],
+      selectedThumbnailIndex: 0,
+      selectedSide: null,
       otherCollectionProducts: [
         {
           id: 1,
@@ -209,9 +224,25 @@ export default {
       selectedColor: '#ffffff'
     }
   },
+  computed: {
+    frontOrFirst() {
+      return _.includes(this.sides, 'front') ? 'front' : this.sides[0]
+    }
+  },
   methods: {
     addToCart() {
       this.$refs.addedToCartModal.show()
+    },
+    getContrastOf(color) {
+      return ColorRegulator.getContrastOf(color)
+    },
+    selectVariant(variant) {
+      this.selectedVariant = variant
+      this.sides = _.keys(variant.thumbnails)
+      this.selectedSize = _.first(
+        _.filter(_.keys(variant.sizes), k => variant.sizes[k].quantity)
+      )
+      this.selectedSide = this.frontOrFirst
     }
   }
 }

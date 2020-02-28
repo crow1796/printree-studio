@@ -34,7 +34,7 @@
     </VueTailwindModal>
     <div class="flex flex-grow text-gray-600 overflow-hidden">
       <div class="flex flex-col flex-grow">
-        <div class="flex flex-grow items-center justify-between border-b px-4 py-0">
+        <div class="flex flex-grow items-center border-b p-4">
           <div class="flex w-4/12 uppercase font-bold">
             <div class="flex flex-col items-center">
               <div>TOTAL ESTIMATED PROFIT</div>
@@ -59,7 +59,7 @@
               </div>
             </div>
           </div>
-          <div class="flex w-4/12 justify-end">
+          <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
               @click="hide"
@@ -72,7 +72,7 @@
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
-                <div class="relative">
+                <div class="flex relative justify-center items-center">
                   <button
                     type="button"
                     class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
@@ -92,13 +92,14 @@
                   >
                     <font-awesome-icon :icon="['fas', 'download']" />
                   </button>
-                  <div
-                    v-html="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
-                  ></div>
+                  <img
+                    :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
+                    class="w-3/5"
+                  />
                 </div>
-                <div class="variants flex">
+                <div class="variants flex mt-4">
                   <div
-                    class="flex w-2/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
+                    class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
                     v-for="(variant, vid) in selectedProduct.variants"
                     :class="{
                       'border-gray-500 shadow-xl': selectedProductVariantKey === vid
@@ -106,15 +107,16 @@
                     :key="variant.id"
                     @click="() => (selectedProductVariantKey = vid)"
                   >
-                    <div class="flex w-full" v-for="(side, i) in variant.sides" :key="i">
-                      <div
-                        v-html="side.with_placeholder"
-                      ></div>
+                    <div class="flex flex-col w-full">
+                      <img
+                        :src="variant.sides[_firstPrintableAreaOf(variant.sides)]
+                            .with_placeholder"
+                      />
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 w-full ml-4">
+              <div class="flex flex-col mt-5 flex-grow ml-4">
                 <div class="text-4xl">
                   <span class="font-bold w-full outline-none">{{selectedProduct.meta.name}}</span>
                 </div>
@@ -189,7 +191,7 @@
                       }"
                       @click="selectProduct(product)"
                     >
-                      <div class="px-2 pt-2" v-html="_placeholderOfFirstVariantOf(product)"></div>
+                      <div class="px-2 pt-2"><img :src="_placeholderOfFirstVariantOf(product)"/></div>
                     </div>
                   </div>
                 </div>
@@ -254,11 +256,13 @@ export default {
     }
   },
   methods: {
-    switchSides(){
-      const sides = _.keys(this.selectedProduct.variants[this.selectedProductVariantKey].sides)
+    switchSides() {
+      const sides = _.keys(
+        this.selectedProduct.variants[this.selectedProductVariantKey].sides
+      )
       const sideIndex = sides.indexOf(this.selectedProductSide)
       const nextSide = sides[sideIndex + 1]
-      if(nextSide){
+      if (nextSide) {
         this.selectedProductSide = nextSide
         return
       }

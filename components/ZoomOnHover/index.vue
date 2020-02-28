@@ -30,10 +30,10 @@ export default {
       let zoomer = e.currentTarget
       let offsetX = e.offsetX
         ? (offsetX = e.offsetX)
-        : (offsetX = e.touches[0].pageX)
+        : e.touches ? (offsetX = e.touches[0].pageX) : (offsetX = e.offsetX)
       let offsetY = e.offsetY
         ? (offsetY = e.offsetY)
-        : (offsetX = e.touches[0].pageX)
+        : e.touches ? (offsetX = e.touches[0].pageX) : (offsetY = e.offsetY)
       let x = (offsetX / zoomer.offsetWidth) * 100
       let y = (offsetY / zoomer.offsetHeight) * 100
       zoomer.style.backgroundPosition = x + '% ' + y + '%'

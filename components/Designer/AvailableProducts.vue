@@ -113,25 +113,12 @@ export default {
     this.isLoading = true
     await this.$store.dispatch('designer/fetchAvailableProducts')
     this.isLoading = false
-    this.tmpProducts = JSON.parse(JSON.stringify(this.selectedProducts))
-    _.map(this.tmpProducts, product => {
-      if (!this.groupedProducts[product.category.id])
-        this.groupedProducts[product.category.id] = []
-      this.groupedProducts[product.category.id].push(product)
-    })
     this.categories = [
       {
         name: 'all',
         title: 'All'
-      },
-      ..._.map(_.map(this.tmpProducts, 'category'), ({ name, id }) => {
-        return {
-          name: id,
-          title: name
-        }
-      })
+      }
     ]
-    this.$emit('input', this.tmpProducts)
   },
   data() {
     return {
@@ -143,8 +130,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      availableProducts: 'designer/availableProducts',
-      selectedProducts: 'designer/selectedProducts'
+      availableProducts: 'designer/availableProducts'
     })
   },
   methods: {

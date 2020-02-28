@@ -118,6 +118,7 @@ export default {
           name: productData.name,
           meta: productDocData.meta,
           availableVariants,
+          parent_id: productSnap.id,
           variants
         }
       })
@@ -151,7 +152,7 @@ export default {
   async createDesignFor(user, products) {
     const batch = fireDb.batch()
     const createdProducts = _.map(products, product => {
-      const productRef = fireDb.collection('products').doc()
+      const productRef = fireDb.collection('user_products').doc()
       let objects = {}
       let sizes = {}
       _.map(product.availableVariants[0].printable_area, (v, k) => {
@@ -176,7 +177,7 @@ export default {
             objects,
             sizes,
             variant: fireDb
-              .collection('product_variants')
+              .collection('available_product_variants')
               .doc(product.availableVariants[0].id)
           }
         ]
@@ -207,7 +208,7 @@ export default {
     const batch = fireDb.batch()
     const products = await Promise.all(
       _.map(selectedProducts, async product => {
-        const productRef = product.id ? fireDb.collection('products').doc(product.id) : fireDb.collection('products').doc()
+        const productRef = fireDb.collection('user_products').doc(product.id)
         let variants = _.map(product.variants, variant => {
           let objects = {}
           _.map(variant.printable_area, (side, key) => {
@@ -215,7 +216,7 @@ export default {
           })
 
           return {
-            variant: fireDb.collection('product_variants').doc(variant.id),
+            variant: fireDb.collection('available_product_variants').doc(variant.id),
             objects,
             sizes: variant.sizes
           }
@@ -223,9 +224,11 @@ export default {
         const prod = {
           id: productRef.id,
           meta: product.meta,
+          product: fireDb.collection('available_products').doc(product.parent_id),
           variants
         }
-        batch.update(productRef, prod)
+        if(!product.is_new) batch.update(productRef, prod)
+        else batch.set(productRef, prod)
         return productRef
       })
     )

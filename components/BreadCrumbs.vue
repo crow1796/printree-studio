@@ -5,7 +5,7 @@
   >
     <ol class="list-none p-0 inline-flex">
       <li v-for="(item, i) in items" :key="i">
-        <a href="#" class="text-gray-500" aria-current="page" v-if="item.active">
+        <a href="#" class="text-primary" aria-current="page" v-if="item.active">
           {{ item.title }}
           <font-awesome-icon class="w-3 h-3 mx-3" :icon="['fas', 'chevron-right']" v-if="i < (items.length - 1)"/>
         </a>

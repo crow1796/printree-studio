@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-wrap items-center justify-center">
+  <div class="flex flex-wrap items-center px-6">
     <nuxt-link
       class="flex-shrink-0 my-6 mx-2 relative overflow-hidden hover:shadow-lg border rounded-lg"
       v-for="product in products"
