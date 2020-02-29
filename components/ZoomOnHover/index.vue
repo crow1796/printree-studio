@@ -3,7 +3,7 @@
     class="zoom"
     style="background-image: none"
   >
-    <img :src="img" />
+    <progressive-img :src="img" />
   </figure>
 </template>
 

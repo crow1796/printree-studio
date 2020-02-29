@@ -183,6 +183,7 @@
                             align="center"
                             style="width: 90px"
                             class="ml-1"
+                            :min="1"
                             v-model="selectedProductSizes[i].quantity"
                             @input="calculateProfit(i)"
                           />

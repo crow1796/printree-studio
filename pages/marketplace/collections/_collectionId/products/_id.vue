@@ -60,7 +60,7 @@
               :key="i"
               @click="selectedThumbnailIndex = i"
             >
-              <img :src="thumb[frontOrFirst]" class="lg:w-24 sm:w-16" />
+              <progressive-img :src="thumb[frontOrFirst]" class="lg:w-24 sm:w-16" />
             </div>
           </div>
           <div class="flex lg:w-9/12 sm:w-full">
@@ -231,6 +231,7 @@ export default {
   },
   methods: {
     addToCart() {
+      console.log(this.selectedVariant, this.quantity, this.selectedSide, this.selectedSize)
       this.$refs.addedToCartModal.show()
     },
     getContrastOf(color) {

@@ -15,7 +15,7 @@
               :class="{ 'border-primary hover:border-primary-lighter': _hasBeenSelected(product), 'hover:border-gray-500': !_hasBeenSelected(product) }"
             >
               <div class="flex w-1/3 product-thumb p-4 items-center justify-center">
-                <img :src="_firstVariantPlaceholderOf(product)" class="w-full" />
+                <progressive-img :src="_firstVariantPlaceholderOf(product)" class="w-full" />
               </div>
               <div
                 class="flex flex-grow flex-col product-desc p-4 relative"
@@ -61,7 +61,7 @@
                 :class="{ 'border-primary hover:border-primary-lighter': _hasBeenSelected(product), 'hover:border-gray-500': !_hasBeenSelected(product) }"
               >
                 <div class="flex w-1/3 product-thumb p-4 items-center justify-center">
-                  <img :src="_firstVariantPlaceholderOf(product)" class="w-full" />
+                  <progressive-img :src="_firstVariantPlaceholderOf(product)" class="w-full" />
                 </div>
                 <div
                   class="flex flex-grow flex-col product-desc p-4 relative"

@@ -2,7 +2,6 @@ import Vue from 'vue'
 import VueTippy from 'vue-tippy'
 import simplebar from 'simplebar-vue'
 import 'simplebar/dist/simplebar.min.css'
-import VueLazyload from 'vue-lazyload'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import AreaLoader from '@/components/AreaLoader'
@@ -20,15 +19,10 @@ const pluginOptions = {
   globalOptions: { currency: 'PHP' }
 }
 Vue.use(VueCurrencyInput, pluginOptions)
-Vue.use(VueLazyload, {
-  preLoad: 1,
-  error: require('~/assets/images/logo.png'),
-  loading: require('~/assets/images/loader.gif'),
-  attempt: 1
-})
 
 if (process.client) {
   require('vue2-animate/dist/vue2-animate.min.css')
+  const VueProgressiveImage = require('vue-progressive-image').default
   const drr = require('@/components/Designer/drr').default
   const VueKonva = require('vue-konva')
   const vClickOutside = require('v-click-outside')
@@ -45,4 +39,5 @@ if (process.client) {
   Vue.use(VTooltip)
   Vue.use(vClickOutside)
   Vue.use(VueKonva)
+  Vue.use(VueProgressiveImage)
 }

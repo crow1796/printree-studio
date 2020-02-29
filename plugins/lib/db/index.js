@@ -33,11 +33,11 @@ export default {
 
             return JSON.parse(
               JSON.stringify({
-                id: variantSnap.id,
                 color: variant.color,
                 printable_area: printableArea,
                 available_sizes: variant.available_sizes,
-                sizes
+                sizes,
+                parent_id: variantRef.id
               })
             )
           })
@@ -56,7 +56,7 @@ export default {
     )
     return products
   },
-  async _extractCollectionFromSnap(snap){
+  async _extractCollectionFromSnap(snap) {
     let collection = {
       id: null,
       name: null,
@@ -74,7 +74,7 @@ export default {
       _.map(snap.data().products, async productRef => {
         const productDocSnap = await productRef.get()
         const productDocData = productDocSnap.data()
-        const productSnap = (await productDocData.product.get())
+        const productSnap = await productDocData.product.get()
         const productData = productSnap.data()
         let categorySnap = await productData.category.get()
         let category = {
@@ -97,18 +97,20 @@ export default {
         )
         const variants = await Promise.all(
           _.map(productDocData.variants, async variantRef => {
-            let variantSnap = await variantRef.variant.get()
-            let printableArea = variantSnap.data().printable_area
+            const variantData = (await variantRef.get()).data()
+            let parentVariantSnap = await variantData.variant.get()
+            let printableArea = parentVariantSnap.data().printable_area
             _.map(
               _.keys(printableArea),
-              key => (printableArea[key].objects = variantRef.objects[key])
+              key => (printableArea[key].objects = variantData.objects[key])
             )
             return {
-              id: variantSnap.id,
-              color: variantSnap.data().color,
+              id: variantRef.id,
+              color: parentVariantSnap.data().color,
               printable_area: printableArea,
-              available_sizes: variantSnap.data().available_sizes,
-              sizes: variantRef.sizes
+              available_sizes: parentVariantSnap.data().available_sizes,
+              sizes: variantData.sizes,
+              parent_id: variantData.variant.id
             }
           })
         )
@@ -127,7 +129,10 @@ export default {
     return collection
   },
   async getCollection(id) {
-    const snap = await fireDb.collection('user_collections').doc(id).get()
+    const snap = await fireDb
+      .collection('user_collections')
+      .doc(id)
+      .get()
     const collection = await this._extractCollectionFromSnap(snap)
     return collection
   },
@@ -164,6 +169,15 @@ export default {
           price: v.base_cost
         }
       })
+      const variantRef = fireDb.collection('user_product_variants').doc()
+      batch.set(variantRef, {
+        objects,
+        sizes,
+        variant: fireDb
+          .collection('available_product_variants')
+          .doc(product.availableVariants[0].parent_id),
+        product: productRef
+      })
       const prod = {
         id: productRef.id,
         meta: {
@@ -172,15 +186,7 @@ export default {
           tags: ''
         },
         product: fireDb.collection('available_products').doc(product.id),
-        variants: [
-          {
-            objects,
-            sizes,
-            variant: fireDb
-              .collection('available_product_variants')
-              .doc(product.availableVariants[0].id)
-          }
-        ]
+        variants: [variantRef]
       }
       batch.set(productRef, prod)
       return productRef
@@ -211,23 +217,35 @@ export default {
         const productRef = fireDb.collection('user_products').doc(product.id)
         let variants = _.map(product.variants, variant => {
           let objects = {}
+          const variantRef = variant.id ? fireDb.collection('user_product_variants').doc(variant.id) : fireDb.collection('user_product_variants').doc()
           _.map(variant.printable_area, (side, key) => {
             objects[key] = side.objects
           })
 
-          return {
-            variant: fireDb.collection('available_product_variants').doc(variant.id),
+          const newVariantData = {
+            variant: fireDb
+              .collection('available_product_variants')
+              .doc(variant.parent_id),
             objects,
             sizes: variant.sizes
           }
+          if(variant.id){
+            batch.update(variantRef, newVariantData)
+          }else {
+            batch.set(variantRef, newVariantData)
+          }
+          
+          return variantRef
         })
         const prod = {
           id: productRef.id,
           meta: product.meta,
-          product: fireDb.collection('available_products').doc(product.parent_id),
+          product: fireDb
+            .collection('available_products')
+            .doc(product.parent_id),
           variants
         }
-        if(!product.is_new) batch.update(productRef, prod)
+        if (!product.is_new) batch.update(productRef, prod)
         else batch.set(productRef, prod)
         return productRef
       })
@@ -268,11 +286,15 @@ export default {
     return collectionsData
   },
   async updateCollection(collectionId, data) {
-    const collectionRef = fireDb.collection('user_collections').doc(collectionId)
+    const collectionRef = fireDb
+      .collection('user_collections')
+      .doc(collectionId)
     await collectionRef.update(data)
   },
   async deleteCollection(collectionId) {
-    const collectionRef = fireDb.collection('user_collections').doc(collectionId)
+    const collectionRef = fireDb
+      .collection('user_collections')
+      .doc(collectionId)
     await collectionRef.delete()
   }
 }
