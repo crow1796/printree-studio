@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-grow text-gray-800">
     <ShoppingCartDrawer ref="shoppingCart" />
+    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" />
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -51,38 +52,35 @@
                   >
                     <div class="relative">
                       <font-awesome-icon :icon="['fas', 'shopping-cart']" />
-                      <div
-                        class="absolute bg-primary-lighter rounded-full text-white w-4 h-4 text-xs flex justify-center items-center"
-                        style="top: -5px; right: -8px;"
-                      >2</div>
                     </div>
                     <span class="ml-2">Cart</span>
                   </a>
                 </div>
               </div>
 
-              <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
-                <a
-                  v-if="!isLoggedIn"
-                  href="#"
-                  class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mr-4"
-                >Sign in</a>
-                <nuxt-link
-                  :to="isLoggedIn ? '/dashboard' : '/'"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white text-xs"
-                  @click.prevent="signOut"
-                >
-                  <span>{{ isLoggedIn ? user.email : 'Sign In' }}</span>
-                  <span v-if="isLoggedIn" class="ml-3">
-                    <font-awesome-icon :icon="['fas', 'arrow-right']" />
-                  </span>
-                </nuxt-link>
-              </div>
-
-              <div class="sm:hidden cursor-pointer">
-                <font-awesome-icon class="w-6 h-6 text-primary-lighter" :icon="['fas', 'bars']" />
-              </div>
+            <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
+              <nuxt-link
+                to="/dashboard"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                v-if="isLoggedIn"
+              >
+                <span>{{ user.email }}</span>
+                <span class="ml-3">
+                  <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                </span>
+              </nuxt-link>
+              <a
+                href="#"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                @click.prevent="$refs.authModal.show()"
+                v-else
+              >Get Started</a>
             </div>
+
+            <div class="sm:hidden cursor-pointer">
+              <font-awesome-icon :icon="['fas', 'bars']" />
+            </div>
+          </div>
 
             <div class="block sm:hidden bg-white border-t-2 py-2">
               <div class="flex flex-col">
@@ -128,6 +126,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import ShoppingCartDrawer from '@/components/ShoppingCart/Drawer'
+import AuthModal from '@/components/Auth/AuthModal'
 import Footer from '@/components/Footer'
 import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 
@@ -136,6 +135,7 @@ export default {
     title: 'Printree'
   },
   components: {
+    AuthModal,
     ShoppingCartDrawer,
     Footer,
     VueTailwindDropdown

@@ -145,6 +145,7 @@ import ZoomOnHover from '@/components/ZoomOnHover/index'
 import VueTailwindModal from '@/components/VueTailwindModal'
 import BreadCrumbs from '@/components/BreadCrumbs'
 import ColorRegulator from '~/plugins/color-regulator'
+import { mapGetters } from 'vuex'
 
 export default {
   layout: 'marketplace',
@@ -225,13 +226,24 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      'user': 'user/user'
+    }),
     frontOrFirst() {
       return _.includes(this.sides, 'front') ? 'front' : this.sides[0]
     }
   },
   methods: {
-    addToCart() {
-      console.log(this.selectedVariant, this.quantity, this.selectedSide, this.selectedSize)
+    async addToCart() {
+      const item = {
+        variant: this.selectedVariant,
+        quantity: this.quantity,
+        size: this.selectedSize
+      }
+      await this.$store.dispatch('marketplace/addToCartOf', {
+        item,
+        user: this.user
+      })
       this.$refs.addedToCartModal.show()
     },
     getContrastOf(color) {

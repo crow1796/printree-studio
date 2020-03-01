@@ -549,7 +549,13 @@ export default {
       }
       let newVariant = await this.$store.dispatch(
         'designer/addVariant',
-        variant
+        {
+          ...variant,
+          ...{
+            id: null,
+            parent_id: variant.id
+          }
+        }
       )
       this.currentProduct.variants.push(JSON.parse(JSON.stringify(newVariant)))
       this.selectVariant(

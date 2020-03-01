@@ -1,4 +1,4 @@
-import { fireDb, fireStorage } from '~/plugins/firebase'
+import { fireDb, FieldValue, fireStorage } from '~/plugins/firebase'
 
 export default {
   async fetchAvailableProducts() {
@@ -217,7 +217,9 @@ export default {
         const productRef = fireDb.collection('user_products').doc(product.id)
         let variants = _.map(product.variants, variant => {
           let objects = {}
-          const variantRef = variant.id ? fireDb.collection('user_product_variants').doc(variant.id) : fireDb.collection('user_product_variants').doc()
+          const variantRef = variant.id
+            ? fireDb.collection('user_product_variants').doc(variant.id)
+            : fireDb.collection('user_product_variants').doc()
           _.map(variant.printable_area, (side, key) => {
             objects[key] = side.objects
           })
@@ -227,14 +229,15 @@ export default {
               .collection('available_product_variants')
               .doc(variant.parent_id),
             objects,
-            sizes: variant.sizes
+            sizes: variant.sizes,
+            product: productRef
           }
-          if(variant.id){
+          if (variant.id) {
             batch.update(variantRef, newVariantData)
-          }else {
+          } else {
             batch.set(variantRef, newVariantData)
           }
-          
+
           return variantRef
         })
         const prod = {
@@ -296,5 +299,86 @@ export default {
       .collection('user_collections')
       .doc(collectionId)
     await collectionRef.delete()
+  },
+  async addToCartOf(item, user) {
+    const collection = fireDb.collection('user_carts')
+    const ref = await collection.where('user_id', '==', user.uid).get()
+    if (ref.size) {
+      const cartRef = _.first(ref.docs)
+      const cartData = cartRef.data()
+      const { products } = cartData
+      const isExistingVariant = _.filter(
+        products,
+        ({ variant }) => variant.id === item.variant.id
+      ).length
+      if (!isExistingVariant) {
+        await collection.doc(cartRef.id).update({
+          products: FieldValue.arrayUnion({
+            variant: fireDb
+              .collection('user_product_variants')
+              .doc(item.variant.id),
+            quantity: item.quantity,
+            size: item.size
+          })
+        })
+        return
+      }
+      return
+    }
+    await collection.doc().set({
+      user_id: user.uid,
+      products: [
+        {
+          variant: fireDb
+            .collection('user_product_variants')
+            .doc(item.variant.id),
+          quantity: item.quantity,
+          size: item.size
+        }
+      ]
+    })
+  },
+  async getCartOf(user) {
+    const collection = fireDb.collection('user_carts')
+    const ref = await collection.where('user_id', '==', user.uid).get()
+    if (ref.size) {
+      const cartRef = _.first(ref.docs)
+      const cartData = cartRef.data()
+      const products = await Promise.all(
+        _.map(cartData.products, async product => {
+          const variantRef = await product.variant.get()
+          const variantData = variantRef.data()
+          const parentVariantRef = await variantData.variant.get()
+          const parentVariantData = parentVariantRef.data()
+          const sides = _.keys(parentVariantData.printable_area)
+          const side = _.includes(sides, 'front') ? 'front' : sides[0]
+          const productRef = await variantData.product.get()
+          const productData = productRef.data()
+          const thumb = await fireStorage
+            .ref(
+              `products/thumbnails/${productRef.id}/${variantRef.id}/${side}.png`
+            )
+            .getDownloadURL()
+          const baseCost = _.find(parentVariantData.available_sizes, {
+            name: product.size
+          }).base_cost
+          return {
+            name: productData.meta.name,
+            quantity: product.quantity,
+            size: product.size,
+            thumbnail: thumb,
+            price: baseCost + variantData.sizes[product.size].price
+          }
+        })
+      )
+      return JSON.parse(
+        JSON.stringify({
+          products
+        })
+      )
+    }
+    return {
+      products: []
+    }
   }
 }
