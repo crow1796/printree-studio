@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed h-full z-20 vt-drawer top-0"
+  <div class="fixed h-full z-60 vt-drawer top-0"
     v-if="isShown"
     @click="() => backdrop && closeOnBackdropClicked ? hide() : false"
     :class="{
@@ -71,6 +71,16 @@ export default {
         this.isShown = false
         this.$emit('hidden')
       }, 300)
+    }
+  },
+  watch: {
+    isShown(to){
+      if(to){
+        this._oldOverflow = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
+        return
+      }
+      document.body.style.overflow = this._oldOverflow
     }
   }
 }

@@ -31,6 +31,10 @@ const actions = {
   async getCartOf(context, user){
     const cart = await db.getCartOf(user)
     return cart
+  },
+  async getAddresses(context, query){
+    const res = await this.$axios.get(`/addresses`)
+    return res.data
   }
 }
 

@@ -363,16 +363,19 @@ export default {
             name: product.size
           }).base_cost
           return {
+            variantId: variantRef.id,
             name: productData.meta.name,
             quantity: product.quantity,
             size: product.size,
             thumbnail: thumb,
-            price: baseCost + variantData.sizes[product.size].price
+            price: baseCost + variantData.sizes[product.size].price,
+            max: variantData.sizes[product.size].quantity
           }
         })
       )
       return JSON.parse(
         JSON.stringify({
+          id: cartRef.id,
           products
         })
       )

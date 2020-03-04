@@ -1,12 +1,17 @@
 <template>
   <div class="flex flex-wrap">
     <div
-      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2"
+      class="px-4 py-2 border mr-2 cursor-pointer hover:border-gray-600 rounded font-bold mt-2 relative"
       v-for="(opt, i) in options"
       :key="i"
       :class="{'bg-primary text-white border-white hover:border-white': ((!isMultiple && opt.value === selected) || (isMultiple && _isSelected(opt)))}"
       @click="toggle(opt)"
-    >{{ opt.label }}</div>
+    >
+      <span class="absolute top-0 right-0 mr-2 mt-1" v-if="((!isMultiple && opt.value === selected) || (isMultiple && _isSelected(opt)))">
+        <font-awesome-icon :icon="['fas', 'check-circle']"/>
+      </span>
+      <slot v-bind:option="opt">{{ opt.label }}</slot>
+    </div>
   </div>
 </template>
 
