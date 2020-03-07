@@ -32,9 +32,20 @@ const actions = {
     const cart = await db.getCartOf(user)
     return cart
   },
-  async getAddresses(context, query){
-    const res = await this.$axios.get(`/addresses`)
+  async getPHAddresses(context, params){
+    const res = await this.$axios.get(`/addresses`, {params})
     return res.data
+  },
+  async saveAddress(context, data){
+    const address = await db.saveAddress(data)
+    return address
+  },
+  async getAddressesOf(context, userId){
+    const addresses = await db.getAddressesOf(userId)
+    return addresses
+  },
+  async confirmOrderFor(context, payload){
+    await db.confirmOrderFor(payload)
   }
 }
 

@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-grow text-gray-800">
-    <ShoppingCartDrawer ref="shoppingCart" />
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" />
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
@@ -9,7 +8,7 @@
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
-                  <img src="~/assets/images/logo.png" alt="Printree" class="w-24"/>
+                  <img src="~/assets/images/logo.png" alt="Printree" class="w-24" />
                 </nuxt-link>
               </div>
 
@@ -23,9 +22,7 @@
                       </a>
                     </template>
                     <template v-slot:content>
-                      <div class="p-4">
-                        
-                      </div>
+                      <div class="p-4"></div>
                     </template>
                   </VueTailwindDropdown>
                 </div>
@@ -45,42 +42,42 @@
                   />
                 </div>
                 <div class="ml-3">
-                  <a
-                    href="#"
-                    @click.prevent="$refs.shoppingCart.show()"
-                    class="flex items-center hover:text-primary text-sm"
+                  <button
+                    type="button"
+                    class="flex items-center hover:text-primary text-sm outline-none focus:outline-none"
+                    @click="openCart"
                   >
                     <div class="relative">
                       <font-awesome-icon :icon="['fas', 'shopping-cart']" />
                     </div>
                     <span class="ml-2">Cart</span>
-                  </a>
+                  </button>
                 </div>
               </div>
 
-            <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
-              <nuxt-link
-                to="/dashboard"
-                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                v-if="isLoggedIn"
-              >
-                <span>{{ user.email }}</span>
-                <span class="ml-3">
-                  <font-awesome-icon :icon="['fas', 'arrow-right']" />
-                </span>
-              </nuxt-link>
-              <a
-                href="#"
-                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                @click.prevent="$refs.authModal.show()"
-                v-else
-              >Get Started</a>
-            </div>
+              <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
+                <nuxt-link
+                  to="/dashboard"
+                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  v-if="isLoggedIn"
+                >
+                  <span>{{ user.email }}</span>
+                  <span class="ml-3">
+                    <font-awesome-icon :icon="['fas', 'arrow-right']" />
+                  </span>
+                </nuxt-link>
+                <a
+                  href="#"
+                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  @click.prevent="$refs.authModal.show()"
+                  v-else
+                >Get Started</a>
+              </div>
 
-            <div class="sm:hidden cursor-pointer">
-              <font-awesome-icon :icon="['fas', 'bars']" />
+              <div class="sm:hidden cursor-pointer">
+                <font-awesome-icon :icon="['fas', 'bars']" />
+              </div>
             </div>
-          </div>
 
             <div class="block sm:hidden bg-white border-t-2 py-2">
               <div class="flex flex-col">
@@ -125,7 +122,6 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import ShoppingCartDrawer from '@/components/ShoppingCart/Drawer'
 import AuthModal from '@/components/Auth/AuthModal'
 import Footer from '@/components/Footer'
 import VueTailwindDropdown from '@/components/VueTailwindDropdown'
@@ -136,18 +132,23 @@ export default {
   },
   components: {
     AuthModal,
-    ShoppingCartDrawer,
     Footer,
     VueTailwindDropdown
-  },
-  data() {
-    return {}
   },
   computed: {
     ...mapGetters({
       isLoggedIn: 'user/isLoggedIn',
       user: 'user/user'
     })
+  },
+  methods: {
+    openCart(){
+      if(!this.isLoggedIn){
+        this.$refs.authModal.show()
+        return
+      }
+      this.$router.replace('/marketplace/cart')
+    }
   }
 }
 </script>

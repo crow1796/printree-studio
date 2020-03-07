@@ -28,8 +28,8 @@
 
             <nuxt-link
               class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-              to="/marketplace/checkout/shipping"
-            >Go to Checkout</nuxt-link>
+              to="/marketplace/cart"
+            >Go to Cart</nuxt-link>
           </div>
         </div>
       </VueTailwindModal>
@@ -221,12 +221,12 @@ export default {
         }
       ],
       quantity: 1,
-      selectedSize: 'xs',
       selectedColor: '#ffffff'
     }
   },
   computed: {
     ...mapGetters({
+      'isLoggedIn': 'user/isLoggedIn',
       'user': 'user/user'
     }),
     frontOrFirst() {
@@ -235,6 +235,10 @@ export default {
   },
   methods: {
     async addToCart() {
+      if(!this.isLoggedIn){
+        // TODO: Show Auth Modal
+        return
+      }
       const item = {
         variant: this.selectedVariant,
         quantity: this.quantity,

@@ -301,81 +301,62 @@ export default {
     await collectionRef.delete()
   },
   async addToCartOf(item, user) {
-    const collection = fireDb.collection('user_carts')
-    const ref = await collection.where('user_id', '==', user.uid).get()
-    if (ref.size) {
-      const cartRef = _.first(ref.docs)
-      const cartData = cartRef.data()
-      const { products } = cartData
-      const isExistingVariant = _.filter(
-        products,
-        ({ variant }) => variant.id === item.variant.id
-      ).length
-      if (!isExistingVariant) {
-        await collection.doc(cartRef.id).update({
-          products: FieldValue.arrayUnion({
-            variant: fireDb
-              .collection('user_product_variants')
-              .doc(item.variant.id),
-            quantity: item.quantity,
-            size: item.size
-          })
-        })
-        return
+    const batch = fireDb.batch()
+    const ref = await fireDb.collection('user_carts').doc(user.uid)
+
+    const products = [
+      {
+        variant: fireDb
+          .collection('user_product_variants')
+          .doc(item.variant.id),
+        quantity: item.quantity,
+        size: item.size
       }
-      return
-    }
-    await collection.doc().set({
-      user_id: user.uid,
-      products: [
-        {
-          variant: fireDb
-            .collection('user_product_variants')
-            .doc(item.variant.id),
-          quantity: item.quantity,
-          size: item.size
-        }
-      ]
+    ]
+    
+    _.map(products, product => {
+      const productRef = ref.collection('products').doc()
+      batch.set(productRef, product)
     })
+
+    batch.commit()
   },
   async getCartOf(user) {
-    const collection = fireDb.collection('user_carts')
-    const ref = await collection.where('user_id', '==', user.uid).get()
-    if (ref.size) {
-      const cartRef = _.first(ref.docs)
-      const cartData = cartRef.data()
+    const productsSnapshot = await fireDb.collection('user_carts').doc(user.uid).collection('products').get()
+    if (productsSnapshot.docs.length) {
       const products = await Promise.all(
-        _.map(cartData.products, async product => {
-          const variantRef = await product.variant.get()
+        _.map(productsSnapshot.docs, async productSnap => {
+          const productData = productSnap.data()
+          const variantRef = await productData.variant.get()
           const variantData = variantRef.data()
           const parentVariantRef = await variantData.variant.get()
           const parentVariantData = parentVariantRef.data()
           const sides = _.keys(parentVariantData.printable_area)
           const side = _.includes(sides, 'front') ? 'front' : sides[0]
           const productRef = await variantData.product.get()
-          const productData = productRef.data()
+          const parentProductData = productRef.data()
           const thumb = await fireStorage
             .ref(
               `products/thumbnails/${productRef.id}/${variantRef.id}/${side}.png`
             )
             .getDownloadURL()
           const baseCost = _.find(parentVariantData.available_sizes, {
-            name: product.size
+            name: productData.size
           }).base_cost
           return {
+            id: productSnap.id,
             variantId: variantRef.id,
-            name: productData.meta.name,
-            quantity: product.quantity,
-            size: product.size,
+            name: parentProductData.meta.name,
+            quantity: productData.quantity,
+            size: productData.size,
             thumbnail: thumb,
-            price: baseCost + variantData.sizes[product.size].price,
-            max: variantData.sizes[product.size].quantity
+            price: baseCost + variantData.sizes[productData.size].price,
+            max: variantData.sizes[productData.size].quantity
           }
         })
       )
       return JSON.parse(
         JSON.stringify({
-          id: cartRef.id,
           products
         })
       )
@@ -383,5 +364,70 @@ export default {
     return {
       products: []
     }
+  },
+  async saveAddress(data) {
+    const userId = data.user_id
+    const docId = data.id
+    delete data.id
+    delete data.user_id
+    if (docId) {
+      const addressRef = await fireDb
+        .collection('user_addresses')
+        .doc(userId)
+        .collection('addresses')
+        .doc(docId)
+        .update(data)
+      return {
+        ...data,
+        id: addressRef.id,
+        user_id: userId
+      }
+    }
+    const addressRef = await fireDb
+      .collection('user_addresses')
+      .doc(userId)
+      .collection('addresses')
+      .doc()
+    await addressRef.set(data)
+    return {
+      ...data,
+      id: addressRef.id,
+      user_id: userId
+    }
+  },
+  async getAddressesOf(userId) {
+    const userAddressRef = await fireDb
+      .collection('user_addresses')
+      .doc(userId)
+      .collection('addresses')
+      .get()
+    let addresses = _.map(userAddressRef.docs, snapshot => {
+      const addressData = snapshot.data()
+      return {
+        ...addressData,
+        id: snapshot.id,
+        user_id: userId
+      }
+    })
+    return addresses
+  },
+  async confirmOrderFor({ products, user, contact }) {
+    const batch = fireDb.batch()
+    const orderRef = fireDb.collection('user_orders').doc()
+    
+    _.map(products, product => {
+      const productRef = orderRef.collection('products').doc(product.id)
+      batch.set(productRef, product)
+      const cartProductRef = fireDb.collection('user_carts').doc(user.uid).collection('products').doc(product.id)
+      batch.delete(cartProductRef)
+    })
+
+    batch.set(orderRef, {
+      user_id: user.uid,
+      status: 'draft',
+      contact
+    })
+
+    batch.commit()
   }
 }
