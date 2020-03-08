@@ -75,6 +75,26 @@
                   </span> My Collections
                 </nuxt-link>
               </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/dashboard/orders"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                >
+                  <span class="h-6 w-6 fill-current mr-2">
+                    <font-awesome-icon :icon="['fas', 'boxes']" />
+                  </span> Orders
+                </nuxt-link>
+              </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/dashboard/my-orders"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                >
+                  <span class="h-6 w-6 fill-current mr-2">
+                    <font-awesome-icon :icon="['fas', 'boxes']" />
+                  </span> My Orders
+                </nuxt-link>
+              </div>
               <div class="flex -mb-px">
                 <nuxt-link
                   to="/dashboard/settings"

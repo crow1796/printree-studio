@@ -579,9 +579,9 @@ export default {
         return
       this.isLoading = true
 
-      await this.$store.dispatch('marketplace/confirmOrderFor', {
+      const order = await this.$store.dispatch('marketplace/confirmOrderFor', {
         user: this.user,
-        products: this.products,
+        products: _.map(this.products, 'id'),
         contact: {
           shipping_address: this.shippingAddress,
           billing_address: this.billingAddress,
@@ -589,6 +589,7 @@ export default {
           contact_email: this.contactEmail
         }
       })
+      this.$storage.setLocalStorage('order_id', order.id)
       this.$storage.removeLocalStorage('products_to_checkout')
       this.$router.replace('/marketplace/cart/payment')
     },

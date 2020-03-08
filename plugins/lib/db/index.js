@@ -313,7 +313,7 @@ export default {
         size: item.size
       }
     ]
-    
+
     _.map(products, product => {
       const productRef = ref.collection('products').doc()
       batch.set(productRef, product)
@@ -322,7 +322,11 @@ export default {
     batch.commit()
   },
   async getCartOf(user) {
-    const productsSnapshot = await fireDb.collection('user_carts').doc(user.uid).collection('products').get()
+    const productsSnapshot = await fireDb
+      .collection('user_carts')
+      .doc(user.uid)
+      .collection('products')
+      .get()
     if (productsSnapshot.docs.length) {
       const products = await Promise.all(
         _.map(productsSnapshot.docs, async productSnap => {
@@ -414,13 +418,23 @@ export default {
   async confirmOrderFor({ products, user, contact }) {
     const batch = fireDb.batch()
     const orderRef = fireDb.collection('user_orders').doc()
-    
-    _.map(products, product => {
-      const productRef = orderRef.collection('products').doc(product.id)
-      batch.set(productRef, product)
-      const cartProductRef = fireDb.collection('user_carts').doc(user.uid).collection('products').doc(product.id)
-      batch.delete(cartProductRef)
-    })
+
+    await Promise.all(
+      _.map(products, async product => {
+        const cartProductRef = fireDb
+          .collection('user_carts')
+          .doc(user.uid)
+          .collection('products')
+          .doc(product)
+        const cartProductSnap = await cartProductRef.get()
+        const productRef = orderRef.collection('products').doc(product)
+        batch.set(productRef, {
+          id: cartProductRef.id,
+          ...cartProductSnap.data()
+        })
+        batch.delete(cartProductRef)
+      })
+    )
 
     batch.set(orderRef, {
       user_id: user.uid,
@@ -429,5 +443,67 @@ export default {
     })
 
     batch.commit()
+
+    return {
+      id: orderRef.id,
+      user_id: user.uid,
+      status: 'draft',
+      contact
+    }
+  },
+  async placeOrder(orderId) {
+    await fireDb
+      .collection('user_orders')
+      .doc(orderId)
+      .update({ status: 'pending' })
+  },
+  async getUserPurchasesOf(user) {
+    const ordersQuery = fireDb
+      .collection('user_orders')
+      .where('user_id', '==', user.uid)
+    const ordersSnap = await ordersQuery.get()
+
+    const orders = await Promise.all(
+      _.map(ordersSnap.docs, async snap => {
+        const orderData = snap.data()
+
+        const productsRef = await snap.ref.collection('products').get()
+        const products = await Promise.all(
+          _.map(productsRef.docs, async productSnap => {
+            const productData = productSnap.data()
+            if (!productData.variant) return productData
+            const variantRef = productData.variant
+            const variantSnap = await variantRef.get()
+            let variantData = variantSnap.data()
+
+            const parentVariantRef = await variantData.variant.get()
+            const parentVariantData = parentVariantRef.data()
+            const sides = _.keys(parentVariantData.printable_area)
+            const side = _.includes(sides, 'front') ? 'front' : sides[0]
+            const productRef = await variantData.product.get()
+            const thumb = await fireStorage
+              .ref(
+                `products/thumbnails/${productRef.id}/${variantRef.id}/${side}.png`
+              )
+              .getDownloadURL()
+
+            console.log(parentVariantData)
+              
+            return {
+              id: productData.id,
+              quantity: productData.quantity,
+              size: productData.size,
+              thumbnail: thumb
+            }
+          })
+        )
+
+        return {
+          ...orderData,
+          products: products
+        }
+      })
+    )
+    return orders
   }
 }

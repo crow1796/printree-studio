@@ -87,9 +87,6 @@
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Name</th>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >Progress</th>
-                <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
                 >Status</th>
                 <th
@@ -131,21 +128,13 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                  <div class="border bg-gray-200 w-full bg-grey-light rounded-full" v-if="col.plan === 'sell'">
-                    <div
-                      class="bg-primary text-xs rounded-full leading-none py-1 text-center text-white"
-                      style="width: 45%"
-                    >45%</div>
-                  </div>
-                  <div v-else>
-                    N/A
-                  </div>
-                </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
                   >
-                    <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
+                    <span aria-hidden class="absolute inset-0 opacity-50 rounded-full" :class="{
+                      'bg-green-200': col.status === 'approved',
+                      'bg-blue-200': col.status === 'pending',
+                    }"></span>
                     <span class="relative uppercase">{{ col.status }}</span>
                   </span>
                 </td>

@@ -45,7 +45,11 @@ const actions = {
     return addresses
   },
   async confirmOrderFor(context, payload){
-    await db.confirmOrderFor(payload)
+    const order = await db.confirmOrderFor(payload)
+    return order
+  },
+  async placeOrder(context, orderId){
+    await db.placeOrder(orderId)
   }
 }
 

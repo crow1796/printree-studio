@@ -641,8 +641,8 @@ const actions = {
   async publishCollection(context){
     await db.updateCollection(context.getters.currentDesignId, {status: 'pending'})
   },
-  async deleteCollection(context){
-    await db.deleteCollection(context.getters.currentDesignId)
+  async deleteCollection(context, collectionId){
+    await db.deleteCollection(collectionId)
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <AreaLoader v-if="isLoading" fullscreen/>
+    <AreaLoader v-if="isLoading"/>
     <div class="mx-auto p-16 sm:p-16 lg:px-48 bg-gray-100">
       <div class="flex-grow flex flex-col">
         <div class="flex justify-between">
@@ -80,6 +80,9 @@
                 </div>
               </div>
             </div>
+          </div>
+          <div class="text-3xl my-12 text-gray-400 text-center font-bold " v-if="!products.length">
+            Your cart is empty.
           </div>
         </div>
         <div class="flex justify-between p-4 items-center border-t">
