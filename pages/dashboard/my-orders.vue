@@ -1,28 +1,39 @@
 <template>
-  <div class="relative">
+  <div class="relative sm:px-8 py-8">
     <AreaLoader v-if="isLoading" fullscreen />
-    <div class="border flex flex-col" v-for="(order, i) in userPurchases" :key="i">
-      <div class="border-b p-4">
+    <div class="my-2 flex sm:flex-row justify-between items-center"><h2 class="text-2xl font-semibold leading-tight">My Orders</h2></div>
+    <div class="border flex flex-col mb-6" v-for="(order, i) in userPurchases" :key="i">
+      <div class="flex border-b p-4 justify-between items-center">
         <div class="flex flex-col">
-          <div class="uppercase font-bold">ORDER #</div>
-          <div class="text-sm text-gray-500">Placed Mar 08, 2019 11:19PM</div>
+          <div class="uppercase font-bold">ORDER: {{ order.id }}</div>
+          <div
+            class="text-sm text-gray-500"
+          >{{ order.placed_at ? `Placed at ${formatTimestamp(order.placed_at)}` : `Checked out at ${formatTimestamp(order.created_at)}` }}</div>
+        </div>
+        <div class="uppercase font-bold">
+          {{ orderStatus(order.status) }}
         </div>
       </div>
       <div class="p-4">
-        <div class="flex flex-grow-0 border-b px-4 py-2" v-for="(product, i) in order.products" :key="i">
+        <div
+          class="flex flex-grow-0 px-4 py-2"
+          v-for="(product, i) in order.products"
+          :class="{ 'border-b': i < (order.products - 1) }"
+          :key="i"
+        >
           <div class="w-2/12 flex-justify-between">
-            <div class="w-16 mx-auto">
+            <div class="w-24 mx-auto">
               <progressive-img class="relative mx-auto" :src="product.thumbnail" />
             </div>
           </div>
           <div class="flex flex-col w-4/12 justify-center">
             <span class="font-bold leading-none">
               {{
-              product.name
+              product.meta.name
               }}
             </span>
           </div>
-          <div class="flex w-2/12 justify-center items-center">
+          <div class="flex flex-grow justify-end items-center">
             <div class="flex flex-col">
               <div>Qty. {{ product.quantity }}</div>
             </div>
@@ -35,10 +46,11 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import moment from 'moment'
 
 export default {
   layout: 'user_dashboard',
-  async created() {
+  async mounted() {
     await this.$store.dispatch('user_dashboard/getUserPurchasesOf', this.user)
     this.isLoading = false
   },
@@ -52,6 +64,19 @@ export default {
       userPurchases: 'user_dashboard/userPurchases',
       user: 'user/user'
     })
+  },
+  methods: {
+    formatTimestamp(timestamp){
+      return moment(timestamp.toDate()).format('MMMM Do YYYY, h:mm:ss a')
+    },
+    orderStatus(status){
+      switch(status){
+        case 'pending':
+          status = 'Order Received'
+          break
+      }
+      return status
+    }
   }
 }
 </script>

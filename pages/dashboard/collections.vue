@@ -1,5 +1,5 @@
 <template>
-  <div class="sm:px-8">
+  <div class="sm:px-8 relative">
     <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="availableProductsModal"

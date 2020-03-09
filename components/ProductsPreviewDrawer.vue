@@ -44,8 +44,8 @@
     </VueTailwindToast>
     <div class="flex h-full w-full text-gray-600 overflow-hidden">
       <div class="flex flex-col w-full h-full">
-        <div class="flex flex-grow items-center border-b p-4">
-          <div class="flex w-4/12 uppercase flex-col">
+        <div class="flex flex-grow-0 items-center border-b p-4">
+          <!-- <div class="flex w-4/12 uppercase flex-col">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
@@ -65,8 +65,8 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
-          </div>
-          <div class="flex w-4/12 uppercase font-bold justify-center">
+          </div> -->
+          <div class="flex flex-grow uppercase font-bold justify-start">
             <div class="flex flex-col items-center">
               <div>TOTAL ESTIMATED PROFIT</div>
               <div class="text-primary">
@@ -90,7 +90,7 @@
               </div>
             </div>
           </div>
-          <div class="flex w-4/12 justify-end">
+          <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
               @click="hide"

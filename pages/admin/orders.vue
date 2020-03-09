@@ -1,0 +1,114 @@
+<template>
+  <div class="relative sm:px-8 py-8">
+    <AreaLoader v-if="isLoading" fullscreen />
+    <div class="my-2 flex sm:flex-row justify-between items-center">
+      <h2 class="text-2xl font-semibold leading-tight">Orders</h2>
+    </div>
+    <div class="border flex flex-col mb-6" v-for="(order, i) in orders" :key="i">
+      <div class="flex border-b p-4 justify-between items-center">
+        <div class="flex flex-col">
+          <div class="uppercase font-bold">ORDER: {{ order.id }}</div>
+          <div
+            class="text-sm text-gray-500"
+          >{{ order.placed_at ? `Placed at ${(order.placed_at)}` : `Checked out at ${(order.created_at)}` }}</div>
+        </div>
+        <div class="uppercase font-bold">
+          <div class="flex items-center">
+            <div class="mr-2" :class="{'text-green-600': order.status === 'delivered'}">
+              <span>{{ orderStatus(order.status) }}</span>
+              <font-awesome-icon
+                v-if="order.status === 'delivered'"
+                :icon="['fas', 'check-circle']"
+              />
+            </div>
+            <PTButton
+              @click="processOrder(order, 'processing')"
+              color="primary"
+              v-if="order.status === 'pending'"
+            >PROCESS</PTButton>
+            <PTButton
+              @click="processOrder(order, 'delivering')"
+              color="primary"
+              v-if="order.status === 'processing'"
+            >DELIVER</PTButton>
+            <PTButton
+              @click="processOrder(order, 'delivered')"
+              color="primary"
+              v-if="order.status === 'delivering'"
+            >
+              <span class="mr-2">DELIVERED</span>
+              <font-awesome-icon :icon="['fas', 'check-circle']" />
+            </PTButton>
+          </div>
+        </div>
+      </div>
+      <div class="p-4">
+        <div
+          class="flex flex-grow-0 px-4 py-2"
+          v-for="(product, i) in order.products"
+          :class="{ 'border-b': i < (order.products - 1) }"
+          :key="i"
+        >
+          <div class="w-2/12 flex-justify-between">
+            <div class="w-24 mx-auto">
+              <progressive-img class="relative mx-auto" :src="product.thumbnail" />
+            </div>
+          </div>
+          <div class="flex flex-col w-4/12 justify-center">
+            <span class="font-bold leading-none">
+              {{
+              product.meta.name
+              }}
+            </span>
+          </div>
+          <div class="flex flex-grow justify-end items-center">
+            <div class="flex flex-col">
+              <div>Qty. {{ product.quantity }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+import moment from 'moment'
+
+export default {
+  layout: 'admin_dashboard',
+  async mounted() {
+    await this.$store.dispatch('admin/getOrders')
+    this.isLoading = false
+  },
+  data() {
+    return {
+      isLoading: true
+    }
+  },
+  computed: {
+    ...mapGetters({
+      orders: 'admin/orders'
+    })
+  },
+  methods: {
+    orderStatus(status) {
+      switch (status) {
+        case 'pending':
+          status = 'Order Received'
+          break
+      }
+      return status
+    },
+    async processOrder(order, status) {
+      this.isLoading = true
+      await this.$store.dispatch('admin/processOrder', {
+        order,
+        status
+      })
+      this.isLoading = false
+    }
+  }
+}
+</script>

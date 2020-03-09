@@ -20,7 +20,7 @@
                 <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-24" />
               </nuxt-link>
             </div>
-            <div class="w-1/4 md:w-auto md:flex text-right">
+            <div class="w-1/4 md:w-auto md:flex text-right" v-if="isLoggedIn && user">
               <VueTailwindDropdown>
                 <template v-slot:trigger>
                   <div
@@ -88,17 +88,6 @@
                   </span> ORDERS
                 </nuxt-link>
               </div>
-              <div class="flex -mb-px">
-                <nuxt-link
-                  to="/admin/settings"
-                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
-                  active-class="text-primary"
-                >
-                  <span class="h-6 w-6 fill-current mr-2">
-                    <font-awesome-icon :icon="['fas', 'cog']" />
-                  </span> Settings
-                </nuxt-link>
-              </div>
             </div>
           </div>
         </div>
@@ -130,8 +119,8 @@ export default {
   },
   methods: {
     async signOut() {
-      await this.$store.dispatch('user/signOut')
       this.$router.replace('/')
+      await this.$store.dispatch('user/signOut')
     }
   }
 }

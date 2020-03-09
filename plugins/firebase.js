@@ -31,5 +31,7 @@ const authProviderOf = function(type){
 }
 
 const FieldValue = firebase.firestore.FieldValue
+const Timestamp = firebase.firestore.Timestamp
+const ServerTimestamp = firebase.firestore.FieldValue.serverTimestamp()
 
-export { fireDb, fireAuth, authProviderOf, FieldValue, fireStorage }
+export { fireDb, fireAuth, authProviderOf, FieldValue, Timestamp, ServerTimestamp, fireStorage }

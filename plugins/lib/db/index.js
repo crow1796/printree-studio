@@ -1,4 +1,4 @@
-import { fireDb, FieldValue, fireStorage } from '~/plugins/firebase'
+import { fireDb, ServerTimestamp, fireStorage } from '~/plugins/firebase'
 
 export default {
   async fetchAvailableProducts() {
@@ -438,8 +438,9 @@ export default {
 
     batch.set(orderRef, {
       user_id: user.uid,
-      status: 'draft',
-      contact
+      status: 'unpaid',
+      contact,
+      created_at: ServerTimestamp.now()
     })
 
     batch.commit()
@@ -447,15 +448,15 @@ export default {
     return {
       id: orderRef.id,
       user_id: user.uid,
-      status: 'draft',
+      status: 'unpaid',
       contact
     }
   },
-  async placeOrder(orderId) {
+  async placeOrder(orderId, paymentMethod) {
     await fireDb
       .collection('user_orders')
       .doc(orderId)
-      .update({ status: 'pending' })
+      .update({ status: 'pending', placed_at: ServerTimestamp.now(), payment_method: paymentMethod })
   },
   async getUserPurchasesOf(user) {
     const ordersQuery = fireDb
@@ -486,24 +487,25 @@ export default {
                 `products/thumbnails/${productRef.id}/${variantRef.id}/${side}.png`
               )
               .getDownloadURL()
-
-            console.log(parentVariantData)
-              
+            const parentProductSnap = await variantData.product.get()
+            
             return {
               id: productData.id,
               quantity: productData.quantity,
               size: productData.size,
-              thumbnail: thumb
+              thumbnail: thumb,
+              meta: (parentProductSnap.data()).meta
             }
           })
         )
-
         return {
           ...orderData,
+          id: snap.id,
           products: products
         }
       })
     )
+    
     return orders
   }
 }

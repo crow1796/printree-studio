@@ -6,7 +6,8 @@ const state = () => ({
   user: null,
   isLoggedIn: false,
   users: [],
-  collections: []
+  collections: [],
+  orders: []
 })
 
 const mutations = {
@@ -24,6 +25,12 @@ const mutations = {
   },
   UPDATE_USER(state, user){
     state.users[_.findIndex(state.users, { uid: user.uid})] = user
+  },
+  ORDERS(state, orders){
+    state.orders = orders
+  },
+  PROCESS_ORDER(state, order){
+    state.orders[_.findIndex(state.orders, { id: order.id })] = order
   }
 }
 
@@ -39,6 +46,9 @@ const getters = {
   },
   collections(state){
     return state.collections
+  },
+  orders(state){
+    return state.orders
   }
 }
 
@@ -57,6 +67,17 @@ const actions = {
   },
   async updateCollection(context, {id, data}){
     await db.updateCollection(id, data)
+  },
+  async getOrders(context, query){
+    const res = await this.$axios.get('/orders')
+    context.commit('ORDERS', res.data.orders)
+  },
+  async processOrder(context, { order, status }){
+    const res = await this.$axios.put(`/orders/${order.id}/process/${status}`)
+    context.commit('PROCESS_ORDER', {
+      ...order,
+      status
+    })
   }
 }
 

@@ -24,7 +24,7 @@
               <nuxt-link
                 to="/dashboard"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                v-if="isLoggedIn"
+                v-if="isLoggedIn && user"
               >
                 <span>{{ user.email }}</span>
                 <span class="ml-3">
@@ -89,8 +89,9 @@ export default {
     })
   },
   methods: {
-    signOut() {
-      this.$store.dispatch('user/signOut')
+    async signOut() {
+      this.$router.replace('/')
+      await this.$store.dispatch('user/signOut')
     }
   }
 }

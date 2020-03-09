@@ -86,6 +86,7 @@ export default {
         this.isLoginFailed = true
         return
       }
+      this.$axios.setToken(res.user.token, 'Bearer')
       this.$router.push('/admin/collections')
     }
   }

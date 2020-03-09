@@ -148,8 +148,8 @@ export default {
   },
   methods: {
     async signOut() {
-      await this.$store.dispatch('user/signOut')
       this.$router.replace('/')
+      await this.$store.dispatch('user/signOut')
     }
   }
 }

@@ -34,7 +34,7 @@
     </VueTailwindModal>
     <div class="flex flex-grow text-gray-600 overflow-hidden">
       <div class="flex flex-col flex-grow">
-        <div class="flex flex-grow items-center border-b p-4">
+        <div class="flex flex-grow-0 items-center border-b p-4">
           <div class="flex w-4/12 uppercase font-bold">
             <div class="flex flex-col items-center">
               <div>TOTAL ESTIMATED PROFIT</div>

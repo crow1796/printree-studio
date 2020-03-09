@@ -59,6 +59,8 @@ const actions = {
   async signOut(context){
     await auth.signOut()
     Cookies.remove('access_token')
+    context.commit('IS_LOGGED_IN', false)
+    context.commit('USER', null)
   },
   async signInAsAGuest(context){
     const response = await auth.signInAsAGuest()
