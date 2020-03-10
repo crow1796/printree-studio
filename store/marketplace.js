@@ -18,12 +18,12 @@ const getters = {
 
 const actions = {
   async getProductsToSell(context, query){
-    const res = await this.$axios.get('/products', query)
-    return res.data.products
+    const products = await db.getProductsToSell(query)
+    return products
   },
   async getProductFromCollection(context, {collection, product}){
-    const res = await this.$axios.get(`/collections/${collection}/products/${product}`)
-    return res.data.product
+    const prod = await db.getProductFromCollection(collection, product)
+    return prod
   },
   async addToCartOf(context, {item, user}){
     await db.addToCartOf(item, user)
@@ -32,9 +32,27 @@ const actions = {
     const cart = await db.getCartOf(user)
     return cart
   },
-  async getPHAddresses(context, params){
-    const res = await this.$axios.get(`/addresses`, {params})
-    return res.data
+  async getPHAddresses(context, {province, city, barangay}){
+    const provinceCode = province
+    const cityCode = city
+    let provinces = []
+    let cities = []
+    let barangays = []
+    let rawProvinces = require('~/resources/data/refprovince.json')
+    provinces = rawProvinces.RECORDS
+    if (provinceCode) {
+      let rawCities = require('~/resources/data/refcitymun.json')
+      cities = rawCities.RECORDS
+
+      cities = cities.filter(({ provCode }) => provCode === provinceCode)
+    }
+    if (cityCode) {
+      let rawBarangays = require('~/resources/data/refbrgy.json')
+      barangays = rawBarangays.RECORDS
+
+      barangays = barangays.filter(({ citymunCode }) => citymunCode === cityCode)
+    }
+    return { provinces, cities, barangays }
   },
   async saveAddress(context, data){
     const address = await db.saveAddress(data)
@@ -48,8 +66,8 @@ const actions = {
     const order = await db.confirmOrderFor(payload)
     return order
   },
-  async placeOrder(context, orderId){
-    await db.placeOrder(orderId)
+  async placeOrder(context, { orderId, paymentMethod}){
+    await db.placeOrder(orderId, paymentMethod)
   }
 }
 

@@ -69,6 +69,7 @@
                 <a
                   href="#"
                   class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  id="get-started-btn"
                   @click.prevent="$refs.authModal.show()"
                   v-else
                 >Get Started</a>

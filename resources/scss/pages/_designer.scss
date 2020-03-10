@@ -203,3 +203,8 @@
 #right-content{
   height: calc(100vh - 78.2px);
 }
+
+.lightbox__image img {
+  width: initial !important;
+  margin: 0 auto !important;
+}

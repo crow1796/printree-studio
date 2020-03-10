@@ -87,17 +87,18 @@
                     name="fullname"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('fullname'), 'focus:border-gray-600': !errors.has('fullname') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.fullname'), 'focus:border-gray-600': !errors.has('addressForm.fullname') }"
                     placeholder="Your Name"
                     v-model="addressFormData.fullname"
                     data-vv-as="Full Name"
                     v-validate="'required'"
+                    data-vv-scope="addressForm"
                   />
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('fullname')"
-                >{{ errors.first('fullname') }}</span>
+                  v-if="errors.has('addressForm.fullname')"
+                >{{ errors.first('addressForm.fullname') }}</span>
               </div>
               <div class="mb-3">
                 <div>
@@ -105,17 +106,18 @@
                     name="house_number"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('house_number'), 'focus:border-gray-600': !errors.has('house_number') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.house_number'), 'focus:border-gray-600': !errors.has('addressForm.house_number') }"
                     placeholder="Your House Number, Building and Street Name"
                     v-model="addressFormData.house_number"
                     data-vv-as="House Number, Building and Street Name"
                     v-validate="'required'"
+                    data-vv-scope="addressForm"
                   />
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('house_number')"
-                >{{ errors.first('house_number') }}</span>
+                  v-if="errors.has('addressForm.house_number')"
+                >{{ errors.first('addressForm.house_number') }}</span>
               </div>
               <div class="mb-3">
                 <div>
@@ -123,12 +125,13 @@
                     name="province"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('province'), 'focus:border-gray-600': !errors.has('province') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.province'), 'focus:border-gray-600': !errors.has('addressForm.province') }"
                     placeholder="Your Province"
                     v-model="addressFormData.province"
                     data-vv-as="Province"
                     v-validate="'required'"
                     @change="getPHAddresses()"
+                    data-vv-scope="addressForm"
                   >
                     <option :value="null">Select Province</option>
                     <option
@@ -140,8 +143,8 @@
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('province')"
-                >{{ errors.first('province') }}</span>
+                  v-if="errors.has('addressForm.province')"
+                >{{ errors.first('addressForm.province') }}</span>
               </div>
               <div class="mb-3">
                 <div>
@@ -149,12 +152,13 @@
                     name="city"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('city'), 'focus:border-gray-600': !errors.has('city') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.city'), 'focus:border-gray-600': !errors.has('addressForm.city') }"
                     placeholder="Your City"
                     v-model="addressFormData.city"
                     data-vv-as="City"
                     v-validate="'required'"
                     @change="getPHAddresses()"
+                    data-vv-scope="addressForm"
                   >
                     <option :value="null">Select City</option>
                     <option
@@ -166,8 +170,8 @@
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('city')"
-                >{{ errors.first('city') }}</span>
+                  v-if="errors.has('addressForm.city')"
+                >{{ errors.first('addressForm.city') }}</span>
               </div>
               <div class="mb-3">
                 <div>
@@ -175,11 +179,12 @@
                     name="barangay"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('barangay'), 'focus:border-gray-600': !errors.has('barangay') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.barangay'), 'focus:border-gray-600': !errors.has('addressForm.barangay') }"
                     placeholder="Your Barangay"
                     v-model="addressFormData.barangay"
                     data-vv-as="Barangay"
                     v-validate="'required'"
+                    data-vv-scope="addressForm"
                   >
                     <option :value="null">Select Barangay</option>
                     <option
@@ -191,8 +196,8 @@
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('barangay')"
-                >{{ errors.first('barangay') }}</span>
+                  v-if="errors.has('addressForm.barangay')"
+                >{{ errors.first('addressForm.barangay') }}</span>
               </div>
               <div class="mb-3">
                 <div>
@@ -200,17 +205,18 @@
                     name="mobile_number"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('mobile_number'), 'focus:border-gray-600': !errors.has('mobile_number') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.mobile_number'), 'focus:border-gray-600': !errors.has('addressForm.mobile_number') }"
                     placeholder="Your Mobile Number"
                     v-model="addressFormData.mobile_number"
                     data-vv-as="Mobile Number"
                     v-validate="'required|numeric'"
+                    data-vv-scope="addressForm"
                   />
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('mobile_number')"
-                >{{ errors.first('mobile_number') }}</span>
+                  v-if="errors.has('addressForm.mobile_number')"
+                >{{ errors.first('addressForm.mobile_number') }}</span>
               </div>
               <div>
                 <div>
@@ -223,28 +229,28 @@
                 </div>
               </div>
               <!-- <div class="mb-3 flex items-center">
-            <label for="label" class="font-bold mr-4 mt-2">Address Label</label>
-            <div>
-              <OptionButtons
-                :options="addressLabels"
-                v-model="addressFormData.label"
-                :checkIcon="false"
-              />
-            </div>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('label')"
-            >{{ errors.first('label') }}</span>
-          </div>
-          <div>
-            <label for="is_default" class="font-bold">
-              <input type="checkbox" name="is_default" id="is_default" v-model="addressFormData.is_default" />
-              Make this my default address
-            </label>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('is_default')"
-            >{{ errors.first('is_default') }}</span>
+                <label for="label" class="font-bold mr-4 mt-2">Address Label</label>
+                <div>
+                  <OptionButtons
+                    :options="addressLabels"
+                    v-model="addressFormData.label"
+                    :checkIcon="false"
+                  />
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('label')"
+                >{{ errors.first('label') }}</span>
+              </div>
+              <div>
+                <label for="is_default" class="font-bold">
+                  <input type="checkbox" name="is_default" id="is_default" v-model="addressFormData.is_default" />
+                  Make this my default address
+                </label>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('is_default')"
+                >{{ errors.first('is_default') }}</span>
               </div>-->
             </div>
             <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
@@ -255,9 +261,9 @@
               >Cancel</button>
 
               <button
+               @click="saveAddress"
                 type="button"
                 class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-                @click="saveAddress"
               >SAVE</button>
             </div>
           </div>
@@ -558,7 +564,9 @@ export default {
       return this.subtotal + this.deliveryOptionValue
     },
     deliveryOptionValue() {
-      return _.find(this.deliveryOptions, { value: this.deliveryOption }).meta.cost
+      const option = _.find(this.deliveryOptions, { value: this.deliveryOption })
+      if(!option) return 0
+      return option.meta.cost
     }
   },
   methods: {
@@ -587,7 +595,8 @@ export default {
           billing_address: this.billingAddress,
           contact_number: this.contactNumber,
           contact_email: this.contactEmail
-        }
+        },
+        total: this.total
       })
       this.$storage.setLocalStorage('order_id', order.id)
       this.$storage.removeLocalStorage('products_to_checkout')
@@ -617,7 +626,7 @@ export default {
       this.isAddressModalLoading = false
     },
     async saveAddress() {
-      let validationResponse = await this.$validator.validateAll()
+      let validationResponse = await this.$validator.validateAll('addressForm')
       if (!validationResponse || this.isAddressModalLoading) return
       this.isAddressModalLoading = true
       const address = await this.$store.dispatch('marketplace/saveAddress', {

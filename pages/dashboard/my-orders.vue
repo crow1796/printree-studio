@@ -1,5 +1,5 @@
 <template>
-  <div class="relative sm:px-8 py-8">
+  <div class="relative">
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="my-2 flex sm:flex-row justify-between items-center"><h2 class="text-2xl font-semibold leading-tight">My Orders</h2></div>
     <div class="border flex flex-col mb-6" v-for="(order, i) in userPurchases" :key="i">
@@ -18,11 +18,11 @@
         <div
           class="flex flex-grow-0 px-4 py-2"
           v-for="(product, i) in order.products"
-          :class="{ 'border-b': i < (order.products - 1) }"
+          :class="{ 'border-b': i < (order.products.length - 1) }"
           :key="i"
         >
-          <div class="w-2/12 flex-justify-between">
-            <div class="w-24 mx-auto">
+          <div class="w-2/12 flex">
+            <div class="w-16">
               <progressive-img class="relative mx-auto" :src="product.thumbnail" />
             </div>
           </div>
@@ -30,6 +30,11 @@
             <span class="font-bold leading-none">
               {{
               product.meta.name
+              }}
+            </span>
+            <span class="font-bold text-gray-500">
+              {{
+              product.size
               }}
             </span>
           </div>

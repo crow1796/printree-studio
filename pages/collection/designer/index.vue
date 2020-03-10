@@ -262,8 +262,8 @@
 
         <Canvas
           v-model="currentVariant.printable_area[currentSide].objects"
-          :width="currentVariant.printable_area[currentSide].width * 3"
-          :height="currentVariant.printable_area[currentSide].height * 3"
+          :width="currentVariant.printable_area[currentSide].width * 4"
+          :height="currentVariant.printable_area[currentSide].height * 4"
           :backgroundColor="currentVariant.color"
           v-if="selectedTab === 'designer'"
         />

@@ -39,7 +39,7 @@
               <span class="font-bold text-gray-500">
                 {{
                 product.price.formatMoney('₱ ')
-                }}
+                }}, {{ product.size }}
               </span>
             </div>
             <div class="flex flex-col w-2/12 justify-center">

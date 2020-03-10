@@ -1,4 +1,4 @@
-const SCALE = 3
+const SCALE = 4
 const scaleUp = (n) => {
   return n * SCALE
 }

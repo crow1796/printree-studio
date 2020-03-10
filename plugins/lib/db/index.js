@@ -1,4 +1,4 @@
-import { fireDb, ServerTimestamp, fireStorage } from '~/plugins/firebase'
+import { fireDb, Timestamp, fireStorage } from '~/plugins/firebase'
 
 export default {
   async fetchAvailableProducts() {
@@ -415,7 +415,52 @@ export default {
     })
     return addresses
   },
-  async confirmOrderFor({ products, user, contact }) {
+  async getProductsToSell(query) {
+    const collectionsSnap = await fireDb
+      .collection('user_collections')
+      .where('plan', '==', 'sell')
+      .where('status', '==', 'approved')
+      .get()
+    const products = await Promise.all(
+      _.map(collectionsSnap.docs, async doc => {
+        const collectionData = doc.data()
+        return await Promise.all(
+          _.map(collectionData.products, async productRef => {
+            const productData = (await productRef.get()).data()
+            const firstVariantRef = await _.first(productData.variants).get()
+            const firstVariant = firstVariantRef.data()
+            const firstSizeKey = _.first(_.keys(firstVariant.sizes))
+            const price = firstVariant.sizes[firstSizeKey].price
+            const parentVariantRef = await firstVariant.variant.get()
+            const parentVariantData = parentVariantRef.data()
+            const areas = _.keys(parentVariantData.printable_area)
+            const frontOrFirstSide = _.includes(areas, 'front')
+              ? 'front'
+              : _.first(areas)
+            const parentFirstSize = _.first(parentVariantData.available_sizes)
+            const baseCost = parentFirstSize.base_cost
+            const thumbnail = await fireStorage
+              .ref(
+                `products/thumbnails/${productData.id}/${firstVariantRef.id}/${frontOrFirstSide}.png`
+              )
+              .getDownloadURL()
+            const product = {
+              id: productData.id,
+              name: productData.meta.name,
+              collectionName: collectionData.name,
+              collectionId: doc.id,
+              price: baseCost + price,
+              thumbnail: thumbnail
+            }
+            return product
+          })
+        )
+      })
+    )
+
+    return _.flatten(products)
+  },
+  async confirmOrderFor({ products, user, contact, total }) {
     const batch = fireDb.batch()
     const orderRef = fireDb.collection('user_orders').doc()
 
@@ -440,7 +485,9 @@ export default {
       user_id: user.uid,
       status: 'unpaid',
       contact,
-      created_at: ServerTimestamp.now()
+      created_at: Timestamp.now(),
+      payment_method: '',
+      total
     })
 
     batch.commit()
@@ -452,11 +499,77 @@ export default {
       contact
     }
   },
+  async getProductFromCollection(collectionId, productId) {
+    const collectionSnap = await fireDb
+      .collection('user_collections')
+      .doc(collectionId)
+      .get()
+    const productDocSnap = await fireDb
+      .collection('user_products')
+      .doc(productId)
+      .get()
+    const productDocData = productDocSnap.data()
+    const collectionData = collectionSnap.data()
+    const productSnap = await productDocData.product.get()
+    const productData = productSnap.data()
+    const firstVariantRef = await _.first(productDocData.variants).get()
+    const firstVariant = firstVariantRef.data()
+    const firstSizeKey = _.first(_.keys(firstVariant.sizes))
+    const price = firstVariant.sizes[firstSizeKey].price
+    const parentVariantData = (await firstVariant.variant.get()).data()
+    const parentFirstSize = _.first(parentVariantData.available_sizes)
+    const baseCost = parentFirstSize.base_cost
+    const categoryData = (await productData.category.get()).data()
+    const variants = await Promise.all(
+      _.map(productDocData.variants, async variant => {
+        const variantRef = await variant.get()
+        const variantData = variantRef.data()
+        const parentVariantRef = await variantData.variant.get()
+        const parentVariantData = parentVariantRef.data()
+        let thumbnails = {}
+        await Promise.all(
+          _.map(_.keys(parentVariantData.printable_area), async side => {
+            const thumb = await fireStorage
+              .ref(
+                `products/thumbnails/${productId}/${variantRef.id}/${side}.png`
+              )
+              .getDownloadURL()
+
+            thumbnails[side] = thumb
+          })
+        )
+        return {
+          id: variantRef.id,
+          color: parentVariantData.color,
+          sizes: variantData.sizes,
+          thumbnails,
+          parent_id: parentVariantRef.id
+        }
+      })
+    )
+    const product = {
+      id: productDocSnap.id,
+      name: productDocData.meta.name,
+      description: productDocData.meta.description,
+      collectionName: collectionData.name,
+      collectionId: collectionSnap.id,
+      price: baseCost + price,
+      variants,
+      category: categoryData.name,
+      categoryId: categoryData.id
+    }
+
+    return product
+  },
   async placeOrder(orderId, paymentMethod) {
     await fireDb
       .collection('user_orders')
       .doc(orderId)
-      .update({ status: 'pending', placed_at: ServerTimestamp.now(), payment_method: paymentMethod })
+      .update({
+        status: 'pending',
+        placed_at: Timestamp.now(),
+        payment_method: paymentMethod
+      })
   },
   async getUserPurchasesOf(user) {
     const ordersQuery = fireDb
@@ -488,13 +601,13 @@ export default {
               )
               .getDownloadURL()
             const parentProductSnap = await variantData.product.get()
-            
+
             return {
               id: productData.id,
               quantity: productData.quantity,
               size: productData.size,
               thumbnail: thumb,
-              meta: (parentProductSnap.data()).meta
+              meta: parentProductSnap.data().meta
             }
           })
         )
@@ -505,7 +618,7 @@ export default {
         }
       })
     )
-    
+
     return orders
   }
 }

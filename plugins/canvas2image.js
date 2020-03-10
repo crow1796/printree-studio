@@ -93,7 +93,7 @@ var Canvas2Image = function () {
 
     var biWidth = oData.width;
     var biHeight = oData.height;
-    var biSizeImage = biWidth * biHeight * 3;
+    var biSizeImage = biWidth * biHeight * 4;
     var bfSize = biSizeImage + 54; // total header size = 54 bytes
 
     //
@@ -159,7 +159,7 @@ var Canvas2Image = function () {
       0, 0, 0, 0
     ];
 
-    var iPadding = (4 - ((biWidth * 3) % 4)) % 4;
+    var iPadding = (4 - ((biWidth * 4) % 4)) % 4;
 
     var aImgData = oData.data;
 

@@ -156,7 +156,7 @@ export default {
     VueTailwindModal,
     BreadCrumbs
   },
-  async created() {
+  async mounted() {
     this.product = await this.$store.dispatch(
       'marketplace/getProductFromCollection',
       {
@@ -236,7 +236,7 @@ export default {
   methods: {
     async addToCart() {
       if(!this.isLoggedIn){
-        // TODO: Show Auth Modal
+        document.getElementById('get-started-btn').click()
         return
       }
       const item = {

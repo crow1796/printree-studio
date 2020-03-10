@@ -1,6 +1,6 @@
 <template>
   <VueTailwindModal ref="authFormModal"
-    width="35%"
+    width="45%"
     content-class="text-gray-600 overflow-hidden relative"
     :backdrop="false">
     <div class="flex flex-col relative px-4 pb-4">

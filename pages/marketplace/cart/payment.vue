@@ -138,7 +138,7 @@ export default {
     async placeOrder() {
       this.isLoading = true
       const order = this.$storage.getLocalStorage('order_id')
-      await this.$store.dispatch('marketplace/placeOrder', order)
+      await this.$store.dispatch('marketplace/placeOrder', {orderId: order, paymentMethod: this.paymentOption})
       this.$storage.removeLocalStorage('order_id')
       this.isReceived = true
       this.isLoading = false
