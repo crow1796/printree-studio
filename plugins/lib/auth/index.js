@@ -76,5 +76,61 @@ export default {
       response.message = error.message
     }
     return response
+  },
+  async sendPasswordRecoveryEmail(email){
+    let response = {}
+    try {
+      let res = await fireAuth.sendPasswordResetEmail(email)
+      response = {
+        status: true
+      }
+    } catch (error) {
+      response.status = false
+      response.message = error.message
+    }
+    return response
+  },
+  async refreshToken(){
+    let response = {}
+    try {
+      const token = await fireAuth.currentUser.getIdToken(true)
+      response = {
+        status: true,
+        token
+      }
+    } catch (error) {
+      response.status = false
+      response.message = error.message
+    }
+    return response
+  },
+  async updateProfile(data){
+    let response = {}
+    try {
+      await fireAuth.currentUser.updateProfile({
+        displayName: data.displayName
+      })
+      await fireAuth.currentUser.updateEmail(data.email)
+      response = {
+        status: true
+      }
+    } catch (error) {
+      response.status = false
+      response.message = error.message
+    }
+    return response
+  },
+  async updatePassword(password){
+    let response = {}
+    try {
+      let res = await fireAuth.currentUser.updatePassword(password)
+      response = {
+        status: true
+      }
+    } catch (error) {
+      response.status = false
+      response.message = error.message
+    }
+    return response
   }
 }

@@ -39,6 +39,10 @@ const actions = {
   async getUserPurchasesOf(context, user){
     const orders = await db.getUserPurchasesOf(user)
     context.commit('USER_PURCHASES', orders)
+  },
+  async getOrdersForSeller(context, user){
+    const orders = await db.getOrdersForSeller(user)
+    return orders
   }
 }
 

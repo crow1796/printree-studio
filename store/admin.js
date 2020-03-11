@@ -81,11 +81,17 @@ const actions = {
     context.commit('ORDERS', res.data.orders)
   },
   async processOrder(context, { order, status }) {
-    const res = await this.$axios.put(`/orders/${order.id}/process/${status}`)
-    context.commit('PROCESS_ORDER', {
-      ...order,
-      status
-    })
+    let reqStatus = true
+    try{
+      const res = await this.$axios.put(`/orders/${order.id}/process/${status}`)
+      context.commit('PROCESS_ORDER', {
+        ...order,
+        status
+      })
+    } catch(e){
+      reqStatus = false
+    }
+    return reqStatus
   }
 }
 

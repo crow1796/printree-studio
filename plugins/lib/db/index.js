@@ -156,6 +156,7 @@ export default {
   },
   async createDesignFor(user, products) {
     const batch = fireDb.batch()
+    const collectionRef = fireDb.collection('user_collections').doc()
     const createdProducts = _.map(products, product => {
       const productRef = fireDb.collection('user_products').doc()
       let objects = {}
@@ -176,7 +177,8 @@ export default {
         variant: fireDb
           .collection('available_product_variants')
           .doc(product.availableVariants[0].parent_id),
-        product: productRef
+        product: productRef,
+        collection: collectionRef
       })
       const prod = {
         id: productRef.id,
@@ -198,7 +200,6 @@ export default {
       products: createdProducts,
       status: 'draft'
     }
-    const collectionRef = fireDb.collection('user_collections').doc()
     batch.set(collectionRef, design)
     await batch.commit()
     return {
@@ -302,10 +303,19 @@ export default {
   },
   async addToCartOf(item, user) {
     const batch = fireDb.batch()
-    const ref = await fireDb.collection('user_carts').doc(user.uid)
+    const cartRef = await fireDb.collection('user_carts').doc(user.uid)
+
+    const userVariantSnap = await fireDb
+      .collection('user_product_variants')
+      .doc(item.variant.id)
+      .get()
+    const userVariantData = userVariantSnap.data()
+    const collectionSnap = await userVariantData.collection.get()
+    const collectionData = collectionSnap.data()
 
     const products = [
       {
+        owner_id: collectionData.user_id,
         variant: fireDb
           .collection('user_product_variants')
           .doc(item.variant.id),
@@ -314,10 +324,25 @@ export default {
       }
     ]
 
-    _.map(products, product => {
-      const productRef = ref.collection('products').doc()
-      batch.set(productRef, product)
-    })
+    await Promise.all(
+      _.map(products, async product => {
+        const existingProducts = await cartRef
+          .collection('products')
+          .where('variant', '==', product.variant)
+          .where('size', '==', product.size)
+          .get()
+        if (existingProducts.docs.length) {
+          const existingDocSnap = _.first(existingProducts.docs)
+          const existingDocData = existingDocSnap.data()
+          const existingDocRef = existingDocSnap.ref
+          const newQuantity = existingDocData.quantity + product.quantity
+          batch.update(existingDocRef, { quantity: newQuantity })
+          return
+        }
+        const productRef = cartRef.collection('products').doc()
+        batch.set(productRef, product)
+      })
+    )
 
     batch.commit()
   },
@@ -472,11 +497,27 @@ export default {
           .collection('products')
           .doc(product)
         const cartProductSnap = await cartProductRef.get()
+        const cartProductData = cartProductSnap.data()
         const productRef = orderRef.collection('products').doc(product)
-        batch.set(productRef, {
+        console.log()
+        const userVariantSnap = await cartProductData.variant.get()
+        const userVariantData = userVariantSnap.data()
+        const firstSizeKey = _.first(_.keys(userVariantData.sizes))
+        const price = userVariantData.sizes[firstSizeKey].price
+        const parentVariantData = (await userVariantData.variant.get()).data()
+        const parentFirstSize = _.first(parentVariantData.available_sizes)
+        const baseCost = parentFirstSize.base_cost
+        const orderedProduct = {
           id: cartProductRef.id,
-          ...cartProductSnap.data()
-        })
+          ...cartProductData,
+          price: price,
+          base_cost: baseCost,
+          order: orderRef
+        }
+        batch.set(productRef, orderedProduct)
+
+        const orderedProductRef = fireDb.collection('ordered_products').doc()
+        batch.set(orderedProductRef, orderedProduct)
         batch.delete(cartProductRef)
       })
     )
@@ -620,5 +661,39 @@ export default {
     )
 
     return orders
+  },
+  async getOrdersForSeller(user) {
+    const orderedProducts = await fireDb
+      .collection('ordered_products')
+      .where('owner_id', '==', user.uid)
+      .get()
+    const orders = []
+    await Promise.all(
+      _.map(orderedProducts.docs, async productSnap => {
+        const productData = productSnap.data()
+        let orderIndex = _.findIndex(orders, { id: productData.order.id })
+        if (orderIndex === -1) {
+          const orderSnap = await productData.order.get()
+          const orderData = orderSnap.data()
+          orders.push({
+            id: productData.order.id,
+            status: orderData.status,
+            placed_at: orderData.placed_at,
+            created_at: orderData.created_at,
+            payment_method: orderData.payment_method,
+            products: []
+          })
+          orderIndex = orders.length - 1
+        }
+        orders[orderIndex].products.push({
+          quantity: productData.quantity,
+          profit: productData.price,
+          base_cost: productData.base_cost,
+          price: productData.price + productData.base_cost,
+          size: productData.size
+        })
+      })
+    )
+    console.log(orders)
   }
 }

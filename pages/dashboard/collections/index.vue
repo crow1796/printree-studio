@@ -1,6 +1,6 @@
 <template>
-  <div class="sm:px-8 relative">
-    <AreaLoader v-if="isLoading" fullscreen />
+  <div class="relative">
+    <AreaLoader v-if="isLoading" />
     <VueTailwindModal
       ref="availableProductsModal"
       width="100%"
@@ -51,9 +51,7 @@
             </div>
           </div>
         </div>
-        <div class="modal-body p-4 text-center">
-          Are you sure you want to delete this collection?
-        </div>
+        <div class="modal-body p-4 text-center">Are you sure you want to delete this collection?</div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
             type="button"
@@ -69,14 +67,48 @@
         </div>
       </div>
     </VueTailwindModal>
-    <div class="py-8">
+    <div class="flex justify-between items-center">
+      <div class="flex">
+        <nuxt-link
+          to="/dashboard/collections/orders"
+          class="no-underline flex items-center text-blue-600 text-sm border-b"
+        >
+          <span class="mr-3">
+            <font-awesome-icon :icon="['fas', 'boxes']" />
+          </span> Orders
+        </nuxt-link>
+        <nuxt-link
+          to="/dashboard/collections/payouts"
+          class="no-underline flex items-center text-blue-600 text-sm border-b ml-6"
+        >
+          <span class="mr-3">
+            <font-awesome-icon :icon="['fas', 'receipt']" />
+          </span> Payouts
+        </nuxt-link>
+      </div>
+      <div class="flex">
+        <a
+          href="#"
+          class="no-underline md:text-blue-dark flex items-center bg-primary rounded-full h-8 px-4 text-white text-sm"
+        >
+          <number
+            animationPaused
+            ref="profit"
+            :to="15000"
+            :format="(num) => num.formatMoney('₱ ')"
+            :duration=".4"
+            />
+        </a>
+      </div>
+    </div>
+    <div class="py-4">
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">My Collections</h2>
         <button
-              type="button"
-              class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
-              @click="showAvailableProducts"
-            >Create New Collection</button>
+          type="button"
+          class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+          @click="showAvailableProducts"
+        >Create New Collection</button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -95,6 +127,12 @@
               </tr>
             </thead>
             <tbody>
+              <tr v-if="!userCollections.length">
+                <td
+                  colspan="3"
+                  class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                >You have no collection(s).</td>
+              </tr>
               <tr v-for="col in userCollections" :key="col.id">
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div class="flex items-center">
@@ -131,10 +169,14 @@
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
                   >
-                    <span aria-hidden class="absolute inset-0 opacity-50 rounded-full" :class="{
+                    <span
+                      aria-hidden
+                      class="absolute inset-0 opacity-50 rounded-full"
+                      :class="{
                       'bg-green-200': col.status === 'approved',
                       'bg-blue-200': col.status === 'pending',
-                    }"></span>
+                    }"
+                    ></span>
                     <span class="relative uppercase">{{ col.status }}</span>
                   </span>
                 </td>
@@ -185,6 +227,7 @@ export default {
       this.user.uid
     )
     this.isLoading = false
+    this.$refs.profit.play()
   },
   data() {
     return {
@@ -219,20 +262,26 @@ export default {
       this.$storage.setLocalStorage('current_design_id', collection.id)
       this.$router.replace('/collection/designer')
     },
-    showDeleteCollectionConfirmation(collection){
+    showDeleteCollectionConfirmation(collection) {
       this.collectionToDelete = collection
       this.$refs.deleteConfirmationModal.show()
     },
-    hideDeleteCollectionConfirmation(){
+    hideDeleteCollectionConfirmation() {
       this.collectionToDelete = null
       this.$refs.deleteConfirmationModal.hide()
     },
-    async deleteCollection(){
+    async deleteCollection() {
       this.isLoading = true
       this.$refs.deleteConfirmationModal.hide()
       this.$storage.removeLocalStorage('current_design_id')
-      await this.$store.dispatch('designer/deleteCollection', this.collectionToDelete.id)
-      this.$store.dispatch('user_dashboard/removeCollectionById', this.collectionToDelete.id)
+      await this.$store.dispatch(
+        'designer/deleteCollection',
+        this.collectionToDelete.id
+      )
+      this.$store.dispatch(
+        'user_dashboard/removeCollectionById',
+        this.collectionToDelete.id
+      )
       this.isLoading = false
     }
   }

@@ -2,37 +2,6 @@
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
     <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product">
-      <VueTailwindModal
-        ref="addedToCartModal"
-        width="35%"
-        content-class="rounded-none shadow-none text-gray-600"
-      >
-        <div class="flex flex-col">
-          <div class="modal-heading border-b w-full p-4">
-            <div class="text-center uppercase font-bold text-primary">
-              <span>Added to cart</span>
-              <span class="ml-2">
-                <font-awesome-icon :icon="['fas', 'check-circle']" />
-              </span>
-            </div>
-          </div>
-          <div
-            class="modal-body p-4 text-center"
-          >This item has been added to your cart successfully.</div>
-          <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
-            <button
-              type="button"
-              class="justify-center items-center focus:outline-none outline-none px-3 py-2 font-bold text-blue-400 hover:text-blue-600"
-              @click="$refs.addedToCartModal.hide()"
-            >Continue Shopping</button>
-
-            <nuxt-link
-              class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-              to="/marketplace/cart"
-            >Go to Cart</nuxt-link>
-          </div>
-        </div>
-      </VueTailwindModal>
       <BreadCrumbs
         :items="[{
       title: 'Products',
@@ -121,7 +90,12 @@
                 type="button"
                 class="border border-white bg-primary px-8 py-4 font-bold rounded text-white hover:bg-primary-lighter w-full"
                 @click="addToCart"
-              >ADD TO CART</button>
+              >
+                <span v-if="!isAddingToCart">ADD TO CART</span>
+                <span v-if="isAddingToCart">
+                  <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin"/>
+                </span>
+              </button>
             </div>
           </div>
         </div>
@@ -221,7 +195,8 @@ export default {
         }
       ],
       quantity: 1,
-      selectedColor: '#ffffff'
+      selectedColor: '#ffffff',
+      isAddingToCart: false
     }
   },
   computed: {
@@ -239,6 +214,8 @@ export default {
         document.getElementById('get-started-btn').click()
         return
       }
+      if(this.isAddingToCart) return
+      this.isAddingToCart = true
       const item = {
         variant: this.selectedVariant,
         quantity: this.quantity,
@@ -248,7 +225,10 @@ export default {
         item,
         user: this.user
       })
-      this.$refs.addedToCartModal.show()
+      this.$toast.success('This item has been added to your cart successfully.', {
+        position: 'bottom'
+      })
+      this.isAddingToCart = false
     },
     getContrastOf(color) {
       return ColorRegulator.getContrastOf(color)

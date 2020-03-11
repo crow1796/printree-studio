@@ -8,6 +8,8 @@ import AreaLoader from '@/components/AreaLoader'
 import PTForm from '@/components/PTForm'
 import VeeValidate from 'vee-validate'
 import VueCurrencyInput from 'vue-currency-input'
+import VueToast from 'vue-toast-notification'
+import 'vue-toast-notification/dist/theme-sugar.css'
 
 Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
@@ -19,6 +21,7 @@ const pluginOptions = {
   globalOptions: { currency: 'PHP' }
 }
 Vue.use(VueCurrencyInput, pluginOptions)
+Vue.use(VueToast)
 
 if (process.client) {
   require('vue2-animate/dist/vue2-animate.min.css')

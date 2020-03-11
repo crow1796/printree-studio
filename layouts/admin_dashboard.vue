@@ -88,6 +88,17 @@
                   </span> ORDERS
                 </nuxt-link>
               </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/admin/payout-requests"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="h-6 w-6 fill-current mr-2">
+                    <font-awesome-icon :icon="['fas', 'cubes']" />
+                  </span> PAYOUT REQUESTS
+                </nuxt-link>
+              </div>
             </div>
           </div>
         </div>

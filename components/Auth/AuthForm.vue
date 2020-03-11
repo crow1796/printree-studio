@@ -91,7 +91,7 @@
               href="#"
               class="text-blue-400"
               @click.prevent="toggleForm(formType == 'sign_up' && formType != 'password_recovery' ? 'sign_in' : 'sign_up')"
-            >{{ formType == 'sign_up' ? 'Sign In' : 'Create One' }}</a>
+            >{{ formType == 'sign_up' ? 'Sign In' : 'Sign Up' }}</a>
           </div>
         </form>
         <div class="text-center text-xs font-bold text-gray-500">OR</div>
@@ -159,7 +159,7 @@ export default {
       let title = 'SIGN IN'
       switch (this.formType) {
         case 'password_recovery':
-          title = 'RECOVER PASSWORD'
+          title = 'RESET PASSWORD'
           break
         case 'sign_up':
           title = 'SIGN UP'
@@ -204,6 +204,25 @@ export default {
       this.isLoading = false
       if (!res.status && this.formType == 'sign_in') {
         this.isLoginFailed = true
+        return
+      }
+      if(this.formType === 'password_recovery'){
+        if(!res.status){
+          this.$toast.error(res.message, {
+            position: 'bottom'
+          })
+          return
+        }
+        this.$toast.success('A reset password email has been sent to your email.', {
+          position: 'bottom'
+        })
+        this.formData = {
+          name: null,
+          email: null,
+          password: null
+        }
+        this.formType = 'sign_in'
+        this.$validator.reset()
         return
       }
       this.$emit('login-success')

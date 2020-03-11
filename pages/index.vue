@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <!-- <AreaLoader v-if="isLoading" fullscreen/> -->
+    <AreaLoader v-if="isLoading" fullscreen/>
     <VueTailwindModal
       ref="availableProductsModal"
       width="100%"

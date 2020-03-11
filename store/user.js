@@ -1,5 +1,4 @@
 import auth from '~/plugins/lib/auth/index'
-import { fireAuth } from '~/plugins/firebase'
 import Cookies from 'js-cookie'
 
 const state = () => ({
@@ -13,6 +12,12 @@ const mutations = {
   },
   IS_LOGGED_IN(state, status){
     state.isLoggedIn = status
+  },
+  USER_NAME(state, name){
+    state.user.displayName = name
+  },
+  USER_EMAIL(state, email){
+    state.user.email = email
   }
 }
 
@@ -44,8 +49,9 @@ const actions = {
     }
     return res
   },
-  sendPasswordRecovery(context, data) {
-
+  async sendPasswordRecovery(context, data) {
+    const res = await auth.sendPasswordRecoveryEmail(data.email)
+    return res
   },
   async socialLogin(context, type){
     const response = await auth.socialLogin(type)
@@ -66,6 +72,27 @@ const actions = {
     const response = await auth.signInAsAGuest()
     await context.dispatch('saveAuthToken', response.user.token)
     return response
+  },
+  async updateProfile(context, data){
+    const response = await auth.updateProfile({
+      email: data.email,
+      displayName: data.displayName
+    })
+    context.commit('USER_NAME', data.displayName)
+    context.commit('USER_EMAIL', data.email)
+    return response
+  },
+  async updatePassword(context, password){
+    const response = await auth.updatePassword(password)
+    return response
+  },
+  async refreshToken(){
+    const refreshed = await auth.refreshToken()
+    if(refreshed.status){
+      const token = refreshed.token
+      await this.$axios.put('/verify-token', { token })
+      Cookies.set('access_token',token)
+    }
   }
 }
 

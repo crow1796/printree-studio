@@ -13,17 +13,23 @@
             class="text-sm text-gray-500"
           >{{ order.placed_at ? `Placed at ${(order.placed_at)}` : `Checked out at ${(order.created_at)}` }}</div>
         </div>
-        <div class="uppercase font-bold">
-          <div class="flex items-center">
-            <div class="mr-2" :class="{'text-green-600': order.status === 'delivered'}">
-              <span>{{ orderStatus(order.status) }}</span>
-              <font-awesome-icon
-                v-if="order.status === 'delivered'"
-                :icon="['fas', 'check-circle']"
-              />
+        <div class="font-bold">
+          <div class="flex items-end">
+            <div class="font-bold flex-flex-col">
+              <div class="text-xs leading-none">Status:</div>
+              <div
+                class="uppercase"
+                :class="{'text-green-600': order.status === 'delivered', 'text-primary': order.status !== 'delivered'}"
+              >
+                {{ orderStatus(order.status) }}
+                <font-awesome-icon
+                  v-if="order.status === 'delivered'"
+                  :icon="['fas', 'check-circle']"
+                />
+              </div>
             </div>
             <button
-              class="px-2 py-1 text-xs bg-primary hover:bg-primary-lighter text-white border rounded mx-1 cursor-pointer font-bold"
+              class="px-2 py-1 text-xs bg-primary hover:bg-primary-lighter text-white border rounded mx-1 cursor-pointer font-bold uppercase ml-2"
               type="button"
               @click="_processStatusOf(order)"
               v-if="order.status !== 'delivered'"
@@ -135,9 +141,18 @@ export default {
     },
     async processOrder(order, status) {
       this.isLoading = true
-      await this.$store.dispatch('admin/processOrder', {
+      const res = await this.$store.dispatch('admin/processOrder', {
         order,
         status
+      })
+      if (!res) {
+        this.$toast.error('Order status updated failed!', {
+          position: 'top'
+        })
+        return
+      }
+      this.$toast.success('Order status has been updated successfully!', {
+        position: 'top'
       })
       this.isLoading = false
     },
@@ -151,13 +166,13 @@ export default {
       return _.reverse(_.map(thumbnails, thumbnail => thumbnail))
     },
     _processButtonTextOf(order) {
-      let text = 'PROCESS'
+      let text = 'Process'
       switch (order.status) {
         case 'processing':
-          text = 'DELIVER'
+          text = 'Start Shipping'
           break
-        case 'delivering':
-          text = 'DELIVERED'
+        case 'shipping':
+          text = 'Delivered'
           break
       }
       return text
@@ -166,9 +181,9 @@ export default {
       let status = 'processing'
       switch (order.status) {
         case 'processing':
-          status = 'delivering'
+          status = 'shipping'
           break
-        case 'delivering':
+        case 'shipping':
           status = 'delivered'
           break
       }

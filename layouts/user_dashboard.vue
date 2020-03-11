@@ -69,6 +69,7 @@
                 <nuxt-link
                   to="/dashboard/collections"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'boxes']" />
@@ -77,46 +78,26 @@
               </div>
               <div class="flex -mb-px mr-8">
                 <nuxt-link
-                  to="/dashboard/orders"
-                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
-                >
-                  <span class="h-6 w-6 fill-current mr-2">
-                    <font-awesome-icon :icon="['fas', 'boxes']" />
-                  </span> Orders
-                </nuxt-link>
-              </div>
-              <div class="flex -mb-px mr-8">
-                <nuxt-link
                   to="/dashboard/my-orders"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2">
-                    <font-awesome-icon :icon="['fas', 'boxes']" />
+                    <font-awesome-icon :icon="['fas', 'box']" />
                   </span> My Orders
                 </nuxt-link>
               </div>
               <div class="flex -mb-px">
                 <nuxt-link
-                  to="/dashboard/settings"
+                  to="/dashboard/account-settings"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'cog']" />
-                  </span> Settings
+                  </span> Account Settings
                 </nuxt-link>
               </div>
-            </div>
-            <div class="flex">
-              <a
-                href="#"
-                class="no-underline md:text-blue-dark flex items-center bg-primary rounded-full h-8 pl-4 pr-1 text-white text-sm"
-              >
-                <div class="mr-2 font-bold">PHP</div>
-                <div>15,254.25</div>
-                <div
-                  class="ml-1 text-xs bg-primary-darker hover:bg-primary-lighter px-2 rounded-full py-1"
-                >Cash Out</div>
-              </a>
             </div>
           </div>
         </div>
