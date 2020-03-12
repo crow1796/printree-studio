@@ -495,11 +495,10 @@ export default {
           .collection('user_carts')
           .doc(user.uid)
           .collection('products')
-          .doc(product)
+          .doc(product.id)
         const cartProductSnap = await cartProductRef.get()
         const cartProductData = cartProductSnap.data()
-        const productRef = orderRef.collection('products').doc(product)
-        console.log()
+        const productRef = orderRef.collection('products').doc(product.id)
         const userVariantSnap = await cartProductData.variant.get()
         const userVariantData = userVariantSnap.data()
         const firstSizeKey = _.first(_.keys(userVariantData.sizes))
@@ -512,7 +511,8 @@ export default {
           ...cartProductData,
           price: price,
           base_cost: baseCost,
-          order: orderRef
+          order: orderRef,
+          quantity: product.quantity,
         }
         batch.set(productRef, orderedProduct)
 
@@ -671,29 +671,55 @@ export default {
     await Promise.all(
       _.map(orderedProducts.docs, async productSnap => {
         const productData = productSnap.data()
-        let orderIndex = _.findIndex(orders, { id: productData.order.id })
-        if (orderIndex === -1) {
-          const orderSnap = await productData.order.get()
-          const orderData = orderSnap.data()
-          orders.push({
-            id: productData.order.id,
-            status: orderData.status,
-            placed_at: orderData.placed_at,
-            created_at: orderData.created_at,
-            payment_method: orderData.payment_method,
-            products: []
-          })
-          orderIndex = orders.length - 1
-        }
-        orders[orderIndex].products.push({
+        const userProductVariantSnap = await productData.variant.get()
+        const userProductVariantData = userProductVariantSnap.data()
+        const userProductSnap = await userProductVariantData.product.get()
+        const userProductData = userProductSnap.data()
+
+        const parentVariantRef = await userProductVariantData.variant.get()
+        const parentVariantData = parentVariantRef.data()
+        const sides = _.keys(parentVariantData.printable_area)
+        const side = _.includes(sides, 'front') ? 'front' : sides[0]
+        const thumb = await fireStorage
+          .ref(
+            `products/thumbnails/${userProductSnap.id}/${userProductVariantSnap.id}/${side}.png`
+          )
+          .getDownloadURL()
+        const product = {
           quantity: productData.quantity,
           profit: productData.price,
           base_cost: productData.base_cost,
           price: productData.price + productData.base_cost,
-          size: productData.size
+          size: productData.size,
+          meta: userProductData.meta,
+          thumbnail: thumb
+        }
+        const orderSnap = await productData.order.get()
+        const orderData = orderSnap.data()
+        orders.push({
+          id: productData.order.id,
+          status: orderData.status,
+          placed_at: orderData.placed_at,
+          created_at: orderData.created_at,
+          payment_method: orderData.payment_method,
+          products: [product]
         })
       })
     )
-    console.log(orders)
+    const groupedOrders = []
+    
+    _.map(orders, order => {
+      let orderIndex = _.findIndex(groupedOrders, { id: order.id })
+      if(orderIndex === -1){
+        groupedOrders.push(_.omit(order, ['products']))
+        orderIndex = groupedOrders.length - 1
+        groupedOrders[orderIndex].products = []
+      }
+      groupedOrders[orderIndex].products = _.concat(groupedOrders[orderIndex].products, order.products)
+      groupedOrders[orderIndex].total_profit = 0
+      if(order.status === 'delivered') groupedOrders[orderIndex].total_profit = _.sum(_.map(groupedOrders[orderIndex].products, ({quantity, profit}) => quantity * profit))
+    })
+
+    return groupedOrders
   }
 }

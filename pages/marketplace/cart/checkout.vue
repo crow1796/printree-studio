@@ -589,7 +589,7 @@ export default {
 
       const order = await this.$store.dispatch('marketplace/confirmOrderFor', {
         user: this.user,
-        products: _.map(this.products, 'id'),
+        products: _.map(this.products, ({id, quantity}) => ({id, quantity})),
         contact: {
           shipping_address: this.shippingAddress,
           billing_address: this.billingAddress,

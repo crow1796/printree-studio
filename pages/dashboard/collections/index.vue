@@ -86,20 +86,6 @@
           </span> Payouts
         </nuxt-link>
       </div>
-      <div class="flex">
-        <a
-          href="#"
-          class="no-underline md:text-blue-dark flex items-center bg-primary rounded-full h-8 px-4 text-white text-sm"
-        >
-          <number
-            animationPaused
-            ref="profit"
-            :to="15000"
-            :format="(num) => num.formatMoney('₱ ')"
-            :duration=".4"
-            />
-        </a>
-      </div>
     </div>
     <div class="py-4">
       <div class="my-2 flex sm:flex-row justify-between items-center">
@@ -227,7 +213,6 @@ export default {
       this.user.uid
     )
     this.isLoading = false
-    this.$refs.profit.play()
   },
   data() {
     return {
