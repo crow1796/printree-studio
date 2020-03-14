@@ -4,9 +4,8 @@
       class="no-underline md:text-blue-dark flex items-center bg-primary rounded-full h-8 px-4 text-white text-sm leading-none"
     >
       <number
-        animationPaused
         ref="profit"
-        :to="value"
+        :to="totalProfit"
         :format="(num) => num.formatMoney('₱ ')"
         :duration=".4"
       />
@@ -15,18 +14,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  props: {
-    value: {
-      default: 0
-    }
-  },
-  watch: {
-    value(to){
-      this.$nextTick(() => {
-        this.$refs.profit.play()
-      })
-    }
+  computed: {
+    ...mapGetters({
+      totalProfit: 'user_dashboard/totalProfit'
+    })
   }
 }
 </script>

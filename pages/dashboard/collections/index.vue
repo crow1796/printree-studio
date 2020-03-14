@@ -78,14 +78,15 @@
           </span> Orders
         </nuxt-link>
         <nuxt-link
-          to="/dashboard/collections/payouts"
+          to="/dashboard/collections/payout"
           class="no-underline flex items-center text-blue-600 text-sm border-b ml-6"
         >
           <span class="mr-3">
             <font-awesome-icon :icon="['fas', 'receipt']" />
-          </span> Payouts
+          </span> Payout
         </nuxt-link>
       </div>
+      <TotalProfitCounter />
     </div>
     <div class="py-4">
       <div class="my-2 flex sm:flex-row justify-between items-center">
@@ -198,6 +199,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import TotalProfitCounter from '@/components/TotalProfitCounter'
 import VueTailwindModal from '@/components/VueTailwindModal'
 import AvailableProducts from '@/components/Designer/AvailableProducts'
 
@@ -205,13 +207,15 @@ export default {
   layout: 'user_dashboard',
   components: {
     VueTailwindModal,
+    TotalProfitCounter,
     AvailableProducts
   },
-  async created() {
+  async mounted() {
     const collections = await this.$store.dispatch(
       'user_dashboard/getUserCollectionsOf',
       this.user.uid
     )
+    await this.$store.dispatch('user_dashboard/getTotalProfitOf', this.user)
     this.isLoading = false
   },
   data() {

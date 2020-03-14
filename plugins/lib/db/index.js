@@ -488,6 +488,7 @@ export default {
   async confirmOrderFor({ products, user, contact, total }) {
     const batch = fireDb.batch()
     const orderRef = fireDb.collection('user_orders').doc()
+    const now = Timestamp.now()
 
     await Promise.all(
       _.map(products, async product => {
@@ -509,10 +510,12 @@ export default {
         const orderedProduct = {
           id: cartProductRef.id,
           ...cartProductData,
-          price: price,
+          price,
           base_cost: baseCost,
           order: orderRef,
           quantity: product.quantity,
+          created_at: now,
+          status: 'unpaid'
         }
         batch.set(productRef, orderedProduct)
 
@@ -526,7 +529,7 @@ export default {
       user_id: user.uid,
       status: 'unpaid',
       contact,
-      created_at: Timestamp.now(),
+      created_at: now,
       payment_method: '',
       total
     })
@@ -603,14 +606,29 @@ export default {
     return product
   },
   async placeOrder(orderId, paymentMethod) {
-    await fireDb
-      .collection('user_orders')
-      .doc(orderId)
-      .update({
+    const batch = fireDb.batch()
+    const orderRef = fireDb.collection('user_orders').doc(orderId)
+    const now = Timestamp.now()
+
+    const orderedProducts = await fireDb
+      .collection('ordered_products')
+      .where('order', '==', orderRef)
+      .get()
+
+    _.map(orderedProducts.docs, snap => {
+      const prodRef = fireDb.collection('ordered_products').doc(snap.id)
+      batch.update(prodRef, {
         status: 'pending',
-        placed_at: Timestamp.now(),
-        payment_method: paymentMethod
+        placed_at: now
       })
+    })
+
+    batch.update(orderRef, {
+      status: 'pending',
+      placed_at: now,
+      payment_method: paymentMethod
+    })
+    batch.commit()
   },
   async getUserPurchasesOf(user) {
     const ordersQuery = fireDb
@@ -666,6 +684,7 @@ export default {
     const orderedProducts = await fireDb
       .collection('ordered_products')
       .where('owner_id', '==', user.uid)
+      .orderBy('placed_at', 'desc')
       .get()
     const orders = []
     await Promise.all(
@@ -707,19 +726,156 @@ export default {
       })
     )
     const groupedOrders = []
-    
+
     _.map(orders, order => {
       let orderIndex = _.findIndex(groupedOrders, { id: order.id })
-      if(orderIndex === -1){
+      if (orderIndex === -1) {
         groupedOrders.push(_.omit(order, ['products']))
         orderIndex = groupedOrders.length - 1
         groupedOrders[orderIndex].products = []
       }
-      groupedOrders[orderIndex].products = _.concat(groupedOrders[orderIndex].products, order.products)
+      groupedOrders[orderIndex].products = _.concat(
+        groupedOrders[orderIndex].products,
+        order.products
+      )
       groupedOrders[orderIndex].total_profit = 0
-      if(order.status === 'delivered') groupedOrders[orderIndex].total_profit = _.sum(_.map(groupedOrders[orderIndex].products, ({quantity, profit}) => quantity * profit))
+      if (order.status === 'delivered')
+        groupedOrders[orderIndex].total_profit = _.sum(
+          _.map(
+            groupedOrders[orderIndex].products,
+            ({ quantity, profit }) => quantity * profit
+          )
+        )
     })
 
     return groupedOrders
+  },
+  async getTotalProfitOf(user) {
+    const deliveredProducts = await fireDb
+      .collection('ordered_products')
+      .where('owner_id', '==', user.uid)
+      .where('status', '==', 'delivered')
+      .get()
+
+    const payoutsSnap = await fireDb
+      .collection('user_payouts')
+      .doc(user.uid)
+      .collection('payouts')
+      .where('status', 'in', ['pending', 'paid', 'processing'])
+      .get()
+
+    const payouts = _.map(payoutsSnap.docs, snap => {
+      const payoutData = snap.data()
+      return {
+        ...payoutData,
+        id: snap.id
+      }
+    })
+
+    const totalPayoutsAmount = _.sum(_.map(payouts, 'amount'))
+
+    const total = _.sum(
+      _.map(deliveredProducts.docs, snap => {
+        const { price, quantity } = snap.data()
+        return price * quantity
+      })
+    )
+
+    return total - totalPayoutsAmount
+  },
+  async sendPayoutRequest({ user, payout }) {
+    let response = {
+      status: true
+    }
+    try {
+      const payoutRef = payout.id
+        ? fireDb
+            .collection('user_payouts')
+            .doc(user.uid)
+            .collection('payouts')
+            .doc(payout.id)
+        : fireDb
+            .collection('user_payouts')
+            .doc(user.uid)
+            .collection('payouts')
+            .doc()
+      let payoutRequest = {
+        id: payoutRef.id,
+        ...payout,
+        user_id: user.uid,
+        status: 'pending',
+        created_at: Timestamp.now()
+      }
+      if (payout.id) {
+        payoutRequest = {
+          ..._.omit(payoutRequest, ['id', 'created_at']),
+          updated_at: Timestamp.now()
+        }
+        await payoutRef.update(payoutRequest)
+        payoutRequest.created_at = new Timestamp(
+          payout.created_at.seconds,
+          payout.created_at.nanoseconds
+        )
+      } else {
+        await payoutRef.set(payoutRequest)
+      }
+      response.data = payoutRequest
+    } catch (e) {
+      response = {
+        status: false,
+        message: e
+      }
+    }
+    return response
+  },
+  async getPayoutsOf(user) {
+    let response = {
+      status: true
+    }
+    try {
+      const payoutsSnap = await fireDb
+        .collection('user_payouts')
+        .doc(user.uid)
+        .collection('payouts')
+        .orderBy('created_at')
+        .get()
+
+      const payouts = _.map(payoutsSnap.docs, snap => {
+        const payoutData = snap.data()
+        return {
+          ...payoutData,
+          id: snap.id
+        }
+      })
+
+      response.data = payouts
+    } catch (e) {
+      response = {
+        status: false,
+        message: e
+      }
+    }
+    return response
+  },
+  async cancelPayout({ user, payout }) {
+    let response = {
+      status: true
+    }
+    try {
+      await fireDb
+        .collection('user_payouts')
+        .doc(user.uid)
+        .collection('payouts')
+        .doc(payout.id)
+        .update({
+          status: 'cancelled'
+        })
+    } catch (e) {
+      response = {
+        status: false,
+        message: e
+      }
+    }
+    return response
   }
 }

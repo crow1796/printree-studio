@@ -9,7 +9,6 @@
         </nuxt-link>
         <h2 class="text-2xl font-semibold leading-tight">Orders</h2>
       </div>
-      <TotalProfitCounter v-model="totalProfit" />
     </div>
     <div class="border flex flex-col mb-6" v-for="(order, i) in orders" :key="i">
       <div class="flex border-b p-4 justify-between items-center">
@@ -85,26 +84,20 @@
 
 <script>
 import moment from 'moment'
-import TotalProfitCounter from '@/components/TotalProfitCounter'
 import { mapGetters } from 'vuex'
 
 export default {
   layout: 'user_dashboard',
-  components: {
-    TotalProfitCounter
-  },
   async mounted() {
     this.orders = await this.$store.dispatch(
       'user_dashboard/getOrdersForSeller',
       this.user
     )
-    console.log(this.orders)
-    this.totalProfit = _.sum(_.map(this.orders, 'total_profit'))
+    await this.$store.dispatch('user_dashboard/getTotalProfitOf', this.user)
     this.isLoading = false
   },
   data() {
     return {
-      totalProfit: 0,
       isLoading: true,
       orders: []
     }
