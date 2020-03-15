@@ -39,6 +39,12 @@ const mutations = {
   UPDATE_PAYOUT(state, payout){
     const index = _.findIndex(state.payouts, { id: payout.id })
     state.payouts[index] = payout
+  },
+  DECR_TOTAL_PROFIT_BY(state, amount){
+    state.totalProfit -= amount
+  },
+  INCR_TOTAL_PROFIT_BY(state, amount){
+    state.totalProfit += amount
   }
 }
 
@@ -91,11 +97,15 @@ const actions = {
   },
   async sendPayoutRequest(context, data){
     const res = await db.sendPayoutRequest(data)
+    const totalProfit = context.getters.totalProfit
     if(res.status){
       if(res.data.updated_at){
+        const index = _.findIndex(context.getters.payouts, { id: res.data.id })
+        context.commit('TOTAL_PROFIT', ((totalProfit + context.getters.payouts[index].amount) - res.data.amount))
         context.commit('UPDATE_PAYOUT', res.data)
         return res
       }
+      context.commit('DECR_TOTAL_PROFIT_BY', res.data.amount)
       context.commit('INSERT_PAYOUT', res.data)
     }
     return res
@@ -104,6 +114,7 @@ const actions = {
     const res = await db.cancelPayout({user, payout})
     if(res.status){
       context.commit('CANCEL_PAYOUT', payout)
+      context.commit('INCR_TOTAL_PROFIT_BY', payout.amount)
     }
     return res
   }

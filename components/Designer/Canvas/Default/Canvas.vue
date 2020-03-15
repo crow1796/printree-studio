@@ -19,6 +19,7 @@
                     'image/svg+xml, image/png, image/jpeg, image/bmp'
                 }"
                 @vdropzone-success="artAdded"
+                @vdropzone-sending="fileAdded"
               />
             </div>
           </div>
@@ -195,6 +196,9 @@ export default {
     })
   },
   methods: {
+    fileAdded(e){
+      return false
+    },
     leftActionClicked({ action, args }) {
       switch (action) {
         case 'add_text':
@@ -366,6 +370,7 @@ export default {
       this.$refs[modal].show()
     },
     artAdded(file, res) {
+      return false
       let type = 'image'
       let value = file.dataURL
       if (file.type == 'image/svg+xml') {

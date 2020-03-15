@@ -1,13 +1,12 @@
-import auth from '~/plugins/lib/auth/index'
-import db from '~/plugins/lib/db/index'
-import Cookies from 'js-cookie'
+import adminDb from '~/plugins/lib/db/admin'
 
 const state = () => ({
   user: null,
   isLoggedIn: false,
   users: [],
   collections: [],
-  orders: []
+  orders: [],
+  payouts: []
 })
 
 const mutations = {
@@ -35,6 +34,13 @@ const mutations = {
   UPDATE_COLLECTION_STATUS(state, { id, status }) {
     const colIndex = _.findIndex(state.collections, { id: id })
     state.collections[colIndex].status = status
+  },
+  PAYOUTS(state, payouts) {
+    state.payouts = payouts
+  },
+  UPDATE_PAYOUT(state, payout){
+    const index = _.findIndex(state.payouts, { id: payout.id })
+    state.payouts[index] = payout
   }
 }
 
@@ -53,6 +59,9 @@ const getters = {
   },
   orders(state) {
     return state.orders
+  },
+  payouts(state) {
+    return state.payouts
   }
 }
 
@@ -82,16 +91,29 @@ const actions = {
   },
   async processOrder(context, { order, status }) {
     let reqStatus = true
-    try{
+    try {
       const res = await this.$axios.put(`/orders/${order.id}/process/${status}`)
       context.commit('PROCESS_ORDER', {
         ...order,
         status
       })
-    } catch(e){
+    } catch (e) {
       reqStatus = false
     }
     return reqStatus
+  },
+  async getPayouts(context, query) {
+    const res = await adminDb.getAllPayouts(query)
+    if (res.status) {
+      context.commit('PAYOUTS', res.data)
+    }
+  },
+  async updatePayoutStatusTo(context, { payout, status }) {
+    const res = await adminDb.updatePayoutStatusTo(payout, status)
+    if (res.status) {
+      context.commit('UPDATE_PAYOUT', res.data)
+    }
+    return res
   }
 }
 

@@ -1,6 +1,6 @@
 <template>
-  <div class="relative sm:px-8 py-8">
-    <AreaLoader v-if="isLoading" fullscreen />
+  <div class="relative sm:px-8">
+    <AreaLoader v-if="isLoading"/>
     <div class="my-2 flex sm:flex-row justify-between items-center">
       <h2 class="text-2xl font-semibold leading-tight">Orders</h2>
       <h2 class="text-2xl font-semibold leading-tight">Total: {{ total.formatMoney('₱ ') }}</h2>

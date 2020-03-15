@@ -799,6 +799,14 @@ export default {
             .doc(user.uid)
             .collection('payouts')
             .doc()
+      if(payout.id){
+        const payoutSnap = await payoutRef.get()
+        const payoutData = payoutSnap.data()
+        if(payoutData.status !== 'pending') return {
+          status: false,
+          message: 'Unable to update request. Has already moved from "pending" state.'
+        }
+      }
       let payoutRequest = {
         id: payoutRef.id,
         ...payout,
@@ -807,15 +815,16 @@ export default {
         created_at: Timestamp.now()
       }
       if (payout.id) {
-        payoutRequest = {
+        const updatedAt = Timestamp.now()
+        await payoutRef.update({
           ..._.omit(payoutRequest, ['id', 'created_at']),
-          updated_at: Timestamp.now()
-        }
-        await payoutRef.update(payoutRequest)
+          updated_at: updatedAt
+        })
         payoutRequest.created_at = new Timestamp(
           payout.created_at.seconds,
           payout.created_at.nanoseconds
         )
+        payoutRequest.updated_at = updatedAt
       } else {
         await payoutRef.set(payoutRequest)
       }
@@ -837,7 +846,7 @@ export default {
         .collection('user_payouts')
         .doc(user.uid)
         .collection('payouts')
-        .orderBy('created_at')
+        .orderBy('created_at', 'desc')
         .get()
 
       const payouts = _.map(payoutsSnap.docs, snap => {
@@ -862,14 +871,25 @@ export default {
       status: true
     }
     try {
-      await fireDb
-        .collection('user_payouts')
-        .doc(user.uid)
-        .collection('payouts')
-        .doc(payout.id)
-        .update({
-          status: 'cancelled'
-        })
+      const payoutRef = fireDb
+      .collection('user_payouts')
+      .doc(user.uid)
+      .collection('payouts')
+      .doc(payout.id)
+      const payoutSnap = await payoutRef
+        .get()
+
+      const payoutData = payoutSnap.data()
+      if(payoutData.status !== 'pending'){
+        return {
+          status: false,
+          message: 'Unable to update request. Has already moved from "pending" state.'
+        }
+      }
+
+      payoutRef.update({
+        status: 'cancelled'
+      })
     } catch (e) {
       response = {
         status: false,

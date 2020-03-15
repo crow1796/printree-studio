@@ -1,13 +1,13 @@
 <template>
-  <div class="sm:px-8">
-    <AreaLoader v-if="isLoading" fullscreen />
+  <div class="sm:px-8 relative">
+    <AreaLoader v-if="isLoading"/>
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
       v-if="generatedImages.length"
       :products="generatedImages"
       :meta="collectionMeta"
     />
-    <div class="py-8">
+    <div>
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">All Collections</h2>
       </div>

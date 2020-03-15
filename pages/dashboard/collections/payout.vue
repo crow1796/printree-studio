@@ -67,7 +67,7 @@
                 placeholder="Your Amount"
                 v-model.number="recipientData.amount"
                 data-vv-as="Amount"
-                v-validate="`required|numeric|min_value:0|max_value:${totalProfit}`"
+                v-validate="`required|numeric|min_value:0|max_value:${computedTotalProfit}`"
                 data-vv-scope="recipientForm"
               />
             </div>
@@ -188,7 +188,7 @@
               <td
                 colspan="3"
                 class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-              >You have no collection(s).</td>
+              >You have no payout(s).</td>
             </tr>
             <tr v-for="payout in payouts" :key="payout.id">
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-left">
@@ -268,6 +268,7 @@ export default {
     return {
       isLoading: true,
       isConfirmationLoading: false,
+      editingPayout: null,
       recipientData: {
         id: null,
         name: null,
@@ -281,15 +282,28 @@ export default {
       payouts: 'user_dashboard/payouts',
       user: 'user/user',
       totalProfit: 'user_dashboard/totalProfit'
-    })
+    }),
+    computedTotalProfit(){
+      if(this.editingPayout && this.editingPayout.id){
+        return this.totalProfit + this.editingPayout.amount
+      }
+      return this.totalProfit
+    }
   },
   methods: {
     showRequestPayoutModal() {
+      this.recipientData = {
+        id: null,
+        name: null,
+        mobile: null,
+        amount: 0
+      }
       this.$refs.requestPayoutModal.show()
     },
     cancelRequest() {
       this.$refs.requestPayoutModal.hide()
       this.$nextTick(() => {
+        this.editingPayout = null
         this.recipientData = {
           id: null,
           name: null,
@@ -322,19 +336,21 @@ export default {
       if (!res.status) {
         this.$refs.requestPayoutConfirmationModal.hide()
         this.$refs.requestPayoutModal.show()
-        this.$toast.error('Your payout request has failed.', {
+        this.$toast.error(res.message || 'Your payout request has failed.', {
           position: 'top'
         })
         return
       }
+      this.editingPayout = null
       this.$refs.requestPayoutConfirmationModal.hide()
       this.$toast.success('Your payout request has been sent successfully.', {
         position: 'top'
       })
     },
     showEditPayout(payout){
+      this.editingPayout = JSON.parse(JSON.stringify(payout))
       this.recipientData = JSON.parse(JSON.stringify(payout))
-      this.showRequestPayoutModal()
+      this.$refs.requestPayoutModal.show()
     },
     cancelCancellationConfirmation(){
       this.$validator.reset()
@@ -361,7 +377,7 @@ export default {
       })
       this.isConfirmationLoading = false
       if(!res.status){
-        this.$toast.error('Your payout cancellation has failed. Please try again.', {
+        this.$toast.error(res.message || 'Your payout cancellation has failed. Please try again.', {
           position: 'top'
         })
         return
