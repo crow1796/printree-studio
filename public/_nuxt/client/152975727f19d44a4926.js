@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[5],{873:function(n,e,t){"use strict";t.r(e);var l={layout:"admin_dashboard",middleware:"admin-auth"},d=t(7),component=Object(d.a)(l,function(){var n=this.$createElement;return(this._self._c||n)("div")},[],!1,null,null,null);e.default=component.exports}}]);

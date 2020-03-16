@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[17],{872:function(e,n,t){"use strict";t.r(n);var r={layout:"user_dashboard",middleware:function(e){(0,e.redirect)("/dashboard/collections")}},l=t(7),component=Object(l.a)(r,function(){var e=this.$createElement;return(this._self._c||e)("div")},[],!1,null,null,null);n.default=component.exports}}]);

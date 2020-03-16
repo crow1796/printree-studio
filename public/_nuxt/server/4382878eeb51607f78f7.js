@@ -1,0 +1,2 @@
+exports.ids=[14],exports.modules={149:function(e,t,r){"use strict";r.r(t);var l={layout:"user_dashboard",middleware:({redirect:e})=>{e("/dashboard/collections")}},d=r(2),component=Object(d.a)(l,function(){var e=this.$createElement;return(this._self._c||e)("div")},[],!1,null,null,"4f863ff8");t.default=component.exports}};
+//# sourceMappingURL=4382878eeb51607f78f7.js.map
