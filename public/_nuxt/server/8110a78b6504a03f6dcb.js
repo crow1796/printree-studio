@@ -1,0 +1,2 @@
+exports.ids=[2],exports.modules={150:function(e,t,r){"use strict";r.r(t);var d={layout:"admin_dashboard",middleware:"admin-auth"},l=r(2),component=Object(l.a)(d,function(){var e=this.$createElement;return(this._self._c||e)("div",[])},[],!1,null,null,"e4ea111a");t.default=component.exports}};
+//# sourceMappingURL=8110a78b6504a03f6dcb.js.map
