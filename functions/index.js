@@ -30,4 +30,4 @@ async function handleRequest(req, res) {
 
 app.get('*', handleRequest)
 app.use(handleRequest)
-exports.nuxtssr = functions.region('asia-northeast1').https.onRequest(app)
+exports.nuxtssr = functions.https.onRequest(app)
