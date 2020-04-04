@@ -1,0 +1,16 @@
+@mixin tooltipArrow {
+  content: '';
+  position: absolute;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+
+.tooltip-arrow{
+  &-top:before{
+    @include tooltipArrow();
+    border-bottom: 5px solid #E1274E;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
