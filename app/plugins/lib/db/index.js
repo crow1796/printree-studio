@@ -463,13 +463,24 @@ export default {
     return addresses
   },
   async getProductsToSell(query) {
-    const collectionsSnap = await fireDb
+    let collectionSnaps = []
+    let collectionsSnap = null
+    if(query && query.collectionId){
+      collectionsSnap = await fireDb
+      .collection('user_collections')
+      .doc(query.collectionId)
+      .get()
+      collectionSnaps = [collectionsSnap]
+    }else {
+      collectionsSnap = await fireDb
       .collection('user_collections')
       .where('plan', '==', 'sell')
       .where('status', '==', 'approved')
       .get()
+      collectionSnaps = collectionsSnap.docs
+    }
     const products = await Promise.all(
-      _.map(collectionsSnap.docs, async doc => {
+      _.map(collectionSnaps, async doc => {
         const collectionData = doc.data()
         return await Promise.all(
           _.map(collectionData.products, async productRef => {
