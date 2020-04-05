@@ -1,6 +1,5 @@
 {
   "projects": {
-    "default": "printree-52ca8",
-    "dev-printree": "printree-52ca8"
+    "default": "printree-52ca8"
   }
 }
