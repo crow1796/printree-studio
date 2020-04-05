@@ -27,7 +27,7 @@
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
-            @click="publish"
+            @click="updateCollectionStatus"
           >Yes</button>
         </div>
       </div>
@@ -191,7 +191,9 @@
                       }"
                       @click="selectProduct(product)"
                     >
-                      <div class="px-2 pt-2"><img :src="_placeholderOfFirstVariantOf(product)"/></div>
+                      <div class="px-2 pt-2">
+                        <img :src="_placeholderOfFirstVariantOf(product)" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -288,17 +290,19 @@ export default {
         URL.revokeObjectURL(a.href)
       }, 1500)
     },
-    async publish() {
+    async updateCollectionStatus() {
       this.isLoading = true
       this.$refs.publishConfirmationModal.hide()
-      await this.$store.dispatch('admin/updateCollection', {
+      let status = 'approved'
+      if(this.confirmationAction === 'decline') status = 'declined'
+      await this.$store.dispatch('admin/updateCollectionStatus', {
         id: this.meta.id,
-        data: {
-          status:
-            this.confirmationAction === 'approval' ? 'approved' : 'declined'
-        }
+        status
       })
       this.isLoading = false
+      this.$toast.success('Collection status has been updated successfully!', {
+        position: 'top'
+      })
     },
     selectProduct(product) {
       this.selectedProduct = JSON.parse(JSON.stringify(product))

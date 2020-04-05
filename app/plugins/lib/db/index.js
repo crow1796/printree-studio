@@ -295,6 +295,28 @@ export default {
       .doc(collectionId)
     await collectionRef.update(data)
   },
+  async approveCollection(collectionId){
+    const now = Timestamp.now()
+    const collectionRef = fireDb
+      .collection('user_collections')
+      .doc(collectionId)
+    await collectionRef.update({
+      status: 'approved',
+      approved_at: now,
+      declined_at: null
+    })
+  },
+  async declineCollection(collectionId){
+    const now = Timestamp.now()
+    const collectionRef = fireDb
+      .collection('user_collections')
+      .doc(collectionId)
+    await collectionRef.update({
+      status: 'declined',
+      approved_at: null,
+      declined_at: now
+    })
+  },
   async deleteCollection(collectionId) {
     const collectionRef = fireDb
       .collection('user_collections')

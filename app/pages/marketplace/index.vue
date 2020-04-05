@@ -112,7 +112,7 @@
           <nuxt-link class="text-primary hover:text-primary-lighter" to="/marketplace/products">SEE ALL ></nuxt-link>
         </div>
       </div>
-      <ProductsGrid :products="products"/>
+      <ProductsGrid :products="products" />
     </div>
     <!-- Listing END -->
   </div>

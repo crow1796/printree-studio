@@ -11,12 +11,12 @@
         <progressive-img class="relative w-40" :src="product.thumbnail" style="width: 160px" />
       </div>
       <div class="relative text-grey-600 px-3 pb-3">
-        <span class="block opacity-75 mb-1 w-full truncate text-xs">{{product.collectionName}}</span>
+        <span class="block opacity-75 w-full truncate text-xs leading-none">{{product.collectionName}}</span>
         <div class="flex items-center justify-between">
-          <span class="font-semibold truncate w-11/12">{{product.name}}</span>
+          <span class="font-black truncate w-11/12">{{product.name}}</span>
         </div>
         <div
-          class="text-primary mt-2 mb-1 text-xs font-bold text-lg leading-none flex items-center"
+          class="text-primary mb-1 text-xs font-black text-lg leading-none flex items-center"
         >{{product.price.formatMoney('₱ ')}}</div>
         <div class="text-xs text-yellow-500">
           <font-awesome-icon :icon="['fas', 'star']"/>

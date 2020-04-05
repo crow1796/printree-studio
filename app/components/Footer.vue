@@ -2,48 +2,32 @@
   <div class="bg-gray-100 p-8">
     <div class="container mx-auto p-8">
       <div class="sm:flex mb-4 justify-center">
-        <div class="sm:w-1/4 h-auto">
-          <div class="text-primary mb-2">Orange</div>
-          <ul class="list-reset leading-normal">
-            <li class="hover:text-primary text-grey-darker">One</li>
-            <li class="hover:text-primary text-grey-darker">Two</li>
-            <li class="hover:text-primary text-grey-darker">Three</li>
-            <li class="hover:text-primary text-grey-darker">Four</li>
-            <li class="hover:text-primary text-grey-darker">Five</li>
-            <li class="hover:text-primary text-grey-darker">Six</li>
-            <li class="hover:text-primary text-grey-darker">Seven</li>
-            <li class="hover:text-primary text-grey-darker">Eight</li>
-          </ul>
-        </div>
-        <div class="sm:w-1/4 h-auto sm:mt-0 mt-8">
-          <div class="text-blue mb-2">Blue</div>
-          <ul class="list-reset leading-normal">
-            <li class="hover:text-blue text-grey-darker">One</li>
-            <li class="hover:text-blue text-grey-darker">Two</li>
-            <li class="hover:text-blue text-grey-darker">Three</li>
-          </ul>
-
-          <div class="text-blue-light mb-2 mt-4">Blue-light</div>
-          <ul class="list-reset leading-normal">
-            <li class="hover:text-blue-light text-grey-darker">One</li>
-            <li class="hover:text-blue-light text-grey-darker">Two</li>
-            <li class="hover:text-blue-light text-grey-darker">Three</li>
-          </ul>
-        </div>
-        <div class="sm:w-1/4 h-auto sm:mt-0 mt-8">
-          <div class="text-green-dark mb-2">Green-dark</div>
-          <ul class="list-reset leading-normal">
-            <li class="hover:text-green-dark text-grey-darker">One</li>
-            <li class="hover:text-green-dark text-grey-darker">Two</li>
-            <li class="hover:text-green-dark text-grey-darker">Three</li>
-          </ul>
-
-          <div class="text-green-light mb-2 mt-4">Green-light</div>
-          <ul class="list-reset leading-normal">
-            <li class="hover:text-green-light text-grey-darker">One</li>
-            <li class="hover:text-green-light text-grey-darker">Two</li>
-            <li class="hover:text-green-light text-grey-darker">Three</li>
-          </ul>
+        <div class="flex flex-grow">
+          <div class="sm:w-1/4 h-auto">
+            <div class="text-primary mb-2">Pages</div>
+            <ul class="list-reset leading-normal">
+              <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="#">Home</nuxt-link>
+              </li>
+              <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="#">Marketplace</nuxt-link>
+              </li>
+            </ul>
+          </div>
+          <div class="sm:w-1/4 h-auto sm:mt-0 mt-8">
+            <div class="text-primary mb-2">Useful Links</div>
+            <ul class="list-reset leading-normal">
+              <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="#">FAQs</nuxt-link>
+              </li>
+              <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="#">Terms of Service</nuxt-link>
+              </li>
+              <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="#">Privacy Policy</nuxt-link>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="sm:w-1/2 sm:mt-0 mt-8 h-auto">
           <div class="text-red-light mb-2">Newsletter</div>

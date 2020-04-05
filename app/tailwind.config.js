@@ -25,6 +25,9 @@ module.exports = {
         '50': 50,
         '60': 60,
         '70': 70
+      },
+      minHeight: {
+        'area-loader': '450px'
       }
     }
   },

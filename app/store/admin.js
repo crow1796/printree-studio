@@ -1,4 +1,5 @@
 import adminDb from '~/plugins/lib/db/admin'
+import db from '~/plugins/lib/db'
 
 const state = () => ({
   user: null,
@@ -83,6 +84,20 @@ const actions = {
     context.commit('UPDATE_COLLECTION_STATUS', {
       id,
       status: data.status
+    })
+  },
+  async updateCollectionStatus(context, { id, status }){
+    switch(status){
+      case 'approved':
+        await db.approveCollection(id)
+        break;
+      case 'declined':
+        await db.declineCollection(id)
+        break;
+    }
+    context.commit('UPDATE_COLLECTION_STATUS', {
+      id,
+      status
     })
   },
   async getOrders(context, query) {

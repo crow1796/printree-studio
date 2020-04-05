@@ -20,7 +20,7 @@
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Name</th>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
                 >Progress</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
@@ -81,7 +81,7 @@
                       'bg-red-300': col.status === 'declined',
                       'bg-blue-200': col.status === 'pending',
                     }"></span>
-                    <span class="relative uppercase">{{ col.status }}</span>
+                    <span class="relative uppercase font-black">{{ col.status }}</span>
                   </span>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
