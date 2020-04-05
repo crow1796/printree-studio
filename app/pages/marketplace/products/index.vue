@@ -4,7 +4,7 @@
     <div class="relative min-h-area-loader">
       <AreaLoader v-if="isLoading" />
       <ProductsGrid :products="products" />
-      <div class="flex flex-grow justify-center pb-6">
+      <div class="flex flex-grow justify-center pb-6 mt-4">
         <ul class="flex">
           <li class="mx-1 px-3 py-2 text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white text-xs cursor-pointer items-center justify-center flex">
             <a class="flex items-center font-bold" href="#">
@@ -54,7 +54,9 @@ export default {
   data() {
     return {
       isLoading: true,
-      products: []
+      products: [],
+      currentPage: 1,
+      perPage: 20
     }
   }
 }

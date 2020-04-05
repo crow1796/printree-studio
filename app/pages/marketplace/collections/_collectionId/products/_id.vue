@@ -2,18 +2,44 @@
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
     <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product">
-      <BreadCrumbs home-link="/marketplace"
-        :items="[{
-      title: 'Products',
-      link: '/marketplace/products'
-    }, {
-      title: product.collectionName,
-      link: `/marketplace/collections/${product.collectionId}`
-    }, {
-      title: product.name,
-      active: true
-    }]"
-      />
+      <div class="flex justify-between items-center">
+        <div>
+          <BreadCrumbs
+            home-link="/marketplace"
+            :items="[{
+          title: 'Products',
+          link: '/marketplace/products'
+          }, {
+            title: product.collectionName,
+            link: `/marketplace/collections/${product.collectionId}`
+          }, {
+          title: product.name,
+          active: true
+        }]"
+          />
+        </div>
+        <div class="flex items-center">
+          <div class="mr-2 font-bold">
+            Share this product on
+          </div>
+          <social-sharing :url="currentUrl" inline-template>
+            <div>
+              <network network="facebook">
+                <font-awesome-icon
+                  :icon="['fab', 'facebook-f']"
+                  class="cursor-pointer hover:text-primary mx-1"
+                />
+              </network>
+              <network network="twitter">
+                <font-awesome-icon
+                  :icon="['fab', 'twitter']"
+                  class="cursor-pointer hover:text-primary mx-1"
+                />
+              </network>
+            </div>
+          </social-sharing>
+        </div>
+      </div>
       <div class="flex lg:flex-row sm:flex-col">
         <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2 lg:flex-row sm:flex-col">
           <div
@@ -90,7 +116,7 @@
               >
                 <span v-if="!isAddingToCart">ADD TO CART</span>
                 <span v-if="isAddingToCart">
-                  <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin"/>
+                  <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin" />
                 </span>
               </button>
             </div>
@@ -165,20 +191,23 @@ export default {
   },
   computed: {
     ...mapGetters({
-      'isLoggedIn': 'user/isLoggedIn',
-      'user': 'user/user'
+      isLoggedIn: 'user/isLoggedIn',
+      user: 'user/user'
     }),
+    currentUrl() {
+      return window.location.href
+    },
     frontOrFirst() {
       return _.includes(this.sides, 'front') ? 'front' : this.sides[0]
     }
   },
   methods: {
     async addToCart() {
-      if(!this.isLoggedIn){
+      if (!this.isLoggedIn) {
         document.getElementById('get-started-btn').click()
         return
       }
-      if(this.isAddingToCart) return
+      if (this.isAddingToCart) return
       this.isAddingToCart = true
       const item = {
         variant: this.selectedVariant,
@@ -189,9 +218,12 @@ export default {
         item,
         user: this.user
       })
-      this.$toast.success('This item has been added to your cart successfully.', {
-        position: 'bottom'
-      })
+      this.$toast.success(
+        'This item has been added to your cart successfully.',
+        {
+          position: 'bottom'
+        }
+      )
       this.isAddingToCart = false
     },
     getContrastOf(color) {

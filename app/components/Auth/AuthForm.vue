@@ -2,17 +2,13 @@
   <div class="flex flex-col items-center w-full p-4">
     <AreaLoader v-if="isLoading" />
     <div class="top-text flex flex-col items-center">
-      <h2 class="font-bold text-4xl text-primary-lighter">SIGN IN TO CONTINUE</h2>
-      <div class="text-center">
-        <div>Unlock more features.</div>
-        <div>No contract. No commitment.</div>
-      </div>
+      <h2 class="font-black text-4xl text-primary-lighter">SIGN IN TO CONTINUE</h2>
     </div>
-    <div class="content w-full flex flex-grow py-8">
-      <div class="form w-full">
+    <div class="content w-full flex flex-grow pb-4">
+      <div class="form w-full"> 
         <form @submit.prevent="submitForm">
-          <div class="text-lg font-bold text-gray-700 mb-2">{{ formTitle }}</div>
-          <div class="mb-3 mt-2" v-if="formType == 'sign_up'">
+          <div class="text-lg font-black text-gray-700">{{ formTitle }}</div>
+          <div class="mb-3" v-if="formType == 'sign_up'">
             <label for="name" class="font-bold">Name</label>
             <div>
               <input
@@ -118,7 +114,7 @@
       </div>
     </div>
     <div class="bot-text flex">
-      <div>
+      <div class="text-center">
         By using
         <strong>Printree</strong> you also agree to our
         <a href="#" class="text-blue-400">Terms of Service</a> and
@@ -150,7 +146,7 @@ export default {
           title = 'FORGOT PASSWORD?'
           break
         case 'sign_up':
-          title = 'SIGN UP'
+          title = 'CREATE AN ACCOUNT'
           break
       }
       return title
