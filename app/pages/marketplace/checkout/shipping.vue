@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto">
-    <BreadCrumbs :items="[{
+    <BreadCrumbs home-link="/marketplace" :items="[{
       title: 'Shipping Address',
       link: '/marketplace/checkout/shipping-address',
       active: true

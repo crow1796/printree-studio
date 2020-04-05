@@ -2,13 +2,10 @@
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
     <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product">
-      <BreadCrumbs
+      <BreadCrumbs home-link="/marketplace"
         :items="[{
       title: 'Products',
       link: '/marketplace/products'
-    }, {
-      title: product.category,
-      link: `/marketplace/category/${product.categoryId}`
     }, {
       title: product.collectionName,
       link: `/marketplace/collections/${product.collectionId}`

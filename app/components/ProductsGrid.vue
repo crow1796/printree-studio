@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-wrap items-center px-6">
     <nuxt-link
-      class="flex-shrink-0 my-6 mx-2 relative overflow-hidden hover:shadow-lg border rounded-lg"
+      class="flex-shrink-0 flex-grow sm:flex-grow-0 m-2 relative overflow-hidden hover:shadow-lg border rounded-lg relative"
       v-for="product in products"
       :key="product.id"
       :to="`/marketplace/collections/${product.collectionId}/products/${product.id}`"
