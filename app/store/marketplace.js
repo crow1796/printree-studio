@@ -17,6 +17,10 @@ const getters = {
 }
 
 const actions = {
+  async getFeaturedProducts(context, query){
+    const products = await db.getFeaturedProducts(query)
+    return products
+  },
   async getProductsToSell(context, query){
     const products = await db.getProductsToSell(query)
     return products

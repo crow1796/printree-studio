@@ -45,7 +45,41 @@ export default {
         paid_at: now
       }
     } catch (error) {
-      console.log(error)
+      response = {
+        status: false,
+        message: error
+      }
+    }
+
+    return response
+  },
+  async markAsFeatured(data){
+    let response = {
+      status: true
+    }
+    try {
+      const featured_at = data.is_marked ? null : Timestamp.now()
+      switch(data.type){
+        case 'product':
+          const productRef = await fireDb.collection('user_products').doc(data.obj.id)
+
+          await productRef.update({ featured_at })
+          response.data = {
+            ...data.obj,
+            featured_at
+          }
+          break;
+        case 'collection':
+          const collectionRef = await fireDb.collection('user_collections').doc(data.obj.id)
+
+          await collectionRef.update({ featured_at })
+          response.data = {
+            ...data.obj,
+            featured_at
+          }
+          break;
+      }
+    } catch (error) {
       response = {
         status: false,
         message: error

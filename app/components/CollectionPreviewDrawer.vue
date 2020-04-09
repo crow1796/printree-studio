@@ -84,6 +84,18 @@
                   </button>
                   <button
                     type="button"
+                    class="absolute top-0 right-0 rounded flex justify-center items-center w-8 h-8 hover:text-primary outline-none focus:outline-none"
+                    :class="{
+                      'text-primary': selectedProduct.featured_at
+                    }"
+                    @click="markAsFeatured"
+                    :title="selectedProduct.featured_at ? 'Unfeature' : 'Feature'"
+                    v-tippy="{arrow: true}"
+                  >
+                    <font-awesome-icon :icon="['fas', 'star']" />
+                  </button>
+                  <button
+                    type="button"
                     class="absolute bottom-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
                     @click="downloadDesign"
                     :title="`Download (${selectedProductSide.toUpperCase()})`"
@@ -239,7 +251,6 @@ export default {
       selectedProductSide: null,
       confirmationAction: null,
       isLoading: false,
-      selectedProduct: null,
       generatedProducts: JSON.parse(JSON.stringify(this.products)),
       selectedProduct: this.products.length
         ? JSON.parse(JSON.stringify(this.products[0]))
@@ -258,6 +269,19 @@ export default {
     }
   },
   methods: {
+    async markAsFeatured(){
+      this.isLoading = true
+      const res = await this.$store.dispatch('admin/markAsFeatured', {
+        type: 'product',
+        obj: this.selectedProduct,
+        is_marked: this.selectedProduct.featured_at ? true : false
+      })
+      this.selectedProduct = res.data
+      this.isLoading = false
+      this.$toast.success(this.selectedProduct.featured_at ? 'Product is now featured!' : 'Product has been unfeatured!', {
+        position: 'top'
+      })
+    },
     switchSides() {
       const sides = _.keys(
         this.selectedProduct.variants[this.selectedProductVariantKey].sides

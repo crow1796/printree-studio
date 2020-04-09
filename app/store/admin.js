@@ -129,6 +129,10 @@ const actions = {
       context.commit('UPDATE_PAYOUT', res.data)
     }
     return res
+  },
+  async markAsFeatured(context, data){
+    const res = await adminDb.markAsFeatured(data)
+    return res
   }
 }
 

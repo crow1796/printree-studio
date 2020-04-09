@@ -119,6 +119,7 @@ export default {
           category,
           name: productData.name,
           meta: productDocData.meta,
+          featured_at: productDocData.featured_at,
           availableVariants,
           parent_id: productSnap.id,
           variants
@@ -295,7 +296,7 @@ export default {
       .doc(collectionId)
     await collectionRef.update(data)
   },
-  async approveCollection(collectionId){
+  async approveCollection(collectionId) {
     const now = Timestamp.now()
     const collectionRef = fireDb
       .collection('user_collections')
@@ -306,7 +307,7 @@ export default {
       declined_at: null
     })
   },
-  async declineCollection(collectionId){
+  async declineCollection(collectionId) {
     const now = Timestamp.now()
     const collectionRef = fireDb
       .collection('user_collections')
@@ -462,21 +463,77 @@ export default {
     })
     return addresses
   },
+  async getFeaturedProducts(query) {
+    let response = {
+      status: true
+    }
+
+    try {
+      const featuredProductsSnaps = await fireDb
+        .collection('user_products')
+        .orderBy('featured_at', 'desc')
+        .get()
+
+      const featuredProducts = await Promise.all(
+        _.map(featuredProductsSnaps.docs, async productSnap => {
+          const collectionQuery = await fireDb.collection('user_collections').where('products', 'array-contains', productSnap.ref).get()
+          const collectionSnap = _.first(collectionQuery.docs)
+          const collectionData = collectionSnap.data()
+          const productData = productSnap.data()
+          const firstVariantRef = await _.first(productData.variants).get()
+          const firstVariant = firstVariantRef.data()
+          const firstSizeKey = _.first(_.keys(firstVariant.sizes))
+          const price = firstVariant.sizes[firstSizeKey].price
+          const parentVariantRef = await firstVariant.variant.get()
+          const parentVariantData = parentVariantRef.data()
+          const areas = _.keys(parentVariantData.printable_area)
+          const frontOrFirstSide = _.includes(areas, 'front')
+            ? 'front'
+            : _.first(areas)
+          const parentFirstSize = _.first(parentVariantData.available_sizes)
+          const baseCost = parentFirstSize.base_cost
+          const thumbnail = await fireStorage
+            .ref(
+              `products/thumbnails/${productData.id}/${firstVariantRef.id}/${frontOrFirstSide}.png`
+            )
+            .getDownloadURL()
+          const product = {
+            id: productData.id,
+            collectionId: collectionSnap.id,
+            collectionName: collectionData.name,
+            name: productData.meta.name,
+            price: baseCost + price,
+            thumbnail: thumbnail
+          }
+          return product
+        })
+      )
+      response.data = featuredProducts
+    } catch (error) {
+      console.log(error)
+      response = {
+        status: false,
+        message: error
+      }
+    }
+
+    return response
+  },
   async getProductsToSell(query) {
     let collectionSnaps = []
     let collectionsSnap = null
-    if(query && query.collectionId){
+    if (query && query.collectionId) {
       collectionsSnap = await fireDb
-      .collection('user_collections')
-      .doc(query.collectionId)
-      .get()
+        .collection('user_collections')
+        .doc(query.collectionId)
+        .get()
       collectionSnaps = [collectionsSnap]
-    }else {
+    } else {
       collectionsSnap = await fireDb
-      .collection('user_collections')
-      .where('plan', '==', 'sell')
-      .where('status', '==', 'approved')
-      .get()
+        .collection('user_collections')
+        .where('plan', '==', 'sell')
+        .where('status', '==', 'approved')
+        .get()
       collectionSnaps = collectionsSnap.docs
     }
     const products = await Promise.all(
@@ -832,13 +889,15 @@ export default {
             .doc(user.uid)
             .collection('payouts')
             .doc()
-      if(payout.id){
+      if (payout.id) {
         const payoutSnap = await payoutRef.get()
         const payoutData = payoutSnap.data()
-        if(payoutData.status !== 'pending') return {
-          status: false,
-          message: 'Unable to update request. Has already moved from "pending" state.'
-        }
+        if (payoutData.status !== 'pending')
+          return {
+            status: false,
+            message:
+              'Unable to update request. Has already moved from "pending" state.'
+          }
       }
       let payoutRequest = {
         id: payoutRef.id,
@@ -905,18 +964,18 @@ export default {
     }
     try {
       const payoutRef = fireDb
-      .collection('user_payouts')
-      .doc(user.uid)
-      .collection('payouts')
-      .doc(payout.id)
-      const payoutSnap = await payoutRef
-        .get()
+        .collection('user_payouts')
+        .doc(user.uid)
+        .collection('payouts')
+        .doc(payout.id)
+      const payoutSnap = await payoutRef.get()
 
       const payoutData = payoutSnap.data()
-      if(payoutData.status !== 'pending'){
+      if (payoutData.status !== 'pending') {
         return {
           status: false,
-          message: 'Unable to update request. Has already moved from "pending" state.'
+          message:
+            'Unable to update request. Has already moved from "pending" state.'
         }
       }
 

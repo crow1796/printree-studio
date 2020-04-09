@@ -6,7 +6,9 @@
         <div class="container mx-auto px-4">
           <div class="flex items-center justify-between py-4">
             <div class="flex flex-grow">
-              <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-24" />
+              <nuxt-link to="/">
+                <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-24" />
+              </nuxt-link>
             </div>
 
             <div class="flex flex-grow hidden sm:flex sm:items-center justify-end">
@@ -20,7 +22,7 @@
               >Pricing</nuxt-link>
               <nuxt-link
                 to="/dashboard"
-                class="text-white rounded-full border-primary text-primary font-semibold border px-4 py-1 rounded-lg hover:text-primary-white bg-white"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 v-if="isLoggedIn && user"
               >
                 <span>{{ user.email }}</span>
@@ -30,7 +32,7 @@
               </nuxt-link>
               <a
                 href="#"
-                class="text-white rounded-full border-primary text-primary font-semibold border px-4 py-1 rounded-lg hover:text-primary-white bg-white"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 @click.prevent="$refs.authModal.show()"
                 v-else
               >Get Started</a>

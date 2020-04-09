@@ -7,10 +7,7 @@
             <div class="text-primary mb-2">Pages</div>
             <ul class="list-reset leading-normal">
               <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="#">Home</nuxt-link>
-              </li>
-              <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="#">Marketplace</nuxt-link>
+                <nuxt-link to="/marketplace">Marketplace</nuxt-link>
               </li>
             </ul>
           </div>
@@ -18,13 +15,13 @@
             <div class="text-primary mb-2">Useful Links</div>
             <ul class="list-reset leading-normal">
               <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="#">FAQs</nuxt-link>
+                <nuxt-link to="/faqs">FAQs</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="#">Terms of Service</nuxt-link>
+                <nuxt-link to="/terms-of-service">Terms of Service</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="#">Privacy Policy</nuxt-link>
+                <nuxt-link to="/privacy-policy">Privacy Policy</nuxt-link>
               </li>
             </ul>
           </div>
