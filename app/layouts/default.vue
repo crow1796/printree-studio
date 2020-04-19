@@ -17,10 +17,6 @@
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
               >Marketplace</nuxt-link>
               <nuxt-link
-                to="/marketplace"
-                class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Pricing</nuxt-link>
-              <nuxt-link
                 to="/dashboard"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 v-if="isLoggedIn && user"

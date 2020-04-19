@@ -56,6 +56,11 @@
               </div>
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
+              <nuxt-link
+                to="/marketplace/products"
+                class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
+              >Products</nuxt-link>
+                
                 <nuxt-link
                   to="/dashboard"
                   class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"

@@ -217,7 +217,7 @@
           class="flex p-4 items-center border-t"
           :class="{'justify-end': meta.status === 'declined', 'justify-between': meta.status === 'pending'}"
         >
-          <PTButton @click="confirmAction('decline')" v-if="meta.status !== 'declined'">DECLINE</PTButton>
+          <PTButton @click="confirmAction('decline')" v-if="meta.status === 'pending'">DECLINE</PTButton>
           <PTButton
             color="primary"
             v-if="meta.status !== 'approved'"

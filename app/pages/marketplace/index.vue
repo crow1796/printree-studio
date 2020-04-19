@@ -132,7 +132,7 @@ export default {
   },
   async mounted(){
     this.isFeaturedProductLoading = true
-    const res = await this.$store.dispatch('marketplace/getFeaturedProducts')
+    const res = await this.$store.dispatch('marketplace/getProductsToSell', { is_featured: true })
     if(res.status){
       this.featuredProducts = res.data
     }

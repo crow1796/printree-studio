@@ -7,6 +7,9 @@
             <div class="text-primary mb-2">Pages</div>
             <ul class="list-reset leading-normal">
               <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="/">Home</nuxt-link>
+              </li>
+              <li class="hover:text-primary text-grey-darker">
                 <nuxt-link to="/marketplace">Marketplace</nuxt-link>
               </li>
             </ul>

@@ -29,6 +29,7 @@
                   class="cursor-pointer hover:text-primary mx-1"
                 />
               </network>
+              <CopyToClipboardButton/>
             </div>
           </social-sharing>
         </div>
@@ -40,16 +41,19 @@
 <script>
 import ProductsGrid from '@/components/ProductsGrid'
 import BreadCrumbs from '@/components/BreadCrumbs'
+import CopyToClipboardButton from '@/components/CopyToClipboardButton'
 export default {
   layout: 'marketplace',
   components: {
     ProductsGrid,
-    BreadCrumbs
+    BreadCrumbs,
+    CopyToClipboardButton
   },
   async mounted(){
-    this.products = await this.$store.dispatch('marketplace/getProductsToSell', {
+    const res = await this.$store.dispatch('marketplace/getProductsToSell', {
       collectionId: this.$route.params.id
     })
+    this.products = res.data
     if(this.products.length){
       this.collection = {
         id: _.first(this.products).collectionId,

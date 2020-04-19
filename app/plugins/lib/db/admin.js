@@ -87,5 +87,32 @@ export default {
     }
 
     return response
+  },
+  async updateCollectionStatusOf(collectionId, status) {
+    const batch = fireDb.batch()
+    const now = Timestamp.now()
+    const collectionRef = fireDb
+      .collection('user_collections')
+      .doc(collectionId)
+    const productSnaps = await collectionRef.collection('collection_products').get()
+    const productsCount = productSnaps.docs.length
+    _.map(productSnaps.docs, snap => {
+      batch.update(snap.ref, {
+        status,
+        approved_at: status === 'approved' ? now : null,
+        declined_at: status === 'declined' ? now : null
+      })
+    })
+    batch.update(collectionRef, {
+      status,
+      approved_at: status === 'approved' ? now : null,
+      declined_at: status === 'declined' ? now : null
+    })
+    if(status === 'approved'){
+      const counterRef = fireDb.collection('_counters').doc('published_products')
+      const countSnap = await counterRef.get()
+      batch.update(counterRef, { count: countSnap.data().count + productsCount})
+    }
+    batch.commit()
   }
 }

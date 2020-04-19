@@ -65,15 +65,15 @@ export default {
       status: null,
       products: []
     }
+    const productSnaps = await snap.ref.collection('collection_products').get()
     collection.id = snap.id
     collection.name = snap.data().name
     collection.user_id = snap.data().user_id
     collection.plan = snap.data().plan
     collection.status = snap.data().status
     const products = await Promise.all(
-      _.map(snap.data().products, async productRef => {
-        const productDocSnap = await productRef.get()
-        const productDocData = productDocSnap.data()
+      _.map(productSnaps.docs, async snap => {
+        const productDocData = snap.data()
         const productSnap = await productDocData.product.get()
         const productData = productSnap.data()
         let categorySnap = await productData.category.get()
@@ -115,11 +115,13 @@ export default {
           })
         )
         return {
-          id: productRef.id,
+          id: snap.id,
           category,
           name: productData.name,
           meta: productDocData.meta,
           featured_at: productDocData.featured_at,
+          plan: productDocData.plan,
+          status: productDocData.status,
           availableVariants,
           parent_id: productSnap.id,
           variants
@@ -158,8 +160,8 @@ export default {
   async createDesignFor(user, products) {
     const batch = fireDb.batch()
     const collectionRef = fireDb.collection('user_collections').doc()
-    const createdProducts = _.map(products, product => {
-      const productRef = fireDb.collection('user_products').doc()
+    _.map(products, product => {
+      const productRef = fireDb.collection('user_collections').doc(collectionRef.id).collection('collection_products').doc()
       let objects = {}
       let sizes = {}
       _.map(product.availableVariants[0].printable_area, (v, k) => {
@@ -182,14 +184,16 @@ export default {
         collection: collectionRef
       })
       const prod = {
-        id: productRef.id,
         meta: {
           name: '',
           description: '',
           tags: ''
         },
         product: fireDb.collection('available_products').doc(product.id),
-        variants: [variantRef]
+        variants: [variantRef],
+        rating: 0,
+        plan: 'sell',
+        status: 'draft'
       }
       batch.set(productRef, prod)
       return productRef
@@ -198,7 +202,6 @@ export default {
       name: 'Untitled Collection',
       user_id: user.uid,
       plan: 'sell',
-      products: createdProducts,
       status: 'draft'
     }
     batch.set(collectionRef, design)
@@ -216,7 +219,7 @@ export default {
     const batch = fireDb.batch()
     const products = await Promise.all(
       _.map(selectedProducts, async product => {
-        const productRef = fireDb.collection('user_products').doc(product.id)
+        const productRef = fireDb.collection('user_collections').doc(id).collection('collection_products').doc(product.id)
         let variants = _.map(product.variants, variant => {
           let objects = {}
           const variantRef = variant.id
@@ -243,12 +246,14 @@ export default {
           return variantRef
         })
         const prod = {
-          id: productRef.id,
           meta: product.meta,
           product: fireDb
             .collection('available_products')
             .doc(product.parent_id),
-          variants
+          variants,
+          rating: 0,
+          plan,
+          status
         }
         if (!product.is_new) batch.update(productRef, prod)
         else batch.set(productRef, prod)
@@ -295,28 +300,6 @@ export default {
       .collection('user_collections')
       .doc(collectionId)
     await collectionRef.update(data)
-  },
-  async approveCollection(collectionId) {
-    const now = Timestamp.now()
-    const collectionRef = fireDb
-      .collection('user_collections')
-      .doc(collectionId)
-    await collectionRef.update({
-      status: 'approved',
-      approved_at: now,
-      declined_at: null
-    })
-  },
-  async declineCollection(collectionId) {
-    const now = Timestamp.now()
-    const collectionRef = fireDb
-      .collection('user_collections')
-      .doc(collectionId)
-    await collectionRef.update({
-      status: 'declined',
-      approved_at: null,
-      declined_at: now
-    })
   },
   async deleteCollection(collectionId) {
     const collectionRef = fireDb
@@ -463,21 +446,44 @@ export default {
     })
     return addresses
   },
-  async getFeaturedProducts(query) {
+  async getProductsToSell(query) {
     let response = {
       status: true
     }
 
     try {
-      const featuredProductsSnaps = await fireDb
-        .collection('user_products')
-        .orderBy('featured_at', 'desc')
-        .get()
+      console.log(fireDb.collection('user_collections').orderBy('name'))
+      let productsRef = fireDb.collectionGroup('collection_products').where('status', '==', 'approved').where('plan', '==', 'sell')
 
-      const featuredProducts = await Promise.all(
-        _.map(featuredProductsSnaps.docs, async productSnap => {
-          const collectionQuery = await fireDb.collection('user_collections').where('products', 'array-contains', productSnap.ref).get()
-          const collectionSnap = _.first(collectionQuery.docs)
+      if(query && query.collectionId){
+        productsRef = fireDb.collection('user_collections').doc(query.collectionId).collection('collection_products')
+      }
+
+      let productQuery = productsRef
+      
+      if(query && query.is_featured){
+        productQuery = productQuery.orderBy('featured_at', 'desc').limit(5)
+      }else {
+        const perPage = query.per_page || 20
+        productQuery = productQuery.orderBy('rating', 'desc')
+
+        switch(query.step){
+          case -1:
+            console.log(productQuery)
+            productQuery = productQuery.endBefore(query.first_item).limitToLast(perPage)
+            break;
+          case 1:
+            productQuery = productQuery.startAfter(query.last_item).limit(perPage)
+            break;
+          default:
+            productQuery = productQuery.limit(perPage)
+        }
+      }
+      const productSnaps = await productQuery.get()
+
+      const products = await Promise.all(
+        _.map(productSnaps.docs, async productSnap => {
+          const collectionSnap = await productSnap.ref.parent.parent.get()
           const collectionData = collectionSnap.data()
           const productData = productSnap.data()
           const firstVariantRef = await _.first(productData.variants).get()
@@ -494,21 +500,26 @@ export default {
           const baseCost = parentFirstSize.base_cost
           const thumbnail = await fireStorage
             .ref(
-              `products/thumbnails/${productData.id}/${firstVariantRef.id}/${frontOrFirstSide}.png`
+              `products/thumbnails/${productSnap.id}/${firstVariantRef.id}/${frontOrFirstSide}.png`
             )
             .getDownloadURL()
           const product = {
-            id: productData.id,
+            id: productSnap.id,
             collectionId: collectionSnap.id,
             collectionName: collectionData.name,
             name: productData.meta.name,
+            rating: productData.rating,
             price: baseCost + price,
             thumbnail: thumbnail
           }
           return product
         })
       )
-      response.data = featuredProducts
+      response.data = products
+      response.page = {
+        first: _.first(productSnaps.docs),
+        last: _.last(productSnaps.docs)
+      }
     } catch (error) {
       console.log(error)
       response = {
@@ -519,7 +530,7 @@ export default {
 
     return response
   },
-  async getProductsToSell(query) {
+  async getCollectionsToSellWithProducts(query) {
     let collectionSnaps = []
     let collectionsSnap = null
     if (query && query.collectionId) {
