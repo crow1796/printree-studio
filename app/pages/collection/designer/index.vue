@@ -373,7 +373,7 @@ export default {
     Canvas,
     Output
   },
-  async created() {
+  async mounted() {
     WebFontLoader.load({
       google: {
         families: _.map(this.webfonts, 'value')

@@ -123,7 +123,7 @@ export default {
   components: {
     CollectionPreviewDrawer
   },
-  async created() {
+  async mounted() {
     try {
       await this.$store.dispatch('admin/getCollections')
       this.isLoading = false

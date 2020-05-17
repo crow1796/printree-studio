@@ -1,5 +1,5 @@
 <template>
-  <no-ssr>
+  <client-only>
     <div class="flex-grow flex flex-col text-sm">
       <AreaLoader v-if="isLoading" fullscreen />
       <AuthModal ref="authModal" />
@@ -43,7 +43,7 @@
         <nuxt v-if="!isLoading" />
       </div>
     </div>
-  </no-ssr>
+  </client-only>
 </template>
 
 

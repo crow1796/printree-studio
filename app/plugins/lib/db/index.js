@@ -469,8 +469,7 @@ export default {
 
         switch(query.step){
           case -1:
-            console.log(productQuery)
-            productQuery = productQuery.endBefore(query.first_item).limitToLast(perPage)
+            productQuery = productQuery.endBefore(query.first_item).limit(perPage)
             break;
           case 1:
             productQuery = productQuery.startAfter(query.last_item).limit(perPage)

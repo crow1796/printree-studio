@@ -109,7 +109,7 @@ export default {
   components: {
     Tabs
   },
-  async created() {
+  async mounted() {
     this.isLoading = true
     await this.$store.dispatch('designer/fetchAvailableProducts')
     this.isLoading = false
