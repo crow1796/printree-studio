@@ -15,21 +15,22 @@
         <div class="flex items-center justify-between">
           <span class="font-black truncate w-11/12">{{product.name}}</span>
         </div>
-        <div
+        <!-- <div
           class="text-primary mb-1 text-xs font-black text-lg leading-none flex items-center"
-        >{{product.price.formatMoney('₱ ')}}</div>
-        <div class="text-xs text-yellow-500">
-          <font-awesome-icon :icon="['fas', 'star']"/>
-          <font-awesome-icon :icon="['fas', 'star']"/>
-          <font-awesome-icon :icon="['fas', 'star']"/>
-        </div>
+        >{{product.price.formatMoney('₱ ')}}</div> -->
+        <star-rating :increment="0.01" :fixed-points="2" v-model="product.rating" :read-only="true" :show-rating="false" :star-size="15"></star-rating>
       </div>
     </nuxt-link>
   </div>
 </template>
 
 <script>
+import StarRating from 'vue-star-rating'
+
 export default {
-  props: ['products']
+  props: ['products'],
+  components: {
+    StarRating
+  }
 }
 </script>

@@ -176,7 +176,7 @@ export default {
   components: {
     VueTailwindModal
   },
-  async created() {
+  async mounted() {
     try {
       await this.$store.dispatch('admin/getUsers')
       this.isLoading = false

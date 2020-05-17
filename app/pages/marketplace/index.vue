@@ -105,14 +105,18 @@
     </div>
     <!-- Display Container (not part of component) END -->
     <!-- Listing START-->
-    <div class="flex flex-col p-24 py-16 pt-6 container mx-auto px-4">
-      <div class="flex justify-between lg:px-8 font-bold">
-        <div>PRODUCTS</div>
+    <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">
+      <AreaLoader v-if="isFeaturedProductLoading"/>
+      <div class="flex justify-between lg:px-8 font-bold mb-4">
+        <div class="font-black">Featured Products</div>
         <div>
-          <nuxt-link class="text-primary hover:text-primary-lighter" to="/marketplace/products">SEE ALL ></nuxt-link>
+          <nuxt-link class="text-primary hover:text-primary-lighter flex items-center" to="/marketplace/products">
+            <span class="mr-2">See all Products</span>
+            <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+          </nuxt-link>
         </div>
       </div>
-      <ProductsGrid :products="products" />
+      <ProductsGrid :products="featuredProducts" />
     </div>
     <!-- Listing END -->
   </div>
@@ -126,15 +130,18 @@ export default {
   components: {
     ProductsGrid
   },
+  async mounted(){
+    this.isFeaturedProductLoading = true
+    const res = await this.$store.dispatch('marketplace/getProductsToSell', { is_featured: true })
+    if(res.status){
+      this.featuredProducts = res.data
+    }
+    this.isFeaturedProductLoading = false
+  },
   data(){
     return {
-      products: [{
-        id: 1,
-        name: 'Printree T-Shirt',
-        collectionName: 'Printree Uniforms',
-        price: 499,
-        thumbnail: 'https://user-images.githubusercontent.com/2805249/64069899-8bdaa180-cc97-11e9-9b19-1a9e1a254c18.png'
-      }]
+      isFeaturedProductLoading: true,
+      featuredProducts: []
     }
   }
 }

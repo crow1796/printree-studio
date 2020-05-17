@@ -130,7 +130,7 @@ export default {
       designMeta: 'designer/designMeta'
     })
   },
-  async created() {
+  async mounted() {
     if (this.$storage.getLocalStorage('current_design_id')) {
       this.isLoading = true
       const design = await this.$store.dispatch(

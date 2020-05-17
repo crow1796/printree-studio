@@ -87,14 +87,7 @@ const actions = {
     })
   },
   async updateCollectionStatus(context, { id, status }){
-    switch(status){
-      case 'approved':
-        await db.approveCollection(id)
-        break;
-      case 'declined':
-        await db.declineCollection(id)
-        break;
-    }
+    await adminDb.updateCollectionStatusOf(id, status)
     context.commit('UPDATE_COLLECTION_STATUS', {
       id,
       status
@@ -128,6 +121,10 @@ const actions = {
     if (res.status) {
       context.commit('UPDATE_PAYOUT', res.data)
     }
+    return res
+  },
+  async markAsFeatured(context, data){
+    const res = await adminDb.markAsFeatured(data)
     return res
   }
 }

@@ -13,7 +13,7 @@
               </div>
 
               <div class="w-4/12 hidden sm:flex sm:items-center">
-                <div class="mr-3">
+                <div class="mr-3" v-if="categories.length">
                   <VueTailwindDropdown>
                     <template v-slot:trigger>
                       <a href="#" class="hover:text-primary text-sm flex items-center">
@@ -56,9 +56,14 @@
               </div>
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
+              <nuxt-link
+                to="/marketplace/products"
+                class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
+              >Products</nuxt-link>
+                
                 <nuxt-link
                   to="/dashboard"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                   v-if="isLoggedIn"
                 >
                   <span>{{ user.email }}</span>
@@ -68,7 +73,7 @@
                 </nuxt-link>
                 <a
                   href="#"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-lg hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                   id="get-started-btn"
                   @click.prevent="$refs.authModal.show()"
                   v-else
@@ -129,6 +134,11 @@ export default {
       isLoggedIn: 'user/isLoggedIn',
       user: 'user/user'
     })
+  },
+  data(){
+    return {
+      categories: []
+    }
   },
   methods: {
     openCart(){

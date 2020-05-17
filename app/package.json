@@ -52,6 +52,8 @@
     "vue-progressive-image": "^3.2.0",
     "vue-pure-lightbox": "^3.1.0",
     "vue-select": "^3.1.0",
+    "vue-social-sharing": "^2.4.7",
+    "vue-star-rating": "^1.6.1",
     "vue-tippy": "^4.0.0-beta.3",
     "vue-toast-notification": "^0.1.0",
     "vue-virtual-scroller": "^1.0.0-rc.2",
