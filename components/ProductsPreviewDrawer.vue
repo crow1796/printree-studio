@@ -117,7 +117,7 @@
                     :class="{
                       'border-gray-500 shadow-xl': selectedProductVariantKey === vid
                     }"
-                    :key="variant.id"
+                    :key="variant._id"
                     @click="() => (selectedProductVariantKey = vid)"
                   >
                     <div class="flex flex-col w-full">
@@ -493,7 +493,7 @@ export default {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
               variant.available_sizes,
-              s => s.name == k
+              s => s.name === size.name
             )
             if (!availableSize) return
             let baseCost = availableSize.baseCost
@@ -518,7 +518,7 @@ export default {
       this.isCalculating = true
       if (size) {
         this.$store.commit('designer/PRODUCT_PROPERTIES', {
-          id: this.selectedProduct.id,
+          _id: this.selectedProduct._id,
           props: {
             path: `variants.${this.selectedVariantIndex}.sizes.${size}.quantity`,
             value: this.selectedProductSizes[_.findIndex(this.selectedProductSizes, { name: size })].quantity
