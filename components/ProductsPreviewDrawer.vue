@@ -172,20 +172,20 @@
                   <div class="flex flex-wrap">
                     <div
                       class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-2"
-                      v-for="(variant, i) in selectedProduct
+                      v-for="(size, i) in selectedProduct
                         .variants[selectedProductVariantKey].sizes"
                       :key="i"
                     >
                       <div class="flex items-center">
-                        <div class="text-center mr-2">{{ i }}:</div>
+                        <div class="text-center mr-2">{{ size.name }}:</div>
                         <div>
                           <VueNumericInput
                             align="center"
                             style="width: 90px"
                             class="ml-1"
                             :min="1"
-                            v-model="selectedProductSizes[i].quantity"
-                            @input="calculateProfit(i)"
+                            v-model="size.quantity"
+                            @input="calculateProfit(size.name)"
                           />
                         </div>
                       </div>
@@ -341,11 +341,11 @@ export default {
     selectedVariantIndex() {
       const product = JSON.parse(
         JSON.stringify(
-          _.find(this.selectedProducts, { id: this.selectedProduct.id })
+          _.find(this.selectedProducts, { _id: this.selectedProduct._id })
         )
       )
       return _.findIndex(product.variants, {
-        id: this.selectedProductVariantKey
+        _id: this.selectedProductVariantKey
       })
     }
   },
@@ -496,7 +496,7 @@ export default {
               s => s.name == k
             )
             if (!availableSize) return
-            let baseCost = availableSize.base_cost
+            let baseCost = availableSize.baseCost
             let totalForPrintree = baseCost * size.quantity
             let totalWithCustomerPrice = (baseCost + size.price) * size.quantity
             let net = totalWithCustomerPrice - totalForPrintree
@@ -521,7 +521,7 @@ export default {
           id: this.selectedProduct.id,
           props: {
             path: `variants.${this.selectedVariantIndex}.sizes.${size}.quantity`,
-            value: this.selectedProductSizes[size].quantity
+            value: this.selectedProductSizes[_.findIndex(this.selectedProductSizes, { name: size })].quantity
           }
         })
       }
@@ -551,7 +551,7 @@ export default {
         const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
         this.selectedProductBasePrice = _.first(
           to.variants[firstVariantKey].available_sizes
-        ).base_cost
+        ).baseCost
 
         this.selectedProductProfit =
           to.variants[firstVariantKey].sizes[firstSizeKey].price
@@ -573,8 +573,9 @@ export default {
         this.selectedProductSizes = this.selectedProduct.variants[to].sizes
         const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
 
+        console.log(this.generatedProducts)
         this.generatedProducts[
-          _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
+          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes
       }
     },
@@ -592,13 +593,13 @@ export default {
         )
 
         this.generatedProducts[
-          _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
+          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[
           this.selectedProductVariantKey
         ].sizes = this.selectedProductSizes
 
         this.$store.commit('designer/PRODUCT_PROPERTIES', {
-          id: this.selectedProduct.id,
+          _id: this.selectedProduct._id,
           props: {
             path: `variants.${this.selectedVariantIndex}.sizes`,
             value: this.selectedProductSizes

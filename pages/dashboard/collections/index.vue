@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <AreaLoader v-if="isLoading" />
+    <AreaLoader v-if="isLoading" :fullscreen="isLoadingFull" />
     <VueTailwindModal
       ref="availableProductsModal"
       width="100%"
@@ -199,13 +199,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import TotalProfitCounter from '@/components/TotalProfitCounter'
-import VueTailwindModal from '@/components/VueTailwindModal'
-import AvailableProducts from '@/components/Designer/AvailableProducts'
+import { mapGetters } from "vuex";
+import TotalProfitCounter from "@/components/TotalProfitCounter";
+import VueTailwindModal from "@/components/VueTailwindModal";
+import AvailableProducts from "@/components/Designer/AvailableProducts";
 
 export default {
-  layout: 'user_dashboard',
+  layout: "user_dashboard",
   components: {
     VueTailwindModal,
     TotalProfitCounter,
@@ -213,67 +213,70 @@ export default {
   },
   async mounted() {
     const collections = await this.$store.dispatch(
-      'user_dashboard/getUserCollectionsOf',
+      "user_dashboard/getUserCollectionsOf",
       this.user.uid
-    )
+    );
     // await this.$store.dispatch('user_dashboard/getTotalProfitOf', this.user)
-    this.isLoading = false
+    this.isLoading = false;
   },
   data() {
     return {
       isLoading: true,
+      isLoadingFull: false,
       tmpSelectedProducts: []
-    }
+    };
   },
   computed: {
     ...mapGetters({
-      userCollections: 'user_dashboard/userCollections',
-      isLoggedIn: 'user/isLoggedIn',
-      user: 'user/user'
+      userCollections: "user_dashboard/userCollections",
+      isLoggedIn: "user/isLoggedIn",
+      user: "user/user"
     })
   },
   methods: {
     async showAvailableProducts() {
-      this.isLoading = false
-      this.$refs.availableProductsModal.show()
+      this.isLoading = false;
+      this.$refs.availableProductsModal.show();
     },
     async createNewDesign() {
-      if (!this.tmpSelectedProducts.length) return
-      this.isLoading = true
-      let collection = await this.$store.dispatch('designer/createNewDesign', {
+      if (!this.tmpSelectedProducts.length) return;
+      this.isLoadingFull = true;
+      this.isLoading = true;
+      let collection = await this.$store.dispatch("designer/createNewDesign", {
         user: this.user,
         products: this.tmpSelectedProducts
-      })
-      this.tmpSelectedProducts = []
-      this.$storage.setLocalStorage('current_design_id', collection._id)
-      this.$router.push('/collection/designer')
+      });
+      if (!collection) this.isLoadingFull = false;
+      this.tmpSelectedProducts = [];
+      this.$storage.setLocalStorage("current_design_id", collection._id);
+      this.$router.push("/collection/designer");
     },
     editCollection(collection) {
-      this.$storage.setLocalStorage('current_design_id', collection._id)
-      this.$router.replace('/collection/designer')
+      this.$storage.setLocalStorage("current_design_id", collection._id);
+      this.$router.replace("/collection/designer");
     },
     showDeleteCollectionConfirmation(collection) {
-      this.collectionToDelete = collection
-      this.$refs.deleteConfirmationModal.show()
+      this.collectionToDelete = collection;
+      this.$refs.deleteConfirmationModal.show();
     },
     hideDeleteCollectionConfirmation() {
-      this.collectionToDelete = null
-      this.$refs.deleteConfirmationModal.hide()
+      this.collectionToDelete = null;
+      this.$refs.deleteConfirmationModal.hide();
     },
     async deleteCollection() {
-      this.isLoading = true
-      this.$refs.deleteConfirmationModal.hide()
-      this.$storage.removeLocalStorage('current_design_id')
+      this.isLoading = true;
+      this.$refs.deleteConfirmationModal.hide();
+      this.$storage.removeLocalStorage("current_design_id");
       await this.$store.dispatch(
-        'designer/deleteCollection',
+        "designer/deleteCollection",
         this.collectionToDelete._id
-      )
+      );
       this.$store.dispatch(
-        'user_dashboard/removeCollectionById',
+        "user_dashboard/removeCollectionById",
         this.collectionToDelete.id
-      )
-      this.isLoading = false
+      );
+      this.isLoading = false;
     }
   }
-}
+};
 </script>

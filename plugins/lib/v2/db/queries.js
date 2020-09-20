@@ -79,6 +79,8 @@ export default {
         collection(_id: $id){
             _id
             name
+            plan
+            status
             products {
                 _id
                 meta {
@@ -91,6 +93,10 @@ export default {
                     customizableVariants {
                         _id
                         color
+                        sizes {
+                            name
+                            baseCost
+                        }
                     }
                 }
                 variants {
@@ -119,4 +125,45 @@ export default {
         }
     }
   `,
+  updateUserCollection: `
+    mutation ($collection: UpdateCollectionInput){
+        updateUserCollection(collection: $collection){
+            _id
+            name
+            plan
+            approved_at
+            declined_at
+            status
+            created_at
+            updated_at
+            products {
+                _id
+                meta {
+                    name
+                    tags
+                    description
+                }
+                variants {
+                    _id
+                    customizableVariant {
+                        _id
+                        sizes {
+                            name
+                            baseCost
+                        }
+                    }
+                    sizes {
+                        name
+                        quantity
+                    }
+                    contents {
+                        _id
+                        side
+                        objects
+                    }
+                }
+            }
+        }
+    }
+  `
 };

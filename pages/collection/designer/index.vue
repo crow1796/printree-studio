@@ -622,7 +622,8 @@ export default {
     selectedProducts: {
       deep: true,
       handler(to) {
-        clearTimeout(this.autoSaveTimeout);
+        if(this.autoSaveTimeout) clearTimeout(this.autoSaveTimeout);
+        if(this.autoSavingTimeout) clearTimeout(this.autoSavingTimeout);
         this.autoSaveTimeout = setTimeout(async () => {
           this.autoSaving = true;
           this.autoSavingText = "Saving...";
@@ -630,7 +631,7 @@ export default {
             shouldGenerateImages: false
           });
           this.autoSavingText = "Saved!";
-          setTimeout(() => {
+          this.autoSavingTimeout = setTimeout(() => {
             this.autoSaving = false;
           }, 1000);
         }, 3000);

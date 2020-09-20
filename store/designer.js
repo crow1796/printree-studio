@@ -247,7 +247,6 @@ const state = () => ({
     { label: "Press Start 2P", value: "Press Start 2P" },
     { label: "Fugaz One", value: "Fugaz One" },
     { label: "Fredericka the Great", value: "Fredericka the Great" },
-    { label: "Patua One", value: "Patua One" },
     { label: "Bubblegum Sans", value: "Bubblegum Sans" },
     { label: "Shojumaru", value: "Shojumaru" },
     { label: "Bungee Inline", value: "Bungee Inline" },
@@ -323,15 +322,15 @@ const mutations = {
       _.findIndex(state.selectedProducts, { id })
     ].meta = meta;
   },
-  PRODUCT_PROPERTIES(state, { id, props }) {
+  PRODUCT_PROPERTIES(state, { _id, props }) {
     let tmpProduct = JSON.parse(
       JSON.stringify(
-        state.selectedProducts[_.findIndex(state.selectedProducts, { id })]
+        state.selectedProducts[_.findIndex(state.selectedProducts, { _id })]
       )
     );
     _.set(tmpProduct, props.path, props.value);
     state.selectedProducts[
-      _.findIndex(state.selectedProducts, { id })
+      _.findIndex(state.selectedProducts, { _id })
     ] = tmpProduct;
   },
   OBJECT_PROPERTIES(state, data) {
@@ -635,6 +634,7 @@ const actions = {
       generatedImages = res.data || res;
       await this.$api.saveCollection({
         id: context.getters.currentDesignId,
+        name: context.getters.designMeta.name,
         plan: context.getters.designMeta.plan,
         selectedProducts: context.getters.selectedProducts,
         status: context.getters.designMeta.status,

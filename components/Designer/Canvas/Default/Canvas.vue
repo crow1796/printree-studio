@@ -24,7 +24,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-col w-2/3 w-full">
+        <div class="flex flex-col w-2/3 w-full mt-4">
           <div class="uppercase font-bold text-gray-600 pb-2 px-1">Choose an Art</div>
           <div class="overflow-auto">
             <ArtsList
@@ -370,7 +370,6 @@ export default {
       this.$refs[modal].show()
     },
     artAdded(file, res) {
-      return false
       let type = 'image'
       let value = file.dataURL
       if (file.type == 'image/svg+xml') {
