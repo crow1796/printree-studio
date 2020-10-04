@@ -1,5 +1,5 @@
 import queries from "./queries";
-import { createDesignFor, getCollection, saveCollection } from './collections';
+import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
 import { getCollectionsOfUserId } from './users';
 import { fetchAvailableProducts, getArts } from './designer';
 
@@ -13,6 +13,8 @@ export default (axios) => {
     // collections.js
     createDesignFor: (products) => createDesignFor(axios, products),
     getCollection: (id) => getCollection(axios, id),
-    saveCollection: (collection) => saveCollection(axios, collection)
+    saveCollection: (collection) => saveCollection(axios, collection),
+    deleteCollection: (id) => deleteCollection(axios, id),
+    updateCollectionName: (data) => updateCollectionName(axios, data),
   };
 };

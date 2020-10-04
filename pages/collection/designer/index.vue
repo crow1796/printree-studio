@@ -161,40 +161,19 @@
       </div>
 
       <div class="flex flex-grow h-full flex-col w-3/4">
-        <DesignerTabs v-model="selectedTab" />
-
         <div
-          class="flex flex-grow w-full h-full justify-center overflow-hidden"
-          v-if="selectedTab === 'preview'"
+          class="flex flex-grow w-full h-full justify-center printable-output p-2"
+          :class="{'-maximized': isPreviewExpanded}"
         >
+          <button type="button" class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute z-10 bg-white left-0 top-0 preview-resizer-btn" @click="togglePreviewSize" :title="isPreviewExpanded ? 'Minimize' : 'Expand'" v-tippy="{arrow: true}">
+            <font-awesome-icon :icon="['fas', isPreviewExpanded ? 'compress-alt' : 'expand-alt']" :rotation="90"/>
+          </button>
           <div class="outline-none select-none relative w-full h-full text-center">
-            <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
-              <div class="flex bg-white mt-4 rounded border">
-                <div class="flex p-4">
-                  <ToggleSwitch
-                    :options="currentVariantSides"
-                    class="mx-1"
-                    :value="currentSide"
-                    @change="
-                      option =>
-                        $store.dispatch('designer/switchSideTo', option.value)
-                    "
-                  >
-                    <template v-slot:default="{ option }">
-                      <div class="flex flex-col">
-                        <img :src="option.label" width="50" />
-                        <div class="text-center mt-1 text-xs">{{ option.value.toUpperCase() }}</div>
-                      </div>
-                    </template>
-                  </ToggleSwitch>
-                </div>
-              </div>
-            </div>
 
-            <div class="inline-block product-section outline-none relative w-auto h-auto">
-              <div class="relative w-auto h-full">
+            <div class="inline-block outline-none relative w-full h-full">
+              <div class="relative w-full h-full">
                 <div
-                  class="inline-block relative w-auto h-auto"
+                  class="inline-block relative w-full h-full"
                   :style="{ 'background-color': currentVariant.color }"
                 >
                   <img
@@ -208,14 +187,6 @@
                 </div>
                 <div
                   class="printable-area-surface absolute"
-                  :style="{
-                    left: `${currentVariantContent.bounds.left}px`,
-                    top: `${currentVariantContent.bounds.top}px`,
-                    width: `${currentVariantContent.bounds.width}px`,
-                    height: `${currentVariantContent.bounds.height}px`,
-                    zIndex: 2
-                  }"
-                  @mouseenter="printableAreaZ = 3"
                 ></div>
                 <div
                   class="printable-area absolute"
@@ -262,9 +233,30 @@
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
           :height="currentVariantContent.bounds.height * 4"
-          :backgroundColor="currentVariant.color"
-          v-if="selectedTab === 'designer'"
-        />
+          :backgroundColor="currentVariant.color">
+          <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
+            <div class="flex bg-white mt-4 rounded border">
+              <div class="flex p-4">
+                <ToggleSwitch
+                  :options="currentVariantSides"
+                  class="mx-1"
+                  :value="currentSide"
+                  @change="
+                    option =>
+                      $store.dispatch('designer/switchSideTo', option.value)
+                  "
+                >
+                  <template v-slot:default="{ option }">
+                    <div class="flex flex-col">
+                      <img :src="option.label" width="50" />
+                      <div class="text-center mt-1 text-xs">{{ option.value.toUpperCase() }}</div>
+                    </div>
+                  </template>
+                </ToggleSwitch>
+              </div>
+            </div>
+          </div>
+        </Canvas>
       </div>
 
       <VueTailwindDrawer
@@ -335,7 +327,6 @@
 </template>
 
 <script>
-import Tabs from "@/components/Tabs";
 import Select from "@/components/Select";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ColorRegulator from "~/plugins/color-regulator.js";
@@ -344,7 +335,6 @@ import AvailableProducts from "@/components/Designer/AvailableProducts";
 import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueTailwindAccordion from "@/components/VueTailwindAccordion";
 import WrappedEditor from "@/components/WrappedEditor";
-import DesignerTabs from "@/components/Designer/DesignerTabs";
 import draggable from "vuedraggable";
 import Konva from "@/components/Designer/Canvas/Konva";
 import { Canvas, Output } from "@/components/Designer/Canvas/Default/index.js";
@@ -357,7 +347,6 @@ if (process.client) {
 export default {
   layout: "designer",
   components: {
-    Tabs,
     Select,
     ToggleSwitch,
     AvailableProducts,
@@ -365,7 +354,6 @@ export default {
     VueTailwindDrawer,
     VueTailwindAccordion,
     draggable,
-    DesignerTabs,
     Konva,
     Canvas,
     Output
@@ -382,7 +370,6 @@ export default {
   },
   data() {
     return {
-      selectedTab: "preview",
       isLayersCollapsed: false,
       productDescriptionEditor: null,
       fontSizeTimeout: null,
@@ -402,7 +389,8 @@ export default {
         name: "",
         description: "",
         tags: ""
-      }
+      },
+      isPreviewExpanded: false
     };
   },
   computed: {
@@ -429,6 +417,9 @@ export default {
     }
   },
   methods: {
+    togglePreviewSize(){
+      this.isPreviewExpanded = !this.isPreviewExpanded;
+    },
     _firstVariantPlaceholderOf(product) {
       return _.find(product.variants[0].contents, {
         side: this._firstPrintableArea(product.variants[0])
@@ -572,7 +563,6 @@ export default {
     },
     selectProduct(index) {
       if (index == this.currentProductIndex) return;
-      this.selectedTab = "preview";
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", index);
       this.$store.commit("designer/CURRENT_VARIANT_INDEX", 0);
     },

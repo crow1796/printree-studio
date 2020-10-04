@@ -17,7 +17,7 @@ export const createDesignFor = async (axios, products) => {
             {
               customizableVariant: prod.customizableVariants[0]._id,
               sizes: _.map(prod.customizableVariants[0].sizes, (size) => ({
-                name: size,
+                name: size.name,
                 quantity: 0,
               })),
             },
@@ -96,3 +96,26 @@ export const saveCollection = async (axios, collection) => {
   const { updateUserCollection } = data.data;
   return updateUserCollection;
 };
+
+export const deleteCollection = async (axios, id) => {
+  const { data } = await axios.post("/graphql", {
+    query: queries.deleteCollection,
+    variables: {
+      id
+    },
+  });
+  const { deleteCollection } = data.data;
+  return deleteCollection;
+}
+
+export const updateCollectionName = async (axios, {_id, name}) => {
+  const { data } = await axios.post("/graphql", {
+    query: queries.updateCollectionName,
+    variables: {
+      _id,
+      name
+    },
+  });
+  const { updateCollectionName } = data.data;
+  return updateCollectionName;
+}

@@ -102,23 +102,23 @@
 </template>
 
 <script>
-import Tabs from '@/components/Tabs'
-import { mapGetters } from 'vuex'
+import Tabs from "@/components/Tabs";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     Tabs
   },
   async mounted() {
-    this.isLoading = true
-    await this.$store.dispatch('designer/fetchAvailableProducts')
-    this.isLoading = false
+    this.isLoading = true;
+    await this.$store.dispatch("designer/fetchAvailableProducts");
+    this.isLoading = false;
     this.categories = [
       {
-        name: 'all',
-        title: 'All'
+        name: "all",
+        title: "All"
       }
-    ]
+    ];
   },
   data() {
     return {
@@ -126,46 +126,51 @@ export default {
       categories: [],
       tmpProducts: [],
       isLoading: false
-    }
+    };
   },
   computed: {
     ...mapGetters({
-      availableProducts: 'designer/availableProducts'
+      availableProducts: "designer/availableProducts"
     })
   },
   methods: {
     toggleProduct(product) {
       if (this._hasBeenSelected(product)) {
-        if (this.tmpProducts.length == 1) return
-        let index = _.findIndex(this.tmpProducts, { _id: product._id })
-        this.tmpProducts.splice(index, 1)
-        this.$emit('input', this.tmpProducts)
-        return
+        if (this.tmpProducts.length == 1) return;
+        let index = _.findIndex(this.tmpProducts, { _id: product._id });
+        this.tmpProducts.splice(index, 1);
+        this.$emit("input", this.tmpProducts);
+        return;
       }
-      product = JSON.parse(JSON.stringify(product))
-      this.tmpProducts.push(product)
-      this.$emit('input', this.tmpProducts)
+      product = JSON.parse(JSON.stringify(product));
+      this.tmpProducts.push(product);
+      this.$emit("input", this.tmpProducts);
     },
     _firstVariantPlaceholderOf(product) {
-      if (!product.customizableVariants.length) return
-      const areaKeys = _.map(product.customizableVariants[0].printableArea, 'side')
-      let firstSide = _.includes(areaKeys, 'front') ? 'front' : areaKeys[0]
-      return _.find(product.customizableVariants[0].printableArea, { side: firstSide }).placeholder
+      if (!product.customizableVariants.length) return;
+      const areaKeys = _.map(
+        product.customizableVariants[0].printableArea,
+        "side"
+      );
+      let firstSide = _.includes(areaKeys, "front") ? "front" : areaKeys[0];
+      return _.find(product.customizableVariants[0].printableArea, {
+        side: firstSide
+      }).placeholder;
     },
     _availableSizesOf(product) {
-      if (!product.customizableVariants.length) return
-      let sizeNames = product.customizableVariants[0].sizes
-      return sizeNames.join(', ')
+      if (!product.customizableVariants.length) return;
+      let sizeNames = _.map(product.customizableVariants[0].sizes, "name");
+      return sizeNames.join(", ");
     },
     _hasBeenSelected(product) {
-      return _.find(this.tmpProducts, { _id: product._id })
+      return _.find(this.tmpProducts, { _id: product._id });
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>
-.thumbnail:not([lazy='loaded']) {
+.thumbnail:not([lazy="loaded"]) {
   width: 16px;
   height: 16px;
 }

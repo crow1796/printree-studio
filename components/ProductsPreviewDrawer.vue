@@ -15,9 +15,9 @@
           </div>
         </div>
         <div class="modal-body p-4 text-center">
-          {{ meta.plan === 'sell' ? 'Are you sure you want to publish these products?' : 'Are you sure you want to proceed? This collection will be added to your cart.' }}
+          {{ meta.plan === 'Sell' ? 'Are you sure you want to publish these products?' : 'Are you sure you want to proceed? This collection will be added to your cart.' }}
           <div
-            v-if="meta.plan === 'sell'"
+            v-if="meta.plan === 'Sell'"
             class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"
           >The collection will be reviewed first before publishing it into the store, you will be receiving an email once it is approved.</div>
         </div>
@@ -42,14 +42,14 @@
         <li v-for="(error, i) in productErrors" :key="i">{{ error }}</li>
       </ul>
     </VueTailwindToast>
-    <div class="flex h-full w-full text-gray-600 overflow-hidden">
+    <div class="flex h-full w-full text-gray-600 overflow-hidden" v-if="selectedProduct">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4">
           <!-- <div class="flex w-4/12 uppercase flex-col">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
-                :value="meta.plan == 'sell'"
+                :value="meta.plan == 'Sell'"
                 :labels="{checked: 'SELL', unchecked: 'BUY'}"
                 :color="{ checked: '#E1274E', unchecked: '#63b3ed' }"
                 :width="60"
@@ -64,8 +64,8 @@
             </div>
             <div
               class="text-xs mt-1"
-            >{{ meta.plan == 'sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
-          </div> -->
+            >{{ meta.plan == 'Sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
+          </div>-->
           <div class="flex flex-grow uppercase font-bold justify-start">
             <div class="flex flex-col items-center">
               <div>TOTAL ESTIMATED PROFIT</div>
@@ -104,11 +104,8 @@
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
                 <img
-                  :src="selectedProduct.variants[selectedProductVariantKey].sides[
-                      _firstPrintableAreaOf(
-                        selectedProduct.variants[selectedProductVariantKey].sides
-                      )
-                    ].with_placeholder"
+                  :src="_firstFullThumbnailOf(selectedProduct)"
+                  :key="`full_${selectedProduct._id}_${drawerId}`"
                 />
                 <div class="variants flex">
                   <div
@@ -124,6 +121,7 @@
                       <img
                         :src="variant.sides[_firstPrintableAreaOf(variant.sides)]
                             .with_placeholder"
+                        :key="`variant_${variant._id}_${drawerId}`"
                       />
                     </div>
                   </div>
@@ -156,7 +154,7 @@
                   <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
                     <div
                       class="text-xs uppercase font-bold mb-1"
-                    >{{ meta.plan === 'sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
+                    >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
                   </div>
                   <div
@@ -239,18 +237,22 @@
                   <div
                     class="flex w-6/12 p-1"
                     v-for="product in generatedProducts"
-                    :key="product.id"
+                    :key="product._id"
                   >
                     <div
                       class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500"
                       :class="{
                         'border-gray-500 shadow-xl':
-                          selectedProduct.id === product.id
+                          selectedProduct._id === product._id
                       }"
                       @click="validateAndSelectProduct(product)"
                     >
                       <div class="px-2 pt-2">
-                        <img :src="_placeholderOfFirstVariantOf(product)"/>
+                        <img
+                          :src="_placeholderOfFirstVariantOf(product)"
+                          :key="`${drawerId}_${product._id}`"
+                          :class="`side_thumb_${drawerId}_${product._id}`"
+                        />
                       </div>
                     </div>
                   </div>
@@ -265,17 +267,18 @@
 </template>
 
 <script>
-import VueTailwindModal from '@/components/VueTailwindModal'
-import VueTailwindDrawer from '@/components/VueTailwindDrawer'
-import VueTailwindToast from '@/components/VueTailwindToast'
-import VueNumericInput from '@/components/VueNumericInput'
-import OptionButtons from '@/components/OptionButtons'
-import { mapGetters } from 'vuex'
+import VueTailwindModal from "@/components/VueTailwindModal";
+import VueTailwindDrawer from "@/components/VueTailwindDrawer";
+import VueTailwindToast from "@/components/VueTailwindToast";
+import VueNumericInput from "@/components/VueNumericInput";
+import OptionButtons from "@/components/OptionButtons";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
     products: {
-      required: true
+      required: true,
+      default: () => ([])
     },
     meta: {
       required: true
@@ -292,24 +295,23 @@ export default {
     return {
       isLoading: false,
       productErrors: [],
-      generatedProducts: JSON.parse(JSON.stringify(this.products)),
-      selectedProduct: JSON.parse(JSON.stringify(this.products[0])),
-      selectedProductVariantKey: _.first(
-        _.keys(JSON.parse(JSON.stringify(this.products[0])).variants)
-      ),
+      generatedProducts: [],
+      selectedProduct: null,
+      selectedProductVariantKey: null,
       selectedSize: null,
+      drawerId: this.makeId(),
       printingOptions: [
         {
-          label: 'Screen Printing',
-          value: 'Screen Printing'
+          label: "Screen Printing",
+          value: "Screen Printing"
         },
         {
-          label: 'Direct To Garments (DTG)',
-          value: 'Direct To Garments (DTG)'
+          label: "Direct To Garments (DTG)",
+          value: "Direct To Garments (DTG)"
         },
         {
-          label: 'Heat Press',
-          value: 'Heat Press'
+          label: "Heat Press",
+          value: "Heat Press"
         }
       ],
       selectedProductProfit: 0,
@@ -319,295 +321,333 @@ export default {
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
       isCalculating: false
-    }
+    };
   },
   computed: {
     ...mapGetters({
-      selectedProducts: 'designer/selectedProducts'
+      selectedProducts: "designer/selectedProducts"
     }),
     hasPreviousProductOrVariant() {
-      const variationKeys = _.keys(this.selectedProduct.variants)
+      const variationKeys = _.keys(this.selectedProduct.variants);
       const previousVariationKey =
-        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+        variationKeys[
+          variationKeys.indexOf(this.selectedProductVariantKey) - 1
+        ];
 
       return (
-        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) >
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) >
           0 || previousVariationKey
-      )
+      );
     },
     productTotalPrice() {
-      return this.selectedProductBasePrice + this.selectedProductProfit
+      return this.selectedProductBasePrice + this.selectedProductProfit;
     },
     selectedVariantIndex() {
       const product = JSON.parse(
         JSON.stringify(
           _.find(this.selectedProducts, { _id: this.selectedProduct._id })
         )
-      )
+      );
       return _.findIndex(product.variants, {
         _id: this.selectedProductVariantKey
-      })
+      });
     }
   },
   methods: {
+    makeId(length = 5) {
+      var result = "";
+      var characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+      }
+      return result;
+    },
     async collectionConfirmed() {
-      if (this.meta.plan === 'sell') {
-        this.isLoading = true
-        this.$refs.publishConfirmationModal.hide()
-        await this.$store.commit('designer/COLLECTION_STATUS', 'pending')
-        await this.$store.dispatch('designer/saveData')
-        this.$router.replace('/dashboard/collections')
-        return
+      if (this.meta.plan === "Sell") {
+        this.isLoading = true;
+        this.$refs.publishConfirmationModal.hide();
+        await this.$store.commit("designer/COLLECTION_STATUS", "pending");
+        await this.$store.dispatch("designer/saveData");
+        this.$router.replace("/dashboard/collections");
+        return;
       }
     },
-    _placeholderOfFirstVariantOf(product) {
-      const firstKey = _.first(_.keys(product.variants))
-      return product.variants[firstKey].sides[
-        this._firstPrintableAreaOf(product.variants[firstKey].sides)
+    _firstFullThumbnailOf(product){
+      return product.variants[this.selectedProductVariantKey].sides[
+        this._firstPrintableAreaOf(
+          product.variants[this.selectedProductVariantKey].sides
+        )
       ].with_placeholder
     },
+    _placeholderOfFirstVariantOf(product) {
+      const firstKey = _.first(_.keys(product.variants));
+      return product.variants[firstKey].sides[
+        this._firstPrintableAreaOf(product.variants[firstKey].sides)
+      ].with_placeholder;
+    },
     _firstPrintableAreaOf(variant) {
-      let areas = _.keys(variant)
-      return _.includes(areas, 'front') ? 'front' : _.head(areas)
+      let areas = _.keys(variant);
+      return _.includes(areas, "front") ? "front" : _.head(areas);
     },
     show() {
-      this.$refs.drawer.show()
+      this.drawerId = this.makeId();
+      this.$refs.drawer.show();
     },
     hide() {
-      this.$refs.drawer.hide()
+      this.$refs.drawer.hide();
     },
     selectProduct(product) {
-      this.selectedProduct = JSON.parse(JSON.stringify(product))
+      this.selectedProduct = JSON.parse(JSON.stringify(product));
     },
     changeCurrentProductPlan({ value }) {
-      let plan = 'buy'
-      if (value) plan = 'sell'
-      this.$store.commit('designer/DESIGN_PLAN', plan)
+      let plan = "buy";
+      if (value) plan = "Sell";
+      this.$store.commit("designer/DESIGN_PLAN", plan);
     },
     previousProduct() {
       const previousProductIndex =
-        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) - 1
-      const previousProduct = this.generatedProducts[previousProductIndex]
-      const variationKeys = _.keys(this.selectedProduct.variants)
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) -
+        1;
+      const previousProduct = this.generatedProducts[previousProductIndex];
+      const variationKeys = _.keys(this.selectedProduct.variants);
 
       const previousVariationKey =
-        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+        variationKeys[
+          variationKeys.indexOf(this.selectedProductVariantKey) - 1
+        ];
 
       if (previousVariationKey) {
-        this.selectedProductVariantKey = previousVariationKey
-        return
+        this.selectedProductVariantKey = previousVariationKey;
+        return;
       }
 
-      this.selectProduct(previousProduct)
+      this.selectProduct(previousProduct);
       this.$nextTick(() => {
         this.selectedProductVariantKey = _.last(
           _.keys(previousProduct.variants)
-        )
-      })
+        );
+      });
     },
     validateAndSelectProduct(product) {
-      const isValidated = this.validateAndSaveMeta()
-      if (!isValidated) return
+      const isValidated = this.validateAndSaveMeta();
+      if (!isValidated) return;
 
-      this.selectProduct(product)
+      this.selectProduct(product);
     },
     validateAndSaveMeta() {
-      let isDirty = false
-      this.productErrors = []
+      let isDirty = false;
+      this.productErrors = [];
 
       if (!this.selectedProduct.meta.name.trim()) {
-        isDirty = true
-        this.productErrors.push('Product name is required.')
+        isDirty = true;
+        this.productErrors.push("Product name is required.");
       }
 
-      if (!this.selectedProductProfit && this.meta.plan === 'sell') {
-        isDirty = true
-        this.productErrors.push('How much would your profit be?')
+      if (!this.selectedProductProfit && this.meta.plan === "Sell") {
+        isDirty = true;
+        this.productErrors.push("How much would your profit be?");
       }
 
       const totalQuantity = _.sum(
         _.map(
           this.selectedProduct.variants[this.selectedProductVariantKey].sizes,
-          'quantity'
+          "quantity"
         )
-      )
+      );
 
       if (!totalQuantity) {
-        isDirty = true
+        isDirty = true;
         this.productErrors.push(
           `How many of this variant would you like to ${this.meta.plan}?`
-        )
+        );
       }
 
       if (totalQuantity < 5) {
-        isDirty = true
-        this.productErrors.push(`Must have a minimum quantity of 5`)
+        isDirty = true;
+        this.productErrors.push(`Must have a minimum quantity of 5`);
       }
 
       if (isDirty) {
-        this.$refs.productValidationToast.show()
-        return false
+        this.$refs.productValidationToast.show();
+        return false;
       }
 
-      this.$store.commit('designer/CURRENT_PRODUCT_META', {
-        id: this.selectedProduct.id,
+      this.$store.commit("designer/CURRENT_PRODUCT_META", {
+        _id: this.selectedProduct._id,
         meta: this.selectedProduct.meta
-      })
-      return true
+      });
+      return true;
     },
     nextProduct() {
-      const isValidated = this.validateAndSaveMeta()
-      if (!isValidated) return
+      const isValidated = this.validateAndSaveMeta();
+      if (!isValidated) return;
 
-      const variationKeys = _.keys(this.selectedProduct.variants)
+      const variationKeys = _.keys(this.selectedProduct.variants);
       const nextVariationKey =
-        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) + 1]
+        variationKeys[
+          variationKeys.indexOf(this.selectedProductVariantKey) + 1
+        ];
       if (nextVariationKey) {
-        this.selectedProductVariantKey = nextVariationKey
-        return
+        this.selectedProductVariantKey = nextVariationKey;
+        return;
       }
 
       const nextProductIndex =
-        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) + 1
-      const nextProduct = this.generatedProducts[nextProductIndex]
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) +
+        1;
+      const nextProduct = this.generatedProducts[nextProductIndex];
 
       if (!nextProduct) {
-        this.$refs.publishConfirmationModal.show()
-        return
+        this.$refs.publishConfirmationModal.show();
+        return;
       }
 
-      this.selectProduct(nextProduct)
+      this.selectProduct(nextProduct);
     },
     setQuantityAndPrice(n, p, v) {
-      this.$store.commit('designer/CURRENT_VARIANT_PROPERTIES', {
+      this.$store.commit("designer/CURRENT_VARIANT_PROPERTIES", {
         path: `sizes.${n}.${p}`,
         value: v
-      })
-      if (this.meta.plan == 'buy') return
-      this._calculateEstProfit()
+      });
+      if (this.meta.plan == "buy") return;
+      this._calculateEstProfit();
     },
     _calculateEstProfit() {
-      let totalProfit = 0
+      let totalProfit = 0;
       _.map(this.generatedProducts, product => {
         _.map(product.variants, variant => {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
               variant.available_sizes,
               s => s.name === size.name
-            )
-            if (!availableSize) return
-            let baseCost = availableSize.baseCost
-            let totalForPrintree = baseCost * size.quantity
-            let totalWithCustomerPrice = (baseCost + size.price) * size.quantity
-            let net = totalWithCustomerPrice - totalForPrintree
-            totalProfit += net
-          })
-        })
-      })
-      let minProfit = totalProfit - totalProfit * 0.05
-      let maxProfit = totalProfit + totalProfit * 0.05
-      this.estimatedMinProfit = minProfit
-      this.estimatedMaxProfit = maxProfit
+            );
+            if (!availableSize) return;
+            let baseCost = availableSize.baseCost;
+            let totalForPrintree = baseCost * size.quantity;
+            let totalWithCustomerPrice =
+              (baseCost + size.price) * size.quantity;
+            let net = totalWithCustomerPrice - totalForPrintree;
+            totalProfit += net;
+          });
+        });
+      });
+      let minProfit = totalProfit - totalProfit * 0.05;
+      let maxProfit = totalProfit + totalProfit * 0.05;
+      this.estimatedMinProfit = minProfit;
+      this.estimatedMaxProfit = maxProfit;
       this.$nextTick(() => {
-        if (this.$refs.estMinProfit) this.$refs.estMinProfit.play()
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play()
-      })
+        if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
+        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play();
+      });
     },
     calculateProfit(size) {
-      clearTimeout(this.calculatorTimeout)
-      this.isCalculating = true
+      clearTimeout(this.calculatorTimeout);
+      this.isCalculating = true;
       if (size) {
-        this.$store.commit('designer/PRODUCT_PROPERTIES', {
+        this.$store.commit("designer/PRODUCT_PROPERTIES", {
           _id: this.selectedProduct._id,
           props: {
             path: `variants.${this.selectedVariantIndex}.sizes.${size}.quantity`,
-            value: this.selectedProductSizes[_.findIndex(this.selectedProductSizes, { name: size })].quantity
+            value: this.selectedProductSizes[
+              _.findIndex(this.selectedProductSizes, { name: size })
+            ].quantity
           }
-        })
+        });
       }
 
       this.calculatorTimeout = setTimeout(() => {
-        this._calculateEstProfit()
-        this.isCalculating = false
-      }, 2000)
+        this._calculateEstProfit();
+        this.isCalculating = false;
+      }, 2000);
     },
     setProductProfit(e) {
-      this.selectedProductProfit = parseFloat(e.target.innerHTML)
+      this.selectedProductProfit = parseFloat(e.target.innerHTML);
 
       _.keys(this.selectedProductSizes).map(
         s => (this.selectedProductSizes[s].price = e)
-      )
+      );
     }
   },
   watch: {
+    products: {
+      handler(to, from){
+        this.generatedProducts = [...to]
+        this.selectedProduct = to[0] || null
+        this.selectedProductVariantKey = this.selectedProduct ? _.first(_.keys(this.selectedProduct.variants)) : null
+      },
+      immediate: true
+    },
     selectedProduct: {
       immediate: true,
       handler(to, from) {
-        const firstVariantKey = _.first(_.keys(to.variants))
+        if(!to) return;
+        const firstVariantKey = _.first(_.keys(to.variants));
         this.selectedProductSizes = JSON.parse(
           JSON.stringify(to.variants[firstVariantKey].sizes)
-        )
-        this.selectedProductVariantKey = firstVariantKey
-        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        );
+        this.selectedProductVariantKey = firstVariantKey;
         this.selectedProductBasePrice = _.first(
           to.variants[firstVariantKey].available_sizes
-        ).baseCost
+        ).baseCost;
 
         this.selectedProductProfit =
-          to.variants[firstVariantKey].sizes[firstSizeKey].price
+          to.variants[firstVariantKey].sizes[0].price;
 
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
-        )
+        );
 
         this.selectedProduct.variants[
           this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes
+        ].sizes = this.selectedProductSizes;
 
-        this._calculateEstProfit()
+        this._calculateEstProfit();
       }
     },
     selectedProductVariantKey: {
       immediate: true,
       handler(to) {
-        this.selectedProductSizes = this.selectedProduct.variants[to].sizes
-        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        if(!this.selectedProduct) return;
+        this.selectedProductSizes = this.selectedProduct.variants[to].sizes;
 
-        console.log(this.generatedProducts)
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
-        ].variants[to].sizes = this.selectedProductSizes
+        ].variants[to].sizes = this.selectedProductSizes;
       }
     },
     selectedProductProfit: {
       immediate: true,
       handler(to) {
-        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants))
+        if(!this.selectedProduct) return;
+        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
         this.selectedProductSizes = this.selectedProduct.variants[
           firstVariantKey
-        ].sizes
-        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        ].sizes;
 
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = to)
-        )
+        );
 
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[
           this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes
+        ].sizes = this.selectedProductSizes;
 
-        this.$store.commit('designer/PRODUCT_PROPERTIES', {
+        this.$store.commit("designer/PRODUCT_PROPERTIES", {
           _id: this.selectedProduct._id,
           props: {
             path: `variants.${this.selectedVariantIndex}.sizes`,
             value: this.selectedProductSizes
           }
-        })
-        this.calculateProfit()
+        });
+        this.calculateProfit();
       }
     }
   }
-}
+};
 </script>

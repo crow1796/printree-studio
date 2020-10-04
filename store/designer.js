@@ -317,9 +317,9 @@ const mutations = {
       data.value
     );
   },
-  CURRENT_PRODUCT_META(state, { id, meta }) {
+  CURRENT_PRODUCT_META(state, { _id, meta }) {
     state.selectedProducts[
-      _.findIndex(state.selectedProducts, { id })
+      _.findIndex(state.selectedProducts, { _id })
     ].meta = meta;
   },
   PRODUCT_PROPERTIES(state, { _id, props }) {
@@ -626,12 +626,6 @@ const actions = {
     };
     let generatedImages = [];
     try {
-      const res = newParams.shouldGenerateImages
-        ? await this.$axios.post("/api/create-images", {
-            products: context.getters.selectedProducts,
-          })
-        : [];
-      generatedImages = res.data || res;
       await this.$api.saveCollection({
         id: context.getters.currentDesignId,
         name: context.getters.designMeta.name,
@@ -639,6 +633,13 @@ const actions = {
         selectedProducts: context.getters.selectedProducts,
         status: context.getters.designMeta.status,
       });
+      
+      const res = newParams.shouldGenerateImages
+        ? await this.$axios.post("/api/create-images", {
+            products: context.getters.selectedProducts,
+          })
+        : [];
+      generatedImages = res.data || res;
     } catch (error) {
       console.log(error);
     }
@@ -651,7 +652,7 @@ const actions = {
     return generatedImages;
   },
   async updateDesignName(context, name) {
-    await db.updateDesignName(context.getters.currentDesignId, name);
+    await this.$api.updateCollectionName({_id: context.getters.currentDesignId, name});
     context.commit("DESIGN_NAME", name);
   },
   async publishCollection(context) {
@@ -660,7 +661,7 @@ const actions = {
     });
   },
   async deleteCollection(context, collectionId) {
-    await db.deleteCollection(collectionId);
+    await this.$api.deleteCollection(collectionId);
   },
 };
 

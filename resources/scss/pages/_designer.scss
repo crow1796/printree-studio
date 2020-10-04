@@ -208,3 +208,33 @@
   width: initial !important;
   margin: 0 auto !important;
 }
+
+.printable-output{
+  position: absolute;
+  z-index: 20;
+  width: auto;
+  background: white;
+  transform: scale(0.4);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0,0 , 0.4);
+  transform-origin: bottom right;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  right: 0;
+  bottom: 0;
+  transition: all .3s ease;
+
+  .preview-resizer-btn{
+    transform: scale(2.4);
+    top: -20px;
+    left: -20px;
+  }
+
+  &.-maximized {
+    transform: scale(0.7);
+  }
+
+  &.-maximized .preview-resizer-btn {
+    transform: scale(1.4);
+  }
+}

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-grow w-full h-full justify-center overflow-hidden bg-gray-200">
+  <div class="flex flex-grow w-full h-full justify-center overflow-hidden bg-gray-200 relative">
     <VueTailwindDrawer ref="artsModal" width="40%">
       <div class="flex p-4 h-full flex-col w-full">
         <div class="flex w-1/3 flex-col w-full">
@@ -136,6 +136,7 @@
         </div>
       </div>
     </div>
+    <slot/>
   </div>
 </template>
 
@@ -370,6 +371,7 @@ export default {
       this.$refs[modal].show()
     },
     artAdded(file, res) {
+      console.log(res, file)
       let type = 'image'
       let value = file.dataURL
       if (file.type == 'image/svg+xml') {

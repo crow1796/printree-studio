@@ -35,7 +35,10 @@ export default {
                   }
               }
               color
-              sizes
+              sizes {
+                  name
+                  baseCost
+              }
           }
           printingOptions {
               _id
@@ -165,5 +168,21 @@ export default {
             }
         }
     }
-  `
+  `,
+  deleteCollection: `
+    mutation($id: ID!){
+        deleteCollection(_id: $id){
+            _id
+            name
+        }
+    }
+  `,
+  updateCollectionName: `
+    mutation ($collection: UpdateCollectionNameInput) {
+        updateCollectionName(collection: $collection){
+            _id
+            name
+        }   
+    }
+  `,
 };

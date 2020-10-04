@@ -36,7 +36,6 @@
       <div class="flex flex-grow" id="right-content">
         <ProductsPreviewDrawer
           ref="productsPreviewDrawer"
-          v-if="generatedImages.length"
           :meta="designMeta"
           :products="generatedImages"
         />
@@ -137,9 +136,7 @@ export default {
       const generatedImages = await this.$store.dispatch('designer/saveData')
       this.isLoading = false
       this.generatedImages = generatedImages
-      this.$nextTick(() => {
-        this.$refs.productsPreviewDrawer.show()
-      })
+      this.$refs.productsPreviewDrawer.show()
     }
   }
 }
