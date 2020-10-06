@@ -47,16 +47,16 @@
 
 
 <script>
-import VueTailwindModal from '@/components/VueTailwindModal'
-import ProductsPreviewDrawer from '@/components/ProductsPreviewDrawer'
-import AuthModal from '@/components/Auth/AuthModal'
-import { mapGetters } from 'vuex'
+import VueTailwindModal from "@/components/VueTailwindModal";
+import ProductsPreviewDrawer from "@/components/ProductsPreviewDrawer";
+import AuthModal from "@/components/Auth/AuthModal";
+import { mapGetters } from "vuex";
 
 export default {
   head: {
-    title: 'Printree Studio',
+    title: "Printree Studio",
     bodyAttrs: {
-      class: 'no-scroll'
+      class: "no-scroll"
     }
   },
   components: {
@@ -64,80 +64,82 @@ export default {
     AuthModal,
     ProductsPreviewDrawer
   },
-  middleware: 'authenticated',
+  middleware: "authenticated",
   computed: {
     ...mapGetters({
-      isLoggedIn: 'user/isLoggedIn',
-      designMeta: 'designer/designMeta',
-      user: 'user/user',
-      currentDesignName: 'designer/currentDesignName',
-      currentDesignId: 'designer/currentDesignId'
+      isLoggedIn: "user/isLoggedIn",
+      designMeta: "designer/designMeta",
+      user: "user/user",
+      currentDesignName: "designer/currentDesignName",
+      currentDesignId: "designer/currentDesignId"
     })
   },
   async created() {
-    if(process.client){
-      if(this.$route.query.id){
-        this.$storage.setLocalStorage('current_design_id', this.$route.query.id)
+    if (process.client) {
+      if (this.$route.query.id) {
+        this.$storage.setLocalStorage(
+          "current_design_id",
+          this.$route.query.id
+        );
       }
       this.$store.commit(
-        'designer/CURRENT_DESIGN_ID',
-        this.$storage.getLocalStorage('current_design_id')
-      )
+        "designer/CURRENT_DESIGN_ID",
+        this.$storage.getLocalStorage("current_design_id")
+      );
       await this.$store.dispatch(
-        'designer/fetchDesignDataAndCommit',
+        "designer/fetchDesignDataAndCommit",
         this.currentDesignId
-      )
-      await this.$store.dispatch(
-        'designer/fetchArts'
-      )
-      this.isLoading = false
+      );
+      await this.$store.dispatch("designer/fetchArts");
+      this.isLoading = false;
     }
   },
   mounted() {
-    window.onbeforeunload = (e) => {
-      e = e || window.event
+    window.onbeforeunload = e => {
+      e = e || window.event;
       // For IE and Firefox prior to version 4
       if (e) {
-        e.returnValue = 'Sure?'
+        e.returnValue = "Sure?";
       }
       // For Safari
-      return 'Sure?'
-    }
+      return "Sure?";
+    };
   },
-  destroyed(){
-    window.onbeforeunload = null
+  destroyed() {
+    window.onbeforeunload = null;
   },
   data() {
     return {
       isLoading: true,
       isEditingDesignName: false,
       generatedImages: []
-    }
+    };
   },
   methods: {
     startEditingName() {
-      this.isEditingDesignName = true
+      this.isEditingDesignName = true;
       this.$nextTick(() => {
-        this.$refs.designNameField.focus()
+        this.$refs.designNameField.focus();
         this.$refs.designNameField.setSelectionRange(
           0,
           this.$refs.designNameField.value.length
-        )
-      })
+        );
+      });
     },
     updateDesignName(newName) {
-      if (!newName.trim()) return
-      this.$store.dispatch('designer/updateDesignName', newName)
-      this.isEditingDesignName = false
+      if (!newName.trim()) return;
+      this.$store.dispatch("designer/updateDesignName", newName);
+      this.isEditingDesignName = false;
     },
     async nextStep() {
-      if (!this.isLoggedIn) return this.$refs.authModal.show()
-      this.isLoading = true
-      const generatedImages = await this.$store.dispatch('designer/saveData')
-      this.isLoading = false
-      this.generatedImages = generatedImages
-      this.$refs.productsPreviewDrawer.show()
+      if (!this.isLoggedIn) return this.$refs.authModal.show();
+      this.isLoading = true;
+      const generatedImages = await this.$store.dispatch("designer/saveData");
+      this.isLoading = false;
+      this.generatedImages = generatedImages;
+      this.$refs.productsPreviewDrawer.show();
+      this.$forceUpdate();
     }
   }
-}
+};
 </script>

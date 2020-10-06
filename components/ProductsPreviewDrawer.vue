@@ -104,8 +104,9 @@
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
                 <img
-                  :src="_firstFullThumbnailOf(selectedProduct)"
+                  :src="`${_firstFullThumbnailOf(selectedProduct)}`"
                   :key="`full_${selectedProduct._id}_${drawerId}`"
+                  :id="`full_${selectedProduct._id}_${drawerId}`"
                 />
                 <div class="variants flex">
                   <div
