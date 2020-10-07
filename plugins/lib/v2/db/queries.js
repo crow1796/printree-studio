@@ -158,6 +158,7 @@ export default {
                     sizes {
                         name
                         quantity
+                        price
                     }
                     contents {
                         _id

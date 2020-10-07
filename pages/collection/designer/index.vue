@@ -168,7 +168,7 @@
           <button type="button" class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute z-10 bg-white left-0 top-0 preview-resizer-btn" @click="togglePreviewSize" :title="isPreviewExpanded ? 'Minimize' : 'Expand'" v-tippy="{arrow: true}">
             <font-awesome-icon :icon="['fas', isPreviewExpanded ? 'compress-alt' : 'expand-alt']" :rotation="90"/>
           </button>
-          <div class="outline-none select-none relative w-full h-full text-center">
+          <div class="outline-none select-none relative w-full h-full text-center overflow-hidden">
 
             <div class="inline-block outline-none relative w-full h-full">
               <div class="relative w-full h-full">
