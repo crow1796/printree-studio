@@ -1,7 +1,7 @@
 import queries from "./queries";
 
 export const createDesignFor = async (axios, products) => {
-  const { data } = await axios.post("/graphql", {
+  const { data } = await axios.post("/gql", {
     query: queries.createUserCollection,
     variables: {
       collection: {
@@ -31,7 +31,7 @@ export const createDesignFor = async (axios, products) => {
 };
 
 export const getCollection = async (axios, id) => {
-  const { data } = await axios.post("/graphql", {
+  const { data } = await axios.post("/gql", {
     query: queries.collection,
     variables: {
       id,
@@ -84,10 +84,11 @@ export const saveCollection = async (axios, collection) => {
   const tmpCollection = {
     _id: collection.id,
     name: collection.name,
+    status: collection.status,
     products: _.map(collection.selectedProducts, stringifyContentsOfProduct),
     plan: collection.plan,
   };
-  const { data } = await axios.post("/graphql", {
+  const { data } = await axios.post("/gql", {
     query: queries.updateUserCollection,
     variables: {
       collection: tmpCollection,
@@ -98,7 +99,7 @@ export const saveCollection = async (axios, collection) => {
 };
 
 export const deleteCollection = async (axios, id) => {
-  const { data } = await axios.post("/graphql", {
+  const { data } = await axios.post("/gql", {
     query: queries.deleteCollection,
     variables: {
       id
@@ -109,7 +110,7 @@ export const deleteCollection = async (axios, id) => {
 }
 
 export const updateCollectionName = async (axios, {_id, name}) => {
-  const { data } = await axios.post("/graphql", {
+  const { data } = await axios.post("/gql", {
     query: queries.updateCollectionName,
     variables: {
       _id,

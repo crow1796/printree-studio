@@ -229,8 +229,8 @@ export default {
   computed: {
     ...mapGetters({
       userCollections: "user_dashboard/userCollections",
-      isLoggedIn: "user/isLoggedIn",
-      user: "user/user"
+      isLoggedIn: "isLoggedIn",
+      user: "user"
     })
   },
   methods: {

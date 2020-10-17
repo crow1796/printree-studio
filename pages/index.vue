@@ -125,8 +125,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'user/isLoggedIn',
-      user: 'user/user',
+      isLoggedIn: 'isLoggedIn',
+      user: 'user',
       designMeta: 'designer/designMeta'
     })
   },

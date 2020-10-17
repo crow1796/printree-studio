@@ -113,7 +113,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: 'user/user'
+      user: 'user'
     }),
     subtotal() {
       return _.sum(

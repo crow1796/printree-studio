@@ -344,11 +344,7 @@ export default {
       return this.selectedProductBasePrice + this.selectedProductProfit;
     },
     selectedVariantIndex() {
-      const product = JSON.parse(
-        JSON.stringify(
-          _.find(this.selectedProducts, { _id: this.selectedProduct._id })
-        )
-      );
+      const product = {..._.find(this.selectedProducts, { _id: this.selectedProduct._id })};
       return _.findIndex(product.variants, {
         _id: this.selectedProductVariantKey
       });

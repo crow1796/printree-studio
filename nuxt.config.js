@@ -40,11 +40,9 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    "~/plugins/axios.js",
-    "~/plugins/check_user.js",
     "~/plugins/prototypes.js",
     "~/plugins/external-installs.js",
-    "~/plugins/api.js"
+    "~/plugins/api.js",
   ],
   /*
    ** Nuxt.js modules
@@ -52,6 +50,7 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     "@nuxtjs/axios",
+    "@nuxtjs/auth",
     "@nuxtjs/pwa",
     [
       "nuxt-fontawesome",
@@ -73,7 +72,7 @@ module.exports = {
         ],
       },
     ],
-    "@nuxtjs/universal-storage"
+    "@nuxtjs/universal-storage",
   ],
   storage: {
     cookie: {
@@ -88,7 +87,28 @@ module.exports = {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: process.env.API_URL,
+    baseURL: process.env.API_URL
+  },
+  auth: {
+    localStorage: false,
+    cookie: {
+      options: {
+        expires: 7
+      }
+    },
+    redirect: {
+      login: '/',
+      callback: '/',
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: 'login', method: 'post', propertyName: 'token' },
+          user: { url: 'me', method: 'post', propertyName: 'user'  },
+          logout: false
+        }
+      }
+    }
   },
   /*
    ** Build configuration

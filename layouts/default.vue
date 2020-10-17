@@ -17,7 +17,7 @@
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
               >Marketplace</nuxt-link>
               <nuxt-link
-                to="/dashboard"
+                :to="dashboardLink"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 v-if="isLoggedIn && user"
               >
@@ -83,9 +83,15 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'user/isLoggedIn',
-      user: 'user/user'
-    })
+      isLoggedIn: 'isLoggedIn',
+      user: 'user'
+    }),
+    dashboardLink(){
+      if(!this.user) return '/dashboard';
+      const isAdmin = _.includes(_.map(this.user.roles, 'name'), 'admin')
+      if(isAdmin) return '/admin/collections';
+      return '/dashboard';
+    }
   },
   methods: {
     async signOut() {

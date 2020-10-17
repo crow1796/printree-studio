@@ -115,7 +115,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      user: 'user/user'
+      user: 'user'
     })
   },
   methods: {
@@ -129,7 +129,6 @@ export default {
       if(this.formData.password && this.formData.password === this.formData.password_confirmation){
         passwordResponse = await this.$store.dispatch('user/updatePassword', this.formData.password)
       }
-      await this.$store.dispatch('user/refreshToken')
       if(!response.status || (passwordResponse && !passwordResponse.status)){
         this.isLoading = false
         this.$toast.error('Updating the profile failed! Please try again.', {

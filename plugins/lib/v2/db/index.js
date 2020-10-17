@@ -1,6 +1,7 @@
-import queries from "./queries";
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
+import { getCollections, updateCollectionStatus, getUsers } from './admin';
 import { getCollectionsOfUserId } from './users';
+import { getProductsToSell } from './marketplace';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -16,5 +17,15 @@ export default (axios) => {
     saveCollection: (collection) => saveCollection(axios, collection),
     deleteCollection: (id) => deleteCollection(axios, id),
     updateCollectionName: (data) => updateCollectionName(axios, data),
+    // admin
+    admin: {
+      getCollections: (data) => getCollections(axios, data),
+      updateCollectionStatus: (data) => updateCollectionStatus(axios, data),
+      getUsers: (data) => getUsers(axios, data),
+    },
+    // marketplace
+    marketplace: {
+      getProductsToSell: (query) => getProductsToSell(axios, query),
+    }
   };
 };

@@ -116,7 +116,7 @@
                     :class="{
                       'border-gray-500 shadow-xl': selectedProductVariantKey === vid
                     }"
-                    :key="variant.id"
+                    :key="variant._id"
                     @click="() => (selectedProductVariantKey = vid)"
                   >
                     <div class="flex flex-col w-full">
@@ -166,10 +166,10 @@
                       v-for="(variant, i) in selectedProduct
                         .variants[selectedProductVariantKey].sizes"
                       :key="i"
-                      :class="{' px-4 py-2 border hover:border-gray-600': selectedProductSizes[i].quantity}"
+                      :class="{'px-4 py-2 border hover:border-gray-600': selectedProductSizes[i].quantity}"
                     >
                       <div class="flex items-center" v-if="selectedProductSizes[i].quantity">
-                        <div class="text-center mr-2">{{ i }}:</div>
+                        <div class="text-center mr-2">{{ selectedProductSizes[i].name }}:</div>
                         <div>{{selectedProductSizes[i].quantity}}</div>
                       </div>
                     </div>
@@ -193,13 +193,13 @@
                   <div
                     class="flex w-6/12 p-1"
                     v-for="product in generatedProducts"
-                    :key="product.id"
+                    :key="product._id"
                   >
                     <div
                       class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500"
                       :class="{
                         'border-gray-500 shadow-xl':
-                          selectedProduct.id === product.id
+                          selectedProduct._id === product._id
                       }"
                       @click="selectProduct(product)"
                     >
@@ -295,17 +295,16 @@ export default {
       this.selectedProductSide = _.first(sides)
     },
     downloadDesign() {
-      const fileName = `${this.selectedProduct.meta.name}-${this.selectedProduct.id}`
+      const fileName = `${this.selectedProduct.meta.name}-${this.selectedProduct._id}`
       const fileType = 'image/svg+xml'
       let content = this.selectedProduct.variants[
         this.selectedProductVariantKey
       ].sides[this.selectedProductSide].design
-      let blob = new Blob([content], { type: fileType })
 
       let a = document.createElement('a')
+      a.target = '_blank';
       a.download = `(${this.selectedProductSide.toUpperCase()})${fileName}.svg`
-      a.href = URL.createObjectURL(blob)
-      a.dataset.downloadurl = [fileType, a.download, a.href].join(':')
+      a.href = content
       a.style.display = 'none'
       document.body.appendChild(a)
       a.click()
@@ -320,7 +319,7 @@ export default {
       let status = 'approved'
       if(this.confirmationAction === 'decline') status = 'declined'
       await this.$store.dispatch('admin/updateCollectionStatus', {
-        id: this.meta.id,
+        _id: this.meta._id,
         status
       })
       this.isLoading = false
@@ -399,7 +398,7 @@ export default {
         variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
 
       return (
-        _.findIndex(this.generatedProducts, { id: this.selectedProduct.id }) >
+        _.findIndex(this.generatedProducts, { id: this.selectedProduct._id }) >
           0 || previousVariationKey
       )
     }
@@ -408,65 +407,65 @@ export default {
     selectedProduct: {
       immediate: true,
       handler(to, from) {
-        if (!to) return
-        const firstVariantKey = _.first(_.keys(to.variants))
-        this.selectedProductSizes = to.variants[firstVariantKey].sizes
-        this.selectedProductVariantKey = firstVariantKey
-        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        if(!to) return;
+        const firstVariantKey = _.first(_.keys(to.variants));
+        this.selectedProductSizes = JSON.parse(
+          JSON.stringify(to.variants[firstVariantKey].sizes)
+        );
+        this.selectedProductVariantKey = firstVariantKey;
         this.selectedProductBasePrice = _.first(
           to.variants[firstVariantKey].available_sizes
-        ).base_cost
+        ).baseCost;
+        
         this.selectedProductSide = this._firstPrintableAreaOf(
           to.variants[this.selectedProductVariantKey].sides
         )
 
         this.selectedProductProfit =
-          to.variants[firstVariantKey].sizes[firstSizeKey].price
+          to.variants[firstVariantKey].sizes[0].price;
 
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
-        )
+        );
 
         this.selectedProduct.variants[
           this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes
+        ].sizes = this.selectedProductSizes;
 
-        this._calculateEstProfit()
+        this._calculateEstProfit();
       }
     },
     selectedProductVariantKey: {
       immediate: true,
       handler(to) {
-        if (!this.selectedProduct) return
-        this.selectedProductSizes = this.selectedProduct.variants[to].sizes
-        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        if(!this.selectedProduct) return;
+        this.selectedProductSizes = this.selectedProduct.variants[to].sizes;
 
         this.generatedProducts[
-          _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
-        ].variants[to].sizes = this.selectedProductSizes
+          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
+        ].variants[to].sizes = this.selectedProductSizes;
       }
     },
     selectedProductProfit: {
       immediate: true,
       handler(to) {
-        if (!this.selectedProduct) return
-        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants))
+        if(!this.selectedProduct) return;
+        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
         this.selectedProductSizes = this.selectedProduct.variants[
           firstVariantKey
-        ].sizes
-        const firstSizeKey = _.first(_.keys(this.selectedProductSizes))
+        ].sizes;
 
         _.keys(this.selectedProductSizes).map(
           s => (this.selectedProductSizes[s].price = to)
-        )
+        );
 
         this.generatedProducts[
-          _.findIndex(this.generatedProducts, { id: this.selectedProduct.id })
+          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[
           this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes
-
-        this.calculateProfit()
+        ].sizes = this.selectedProductSizes;
+        
+        this.calculateProfit();
       }
     }
   }

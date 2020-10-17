@@ -71,7 +71,7 @@ export default {
   computed: {
     ...mapGetters({
       userPurchases: 'user_dashboard/userPurchases',
-      user: 'user/user'
+      user: 'user'
     })
   },
   methods: {

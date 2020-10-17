@@ -3,7 +3,7 @@
     <AreaLoader v-if="isLoading"/>
     <VueTailwindModal ref="userFormModal" width="30%">
       <form @submit.prevent="submitForm">
-        <div class="text-xl font-bold mb-2">{{ formData.uid ? 'EDIT' : 'ADD NEW' }} USER</div>
+        <div class="text-xl font-bold mb-2">{{ formData._id ? 'EDIT' : 'ADD NEW' }} USER</div>
         <div class="mb-3 mt-2">
           <label for="name" class="font-bold">Name</label>
           <div>
@@ -13,7 +13,7 @@
               type="text"
               :class="{ 'border-red-400': errors.has('name'), 'focus:border-gray-600': !errors.has('name') }"
               placeholder="Name"
-              v-model="formData.displayName"
+              v-model="formData.name"
               data-vv-as="Name"
               v-validate="'required'"
             />
@@ -105,13 +105,13 @@
             <thead>
               <tr>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >UID</th>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Email</th>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Display Name</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
@@ -120,23 +120,17 @@
             </thead>
             <tbody>
               <tr v-for="user in users" :key="user._id">
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                  <div class="flex items-center justify-center">
-                    <div class="ml-3">
-                      <p class="text-gray-900 whitespace-no-wrap text-center">
-                        <a href="#" class="text-blue-600 hover:underline">
-                          <span>{{ user.uid }}</span>
-                        </a>
-                      </p>
-                    </div>
-                  </div>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  <a href="#" class="text-blue-600 hover:underline">
+                    <span>{{ user._id }}</span>
+                  </a>
                 </td>
                 <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
                 >{{user.email}}</td>
                 <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >{{ user.displayName }}</td>
+                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
+                >{{ user.name }}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div>
                     <button
@@ -180,14 +174,16 @@ export default {
     try {
       await this.$store.dispatch('admin/getUsers')
       this.isLoading = false
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   },
   data() {
     return {
       isLoading: true,
       formData: {
         email: null,
-        displayName: null,
+        name: null,
         password: null,
         role: 'customer'
       }
@@ -202,14 +198,14 @@ export default {
     addNewUser() {
       this.formData = {
         email: null,
-        displayName: null,
+        name: null,
         password: null,
         role: 'customer'
       }
       this.$refs.userFormModal.show()
     },
     async submitForm() {
-      if(this.formData.uid){
+      if(this.formData._id){
         this.isLoading = true
         this.$refs.userFormModal.hide()
         await this.$store.dispatch('admin/updateUser', this.formData)

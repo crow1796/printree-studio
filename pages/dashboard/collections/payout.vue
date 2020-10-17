@@ -280,7 +280,7 @@ export default {
   computed: {
     ...mapGetters({
       payouts: 'user_dashboard/payouts',
-      user: 'user/user',
+      user: 'user',
       totalProfit: 'user_dashboard/totalProfit'
     }),
     computedTotalProfit(){

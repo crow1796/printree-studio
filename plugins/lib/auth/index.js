@@ -11,24 +11,7 @@ export default {
   async createUserWithEmailAndPassword(formData, http){
     let response = {}
     try {
-      let res = await http.post('/api/signup', formData)
-      response = {
-        status: true,
-        user: this._extractUserdata({
-          ...res.data.user,
-          token: res.data.token
-        })
-      }
-    } catch (error) {
-      response.status = false
-      response.message = error.message
-    }
-    return response
-  },
-  async signInWithEmailAndPassword(formData, http) {
-    let response = {}
-    try {
-      let res = await http.post('/api/login', formData)
+      let res = await http.post('/signup', formData)
       response = {
         status: true,
         user: this._extractUserdata({
@@ -77,20 +60,6 @@ export default {
       let res = await fireAuth.sendPasswordResetEmail(email)
       response = {
         status: true
-      }
-    } catch (error) {
-      response.status = false
-      response.message = error.message
-    }
-    return response
-  },
-  async refreshToken(){
-    let response = {}
-    try {
-      const token = await fireAuth.currentUser.getIdToken(true)
-      response = {
-        status: true,
-        token
       }
     } catch (error) {
       response.status = false

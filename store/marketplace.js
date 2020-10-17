@@ -22,7 +22,7 @@ const actions = {
     return products
   },
   async getProductsToSell(context, query){
-    const products = await db.getProductsToSell(query)
+    const products = await this.$api.marketplace.getProductsToSell(query)
     return products
   },
   async getProductFromCollection(context, {collection, product}){

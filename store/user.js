@@ -1,55 +1,26 @@
 import auth from "~/plugins/lib/auth/index";
 
 const state = () => ({
-  user: null,
-  isLoggedIn: false,
 });
 
 const mutations = {
-  USER(state, user) {
-    state.user = user;
-  },
-  IS_LOGGED_IN(state, status) {
-    state.isLoggedIn = status;
-  },
-  USER_NAME(state, name) {
-    state.user.displayName = name;
-  },
-  USER_EMAIL(state, email) {
-    state.user.email = email;
-  },
 };
 
 const getters = {
-  user(state) {
-    return state.user;
-  },
-  isLoggedIn(state) {
-    return state.isLoggedIn;
-  },
 };
 
 const actions = {
-  async saveAuthToken(context, token) {
-    this.$storage.setCookie("access_token", token);
-    this.$axios.setToken(token, "Bearer");
-  },
   async createAccount(context, data) {
     let res = await auth.createUserWithEmailAndPassword(data, this.$axios);
-    if (res.status && res.user) {
-      await context.dispatch("saveAuthToken", res.user.token);
-      context.commit("USER", res.user);
-      context.commit("IS_LOGGED_IN", true);
+    if (res.status) {
+      await context.dispatch('signIn', data);
     }
     return res;
   },
   async signIn(context, data) {
-    let res = await auth.signInWithEmailAndPassword(data, this.$axios);
-    if (res.status && res.user) {
-      await context.dispatch("saveAuthToken", res.user.token);
-      context.commit("USER", res.user);
-      context.commit("IS_LOGGED_IN", true);
-    }
+    let res = await this.$auth.loginWith('local', {
+      data,
+    })
     return res;
   },
   async sendPasswordRecovery(context, data) {
@@ -61,18 +32,14 @@ const actions = {
     if (response.status && response.user) {
       context.commit("USER", response.user);
       context.commit("IS_LOGGED_IN", true);
-      await context.dispatch("saveAuthToken", response.user.token);
     }
     return response;
   },
   async signOut(context) {
-    context.commit("USER", null);
-    context.commit("IS_LOGGED_IN", false);
-    this.$storage.setCookie("access_token", "");
+    await this.$auth.logout();
   },
   async signInAsAGuest(context) {
     const response = await auth.signInAsAGuest();
-    await context.dispatch("saveAuthToken", response.user.token);
     return response;
   },
   async updateProfile(context, data) {
@@ -87,14 +54,6 @@ const actions = {
   async updatePassword(context, password) {
     const response = await auth.updatePassword(password);
     return response;
-  },
-  async refreshToken() {
-    const refreshed = await auth.refreshToken();
-    if (refreshed.status) {
-      const token = refreshed.token;
-      await this.$axios.put("/api/refresh-token", { token });
-      this.$storage.setCookie("access_token", token);
-    }
   },
 };
 

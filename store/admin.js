@@ -30,17 +30,17 @@ const mutations = {
     state.orders = orders
   },
   PROCESS_ORDER(state, order) {
-    state.orders[_.findIndex(state.orders, { id: order.id })] = order
+    state.orders[_.findIndex(state.orders, { _id: order._id })] = order
   },
-  UPDATE_COLLECTION_STATUS(state, { id, status }) {
-    const colIndex = _.findIndex(state.collections, { id: id })
+  UPDATE_COLLECTION_STATUS(state, { _id, status }) {
+    const colIndex = _.findIndex(state.collections, { _id: _id })
     state.collections[colIndex].status = status
   },
   PAYOUTS(state, payouts) {
     state.payouts = payouts
   },
   UPDATE_PAYOUT(state, payout){
-    const index = _.findIndex(state.payouts, { id: payout.id })
+    const index = _.findIndex(state.payouts, { _id: payout._id })
     state.payouts[index] = payout
   }
 }
@@ -68,28 +68,28 @@ const getters = {
 
 const actions = {
   async getUsers(context) {
-    const res = await this.$axios.get('/users')
-    context.commit('USERS', res.data.users)
+    const users = await this.$api.admin.getUsers()
+    context.commit('USERS', users)
   },
   async getCollections(context) {
-    const res = await this.$axios.get('/collections')
-    context.commit('COLLECTIONS', res.data.collections)
+    const collections = await this.$api.admin.getCollections()
+    context.commit('COLLECTIONS', collections)
   },
   async updateUser(context, data) {
     const res = await this.$axios.patch(`/users/${data.uid}`, data)
     context.commit('UPDATE_USER', res.data.user)
   },
-  async updateCollection(context, { id, data }) {
-    await db.updateCollection(id, data)
+  async updateCollection(context, { _id, data }) {
+    await db.updateCollection(_id, data)
     context.commit('UPDATE_COLLECTION_STATUS', {
-      id,
+      _id,
       status: data.status
     })
   },
-  async updateCollectionStatus(context, { id, status }){
-    await adminDb.updateCollectionStatusOf(id, status)
+  async updateCollectionStatus(context, { _id, status }){
+    await this.$api.admin.updateCollectionStatus({ _id, status })
     context.commit('UPDATE_COLLECTION_STATUS', {
-      id,
+      _id,
       status
     })
   },
@@ -100,7 +100,7 @@ const actions = {
   async processOrder(context, { order, status }) {
     let reqStatus = true
     try {
-      const res = await this.$axios.put(`/orders/${order.id}/process/${status}`)
+      const res = await this.$axios.put(`/orders/${order._id}/process/${status}`)
       context.commit('PROCESS_ORDER', {
         ...order,
         status

@@ -38,12 +38,12 @@
                       <p class="text-gray-900 whitespace-no-wrap flex items-center">
                         <span
                           class="relative text-xs inline-block px-3 py-1 font-semibold leading-tight mr-2"
-                          :class="{'text-white': col.plan === 'sell', 'text-blue-800': col.plan === 'buy'}"
+                          :class="{'text-white': col.plan === 'Sell', 'text-blue-800': col.plan === 'Buy'}"
                         >
                           <span
                             aria-hidden
                             class="absolute inset-0 rounded-full"
-                            :class="{'bg-primary': col.plan === 'sell', 'bg-blue-400': col.plan === 'buy'}"
+                            :class="{'bg-primary': col.plan === 'Sell', 'bg-blue-400': col.plan === 'Buy'}"
                           ></span>
                           <span class="relative uppercase">{{ col.plan }}</span>
                         </span>
@@ -62,7 +62,7 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <div class="border bg-gray-200 w-full bg-grey-light rounded-full" v-if="col.plan === 'sell'">
+                  <div class="border bg-gray-200 w-full bg-grey-light rounded-full" v-if="col.plan === 'Sell'">
                     <div
                       class="bg-primary text-xs rounded-full leading-none py-1 text-center text-white"
                       style="width: 45%"
@@ -127,13 +127,15 @@ export default {
     try {
       await this.$store.dispatch('admin/getCollections')
       this.isLoading = false
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   },
   data() {
     return {
       isLoading: true,
       generatedImages: [],
-      collectionMeta: null
+      collectionMeta: {}
     }
   },
   computed: {
@@ -150,7 +152,7 @@ export default {
       this.generatedImages = res.data
       this.collectionMeta = collection
       this.$nextTick(() => {
-        this.$refs.collectionPreviewDrawer.show()
+        if(this.$refs.collectionPreviewDrawer) this.$refs.collectionPreviewDrawer.show()
       })
     }
   }

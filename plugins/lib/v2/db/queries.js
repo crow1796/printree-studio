@@ -110,6 +110,7 @@ export default {
                     sizes {
                         name
                         quantity
+                        price
                     }
                     contents {
                         _id
@@ -186,4 +187,70 @@ export default {
         }   
     }
   `,
+  updateCollectionStatus: `
+    mutation ($collection: UpdateCollectionStatusInput) {
+        updateCollectionStatus(collection: $collection){
+            _id
+            status
+        }   
+    }
+  `,
+  getCollections: `
+    query ($searchQuery: CollectionQueryInput){
+        collections(query: $searchQuery){
+            _id
+            name
+            plan
+            approved_at
+            declined_at
+            status
+            created_at
+            updated_at
+            user {
+                email
+            }
+            products {
+                _id
+                meta {
+                    name
+                    description
+                    tags
+                }
+            }
+        }
+    }
+  `,
+  getUsers: `
+    query ($searchQuery: UserQueryInput!){
+        users(query: $searchQuery) {
+            _id
+            name
+            email
+            created_at
+            updated_at
+            roles {
+                _id
+                name
+                displayName
+            }
+        }
+    }
+  `,
+  products: `
+    query ($searchQuery: ProductQueryInput) {
+        products(query: $searchQuery){
+            _id
+            meta {
+                name
+                description
+                tags
+            }
+            created_at
+            parent_collection {
+                _id
+                name
+            }
+        }
+    }
+  `
 };

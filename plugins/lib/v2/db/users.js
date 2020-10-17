@@ -1,7 +1,7 @@
 import queries from "./queries";
 
 export const getCollectionsOfUserId = async (axios, userId) => {
-  const { data } = await axios.post("/graphql", {
+  const { data } = await axios.post("/gql", {
     query: queries.currentUserCollections,
     variables: {
       user_id: userId,

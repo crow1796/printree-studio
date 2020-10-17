@@ -67,9 +67,9 @@ export default {
   middleware: "authenticated",
   computed: {
     ...mapGetters({
-      isLoggedIn: "user/isLoggedIn",
+      isLoggedIn: "isLoggedIn",
       designMeta: "designer/designMeta",
-      user: "user/user",
+      user: "user",
       currentDesignName: "designer/currentDesignName",
       currentDesignId: "designer/currentDesignId"
     })

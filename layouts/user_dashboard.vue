@@ -117,14 +117,14 @@ export default {
   head: {
     title: 'Dashboard'
   },
-  middleware: ['authenticated'],
+  middleware: ['auth'],
   components: {
     VueTailwindDropdown
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'user/isLoggedIn',
-      user: 'user/user'
+      isLoggedIn: 'isLoggedIn',
+      user: 'user'
     })
   },
   methods: {

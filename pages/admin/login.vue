@@ -82,11 +82,10 @@ export default {
       this.isLoading = true
       const res = await this.$store.dispatch('user/signIn', this.formData)
       this.isLoading = false
-      if (!res.status) {
+      if (!res.data.status) {
         this.isLoginFailed = true
         return
       }
-      this.$axios.setToken(res.user.token, 'Bearer')
       this.$router.push('/admin/collections')
     }
   }

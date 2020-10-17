@@ -111,28 +111,28 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import VueTailwindDropdown from '@/components/VueTailwindDropdown'
+import { mapGetters } from "vuex";
+import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 
 export default {
   head: {
-    title: 'Admin Dashboard'
+    title: "Admin Dashboard"
   },
-  middleware: ['admin-auth'],
+  middleware: ["admin-auth"],
   components: {
     VueTailwindDropdown
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'user/isLoggedIn',
-      user: 'user/user'
+      isLoggedIn: "isLoggedIn",
+      user: "user"
     })
   },
   methods: {
-    async signOut() {
-      this.$router.replace('/')
-      await this.$store.dispatch('user/signOut')
+    async signOut(e) {
+      this.$router.replace("/");
+      await this.$store.dispatch("user/signOut");
     }
   }
-}
+};
 </script>

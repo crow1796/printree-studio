@@ -589,7 +589,7 @@ const actions = {
     context.commit("ARTS", arts);
   },
   async fetchDesignData(context, id) {
-    const design = await db.getCollection(id);
+    const design = await this.$api.getCollection(id);
     return design;
   },
   async fetchDesignDataAndCommit(context, id) {
