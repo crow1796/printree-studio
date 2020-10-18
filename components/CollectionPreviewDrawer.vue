@@ -84,18 +84,6 @@
                   </button>
                   <button
                     type="button"
-                    class="absolute top-0 right-0 rounded flex justify-center items-center w-8 h-8 hover:text-primary outline-none focus:outline-none"
-                    :class="{
-                      'text-primary': selectedProduct.featured_at
-                    }"
-                    @click="markAsFeatured"
-                    :title="selectedProduct.featured_at ? 'Unfeature' : 'Feature'"
-                    v-tippy="{arrow: true}"
-                  >
-                    <font-awesome-icon :icon="['fas', 'star']" />
-                  </button>
-                  <button
-                    type="button"
                     class="absolute bottom-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
                     @click="downloadDesign"
                     :title="`Download (${selectedProductSide.toUpperCase()})`"

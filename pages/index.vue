@@ -142,6 +142,7 @@ export default {
   },
   methods: {
     async showAvailableProducts() {
+      if(!this.isLoggedIn) return this.$refs.authModal.show();
       if (this.$storage.getLocalStorage('current_design_id')) {
         this.isLoading = true
         const design = await this.$store.dispatch(
@@ -155,20 +156,23 @@ export default {
       this.$refs.availableProductsModal.show()
     },
     async createNewDesign() {
-      if (!this.tmpSelectedProducts.length) return
       if (!this.isLoggedIn) {
         this.$refs.authModal.show()
         return
       }
       this.$refs.authModal.hide()
-      this.isLoading = true
-      let design = await this.$store.dispatch('designer/createNewDesign', {
-        user: this.user,
-        products: this.tmpSelectedProducts
-      })
-      this.tmpSelectedProducts = []
-      this.$storage.setLocalStorage('current_design_id', design._id)
-      this.$router.push('/collection/designer')
+      if(this.tmpSelectedProducts.length){
+        this.isLoading = true
+        let design = await this.$store.dispatch('designer/createNewDesign', {
+          user: this.user,
+          products: this.tmpSelectedProducts
+        })
+        this.tmpSelectedProducts = []
+        this.$storage.setLocalStorage('current_design_id', design._id)
+        this.$router.push('/collection/designer')
+        return;
+      }
+      this.$router.push('/dashboard/collections')
     }
   }
 }

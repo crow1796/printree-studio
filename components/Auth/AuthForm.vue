@@ -2,21 +2,40 @@
   <div class="flex flex-col items-center w-full p-4">
     <AreaLoader v-if="isLoading" />
     <div class="top-text flex flex-col items-center">
-      <h2 class="font-black text-4xl text-primary-lighter">SIGN IN TO CONTINUE</h2>
+      <h2 class="font-black text-4xl text-primary-lighter mb-4">SIGN IN TO CONTINUE</h2>
     </div>
     <div class="content w-full flex flex-grow pb-4">
       <div class="form w-full"> 
         <form @submit.prevent="submitForm">
-          <div class="text-lg font-black text-gray-700">{{ formTitle }}</div>
+          <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
+          <div class="mb-3" v-if="formType == 'sign_up'">
+            <label for="shop_name" class="font-bold">Shop Name</label>
+            <div class="mt-2">
+              <input
+                name="shop_name"
+                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                type="text"
+                :class="{ 'border-red-400': errors.has('shop_name'), 'focus:border-gray-600': !errors.has('shop_name') }"
+                placeholder="Name of your shop"
+                v-model="formData.shopName"
+                data-vv-as="Shop Name"
+                v-validate="'required'"
+              />
+            </div>
+            <span
+              class="text-red-700 text-xs pt-1 font-bold inline-block"
+              v-if="errors.has('shop_name')"
+            >{{ errors.first('shop_name') }}</span>
+          </div>
           <div class="mb-3" v-if="formType == 'sign_up'">
             <label for="name" class="font-bold">Name</label>
-            <div>
+            <div class="mt-2">
               <input
                 name="name"
                 class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                 type="text"
                 :class="{ 'border-red-400': errors.has('name'), 'focus:border-gray-600': !errors.has('name') }"
-                placeholder="Your Name"
+                placeholder="Your name"
                 v-model="formData.name"
                 data-vv-as="Name"
                 v-validate="'required'"
@@ -29,7 +48,7 @@
           </div>
           <div class="mb-3">
             <label for="email" class="font-bold">Email</label>
-            <div>
+            <div class="mt-2">
               <input
                 name="email"
                 class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
@@ -48,7 +67,7 @@
           </div>
           <div class="mb-3" v-if="formType != 'password_recovery'">
             <label for="pass" class="font-bold">Password</label>
-            <div>
+            <div class="mt-2">
               <input
                 type="password"
                 name="pass"
@@ -132,7 +151,8 @@ export default {
       formData: {
         name: null,
         email: null,
-        password: null
+        password: null,
+        shopName: null
       },
       isLoading: false,
       isLoginFailed: false

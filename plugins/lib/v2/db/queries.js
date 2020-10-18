@@ -252,5 +252,17 @@ export default {
             }
         }
     }
-  `
+  `,
+  shopify: {
+      createCollection: `
+        mutation ($collectionInput: CollectionInput!) {
+            collectionCreate(input: $collectionInput) {
+                collection {
+                    id
+                }
+            }
+        }
+      `,
+      productCreate
+  }
 };

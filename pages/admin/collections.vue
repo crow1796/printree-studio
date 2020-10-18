@@ -54,9 +54,6 @@
                         >
                           <span>{{ col.name }}</span>
                         </a>
-                        <a href="#" class="ml-2 text-gray-400 hover:text-gray-600" title="Feature this Collection" v-tippy="{arrow: true}">
-                          <font-awesome-icon :icon="['fas', 'star']"/>
-                        </a>
                       </p>
                     </div>
                   </div>

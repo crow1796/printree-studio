@@ -36,6 +36,7 @@ const actions = {
     return response;
   },
   async signOut(context) {
+    this.$storage.removeLocalStorage('current_design_id')
     await this.$auth.logout();
   },
   async signInAsAGuest(context) {

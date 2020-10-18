@@ -635,7 +635,7 @@ const actions = {
       });
       
       const res = newParams.shouldGenerateImages
-        ? await this.$axios.post("/api/create-images", {
+        ? await this.$axios.post("/create-images", {
             products: context.getters.selectedProducts,
           })
         : [];
