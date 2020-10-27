@@ -336,40 +336,41 @@ export default {
       this.$refs.drawer.hide()
     },
     _calculateEstProfit() {
-      let totalProfit = 0
+      let totalProfit = 0;
       _.map(this.generatedProducts, product => {
         _.map(product.variants, variant => {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
               variant.available_sizes,
-              s => s.name == k
-            )
-            if (!availableSize) return
-            let baseCost = availableSize.base_cost
-            let totalForPrintree = baseCost * size.quantity
-            let totalWithCustomerPrice = (baseCost + size.price) * size.quantity
-            let net = totalWithCustomerPrice - totalForPrintree
-            totalProfit += net
-          })
-        })
-      })
-      let minProfit = totalProfit - totalProfit * 0.05
-      let maxProfit = totalProfit + totalProfit * 0.05
-      this.estimatedMinProfit = minProfit
-      this.estimatedMaxProfit = maxProfit
+              s => s.name === size.name
+            );
+            if (!availableSize) return;
+            let baseCost = availableSize.baseCost;
+            let totalForPrintree = baseCost * size.quantity;
+            let totalWithCustomerPrice =
+              (baseCost + size.price) * size.quantity;
+            let net = totalWithCustomerPrice - totalForPrintree;
+            totalProfit += net;
+          });
+        });
+      });
+      let minProfit = totalProfit - totalProfit * 0.05;
+      let maxProfit = totalProfit + totalProfit * 0.05;
+      this.estimatedMinProfit = minProfit;
+      this.estimatedMaxProfit = maxProfit;
       this.$nextTick(() => {
-        if (this.$refs.estMinProfit) this.$refs.estMinProfit.play()
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play()
-      })
+        if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
+        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play();
+      });
     },
-    calculateProfit() {
-      clearTimeout(this.calculatorTimeout)
-      this.isCalculating = true
+    calculateProfit(size) {
+      clearTimeout(this.calculatorTimeout);
+      this.isCalculating = true;
 
       this.calculatorTimeout = setTimeout(() => {
-        this._calculateEstProfit()
-        this.isCalculating = false
-      }, 2000)
+        this._calculateEstProfit();
+        this.isCalculating = false;
+      }, 2000);
     },
     confirmAction(action) {
       this.confirmationAction = action
