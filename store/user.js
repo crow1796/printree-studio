@@ -27,14 +27,6 @@ const actions = {
     const res = await auth.sendPasswordRecoveryEmail(data.email);
     return res;
   },
-  async socialLogin(context, type) {
-    const response = await auth.socialLogin(type);
-    if (response.status && response.user) {
-      context.commit("USER", response.user);
-      context.commit("IS_LOGGED_IN", true);
-    }
-    return response;
-  },
   async signOut(context) {
     this.$storage.removeLocalStorage('current_design_id')
     await this.$auth.logout();

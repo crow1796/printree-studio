@@ -109,27 +109,6 @@
             >{{ formType == 'sign_up' ? 'Sign In' : 'Sign Up' }}</a>
           </div>
         </form>
-        <div class="text-center text-xs font-bold text-gray-500">OR</div>
-        <div class="flex justify-center">
-          <div class="my-3 mr-2 flex flex-grow">
-            <button
-              class="w-full items-center focus:outline-none outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:border-primary hover:text-primary justify-center"
-              @click="socialLogin('google')"
-            >
-              <font-awesome-icon :icon="['fab', 'google']" class="text-xs mr-2 text-red-700" />
-              <span>Sign In with Google</span>
-            </button>
-          </div>
-          <div class="my-3 ml-2 flex flex-grow">
-            <button
-              class="w-full items-center focus:outline-none outline-none flex flex-grow border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:border-primary hover:text-primary justify-center"
-              @click="socialLogin('facebook')"
-            >
-              <font-awesome-icon :icon="['fab', 'facebook-f']" class="text-xs mr-2 text-blue-600" />
-              <span>Sign In with Facebook</span>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
     <div class="bot-text flex">
@@ -242,12 +221,6 @@ export default {
         return
       }
       this.$emit('login-success')
-    },
-    async socialLogin(type) {
-      this.isLoading = true
-      let res = await this.$store.dispatch('user/socialLogin', type)
-      this.isLoading = false
-      if (res.status) this.$emit('login-success')
     }
   }
 }
