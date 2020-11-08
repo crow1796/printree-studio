@@ -4,11 +4,9 @@
       v-for="(art, index) in arts"
       :key="index"
       @click="$emit('selected', art)">
-      <div class="text-center mt-2 text-gray-600">
-        {{ art.label }}
+      <div class="flex w-full h-full items-center justify-center overflow-hidden">
+        <img :src="art.location" class="object-contain w-full h-full"/>
       </div>
-      <div class="flex w-full h-full px-4 pb-4 pt-2 items-center justify-center overflow-hidden"
-        v-html="art.value"></div>
     </div>
   </div>
 </template>

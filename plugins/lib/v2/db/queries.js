@@ -252,5 +252,14 @@ export default {
             }
         }
     }
+  `,
+  assetsOfCurrentUser: `
+    query {
+        assetsOfCurrentUser {
+            _id
+            location
+            key
+        }
+    }
   `
 };

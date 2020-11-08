@@ -34,6 +34,7 @@
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
     "nuxt": "^2.0.0",
+    "nuxt-dropzone": "^1.0.4",
     "nuxt-fontawesome": "^0.4.0",
     "panzoom": "^8.1.1",
     "paper": "^0.12.3",
