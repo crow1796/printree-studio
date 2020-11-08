@@ -16,7 +16,7 @@
               <div class="rounded-full p-1 bg-white border m-1 hover:border-gray-300"
                 v-for="(color, index) in textColors"
                 :key="index"
-                @click="$emit('actionClicked', {action: 'set_color', args: color})"
+                @click="$emit('action-clicked', {action: 'set_color', args: color})"
                 :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }">
                 <div class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
                   :style="{ 'background-color': color.code }">
@@ -34,7 +34,7 @@
           <v-select :options="webfonts"
             class="flex-grow h-full text-sm"
             :value="activeObject.style.fontFamily"
-            @input="$emit('actionClicked', {action: 'font_family_changed', args: $event})">
+            @input="$emit('action-clicked', {action: 'font_family_changed', args: $event})">
             <template slot="option" slot-scope="item">
               <span :style="{ fontFamily: item.value }">
                 {{ item.label }}
@@ -45,7 +45,7 @@
         <button type="button"
           class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
-          @click="$emit('actionClicked', {action: 'toggle_font_weight', args: activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold'})"
+          @click="$emit('action-clicked', {action: 'toggle_font_weight', args: activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold'})"
           title="Bold (Ctrl + B)"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'bold']"/>
@@ -54,7 +54,7 @@
           type="button"
           class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
-          @click="$emit('actionClicked', {action: 'toggle_font_style', args: activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic'})"
+          @click="$emit('action-clicked', {action: 'toggle_font_style', args: activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic'})"
           title="Italic (Ctrl + I)"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'italic']"/>
@@ -63,7 +63,7 @@
           type="button"
           class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
-          @click="$emit('actionClicked', {action: 'toggle_text_decoration', args: 'underline'})"
+          @click="$emit('action-clicked', {action: 'toggle_text_decoration', args: 'underline'})"
           title="Underline (Ctrl + U)"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'underline']"/>
@@ -72,13 +72,13 @@
           type="button"
           class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
-          @click="$emit('actionClicked', {action: 'toggle_text_decoration', args: 'line-through'})"
+          @click="$emit('action-clicked', {action: 'toggle_text_decoration', args: 'line-through'})"
           title="Strikethrough (Ctrl + K)"
           v-tippy="{ arrow: true }">
           <font-awesome-icon :icon="['fas', 'strikethrough']"/>
         </button>
         <VueNumericInput :min="0"
-          @input="$emit('actionClicked', {action: 'font_size_changed', args: $event})"
+          @input="$emit('action-clicked', {action: 'font_size_changed', args: $event})"
           v-model="activeObject.style.fontSize"
           align="center"
           style="width: 90px"
@@ -90,7 +90,7 @@
       <button type="button"
         class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Left"
-        @click="$emit('actionClicked', {action: 'align_object', args: ['left', activeObject.bounds.width / 2]})"
+        @click="$emit('action-clicked', {action: 'align_object', args: ['left', activeObject.bounds.width / 2]})"
         v-tippy="{ arrow: true }">
         <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="4" height="54" rx="2" fill="#718096"/>
@@ -101,7 +101,7 @@
       <button type="button"
         class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Horizontal Center"
-        @click="$emit('actionClicked', {action: 'align_object', args: ['left', (width / 2)]})"
+        @click="$emit('action-clicked', {action: 'align_object', args: ['left', (width / 2)]})"
         v-tippy="{ arrow: true }">
         <svg width="13" height="13" viewBox="0 0 39 54" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="17" width="4" height="54" rx="2" fill="#718096"/>
@@ -112,7 +112,7 @@
       <button type="button"
         class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Right"
-        @click="$emit('actionClicked', {action: 'align_object', args: ['left', ((width) - (activeObject.bounds.width / 2))]})"
+        @click="$emit('action-clicked', {action: 'align_object', args: ['left', ((width) - (activeObject.bounds.width / 2))]})"
         v-tippy="{ arrow: true }">
         <svg width="13" height="13" viewBox="0 0 51 54" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="4" height="54" rx="2" transform="matrix(-1 0 0 1 51 0)" fill="#718096"/>
@@ -123,7 +123,7 @@
       <button type="button"
         class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Top"
-        @click="$emit('actionClicked', {action: 'align_object', args: ['top', activeObject.bounds.height / 2]})"
+        @click="$emit('action-clicked', {action: 'align_object', args: ['top', activeObject.bounds.height / 2]})"
         v-tippy="{ arrow: true }">
         <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="54.5" y="0.5" width="4" height="54" rx="2" transform="rotate(90 54.5 0.5)" fill="#718096"/>
@@ -134,7 +134,7 @@
       <button type="button"
         class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Vertical Center"
-        @click="$emit('actionClicked', {action: 'align_object', args: ['top', (height / 2)]})"
+        @click="$emit('action-clicked', {action: 'align_object', args: ['top', (height / 2)]})"
         v-tippy="{ arrow: true }">
         <svg width="13" height="13" viewBox="0 0 55 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect x="0.5" y="22.5" width="4" height="54" rx="2" transform="rotate(-90 0.5 22.5)" fill="#718096"/>
@@ -145,7 +145,7 @@
       <button type="button"
         class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Bottom"
-        @click="$emit('actionClicked', {action: 'align_object', args: ['top', (height) - (activeObject.bounds.height / 2)]})"
+        @click="$emit('action-clicked', {action: 'align_object', args: ['top', (height) - (activeObject.bounds.height / 2)]})"
         v-tippy="{ arrow: true }">
         <svg width="13" height="13" viewBox="0 0 55 52" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="4" height="54" rx="2" transform="matrix(1.19249e-08 -1 -1 -1.19249e-08 54.5 51.5)" fill="#718096"/>

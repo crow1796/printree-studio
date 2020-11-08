@@ -299,6 +299,9 @@ const mutations = {
   ARTS(state, arts) {
     state.arts = arts;
   },
+  ADD_ASSET(state, asset) {
+    state.arts.push(asset);
+  },
   SELECTED_PRODUCTS(state, products) {
     state.selectedProducts = products;
   },
@@ -311,7 +314,7 @@ const mutations = {
   CURRENT_VARIANT_PROPERTIES(state, data) {
     _.set(
       state.selectedProducts[state.currentProductIndex].variants[
-        state.currentVariantIndex
+      state.currentVariantIndex
       ],
       data.path,
       data.value
@@ -395,7 +398,7 @@ const mutations = {
   SWAP_OBJECT_INDEX(state, { currentIndex, newIndex }) {
     let variant =
       state.selectedProducts[state.currentProductIndex].variants[
-        state.currentVariantIndex
+      state.currentVariantIndex
       ];
     const sideContent = _.find(variant.contents, { side: state.currentSide });
     let tmp = sideContent.objects[currentIndex];
@@ -633,11 +636,11 @@ const actions = {
         selectedProducts: context.getters.selectedProducts,
         status: context.getters.designMeta.status,
       });
-      
+
       const res = newParams.shouldGenerateImages
         ? await this.$axios.post("/create-images", {
-            products: context.getters.selectedProducts,
-          })
+          products: context.getters.selectedProducts,
+        })
         : [];
       generatedImages = res.data || res;
     } catch (error) {
@@ -652,7 +655,7 @@ const actions = {
     return generatedImages;
   },
   async updateDesignName(context, name) {
-    await this.$api.updateCollectionName({_id: context.getters.currentDesignId, name});
+    await this.$api.updateCollectionName({ _id: context.getters.currentDesignId, name });
     context.commit("DESIGN_NAME", name);
   },
   async publishCollection(context) {

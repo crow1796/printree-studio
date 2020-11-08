@@ -17,21 +17,18 @@
               maxFiles: 1,
               acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload'
               }"
-                @vdropzone-success="artAdded"
-                @vdropzone-sending="artSending"
+                @vdropzone-success="assetAdded"
+                @vdropzone-sending="assetSending"
               />
             </div>
           </div>
         </div>
         <div class="flex flex-col w-2/3 w-full mt-4">
-          <div class="uppercase font-bold text-gray-600 pb-2 px-1">Choose an Art</div>
+          <div class="uppercase font-bold text-gray-600 pb-2 px-1">Choose an Asset</div>
           <div class="overflow-auto">
-            <ArtsList
-              @selected="
-                addObject('svg', $event.value, $event.label)
-                $refs.artsModal.hide()
-              "
-            />
+            <ArtsList @selected="useAsset
+                
+              " />
           </div>
         </div>
       </div>
@@ -49,13 +46,13 @@
 
           <DesignerActions>
             <TopActions
-              @actionClicked="topActionClicked"
+              @action-clicked="topActionClicked"
               :width="width"
               :height="height"
               :activeObject="activeObject"
             />
 
-            <LeftActions @actionClicked="leftActionClicked" />
+            <LeftActions @action-clicked="leftActionClicked" />
           </DesignerActions>
 
           <div class="z-1 inline-block product-section outline-none relative w-auto h-auto">
@@ -148,7 +145,7 @@ import TopActions from "@/components/Designer/Canvas/Actions/Top";
 import DesignerActions from "@/components/Designer/Canvas/Actions/index";
 import { scaleDown } from "~/plugins/scaler";
 import Canvg from "canvg";
-import { mapGetters } from 'vuex';
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -198,8 +195,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user'
+      isLoggedIn: "isLoggedIn",
+      user: "user"
     })
   },
   methods: {
@@ -373,35 +370,55 @@ export default {
     showDrawer(modal) {
       this.$refs[modal].show();
     },
-    artSending(e, xhr) {
-      console.log(this.user)
-      xhr.setRequestHeader()
-      return false;
+    assetSending(e, xhr) {
+      xhr.setRequestHeader("Authorization", this.$auth.getToken("local"));
     },
-    artAdded(file, res) {
-      // let type = "image";
-      // let value = file.dataURL;
-      // if (file.type == "image/svg+xml") {
-      //   let el = document.createElement("canvas");
-      //   let ctx = el.getContext("2d");
+    assetAdded(file, res) {
+      let type = "image";
+      let value = res.data.location;
+      if (file.type == "image/svg+xml") {
+        let el = document.createElement("canvas");
+        let ctx = el.getContext("2d");
 
-      //   const v = Canvg.fromString(ctx, res.files.file);
-      //   v.start();
+        const v = Canvg.fromString(ctx, res.files.file);
+        v.start();
 
-      //   el.innerHTML = value;
-      //   el.style.position = "absolute";
-      //   el.style.visibility = "hidden";
-      //   el.style.display = "block";
-      //   document.body.appendChild(el);
+        el.innerHTML = value;
+        el.style.position = "absolute";
+        el.style.visibility = "hidden";
+        el.style.display = "block";
+        document.body.appendChild(el);
 
-      //   value = el.toDataURL("image/png");
+        value = el.toDataURL("image/png");
 
-      //   document.body.removeChild(el);
-      //   el = null;
-      // }
-      // this.addObject(type, value, file.name, {
-      //   bounds: { width: scaleDown(file.width), height: scaleDown(file.height) }
-      // });
+        document.body.removeChild(el);
+        el = null;
+      }
+      this.addObject(type, value, file.name, {
+        bounds: { width: scaleDown(file.width), height: scaleDown(file.height) }
+      });
+      this.$store.commit('designer/ADD_ASSET', res.data)
+      this.$refs.artsModal.hide();
+    },
+    async useAsset(asset) {
+      const ext = asset.location
+        .split(/[#?]/)[0]
+        .split(".")
+        .pop()
+        .trim();
+      const img = new Image();
+      img.src = asset.location;
+      const imgData = await new Promise((resolve, reject) => {
+        img.onload = function() {
+          resolve(this);
+        };
+      });
+      this.addObject(ext === "svg" ? "svg" : "image", asset.location, "", {
+        bounds: {
+          width: scaleDown(imgData.width),
+          height: scaleDown(imgData.height)
+        }
+      });
       this.$refs.artsModal.hide();
     },
     async addObject(type, value = "", name = null, props = {}) {
