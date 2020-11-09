@@ -30,6 +30,20 @@ export const createDesignFor = async (axios, products) => {
   return createUserCollection;
 };
 
+const parseCollection = collection => ({
+  ...collection,
+  products: _.map(collection.products, (prod) => ({
+    ...prod,
+    variants: _.map(prod.variants, (variant) => ({
+      ...variant,
+      contents: _.map(variant.contents, (content) => ({
+        ...content,
+        objects: JSON.parse(content.objects),
+      })),
+    })),
+  })),
+})
+
 export const getCollection = async (axios, id) => {
   const { data } = await axios.post("/gql", {
     query: queries.collection,
@@ -37,45 +51,31 @@ export const getCollection = async (axios, id) => {
       id,
     },
   });
-  const collection = {
-    ...data.data.collection,
-    products: _.map(data.data.collection.products, (prod) => ({
-      ...prod,
-      variants: _.map(prod.variants, (variant) => ({
-        ...variant,
-        contents: _.map(variant.contents, (content) => ({
-          ...content,
-          objects: JSON.parse(content.objects),
-        })),
-      })),
-    })),
-  };
-  return collection;
+  return parseCollection(data.data.collection);
 };
 
 const stringifyContentsOfProduct = (product) => {
   return {
-    _id: product._id,
+    ...product,
+    customizableProduct: product.customizableProduct._id,
     meta: product.meta,
     variants: _.map(product.variants, (variant) => {
       let newVariant = {
+        customizableVariant: variant.customizableVariant._id,
         sizes: variant.sizes,
         contents: _.map(variant.contents, (content) => {
           let newContent = {
             objects: JSON.stringify(content.objects)
           };
-          // TODO: Update id
           if (content._id) newContent._id = content._id;
-          else newContent.printableArea = "test printable area";
+          else newContent.printableArea = content.side;
 
           return newContent;
         }),
       };
-      // TODO: Update id
-      if(variant._id) newVariant._id = variant._id;
-      else newVariant.customizableVariant = 'test customizable variant';
+      if (variant._id) newVariant._id = variant._id;
 
-      return newVariant;
+      return { ...variant, ...newVariant };
     }),
   };
 };
@@ -88,6 +88,7 @@ export const saveCollection = async (axios, collection) => {
     products: _.map(collection.selectedProducts, stringifyContentsOfProduct),
     plan: collection.plan,
   };
+
   const { data } = await axios.post("/gql", {
     query: queries.updateUserCollection,
     variables: {
@@ -95,7 +96,7 @@ export const saveCollection = async (axios, collection) => {
     },
   });
   const { updateUserCollection } = data.data;
-  return updateUserCollection;
+  return parseCollection(updateUserCollection);
 };
 
 export const deleteCollection = async (axios, id) => {
@@ -109,7 +110,7 @@ export const deleteCollection = async (axios, id) => {
   return deleteCollection;
 }
 
-export const updateCollectionName = async (axios, {_id, name}) => {
+export const updateCollectionName = async (axios, { _id, name }) => {
   const { data } = await axios.post("/gql", {
     query: queries.updateCollectionName,
     variables: {

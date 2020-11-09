@@ -618,6 +618,26 @@ const actions = {
     });
     return design;
   },
+  async saveProducts(context, products) {
+    const updatedCollection = await this.$api.saveCollection({
+      id: context.getters.currentDesignId,
+      name: context.getters.designMeta.name,
+      plan: context.getters.designMeta.plan,
+      selectedProducts: products,
+      status: context.getters.designMeta.status,
+    });
+
+    context.commit("DESIGN_META", {
+      id: updatedCollection._id,
+      name: updatedCollection.name,
+      user_id: updatedCollection.user_id,
+      plan: updatedCollection.plan,
+      status: updatedCollection.status,
+    });
+    context.commit("SELECTED_PRODUCTS", updatedCollection.products);
+
+    return updatedCollection;
+  },
   async saveData(context, params) {
     const defaultParams = {
       shouldGenerateImages: true,
@@ -629,7 +649,7 @@ const actions = {
     };
     let generatedImages = [];
     try {
-      await this.$api.saveCollection({
+      const updatedCollection = await this.$api.saveCollection({
         id: context.getters.currentDesignId,
         name: context.getters.designMeta.name,
         plan: context.getters.designMeta.plan,
@@ -639,10 +659,10 @@ const actions = {
 
       const res = newParams.shouldGenerateImages
         ? await this.$axios.post("/create-images", {
-          products: context.getters.selectedProducts,
+          products: updatedCollection.products,
         })
         : [];
-      generatedImages = res.data || res;
+      generatedImages = newParams.shouldGenerateImages ? (res.data || res) : res;
     } catch (error) {
       console.log(error);
     }

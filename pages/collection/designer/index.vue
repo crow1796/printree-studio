@@ -3,6 +3,7 @@
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="flex flex-grow w-full relative" v-else>
       <VueTailwindDrawer ref="availableProductsModal" width="70%">
+        <AreaLoader v-if="isAvailableProductsLoading"/>
         <div class="flex flex-col flex-grow">
           <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
@@ -165,11 +166,19 @@
           class="flex flex-grow w-full h-full justify-center printable-output p-2"
           :class="{'-maximized': isPreviewExpanded}"
         >
-          <button type="button" class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute z-10 bg-white left-0 top-0 preview-resizer-btn" @click="togglePreviewSize" :title="isPreviewExpanded ? 'Minimize' : 'Expand'" v-tippy="{arrow: true}">
-            <font-awesome-icon :icon="['fas', isPreviewExpanded ? 'compress-alt' : 'expand-alt']" :rotation="90"/>
+          <button
+            type="button"
+            class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute z-10 bg-white left-0 top-0 preview-resizer-btn"
+            @click="togglePreviewSize"
+            :title="isPreviewExpanded ? 'Minimize' : 'Expand'"
+            v-tippy="{arrow: true}"
+          >
+            <font-awesome-icon
+              :icon="['fas', isPreviewExpanded ? 'compress-alt' : 'expand-alt']"
+              :rotation="90"
+            />
           </button>
           <div class="outline-none select-none relative w-full h-full text-center overflow-hidden">
-
             <div class="inline-block outline-none relative w-full h-full">
               <div class="relative w-full h-full">
                 <div
@@ -185,9 +194,7 @@
                     "
                   />
                 </div>
-                <div
-                  class="printable-area-surface absolute"
-                ></div>
+                <div class="printable-area-surface absolute"></div>
                 <div
                   class="printable-area absolute"
                   id="printable-area"
@@ -230,10 +237,12 @@
         </div>
 
         <Canvas
+          :key="currentProductIndex"
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
           :height="currentVariantContent.bounds.height * 4"
-          :backgroundColor="currentVariant.color">
+          :backgroundColor="currentVariant.color"
+        >
           <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded border">
               <div class="flex p-4">
@@ -370,6 +379,7 @@ export default {
   },
   data() {
     return {
+      isAvailableProductsLoading: false,
       isLayersCollapsed: false,
       productDescriptionEditor: null,
       fontSizeTimeout: null,
@@ -404,20 +414,17 @@ export default {
       designMeta: "designer/designMeta"
     }),
     currentVariantSides() {
-      return _.map(
-        _.map(this.currentVariant.contents, "side"),
-        (area) => ({
-          label: _.find(this.currentVariant.contents, { side: area }).placeholder,
-          value: area
-        })
-      );
+      return _.map(_.map(this.currentVariant.contents, "side"), area => ({
+        label: _.find(this.currentVariant.contents, { side: area }).placeholder,
+        value: area
+      }));
     },
     currentVariantContent() {
       return _.find(this.currentVariant.contents, { side: this.currentSide });
     }
   },
   methods: {
-    togglePreviewSize(){
+    togglePreviewSize() {
       this.isPreviewExpanded = !this.isPreviewExpanded;
     },
     _firstVariantPlaceholderOf(product) {
@@ -487,28 +494,33 @@ export default {
       let areas = _.map(variant.contents, "side");
       return _.includes(areas, "front") ? "front" : _.head(areas);
     },
-    manageProducts() {
-      let selectedProductIds = _.map(this.selectedProducts, "id");
-      this.tmpProducts = _.map(this.tmpProducts, product => {
-        if (!product.parent_id) {
-          const ref = fireDb.collection("user_products").doc();
-          product.parent_id = product._id;
-          product._id = ref.id;
-          product.is_new = true;
-        }
-        if (!product.meta)
-          product.meta = {
-            name: "",
+    async manageProducts() {
+      this.isAvailableProductsLoading = true;
+      const tmpProducts = _.map(this.tmpProducts, product => ({
+          customizableProduct: product,
+          meta: {
+            name: product.name,
             description: "",
-            tags: "",
-            printing_option: ""
-          };
-        return product;
-      });
-      this.$store.dispatch("designer/setSelectedProducts", [
-        ...this.selectedProducts,
-        ...this.tmpProducts
+            tags: []
+          },
+          variants: _.map(product.customizableVariants, variant => ({
+            customizableVariant: variant,
+            sizes: _.map(variant.sizes, size => ({
+              name: size.name,
+              quantity: 0,
+              price: 0,
+            })),
+            contents: _.map(variant.printableArea, side => ({
+              printableArea: side.side,
+              objects: []
+            }))
+          }))
+      }));
+      const updatedCollection = await this.$store.dispatch("designer/saveProducts", [
+        ...this.selectedProducts, 
+        ...tmpProducts
       ]);
+      
       let productIndex = this.currentProductIndex;
       if (!this.selectedProducts[productIndex]) productIndex = 0;
       this.currentProduct = JSON.parse(
@@ -516,6 +528,7 @@ export default {
       );
       this.currentVariant = this.currentProduct.variants[0];
       this.tmpProducts = [];
+      this.isAvailableProductsLoading = false;
       this.$refs.availableProductsModal.hide();
     },
     showAvailableProducts() {
@@ -612,8 +625,8 @@ export default {
     selectedProducts: {
       deep: true,
       handler(to) {
-        if(this.autoSaveTimeout) clearTimeout(this.autoSaveTimeout);
-        if(this.autoSavingTimeout) clearTimeout(this.autoSavingTimeout);
+        if (this.autoSaveTimeout) clearTimeout(this.autoSaveTimeout);
+        if (this.autoSavingTimeout) clearTimeout(this.autoSavingTimeout);
         this.autoSaveTimeout = setTimeout(async () => {
           this.autoSaving = true;
           this.autoSavingText = "Saving...";

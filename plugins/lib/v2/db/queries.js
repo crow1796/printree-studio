@@ -1,5 +1,5 @@
 export default {
-  currentUserCollections: `
+    currentUserCollections: `
   query{
       currentUserCollections{
           _id
@@ -12,7 +12,7 @@ export default {
           updated_at
       }
   }`,
-  customizableProducts: `
+    customizableProducts: `
   query {
       customizableProducts {
           _id
@@ -49,7 +49,7 @@ export default {
           updated_at
       }
   }`,
-  createUserCollection: `
+    createUserCollection: `
   mutation ($collection: CollectionInput){
       createUserCollection(collection: $collection){
           _id
@@ -61,23 +61,31 @@ export default {
           created_at
           updated_at
           products {
-              _id
-              meta {
-                  name
-                  tags
-                  description
-              }
-              variants {
-                  _id
-                  sizes {
-                      name
-                      quantity
-                  }
-              }
-          }
+            _id
+            meta {
+                name
+                tags
+                description
+            }
+            variants {
+                _id
+                customizableVariant {
+                    _id
+                }
+                sizes {
+                    name
+                    quantity
+                }
+                contents {
+                    _id
+                    side
+                    objects 
+                }
+            }
+        }
       }
   }`,
-  collection: `
+    collection: `
     query ($id: ID!){
         collection(_id: $id){
             _id
@@ -105,7 +113,12 @@ export default {
                 variants {
                     _id
                     customizableVariant {
+                        _id
                         color
+                        sizes {
+                            name
+                            baseCost
+                        }
                     }
                     sizes {
                         name
@@ -129,7 +142,7 @@ export default {
         }
     }
   `,
-  updateUserCollection: `
+    updateUserCollection: `
     mutation ($collection: UpdateCollectionInput){
         updateUserCollection(collection: $collection){
             _id
@@ -144,26 +157,39 @@ export default {
                 _id
                 meta {
                     name
-                    tags
                     description
+                    tags
                 }
-                variants {
+                customizableProduct {
                     _id
-                    customizableVariant {
+                    customizableVariants {
                         _id
+                        color
                         sizes {
                             name
                             baseCost
                         }
                     }
+                }
+                variants {
+                    _id
                     sizes {
                         name
                         quantity
-                        price
+                    }
+                    customizableVariant {
+                        color
                     }
                     contents {
                         _id
                         side
+                        placeholder
+                        bounds {
+                            left
+                            top
+                            width
+                            height
+                        }
                         objects
                     }
                 }
@@ -171,7 +197,7 @@ export default {
         }
     }
   `,
-  deleteCollection: `
+    deleteCollection: `
     mutation($id: ID!){
         deleteCollection(_id: $id){
             _id
@@ -179,7 +205,7 @@ export default {
         }
     }
   `,
-  updateCollectionName: `
+    updateCollectionName: `
     mutation ($collection: UpdateCollectionNameInput) {
         updateCollectionName(collection: $collection){
             _id
@@ -187,7 +213,7 @@ export default {
         }   
     }
   `,
-  updateCollectionStatus: `
+    updateCollectionStatus: `
     mutation ($collection: UpdateCollectionStatusInput) {
         updateCollectionStatus(collection: $collection){
             _id
@@ -195,7 +221,7 @@ export default {
         }   
     }
   `,
-  getCollections: `
+    getCollections: `
     query ($searchQuery: CollectionQueryInput){
         collections(query: $searchQuery){
             _id
@@ -220,7 +246,7 @@ export default {
         }
     }
   `,
-  getUsers: `
+    getUsers: `
     query ($searchQuery: UserQueryInput!){
         users(query: $searchQuery) {
             _id
@@ -236,7 +262,7 @@ export default {
         }
     }
   `,
-  products: `
+    products: `
     query ($searchQuery: ProductQueryInput) {
         products(query: $searchQuery){
             _id
@@ -253,7 +279,7 @@ export default {
         }
     }
   `,
-  assetsOfCurrentUser: `
+    assetsOfCurrentUser: `
     query {
         assetsOfCurrentUser {
             _id
