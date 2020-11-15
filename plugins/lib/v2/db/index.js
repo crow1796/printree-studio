@@ -2,6 +2,7 @@ import { createDesignFor, getCollection, saveCollection, deleteCollection, updat
 import { getCollections, updateCollectionStatus, getUsers } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
+import { ordersOfCurrentUser } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -26,6 +27,9 @@ export default (axios) => {
     // marketplace
     marketplace: {
       getProductsToSell: (query) => getProductsToSell(axios, query),
+    },
+    userDashboard: {
+      ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query)
     }
   };
 };

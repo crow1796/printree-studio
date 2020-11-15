@@ -287,5 +287,42 @@ export default {
             key
         }
     }
+  `,
+    ordersOfCurrentUser: `
+    query {
+        ordersOfCurrentUser{
+            _id
+            orderNum
+            vendor {
+                _id
+                name
+            }
+            fulfillmentStatus
+            financialStatus
+            statusUrl
+            created_at
+            updated_at
+            orderProducts {
+                _id
+                quantity
+                price
+                shopId
+                variant {
+                    _id
+                    fullThumb
+                    sizes {
+                        name
+                        shopId
+                        price
+                    }
+                    product {
+                        meta {
+                            name
+                        }
+                    }
+                }
+            }
+        }
+    }
   `
 };
