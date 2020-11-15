@@ -2,7 +2,8 @@ const state = () => ({
   userCollections: [],
   userPurchases: [],
   payouts: [],
-  totalProfit: 0
+  totalProfit: 0,
+  orders: []
 })
 
 const mutations = {
@@ -43,6 +44,9 @@ const mutations = {
   },
   INCR_TOTAL_PROFIT_BY(state, amount){
     state.totalProfit += amount
+  },
+  ORDERS(state, orders){
+    state.orders = orders
   }
 }
 
@@ -58,6 +62,9 @@ const getters = {
   },
   payouts(state){
     return state.payouts
+  },
+  orders(state){
+    return state.orders
   }
 }
 
@@ -78,8 +85,9 @@ const actions = {
     const orders = await db.getUserPurchasesOf(user)
     context.commit('USER_PURCHASES', orders)
   },
-  async getOrdersForSeller(context, user){
-    const orders = await db.getOrdersForSeller(user)
+  async ordersOfCurrentUser(context, user){
+    const orders = await this.$api.userDashboard.ordersOfCurrentUser()
+    context.commit('ORDERS', orders)
     return orders
   },
   async getTotalProfitOf(context, user){
