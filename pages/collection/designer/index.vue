@@ -3,7 +3,7 @@
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="flex flex-grow w-full relative" v-else>
       <VueTailwindDrawer ref="availableProductsModal" width="70%">
-        <AreaLoader v-if="isAvailableProductsLoading"/>
+        <AreaLoader v-if="isAvailableProductsLoading" />
         <div class="flex flex-col flex-grow">
           <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
@@ -23,29 +23,36 @@
           <div class="flex modal-body flex-grow">
             <AvailableProducts v-model="tmpProducts" />
           </div>
-          <div class="flex modal-footer justify-between p-4 border-t items-center">
+          <div
+            class="flex modal-footer justify-between p-4 border-t items-center"
+          >
             <a
               href="#"
               class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400"
-            >{{ tmpProducts.length }} Products Selected</a>
+              >{{ tmpProducts.length }} Products Selected</a
+            >
             <button
               type="button"
               class="border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
               @click="manageProducts"
-            >CONTINUE</button>
+            >
+              CONTINUE
+            </button>
           </div>
         </div>
       </VueTailwindDrawer>
 
       <div class="flex w-1/4 border-r flex-grow flex-col">
-        <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
-          <!-- <div
+        <div
+          class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow"
+        >
+          <div
             class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
             @click="showAvailableProducts"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
             <span class="font-bold">MANAGE PRODUCTS</span>
-          </div>-->
+          </div>
           <div class="flex flex-wrap flex mt-4 overflow-auto px-4 pb-4">
             <div class="p-1 w-6/12">
               <div
@@ -54,12 +61,19 @@
                 @click="showAvailableProducts"
               >
                 <div class="flex flex-col items-center justify-center">
-                  <font-awesome-icon :icon="['fas', 'plus-circle']" class="text-5xl" />
+                  <font-awesome-icon
+                    :icon="['fas', 'plus-circle']"
+                    class="text-5xl"
+                  />
                   <span class="font-bold mt-2 block">ADD PRODUCTS</span>
                 </div>
               </div>
             </div>
-            <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
+            <div
+              class="p-1 w-6/12"
+              v-for="(product, index) in selectedProducts"
+              :key="index"
+            >
               <div
                 class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
@@ -68,19 +82,22 @@
                 <div class="flex w-full flex-col justify-center items-center">
                   <div class="flex justify-center items-center w-full">
                     <img
-                      :src="
-                        _firstVariantPlaceholderOf(product)
-                      "
-                      style="height: 100px;"
+                      :src="_firstVariantPlaceholderOf(product)"
+                      style="height: 100px"
                     />
                   </div>
                   <div class="flex-grow flex flex-col pt-2">
-                    <div class="font-bold text-gray-600">{{ product.meta.name }}</div>
+                    <div class="font-bold text-gray-600">
+                      {{ product.meta.name }}
+                    </div>
                     <div class="flex">
                       <v-popover class="flex" placement="right">
                         <div
                           class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700"
-                          v-if="product.customizableProduct.customizableVariants.length > 1"
+                          v-if="
+                            product.customizableProduct.customizableVariants
+                              .length > 1
+                          "
                         >
                           <div
                             class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 bg-white"
@@ -88,39 +105,42 @@
                             <font-awesome-icon
                               :icon="['fas', 'plus']"
                               class="text-xs"
-                              :style="{fontSize: '.6em'}"
+                              :style="{ fontSize: '.6em' }"
                             />
                           </div>
                         </div>
                         <template slot="popover">
                           <div class="bg-white w-64 border rounded shadow-xl">
                             <div class="flex flex-col w-full">
-                              <div class="font-bold text-gray-600 p-2 border-b">Choose a color</div>
+                              <div class="font-bold text-gray-600 p-2 border-b">
+                                Choose a color
+                              </div>
                               <div class="flex p-2">
                                 <div
                                   class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
                                   v-for="(variant,
-                                  variantIndex) in currentProduct.customizableProduct.customizableVariants"
+                                  variantIndex) in currentProduct
+                                    .customizableProduct.customizableVariants"
                                   :key="variantIndex"
                                   :class="{
                                     'border-gray-300 bg-white': _colorIsInVariantsOf(
                                       currentProduct,
                                       variant.color
-                                    )
+                                    ),
                                   }"
                                   @click="addVariant(variant)"
                                 >
                                   <div
                                     class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
                                     :style="{
-                                      'background-color': variant.color
+                                      'background-color': variant.color,
                                     }"
                                   >
                                     <font-awesome-icon
                                       :icon="['fas', 'check']"
                                       :style="{
                                         color: getCorrectColor(variant.color),
-                                        fontSize: '.4em'
+                                        fontSize: '.4em',
                                       }"
                                       v-if="
                                         _colorIsInVariantsOf(
@@ -144,7 +164,7 @@
                         :class="{
                           'border-gray-300 bg-white':
                             index == currentProductIndex &&
-                            variantIndex == currentVariantIndex
+                            variantIndex == currentVariantIndex,
                         }"
                       >
                         <div
@@ -164,21 +184,23 @@
       <div class="flex flex-grow h-full flex-col w-3/4">
         <div
           class="flex flex-grow w-full h-full justify-center printable-output p-2"
-          :class="{'-maximized': isPreviewExpanded}"
+          :class="{ '-maximized': isPreviewExpanded }"
         >
           <button
             type="button"
             class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute z-10 bg-white left-0 top-0 preview-resizer-btn"
             @click="togglePreviewSize"
             :title="isPreviewExpanded ? 'Minimize' : 'Expand'"
-            v-tippy="{arrow: true}"
+            v-tippy="{ arrow: true }"
           >
             <font-awesome-icon
               :icon="['fas', isPreviewExpanded ? 'compress-alt' : 'expand-alt']"
               :rotation="90"
             />
           </button>
-          <div class="outline-none select-none relative w-full h-full text-center overflow-hidden">
+          <div
+            class="outline-none select-none relative w-full h-full text-center overflow-hidden"
+          >
             <div class="inline-block outline-none relative w-full h-full">
               <div class="relative w-full h-full">
                 <div
@@ -189,9 +211,7 @@
                     draggable="false"
                     class="relative"
                     style="z-index: 2"
-                    :src="
-                      currentVariantContent.placeholder
-                    "
+                    :src="currentVariantContent.placeholder"
                   />
                 </div>
                 <div class="printable-area-surface absolute"></div>
@@ -204,15 +224,15 @@
                     width: `${currentVariantContent.bounds.width}px`,
                     height: `${currentVariantContent.bounds.height}px`,
                     zIndex: printableAreaZ,
-                    outlineColor: getCorrectColor(currentVariant.color)
+                    outlineColor: getCorrectColor(currentVariant.color),
                   }"
                   :class="{
-                    '-has-outline': isPrintableAreaHovered || isMoving
+                    '-has-outline': isPrintableAreaHovered || isMoving,
                   }"
                   @mouseenter="isPrintableAreaHovered = true"
                   @mouseleave="
-                    printableAreaZ = 1
-                    isPrintableAreaHovered = false
+                    printableAreaZ = 1;
+                    isPrintableAreaHovered = false;
                   "
                 >
                   <Output
@@ -225,12 +245,16 @@
                   class="printable-area-label"
                   v-if="isPrintableAreaHovered"
                   :style="{
-                    top: `${currentVariantContent.bounds.top +
+                    top: `${
+                      currentVariantContent.bounds.top +
                       currentVariantContent.bounds.height +
-                      5}px`,
-                    color: getCorrectColor(currentVariant.color)
+                      5
+                    }px`,
+                    color: getCorrectColor(currentVariant.color),
                   }"
-                >Printable Area</div>
+                >
+                  Printable Area
+                </div>
               </div>
             </div>
           </div>
@@ -243,7 +267,9 @@
           :height="currentVariantContent.bounds.height * 4"
           :backgroundColor="currentVariant.color"
         >
-          <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
+          <div
+            class="bottom-actions absolute z-10 flex flex-shrink justify-center"
+          >
             <div class="flex bg-white mt-4 rounded border">
               <div class="flex p-4">
                 <ToggleSwitch
@@ -251,14 +277,16 @@
                   class="mx-1"
                   :value="currentSide"
                   @change="
-                    option =>
+                    (option) =>
                       $store.dispatch('designer/switchSideTo', option.value)
                   "
                 >
                   <template v-slot:default="{ option }">
                     <div class="flex flex-col">
                       <img :src="option.label" width="50" />
-                      <div class="text-center mt-1 text-xs">{{ option.value.toUpperCase() }}</div>
+                      <div class="text-center mt-1 text-xs">
+                        {{ option.value.toUpperCase() }}
+                      </div>
                     </div>
                   </template>
                 </ToggleSwitch>
@@ -301,7 +329,7 @@
                     type="text"
                     :class="{
                       'border-red-400': errors.has('product_name'),
-                      'focus:border-gray-600': !errors.has('name')
+                      'focus:border-gray-600': !errors.has('name'),
                     }"
                     placeholder="Product Name"
                     data-vv-as="Product Name"
@@ -312,22 +340,28 @@
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
                   v-if="errors.has('product_name')"
-                >{{ errors.first('product_name') }}</span>
+                  >{{ errors.first("product_name") }}</span
+                >
               </div>
               <div>
-                <label for="product_description" class="font-bold">Product Description</label>
+                <label for="product_description" class="font-bold"
+                  >Product Description</label
+                >
                 <div>
                   <WrappedEditor v-model="tmpProductMetadata.description" />
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
                   v-if="errors.has('product_description')"
-                >{{ errors.first('product_description') }}</span>
+                  >{{ errors.first("product_description") }}</span
+                >
               </div>
             </div>
           </div>
           <div class="flex p-4 justify-end border-t">
-            <PTButton color="primary" @click="saveProductMetadata">SAVE</PTButton>
+            <PTButton color="primary" @click="saveProductMetadata"
+              >SAVE</PTButton
+            >
           </div>
         </div>
       </VueTailwindDrawer>
@@ -365,13 +399,13 @@ export default {
     draggable,
     Konva,
     Canvas,
-    Output
+    Output,
   },
   async mounted() {
     WebFontLoader.load({
       google: {
-        families: _.map(this.webfonts, "value")
-      }
+        families: _.map(this.webfonts, "value"),
+      },
     });
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]));
     this.currentVariant = this.currentProduct.variants[0];
@@ -392,15 +426,15 @@ export default {
       isMoving: false,
       highlightRuler: {
         vertical: false,
-        horizontal: false
+        horizontal: false,
       },
       printableAreaZ: 2,
       tmpProductMetadata: {
         name: "",
         description: "",
-        tags: ""
+        tags: "",
       },
-      isPreviewExpanded: false
+      isPreviewExpanded: false,
     };
   },
   computed: {
@@ -411,17 +445,17 @@ export default {
       currentVariantIndex: "designer/currentVariantIndex",
       currentSide: "designer/currentSide",
       currentDesignId: "designer/currentDesignId",
-      designMeta: "designer/designMeta"
+      designMeta: "designer/designMeta",
     }),
     currentVariantSides() {
-      return _.map(_.map(this.currentVariant.contents, "side"), area => ({
+      return _.map(_.map(this.currentVariant.contents, "side"), (area) => ({
         label: _.find(this.currentVariant.contents, { side: area }).placeholder,
-        value: area
+        value: area,
       }));
     },
     currentVariantContent() {
       return _.find(this.currentVariant.contents, { side: this.currentSide });
-    }
+    },
   },
   methods: {
     togglePreviewSize() {
@@ -429,7 +463,7 @@ export default {
     },
     _firstVariantPlaceholderOf(product) {
       return _.find(product.variants[0].contents, {
-        side: this._firstPrintableArea(product.variants[0])
+        side: this._firstPrintableArea(product.variants[0]),
       }).placeholder;
     },
     _reverseObjects(objects) {
@@ -458,7 +492,7 @@ export default {
         this.tmpProductMetadata = {
           name: "",
           description: "",
-          tags: ""
+          tags: "",
         };
       });
     },
@@ -496,31 +530,31 @@ export default {
     },
     async manageProducts() {
       this.isAvailableProductsLoading = true;
-      const tmpProducts = _.map(this.tmpProducts, product => ({
-          customizableProduct: product,
-          meta: {
-            name: product.name,
-            description: "",
-            tags: []
-          },
-          variants: _.map(product.customizableVariants, variant => ({
-            customizableVariant: variant,
-            sizes: _.map(variant.sizes, size => ({
-              name: size.name,
-              quantity: 0,
-              price: 0,
-            })),
-            contents: _.map(variant.printableArea, side => ({
-              printableArea: side.side,
-              objects: []
-            }))
-          }))
+      const tmpProducts = _.map(this.tmpProducts, (product) => ({
+        customizableProduct: product,
+        meta: {
+          name: product.name,
+          description: "",
+          tags: [],
+        },
+        variants: _.map(product.customizableVariants, (variant) => ({
+          customizableVariant: variant,
+          sizes: _.map(variant.sizes, (size) => ({
+            name: size.name,
+            quantity: 0,
+            price: 0,
+          })),
+          contents: _.map(variant.printableArea, (side) => ({
+            printableArea: side.side,
+            objects: [],
+          })),
+        })),
       }));
-      const updatedCollection = await this.$store.dispatch("designer/saveProducts", [
-        ...this.selectedProducts, 
-        ...tmpProducts
-      ]);
-      
+      const updatedCollection = await this.$store.dispatch(
+        "designer/saveProducts",
+        [...this.selectedProducts, ...tmpProducts]
+      );
+
       let productIndex = this.currentProductIndex;
       if (!this.selectedProducts[productIndex]) productIndex = 0;
       this.currentProduct = JSON.parse(
@@ -559,8 +593,8 @@ export default {
         ...variant,
         ...{
           id: null,
-          parent_id: variant._id
-        }
+          parent_id: variant._id,
+        },
       });
       this.currentProduct.variants.push(JSON.parse(JSON.stringify(newVariant)));
       this.selectVariant(
@@ -571,7 +605,7 @@ export default {
     _colorIsInVariantsOf(product, color) {
       return _.find(
         product.customizableProduct.customizableVariants,
-        variant => variant.color.toLowerCase() == color.toLowerCase()
+        (variant) => variant.color.toLowerCase() == color.toLowerCase()
       );
     },
     selectProduct(index) {
@@ -589,7 +623,7 @@ export default {
     getCorrectColor(hex) {
       if (!hex) return;
       return ColorRegulator.getContrastOf(hex);
-    }
+    },
   },
   watch: {
     currentProduct: {
@@ -597,7 +631,7 @@ export default {
       handler(to) {
         if (!to || (to && !to.meta)) return;
         this.tmpProductMetadata = JSON.parse(JSON.stringify(to.meta));
-      }
+      },
     },
     currentProductIndex: {
       immediate: true,
@@ -608,7 +642,7 @@ export default {
         );
         this.currentVariant = this.currentProduct.variants[0];
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
-      }
+      },
     },
     currentVariantIndex: {
       immediate: true,
@@ -620,7 +654,7 @@ export default {
           )
         );
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
-      }
+      },
     },
     selectedProducts: {
       deep: true,
@@ -631,15 +665,15 @@ export default {
           this.autoSaving = true;
           this.autoSavingText = "Saving...";
           await this.$store.dispatch("designer/saveData", {
-            shouldGenerateImages: false
+            shouldGenerateImages: false,
           });
           this.autoSavingText = "Saved!";
           this.autoSavingTimeout = setTimeout(() => {
             this.autoSaving = false;
           }, 1000);
         }, 3000);
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
