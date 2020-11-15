@@ -90,16 +90,13 @@ const actions = {
     context.commit('ORDERS', orders)
     return orders
   },
-  async getTotalProfitOf(context, user){
-    const total = await db.getTotalProfitOf(user)
+  async totalEarningsOfCurrentUser(context){
+    const total = await this.$api.userDashboard.totalEarningsOfCurrentUser()
     context.commit('TOTAL_PROFIT', total)
   },
-  async getPayoutsOf(context, user){
-    const res = await db.getPayoutsOf(user)
-    if(res.status){
-      context.commit('PAYOUTS', res.data)
-      return
-    }
+  async payoutsOfCurrentUser(context, query){
+    const payouts = await this.$api.userDashboard.payoutsOfCurrentUser(query)
+    context.commit('PAYOUTS', payouts)
   },
   async sendPayoutRequest(context, data){
     const res = await db.sendPayoutRequest(data)

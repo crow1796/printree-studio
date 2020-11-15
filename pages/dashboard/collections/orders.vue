@@ -38,7 +38,7 @@
               class="uppercase"
               :class="{'text-green-600': order.financialStatus === 'paid', 'text-primary': order.financialStatus !== 'paid'}"
             >
-              {{ order.financialStatus}}
+              {{ order.financialStatus || "Pending" }}
               <font-awesome-icon
                 v-if="order.financialStatus === 'paid'"
                 :icon="['fas', 'check-circle']"
@@ -59,7 +59,7 @@
               <progressive-img class="relative mx-auto" :src="product.variant.fullThumb" />
             </div>
           </div>
-          <div class="flex flex-col w-3/12 justify-center">
+          <div class="flex flex-col w-4/12 justify-center">
             <span class="font-bold leading-none">
               {{
               product.variant.product.meta.name
@@ -129,17 +129,6 @@ export default {
     formatTimestamp(timestamp) {
       if (!timestamp) return;
       return moment(timestamp).format("MMMM Do YYYY, h:mm:ss a");
-    },
-    orderStatus(status) {
-      switch (status) {
-        case "pending":
-          status = "Order Received";
-          break;
-        case "shipping":
-          status = "Handed over to our Delivery Partner";
-          break;
-      }
-      return status;
     },
   },
 };

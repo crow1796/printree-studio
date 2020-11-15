@@ -37,16 +37,16 @@
             >{{ errors.first('recipientForm.complete_name') }}</span>
           </div>
           <div class="mb-3">
-            <label for="mobile_number" class="font-bold mr-4 mt-2">Mobile Number</label>
+            <label for="mobile_number" class="font-bold mr-4 mt-2">GCash Number</label>
             <div>
               <input
                 name="mobile_number"
                 class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                 type="text"
                 :class="{ 'border-red-400': errors.has('recipientForm.mobile_number'), 'focus:border-gray-600': !errors.has('recipientForm.mobile_number') }"
-                placeholder="Your Mobile Number"
+                placeholder="Your GCash Number"
                 v-model="recipientData.mobile"
-                data-vv-as="Mobile Number"
+                data-vv-as="GCash Number"
                 v-validate="'required|numeric'"
                 data-vv-scope="recipientForm"
               />
@@ -104,7 +104,7 @@
             {{ recipientData.name }}
           </div>
           <div>
-            <span class="font-bold">Mobile Number:</span>
+            <span class="font-bold">GCash Number:</span>
             {{ recipientData.mobile }}
           </div>
           <div>
@@ -148,10 +148,6 @@
     </VueTailwindModal>
     <div class="my-2 flex justify-between items-center">
       <div>
-        <nuxt-link to="/dashboard/collections" class="text-xs text-blue-500 hover:text-blue-700">
-          <font-awesome-icon :icon="['fas', 'arrow-left']" />
-          <span class="ml-1">Back</span>
-        </nuxt-link>
         <h2 class="text-2xl font-semibold leading-tight">Payout</h2>
       </div>
       <PTButton color="primary" @click="showRequestPayoutModal">
@@ -160,9 +156,6 @@
         </span>
         <span>Request Payout</span>
       </PTButton>
-    </div>
-    <div class="flex justify-end flex-grow">
-      <TotalProfitCounter />
     </div>
     <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
       <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -197,11 +190,11 @@
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 <div>
                     <span class="font-bold">Complete Name:</span>
-                    {{ payout.name }}
+                    {{ payout.recipient.completeName }}
                   </div>
                   <div>
-                    <span class="font-bold">Mobile Number:</span>
-                    {{ payout.mobile }}
+                    <span class="font-bold">GCash Number:</span>
+                    {{ payout.recipient.mobileNumber }}
                   </div>
                   <div>
                     <span class="font-bold">Amount (PHP):</span>
@@ -250,18 +243,15 @@
 <script>
 import { mapGetters } from 'vuex'
 import moment from 'moment'
-import TotalProfitCounter from '@/components/TotalProfitCounter'
 import VueTailwindModal from '@/components/VueTailwindModal'
 
 export default {
   layout: 'user_dashboard',
   components: {
-    VueTailwindModal,
-    TotalProfitCounter
+    VueTailwindModal
   },
   async mounted() {
-    await this.$store.dispatch('user_dashboard/getPayoutsOf', this.user)
-    await this.$store.dispatch('user_dashboard/getTotalProfitOf', this.user)
+    await this.$store.dispatch('user_dashboard/payoutsOfCurrentUser', {})
     this.isLoading = false
   },
   data() {
@@ -323,7 +313,8 @@ export default {
       this.$refs.requestPayoutModal.show()
     },
     formatTimestamp(timestamp) {
-      return moment(timestamp.toDate()).format('MMMM Do YYYY, h:mm:ss a')
+      if(!timestamp) return;
+      return moment(timestamp).format('MMMM Do YYYY, h:mm:ss a')
     },
     async confirmPayoutRequest() {
       if (this.isConfirmationLoading) return

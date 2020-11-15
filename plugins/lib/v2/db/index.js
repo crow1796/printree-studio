@@ -2,7 +2,7 @@ import { createDesignFor, getCollection, saveCollection, deleteCollection, updat
 import { getCollections, updateCollectionStatus, getUsers } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -10,7 +10,7 @@ export default (axios) => {
     // users.js
     getUserCollectionsOf: (userId) => getCollectionsOfUserId(axios, userId),
     // designer.js
-    fetchAvailableProducts: () => fetchAvailableProducts(axios) ,
+    fetchAvailableProducts: () => fetchAvailableProducts(axios),
     getArts: () => getArts(axios),
     // collections.js
     createDesignFor: (products) => createDesignFor(axios, products),
@@ -29,7 +29,9 @@ export default (axios) => {
       getProductsToSell: (query) => getProductsToSell(axios, query),
     },
     userDashboard: {
-      ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query)
+      ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query),
+      totalEarningsOfCurrentUser: () => totalEarningsOfCurrentUser(axios),
+      payoutsOfCurrentUser: (query) => payoutsOfCurrentUser(axios, query),
     }
   };
 };

@@ -324,5 +324,27 @@ export default {
             }
         }
     }
+  `,
+  totalEarningsOfCurrentUser: `
+    query {
+        totalEarningsOfCurrentUser
+    }
+  `,
+  payoutsOfCurrentUser: `
+    query {
+        payoutsOfCurrentUser {
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+            created_at
+            updated_at
+        }
+    }
   `
 };
