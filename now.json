@@ -8,7 +8,7 @@
   ],
   "env": {
     "API_URL": "http://localhost:4000/api",
-    "ON_VERCEL": true
+    "ON_VERCEL": "true"
   },
   "build": {
     "env": {
