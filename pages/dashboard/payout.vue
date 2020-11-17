@@ -25,7 +25,7 @@
                 type="text"
                 :class="{ 'border-red-400': errors.has('recipientForm.complete_name'), 'focus:border-gray-600': !errors.has('recipientForm.complete_name') }"
                 placeholder="Your Complete Name"
-                v-model="recipientData.name"
+                v-model="recipientData.completeName"
                 data-vv-as="Complete Name"
                 v-validate="'required'"
                 data-vv-scope="recipientForm"
@@ -45,7 +45,7 @@
                 type="text"
                 :class="{ 'border-red-400': errors.has('recipientForm.mobile_number'), 'focus:border-gray-600': !errors.has('recipientForm.mobile_number') }"
                 placeholder="Your GCash Number"
-                v-model="recipientData.mobile"
+                v-model="recipientData.mobileNumber"
                 data-vv-as="GCash Number"
                 v-validate="'required|numeric'"
                 data-vv-scope="recipientForm"
@@ -101,11 +101,11 @@
         <div class="flex modal-body flex-col flex-grow p-4">
           <div>
             <span class="font-bold">Complete Name:</span>
-            {{ recipientData.name }}
+            {{ recipientData.completeName }}
           </div>
           <div>
             <span class="font-bold">GCash Number:</span>
-            {{ recipientData.mobile }}
+            {{ recipientData.mobileNumber }}
           </div>
           <div>
             <span class="font-bold">Amount (PHP):</span>
@@ -135,14 +135,14 @@
             </div>
           </div>
         </div>
-        <div class="flex modal-body flex-col flex-grow p-4">
-          Are you sure that you want to cancel this request?
-        </div>
+        <div
+          class="flex modal-body flex-col flex-grow p-4"
+        >Are you sure that you want to cancel this request?</div>
         <div
           class="flex modal-footer justify-between flex-shrink p-4 border-t items-celex modal-footer justify-center flex-shrink p-4 border-t nter"
         >
           <PTButton @click="cancelCancellationConfirmation">NO</PTButton>
-          <PTButton color="primary" @click="cancelPayout">YES</PTButton>
+          <PTButton color="primary" @click="cancelPayoutRequest">YES</PTButton>
         </div>
       </div>
     </VueTailwindModal>
@@ -183,23 +183,25 @@
                 class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
               >You have no payout(s).</td>
             </tr>
-            <tr v-for="payout in payouts" :key="payout.id">
+            <tr v-for="payout in payouts" :key="payout._id">
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-left">
-                <div class="text-gray-900 whitespace-no-wrap">{{ formatTimestamp(payout.created_at) }}</div>
+                <div
+                  class="text-gray-900 whitespace-no-wrap"
+                >{{ formatTimestamp(payout.created_at) }}</div>
               </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 <div>
-                    <span class="font-bold">Complete Name:</span>
-                    {{ payout.recipient.completeName }}
-                  </div>
-                  <div>
-                    <span class="font-bold">GCash Number:</span>
-                    {{ payout.recipient.mobileNumber }}
-                  </div>
-                  <div>
-                    <span class="font-bold">Amount (PHP):</span>
-                    {{ payout.amount }}
-                  </div>
+                  <span class="font-bold">Complete Name:</span>
+                  {{ payout.recipient.completeName }}
+                </div>
+                <div>
+                  <span class="font-bold">GCash Number:</span>
+                  {{ payout.recipient.mobileNumber }}
+                </div>
+                <div>
+                  <span class="font-bold">Amount (PHP):</span>
+                  {{ payout.amount }}
+                </div>
               </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                 <span
@@ -208,8 +210,7 @@
                 >{{ payout.status }}</span>
               </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                <div
-                    v-if="payout.status === 'pending'">
+                <div v-if="payout.status === 'pending'">
                   <button
                     type="button"
                     class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
@@ -241,18 +242,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import moment from 'moment'
-import VueTailwindModal from '@/components/VueTailwindModal'
+import { mapGetters } from "vuex";
+import moment from "moment";
+import VueTailwindModal from "@/components/VueTailwindModal";
+import omit from "lodash/omit";
 
 export default {
-  layout: 'user_dashboard',
+  layout: "user_dashboard",
   components: {
-    VueTailwindModal
+    VueTailwindModal,
   },
   async mounted() {
-    await this.$store.dispatch('user_dashboard/payoutsOfCurrentUser', {})
-    this.isLoading = false
+    await this.$store.dispatch("user_dashboard/payoutsOfCurrentUser", {});
+    this.isLoading = false;
   },
   data() {
     return {
@@ -260,130 +262,137 @@ export default {
       isConfirmationLoading: false,
       editingPayout: null,
       recipientData: {
-        id: null,
-        name: null,
-        mobile: null,
-        amount: 0
-      }
-    }
+        _id: null,
+        completeName: null,
+        mobileNumber: null,
+        amount: 0,
+        channel: "gcash",
+      },
+    };
   },
   computed: {
     ...mapGetters({
-      payouts: 'user_dashboard/payouts',
-      user: 'user',
-      totalProfit: 'user_dashboard/totalProfit'
+      payouts: "user_dashboard/payouts",
+      user: "user",
+      totalProfit: "user_dashboard/totalProfit",
     }),
-    computedTotalProfit(){
-      if(this.editingPayout && this.editingPayout.id){
-        return this.totalProfit + this.editingPayout.amount
+    computedTotalProfit() {
+      if (this.editingPayout && this.editingPayout._id) {
+        return this.totalProfit + this.editingPayout.amount;
       }
-      return this.totalProfit
-    }
+      return this.totalProfit;
+    },
   },
   methods: {
     showRequestPayoutModal() {
       this.recipientData = {
-        id: null,
-        name: null,
-        mobile: null,
-        amount: 0
-      }
-      this.$refs.requestPayoutModal.show()
+        _id: null,
+        completeName: null,
+        mobileNumber: null,
+        amount: 0,
+        channel: 'gcash'
+      };
+      this.$refs.requestPayoutModal.show();
     },
     cancelRequest() {
-      this.$refs.requestPayoutModal.hide()
+      this.$refs.requestPayoutModal.hide();
       this.$nextTick(() => {
-        this.editingPayout = null
+        this.editingPayout = null;
         this.recipientData = {
-          id: null,
-          name: null,
-          mobile: null,
-          amount: 0
-        }
-      })
+          _id: null,
+          completeName: null,
+          mobileNumber: null,
+          amount: 0,
+          channel: 'gcash'
+        };
+      });
     },
     async sendRequest() {
-      const validation = await this.$validator.validateAll('recipientForm')
-      if (!validation) return
-      this.$refs.requestPayoutModal.hide()
-      this.$refs.requestPayoutConfirmationModal.show()
+      const validation = await this.$validator.validateAll("recipientForm");
+      if (!validation) return;
+      this.$refs.requestPayoutModal.hide();
+      this.$refs.requestPayoutConfirmationModal.show();
     },
     cancelPayoutConfirmation() {
-      this.$refs.requestPayoutConfirmationModal.hide()
-      this.$refs.requestPayoutModal.show()
+      this.$refs.requestPayoutConfirmationModal.hide();
+      this.$refs.requestPayoutModal.show();
     },
     formatTimestamp(timestamp) {
-      if(!timestamp) return;
-      return moment(timestamp).format('MMMM Do YYYY, h:mm:ss a')
+      if (!timestamp) return;
+      return moment(timestamp).format("MMMM Do YYYY, h:mm:ss a");
     },
     async confirmPayoutRequest() {
-      if (this.isConfirmationLoading) return
-      this.isConfirmationLoading = true
+      if (this.isConfirmationLoading) return;
+      this.isConfirmationLoading = true;
       const res = await this.$store.dispatch(
-        'user_dashboard/sendPayoutRequest',
-        { user: this.user, payout: this.recipientData }
-      )
-      this.isConfirmationLoading = false
+        "user_dashboard/payoutRequest",
+        omit(this.recipientData, "_id")
+      );
+      this.isConfirmationLoading = false;
       if (!res.status) {
-        this.$refs.requestPayoutConfirmationModal.hide()
-        this.$refs.requestPayoutModal.show()
-        this.$toast.error(res.message || 'Your payout request has failed.', {
-          position: 'top'
-        })
-        return
+        this.$refs.requestPayoutConfirmationModal.hide();
+        this.$refs.requestPayoutModal.show();
+        this.$toast.error(res.message || "Your payout request has failed.", {
+          position: "top",
+        });
+        return;
       }
-      this.editingPayout = null
-      this.$refs.requestPayoutConfirmationModal.hide()
-      this.$toast.success('Your payout request has been sent successfully.', {
-        position: 'top'
-      })
+      this.editingPayout = null;
+      this.$refs.requestPayoutConfirmationModal.hide();
+      this.$toast.success("Your payout request has been sent successfully.", {
+        position: "top",
+      });
     },
-    showEditPayout(payout){
-      this.editingPayout = JSON.parse(JSON.stringify(payout))
-      this.recipientData = JSON.parse(JSON.stringify(payout))
-      this.$refs.requestPayoutModal.show()
+    showEditPayout(payout) {
+      this.editingPayout = JSON.parse(JSON.stringify(payout));
+      this.recipientData = JSON.parse(JSON.stringify(payout));
+      this.$refs.requestPayoutModal.show();
     },
-    cancelCancellationConfirmation(){
-      this.$validator.reset()
-      this.$refs.payoutCancellationModal.hide()
+    cancelCancellationConfirmation() {
+      this.$validator.reset();
+      this.$refs.payoutCancellationModal.hide();
       this.$nextTick(() => {
         this.recipientData = {
-          id: null,
-          name: null,
-          mobile: null,
-          amount: 0
-        }
-      })
+          _id: null,
+          completeName: null,
+          mobileNumber: null,
+          amount: 0,
+        };
+      });
     },
-    showCancellationConfirmation(payout){
-      this.recipientData = payout
-      this.$refs.payoutCancellationModal.show()
+    showCancellationConfirmation(payout) {
+      this.recipientData = payout;
+      this.$refs.payoutCancellationModal.show();
     },
-    async cancelPayout(){
-      if(this.isConfirmationLoading) return
-      this.isConfirmationLoading = true
-      const res = await this.$store.dispatch('user_dashboard/cancelPayout', {
-        user: this.user,
-        payout: this.recipientData
-      })
-      this.isConfirmationLoading = false
-      if(!res.status){
-        this.$toast.error(res.message || 'Your payout cancellation has failed. Please try again.', {
-          position: 'top'
-        })
-        return
+    async cancelPayoutRequest() {
+      if (this.isConfirmationLoading) return;
+      this.isConfirmationLoading = true;
+      const res = await this.$store.dispatch("user_dashboard/cancelPayoutRequest", this.recipientData._id);
+      this.isConfirmationLoading = false;
+      if (!res) {
+        this.$toast.error(
+          res.message ||
+            "Your payout cancellation has failed. Please try again.",
+          {
+            position: "top",
+          }
+        );
+        return;
       }
       this.recipientData = {
-        id: null,
-        name: null,
-        mobile: null,
-        amount: 0
-      }
-      this.$refs.payoutCancellationModal.hide()
-      this.$toast.success('Your payout request has been cancelled successfully.', {
-        position: 'top'
-      })
-    }
-  }
-}
+        _id: null,
+        completeName: null,
+        mobileNumber: null,
+        amount: 0,
+      };
+      this.$refs.payoutCancellationModal.hide();
+      this.$toast.success(
+        "Your payout request has been cancelled successfully.",
+        {
+          position: "top",
+        }
+      );
+    },
+  },
+};
 </script>

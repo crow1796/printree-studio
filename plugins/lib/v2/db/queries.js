@@ -346,5 +346,35 @@ export default {
             updated_at
         }
     }
+  `,
+  payoutRequest: `
+    mutation($payout: PayoutRequestInput!){
+        payoutRequest(payout: $payout){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
+  cancelPayoutRequest: `
+    mutation ($id: ID!) {
+        cancelPayoutRequest(_id: $id){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
   `
 };

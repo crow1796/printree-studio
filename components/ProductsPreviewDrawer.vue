@@ -368,7 +368,7 @@ export default {
         this.isLoading = true;
         this.$refs.publishConfirmationModal.hide();
         await this.$store.commit("designer/COLLECTION_STATUS", "pending");
-        await this.$store.dispatch("designer/saveData");
+        await this.$store.dispatch("designer/saveData", { shouldGenerateImages: false });
         this.$router.replace("/dashboard/collections");
         return;
       }

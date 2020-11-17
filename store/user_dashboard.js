@@ -29,7 +29,7 @@ const mutations = {
     state.payouts = tmpPayouts
   },
   CANCEL_PAYOUT(state, payout){
-    const index = _.findIndex(state.payouts, { id: payout.id })
+    const index = _.findIndex(state.payouts, { _id: payout._id })
     state.payouts[index] = {
       ...payout,
       status: 'cancelled'
@@ -98,28 +98,19 @@ const actions = {
     const payouts = await this.$api.userDashboard.payoutsOfCurrentUser(query)
     context.commit('PAYOUTS', payouts)
   },
-  async sendPayoutRequest(context, data){
-    const res = await db.sendPayoutRequest(data)
-    const totalProfit = context.getters.totalProfit
-    if(res.status){
-      if(res.data.updated_at){
-        const index = _.findIndex(context.getters.payouts, { id: res.data.id })
-        context.commit('TOTAL_PROFIT', ((totalProfit + context.getters.payouts[index].amount) - res.data.amount))
-        context.commit('UPDATE_PAYOUT', res.data)
-        return res
-      }
-      context.commit('DECR_TOTAL_PROFIT_BY', res.data.amount)
-      context.commit('INSERT_PAYOUT', res.data)
-    }
-    return res
+  async payoutRequest(context, data){
+    const payout = await this.$api.userDashboard.payoutRequest(data)
+    context.commit('DECR_TOTAL_PROFIT_BY', payout.amount)
+    context.commit('INSERT_PAYOUT', payout)
+    return payout
   },
-  async cancelPayout(context, {user, payout}){
-    const res = await db.cancelPayout({user, payout})
-    if(res.status){
+  async cancelPayoutRequest(context, id){
+    const payout = await this.$api.userDashboard.cancelPayoutRequest(id)
+    if(payout){
       context.commit('CANCEL_PAYOUT', payout)
       context.commit('INCR_TOTAL_PROFIT_BY', payout.amount)
     }
-    return res
+    return payout
   }
 }
 

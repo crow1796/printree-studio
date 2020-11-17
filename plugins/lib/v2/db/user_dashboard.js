@@ -23,3 +23,25 @@ export const payoutsOfCurrentUser = async (axios, query) => {
   const payoutsOfCurrentUser = data.data.payoutsOfCurrentUser;
   return payoutsOfCurrentUser;
 }
+
+export const payoutRequest = async (axios, payout) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.payoutRequest,
+    variables: {
+      payout,
+    }
+  });
+  const payoutRequest = data.data.payoutRequest;
+  return payoutRequest;
+}
+
+export const cancelPayoutRequest = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.cancelPayoutRequest,
+    variables: {
+      id,
+    }
+  });
+  const cancelPayoutRequest = data.data.cancelPayoutRequest;
+  return cancelPayoutRequest;
+}

@@ -2,7 +2,7 @@ import { createDesignFor, getCollection, saveCollection, deleteCollection, updat
 import { getCollections, updateCollectionStatus, getUsers } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -32,6 +32,8 @@ export default (axios) => {
       ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query),
       totalEarningsOfCurrentUser: () => totalEarningsOfCurrentUser(axios),
       payoutsOfCurrentUser: (query) => payoutsOfCurrentUser(axios, query),
+      payoutRequest: (data) => payoutRequest(axios, data),
+      cancelPayoutRequest: (id) => cancelPayoutRequest(axios, id),
     }
   };
 };
