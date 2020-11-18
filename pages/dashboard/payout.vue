@@ -69,6 +69,7 @@
                 data-vv-as="Amount"
                 v-validate="`required|numeric|min_value:0|max_value:${computedTotalProfit}`"
                 data-vv-scope="recipientForm"
+                :disabled="this.editingPayout"
               />
             </div>
             <span
@@ -290,7 +291,7 @@ export default {
         completeName: null,
         mobileNumber: null,
         amount: 0,
-        channel: 'gcash'
+        channel: "gcash",
       };
       this.$refs.requestPayoutModal.show();
     },
@@ -303,7 +304,7 @@ export default {
           completeName: null,
           mobileNumber: null,
           amount: 0,
-          channel: 'gcash'
+          channel: "gcash",
         };
       });
     },
@@ -324,19 +325,19 @@ export default {
     async confirmPayoutRequest() {
       if (this.isConfirmationLoading) return;
       this.isConfirmationLoading = true;
-      const res = await this.$store.dispatch(
-        "user_dashboard/payoutRequest",
-        omit(this.recipientData, "_id")
-      );
-      this.isConfirmationLoading = false;
-      if (!res.status) {
-        this.$refs.requestPayoutConfirmationModal.hide();
-        this.$refs.requestPayoutModal.show();
-        this.$toast.error(res.message || "Your payout request has failed.", {
-          position: "top",
-        });
-        return;
+      let res = null;
+      if (this.recipientData._id) {
+        res = await this.$store.dispatch(
+          "user_dashboard/editPayoutRequest",
+          this.recipientData
+        );
+      } else {
+        res = await this.$store.dispatch(
+          "user_dashboard/payoutRequest",
+          omit(this.recipientData, "_id")
+        );
       }
+      this.isConfirmationLoading = false;
       this.editingPayout = null;
       this.$refs.requestPayoutConfirmationModal.hide();
       this.$toast.success("Your payout request has been sent successfully.", {
@@ -344,8 +345,15 @@ export default {
       });
     },
     showEditPayout(payout) {
-      this.editingPayout = JSON.parse(JSON.stringify(payout));
-      this.recipientData = JSON.parse(JSON.stringify(payout));
+      const formattedPayout = {
+        _id: payout._id,
+        completeName: payout.recipient.completeName,
+        mobileNumber: payout.recipient.mobileNumber,
+        amount: payout.amount,
+        channel: "gcash",
+      };
+      this.editingPayout = formattedPayout;
+      this.recipientData = formattedPayout;
       this.$refs.requestPayoutModal.show();
     },
     cancelCancellationConfirmation() {
@@ -367,7 +375,10 @@ export default {
     async cancelPayoutRequest() {
       if (this.isConfirmationLoading) return;
       this.isConfirmationLoading = true;
-      const res = await this.$store.dispatch("user_dashboard/cancelPayoutRequest", this.recipientData._id);
+      const res = await this.$store.dispatch(
+        "user_dashboard/cancelPayoutRequest",
+        this.recipientData._id
+      );
       this.isConfirmationLoading = false;
       if (!res) {
         this.$toast.error(

@@ -1,4 +1,5 @@
 import queries from "./queries";
+import omit from "lodash/omit";
 
 export const ordersOfCurrentUser = async (axios, query) => {
   const { data } = await axios.post("/gql", {
@@ -33,6 +34,18 @@ export const payoutRequest = async (axios, payout) => {
   });
   const payoutRequest = data.data.payoutRequest;
   return payoutRequest;
+}
+
+export const editPayoutRequest = async (axios, payout) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.editPayoutRequest,
+    variables: {
+      id: payout._id,
+      payout: omit(payout, '_id'),
+    }
+  });
+  const editPayoutRequest = data.data.editPayoutRequest;
+  return editPayoutRequest;
 }
 
 export const cancelPayoutRequest = async (axios, id) => {

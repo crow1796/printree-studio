@@ -1,8 +1,8 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -23,6 +23,10 @@ export default (axios) => {
       getCollections: (data) => getCollections(axios, data),
       updateCollectionStatus: (data) => updateCollectionStatus(axios, data),
       getUsers: (data) => getUsers(axios, data),
+      payoutRequests: (query) => payoutRequests(axios, query),
+      processPayoutRequest: (payout) => processPayoutRequest(axios, payout),
+      declinePayoutRequest: (payout) => declinePayoutRequest(axios, payout),
+      paidPayoutRequest: (payout) => paidPayoutRequest(axios, payout),
     },
     // marketplace
     marketplace: {
@@ -33,6 +37,7 @@ export default (axios) => {
       totalEarningsOfCurrentUser: () => totalEarningsOfCurrentUser(axios),
       payoutsOfCurrentUser: (query) => payoutsOfCurrentUser(axios, query),
       payoutRequest: (data) => payoutRequest(axios, data),
+      editPayoutRequest: (data) => editPayoutRequest(axios, data),
       cancelPayoutRequest: (id) => cancelPayoutRequest(axios, id),
     }
   };

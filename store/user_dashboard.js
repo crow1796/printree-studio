@@ -36,7 +36,7 @@ const mutations = {
     }
   },
   UPDATE_PAYOUT(state, payout){
-    const index = _.findIndex(state.payouts, { id: payout.id })
+    const index = _.findIndex(state.payouts, { _id: payout._id })
     state.payouts[index] = payout
   },
   DECR_TOTAL_PROFIT_BY(state, amount){
@@ -102,6 +102,13 @@ const actions = {
     const payout = await this.$api.userDashboard.payoutRequest(data)
     context.commit('DECR_TOTAL_PROFIT_BY', payout.amount)
     context.commit('INSERT_PAYOUT', payout)
+    return payout
+  },
+  async editPayoutRequest(context, data){
+    const payout = await this.$api.userDashboard.editPayoutRequest(data)
+    if(payout){
+      context.commit('UPDATE_PAYOUT', payout)
+    }
     return payout
   },
   async cancelPayoutRequest(context, id){
