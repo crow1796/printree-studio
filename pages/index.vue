@@ -131,6 +131,7 @@ export default {
     })
   },
   async mounted() {
+    if(!this.isLoggedIn) this.$storage.removeLocalStorage('current_design_id')
     if (this.$storage.getLocalStorage('current_design_id')) {
       this.isLoading = true
       const design = await this.$store.dispatch(

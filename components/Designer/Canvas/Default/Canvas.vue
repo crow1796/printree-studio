@@ -65,6 +65,7 @@
                   <drr
                     v-for="(obj, index) in objects"
                     :key="index"
+                    :enabled="!isHoldingSpace"
                     :aspectRatio="obj.editorData.aspectRatio"
                     :w="obj.bounds.width || 50"
                     :h="obj.bounds.height || 50"
@@ -183,7 +184,6 @@ export default {
       canvasScale: 1.0,
       canvasSection: null,
       panzoomController: null,
-      isHoldingSpace: false,
       isPanning: false,
       arrowKeysTimeout: null
     };
