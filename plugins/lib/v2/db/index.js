@@ -1,8 +1,8 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -10,7 +10,7 @@ export default (axios) => {
     // users.js
     getUserCollectionsOf: (userId) => getCollectionsOfUserId(axios, userId),
     // designer.js
-    fetchAvailableProducts: () => fetchAvailableProducts(axios) ,
+    fetchAvailableProducts: () => fetchAvailableProducts(axios),
     getArts: () => getArts(axios),
     // collections.js
     createDesignFor: (products) => createDesignFor(axios, products),
@@ -23,13 +23,22 @@ export default (axios) => {
       getCollections: (data) => getCollections(axios, data),
       updateCollectionStatus: (data) => updateCollectionStatus(axios, data),
       getUsers: (data) => getUsers(axios, data),
+      payoutRequests: (query) => payoutRequests(axios, query),
+      processPayoutRequest: (payout) => processPayoutRequest(axios, payout),
+      declinePayoutRequest: (payout) => declinePayoutRequest(axios, payout),
+      paidPayoutRequest: (payout) => paidPayoutRequest(axios, payout),
     },
     // marketplace
     marketplace: {
       getProductsToSell: (query) => getProductsToSell(axios, query),
     },
     userDashboard: {
-      ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query)
+      ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query),
+      totalEarningsOfCurrentUser: () => totalEarningsOfCurrentUser(axios),
+      payoutsOfCurrentUser: (query) => payoutsOfCurrentUser(axios, query),
+      payoutRequest: (data) => payoutRequest(axios, data),
+      editPayoutRequest: (data) => editPayoutRequest(axios, data),
+      cancelPayoutRequest: (id) => cancelPayoutRequest(axios, id),
     }
   };
 };

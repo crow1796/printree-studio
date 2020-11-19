@@ -17,6 +17,9 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  async mounted(){
+    await this.$store.dispatch('user_dashboard/totalEarningsOfCurrentUser')
+  },
   computed: {
     ...mapGetters({
       totalProfit: 'user_dashboard/totalProfit'

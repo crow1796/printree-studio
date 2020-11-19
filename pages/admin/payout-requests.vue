@@ -40,11 +40,11 @@
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 <div>
                   <span class="font-bold">Complete Name:</span>
-                  {{ payout.name }}
+                  {{ payout.recipient.completeName }}
                 </div>
                 <div>
                   <span class="font-bold">Mobile Number:</span>
-                  {{ payout.mobile }}
+                  {{ payout.recipient.mobileNumber }}
                 </div>
                 <div>
                   <span class="font-bold">Amount (PHP):</span>
@@ -96,67 +96,61 @@
 </template>
 
 <script>
-import moment from 'moment'
-import { mapGetters } from 'vuex'
+import moment from "moment";
+import { mapGetters } from "vuex";
 
 export default {
-  layout: 'admin_dashboard',
+  layout: "admin_dashboard",
   async mounted() {
-    await this.$store.dispatch('admin/getPayouts', {})
-    this.isLoading = false
+    await this.$store.dispatch("admin/payoutRequests", {});
+    this.isLoading = false;
   },
   data() {
     return {
-      isLoading: true
-    }
+      isLoading: true,
+    };
   },
   computed: {
     ...mapGetters({
-      payouts: 'admin/payouts'
-    })
+      payouts: "admin/payouts",
+    }),
   },
   methods: {
     formatTimestamp(timestamp) {
-      return moment(timestamp.toDate()).format('MMMM Do YYYY, h:mm:ss a')
+      return moment(timestamp).format("MMMM Do YYYY, h:mm:ss a");
     },
     processBtnTextOf(status) {
-      let text = 'PROCESS'
+      let text = "PROCESS";
       switch (status) {
-        case 'processing':
-          text = 'PAID'
-          break
+        case "processing":
+          text = "PAID";
+          break;
       }
-      return text
+      return text;
     },
     async updatePayoutStatusTo(payout, newStatus) {
-      this.isLoading = true
-      const res = await this.$store.dispatch('admin/updatePayoutStatusTo', {
+      this.isLoading = true;
+      const res = await this.$store.dispatch("admin/updatePayoutStatusTo", {
         payout,
-        status: newStatus
-      })
-      this.isLoading = false
-      if (!res.status) {
-        this.$toast.error(res.message || 'Payout processing failed.', {
-          position: 'top'
-        })
-        return
-      }
-      this.$toast.success('Payout has been updated successfully.', {
-        position: 'top'
-      })
+        status: newStatus,
+      });
+      this.isLoading = false;
+      this.$toast.success("Payout has been updated successfully.", {
+        position: "top",
+      });
     },
     processPayout(payout) {
-      let newStatus = 'processing'
+      let newStatus = "processing";
       switch (payout.status) {
-        case 'pending':
-          newStatus = 'processing'
-          break
-        case 'processing':
-          newStatus = 'paid'
-          break
+        case "pending":
+          newStatus = "processing";
+          break;
+        case "processing":
+          newStatus = "paid";
+          break;
       }
-      this.updatePayoutStatusTo(payout, newStatus)
-    }
-  }
-}
+      this.updatePayoutStatusTo(payout, newStatus);
+    },
+  },
+};
 </script>

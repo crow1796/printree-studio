@@ -55,25 +55,26 @@
         <div class="container mx-auto px-4">
           <div class="md:flex justify-between items-center">
             <div class="flex">
-              <!-- <div class="flex -mb-px mr-8">
-                <nuxt-link
-                  to="/dashboard"
-                  class="no-underline md:text-blue-dark flex items-center py-4 border-b border-blue-dark"
-                >
-                  <span class="h-6 w-6 fill-current mr-2">
-                    <font-awesome-icon :icon="['fas', 'th-large']" />
-                  </span> Dashboard
-                </nuxt-link>
-              </div>-->
               <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/collections"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2">
+                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center">
                     <font-awesome-icon :icon="['fas', 'boxes']" />
                   </span> My Collections
+                </nuxt-link>
+              </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/dashboard/payout"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
+                    <font-awesome-icon :icon="['fas', 'receipt']" />
+                  </span> Payout History
                 </nuxt-link>
               </div>
               <div class="flex -mb-px">
@@ -82,11 +83,15 @@
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2">
+                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center">
                     <font-awesome-icon :icon="['fas', 'cog']" />
                   </span> Account Settings
                 </nuxt-link>
               </div>
+            </div>
+
+            <div>
+              <TotalProfitCounter/>
             </div>
           </div>
         </div>
@@ -99,6 +104,7 @@
 </template>
 
 <script>
+import TotalProfitCounter from "@/components/TotalProfitCounter";
 import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 import { mapGetters } from 'vuex'
 
@@ -108,7 +114,8 @@ export default {
   },
   middleware: ['auth'],
   components: {
-    VueTailwindDropdown
+    VueTailwindDropdown,
+    TotalProfitCounter
   },
   computed: {
     ...mapGetters({
