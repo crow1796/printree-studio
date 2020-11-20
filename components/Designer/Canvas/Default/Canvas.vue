@@ -12,7 +12,7 @@
                 id="dropzone"
                 :style="{ border: 0 }"
                 :options="{
-            url: `http://localhost:4000/api/upload-art`,
+            url: `${apiUrl}/upload-art`,
               thumbnailWidth: 150,
               maxFiles: 1,
               acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload'
@@ -171,6 +171,7 @@ export default {
   },
   data() {
     return {
+      apiUrl: process.env.apiUrl,
       activeObject: null,
       activeObjectIndex: 0,
       objects: this.value,
