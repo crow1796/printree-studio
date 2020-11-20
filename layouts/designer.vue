@@ -1,7 +1,7 @@
 <template>
   <client-only>
     <div class="flex-grow flex flex-col text-sm">
-      <AreaLoader v-if="isLoading" fullscreen />
+      <AreaLoader v-if="isLoading" fullscreen :text="loadingText"/>
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">
         <div class="flex w-1/3">
@@ -110,6 +110,7 @@ export default {
   },
   data() {
     return {
+      loadingText: "",
       isLoading: true,
       isEditingDesignName: false,
       generatedImages: []
@@ -133,10 +134,12 @@ export default {
     },
     async nextStep() {
       if (!this.isLoggedIn) return this.$refs.authModal.show();
+      this.loadingText = "Generating Images..."
       this.isLoading = true;
       const generatedImages = await this.$store.dispatch("designer/saveData");
       this.isLoading = false;
       this.generatedImages = generatedImages;
+      this.loadingText = ""
       this.$refs.productsPreviewDrawer.show();
       this.$forceUpdate();
     }

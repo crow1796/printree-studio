@@ -5,6 +5,9 @@ module.exports = {
   server: {
     port: 3333,
   },
+  env: {
+    apiUrl: process.env.API_URL
+  },
   /*
    ** Headers of the page
    */
