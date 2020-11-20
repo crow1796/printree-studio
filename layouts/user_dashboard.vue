@@ -17,7 +17,11 @@
             </div>
             <div class="w-1/2 md:w-auto text-center">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-24" />
+                <img
+                  src="~/assets/images/logo-nav.png"
+                  alt="Printree"
+                  class="w-24"
+                />
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right">
@@ -73,10 +77,11 @@
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'boxes']" />
-                  </span> My Collections
+                  </span>
+                  My Collections
                 </nuxt-link>
               </div>
-              <div class="flex -mb-px mr-8">
+              <!-- <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/my-orders"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
@@ -86,7 +91,7 @@
                     <font-awesome-icon :icon="['fas', 'box']" />
                   </span> My Orders
                 </nuxt-link>
-              </div>
+              </div> -->
               <div class="flex -mb-px">
                 <nuxt-link
                   to="/dashboard/account-settings"
@@ -95,7 +100,8 @@
                 >
                   <span class="h-6 w-6 fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'cog']" />
-                  </span> Account Settings
+                  </span>
+                  Account Settings
                 </nuxt-link>
               </div>
             </div>
@@ -110,28 +116,28 @@
 </template>
 
 <script>
-import VueTailwindDropdown from '@/components/VueTailwindDropdown'
-import { mapGetters } from 'vuex'
+import VueTailwindDropdown from "@/components/VueTailwindDropdown";
+import { mapGetters } from "vuex";
 
 export default {
   head: {
-    title: 'Dashboard'
+    title: "Dashboard",
   },
-  middleware: ['auth'],
+  middleware: ["auth"],
   components: {
-    VueTailwindDropdown
+    VueTailwindDropdown,
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user'
-    })
+      isLoggedIn: "isLoggedIn",
+      user: "user",
+    }),
   },
   methods: {
     async signOut() {
-      await this.$router.replace('/')
-      await this.$store.dispatch('user/signOut')
-    }
-  }
-}
+      await this.$router.replace("/");
+      await this.$store.dispatch("user/signOut");
+    },
+  },
+};
 </script>
