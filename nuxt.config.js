@@ -2,6 +2,9 @@ const webpack = require("webpack");
 
 module.exports = {
   mode: "universal",
+  server: {
+    port: process.env.PORT || 3333
+  },
   /*
    ** Headers of the page
    */
