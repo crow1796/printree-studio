@@ -116,6 +116,7 @@
 </template>
 
 <script>
+import TotalProfitCounter from "@/components/TotalProfitCounter";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import { mapGetters } from "vuex";
 
@@ -126,6 +127,7 @@ export default {
   middleware: ["auth"],
   components: {
     VueTailwindDropdown,
+    TotalProfitCounter,
   },
   computed: {
     ...mapGetters({
