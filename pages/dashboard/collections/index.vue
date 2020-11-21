@@ -208,6 +208,7 @@
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
                     <button
+                      v-if="col.status === 'approved'"
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Share"
