@@ -15,7 +15,7 @@
             url: `${apiUrl}/upload-art`,
               thumbnailWidth: 150,
               maxFiles: 1,
-              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload'
+              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload. \nMust have a minimum of 1000px. White areas on non-transparent images will also get printed.'
               }"
                 @vdropzone-success="assetAdded"
                 @vdropzone-sending="assetSending"

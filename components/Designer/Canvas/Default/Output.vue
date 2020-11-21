@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full z-10 relative overflow-hidden">
+  <div class="h-full w-full relative overflow-hidden">
     <div
       v-for="(obj, index) in objects"
       :key="index"
