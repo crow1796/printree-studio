@@ -4,6 +4,7 @@ export default {
       currentUserCollections{
           _id
           name
+          handle
           plan
           approved_at
           declined_at
@@ -226,6 +227,7 @@ export default {
         collections(query: $searchQuery){
             _id
             name
+            handle
             plan
             approved_at
             declined_at

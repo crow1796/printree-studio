@@ -193,10 +193,8 @@
                     <span class="relative uppercase">{{ col.status }}</span>
                   </span>
                 </td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >
-                  <div>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                  <div class="flex items-center justify-center">
                     <button
                       v-if="col.status != 'approved'"
                       type="button"
@@ -207,15 +205,35 @@
                     >
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
-                    <button
-                      v-if="col.status === 'approved'"
-                      type="button"
-                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
-                      title="Share"
-                      v-tippy="{ arrow: true }"
-                    >
-                      <font-awesome-icon :icon="['fas', 'share-alt']" />
-                    </button>
+                    <tippy trigger="click" arrow interactive v-if="col.status === 'approved'">
+                      <template v-slot:trigger>
+                        <button
+                          type="button"
+                          class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
+                          title="Share"
+                          v-tippy="{arrow: true}"
+                        >
+                          <font-awesome-icon :icon="['fas', 'share-alt']" />
+                        </button>
+                      </template>
+                      <div class="flex w-full">
+                        <input
+                          class="flex flex-grow pl-4 w-full rounded-l text-black bg-white"
+                          disabled
+                          :value="col.handle"
+                          :ref="`copy-link-${col._id}`"
+                        />
+                        <button
+                          type="button"
+                          class="text-xs w-10 flex items-center justify-center rounded-r bg-white text-black py-2 border-l"
+                          v-tippy="{arrow: true}"
+                          title="Copy Link"
+                          @click="copyCollectionLinkToClipboard(col)"
+                        >
+                          <font-awesome-icon :icon="['fas', 'clipboard']" />
+                        </button>
+                      </div>
+                    </tippy>
                   </div>
                 </td>
               </tr>
@@ -229,7 +247,9 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { TippyComponent } from "vue-tippy";
 import VueTailwindModal from "@/components/VueTailwindModal";
+import first from "lodash/first";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
 
 export default {
@@ -237,6 +257,7 @@ export default {
   components: {
     VueTailwindModal,
     AvailableProducts,
+    tippy: TippyComponent,
   },
   async mounted() {
     const collections = await this.$store.dispatch(
@@ -260,6 +281,15 @@ export default {
     }),
   },
   methods: {
+    copyCollectionLinkToClipboard(col) {
+      const copyText = first(this.$refs[`copy-link-${col._id}`]);
+      if (!copyText) return;
+      copyText.disabled = false;
+      copyText.select();
+      copyText.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      copyText.disabled = true;
+    },
     async showAvailableProducts() {
       this.isLoading = false;
       this.$refs.availableProductsModal.show();
