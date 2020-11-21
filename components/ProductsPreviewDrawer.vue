@@ -137,14 +137,14 @@
                     v-model="selectedProduct.meta.name"
                   />
                 </div>
-                <div class="text-3xl leading-none py-4 flex items-center">
+                <div class="text-3xl leading-none py-4 flex items-start">
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-3">Base Price</div>
                     <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
                   </div>
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Profit*</div>
-                    <div class="flex">
+                    <div class="flex items-center">
                       <div>PHP&nbsp;</div>
                       <span
                         class="border rounded px-4 py-2"
