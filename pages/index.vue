@@ -1,6 +1,6 @@
 <template>
   <div class="w-full">
-    <AreaLoader v-if="isLoading" fullscreen/>
+    <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="availableProductsModal"
       width="100%"
@@ -40,7 +40,9 @@
     </VueTailwindModal>
     <AuthModal ref="authModal" @login-success="createNewDesign" />
     <div class="hero flex relative w-full">
-      <div class="flex z-20 relative sm:mt-32 mt-8 sm:w-3/5 w-full sm:pl-32 flex-col flex-grow sm:flex-grow-0">
+      <div
+        class="flex z-20 relative sm:mt-32 mt-8 sm:w-3/5 w-full sm:pl-32 flex-col flex-grow sm:flex-grow-0"
+      >
         <div class="sm:w-8/12 text-center sm:text-left">
           <div class="text-6xl font-black leading-none tracking-widest">CREATE</div>
           <div class="text-2xl ml-2">your own designs for any product &amp; earn</div>
@@ -53,7 +55,7 @@
           >
             <span>START DESIGNING</span>
             <span class="ml-2">
-              <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+              <font-awesome-icon :icon="['fas', 'arrow-right']" />
             </span>
           </button>
         </div>
@@ -64,40 +66,35 @@
     </div>
 
     <div class="how-it-works mb-12">
-      <div class="text-center text-4xl font-black tracking-widest my-6">HOW DOES <span class="text-primary">PRINTREE</span> WORKS?</div>
+      <div class="text-center text-4xl font-black tracking-widest my-6">
+        HOW DOES
+        <span class="text-primary">PRINTREE</span> WORKS?
+      </div>
       <div class="flex sm:flex-row flex-col justify-center items-center">
         <div class="p-6 shadow-xl rounded mx-4 w-3/12">
           <div class="vis text-center">
-            <img src="/forming_ideas.png" class="sm:w-48 w-64 mx-auto my-2 sm:my-0"/>
+            <img src="/forming_ideas.png" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
-          <div class="text-center font-bold text-xl">
-            Join us
-          </div>
-          <div class="text-center text-gray-600">
-            You can create an account if you don't have one or login.
-          </div>
+          <div class="text-center font-bold text-xl">Join us</div>
+          <div
+            class="text-center text-gray-600"
+          >You can create an account if you don't have one or login.</div>
         </div>
         <div class="p-6 shadow-xl rounded mx-4 w-3/12">
           <div class="vis text-center">
-            <img src="/forming_ideas.png" class="sm:w-48 w-64 mx-auto my-2 sm:my-0"/>
+            <img src="/forming_ideas.png" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
-          <div class="text-center font-bold text-xl">
-            Create Products
-          </div>
-          <div class="text-center text-gray-600">
-            You choose from variety of products and add your designs on them.
-          </div>
+          <div class="text-center font-bold text-xl">Create Products</div>
+          <div
+            class="text-center text-gray-600"
+          >You choose from variety of products and add your designs on them.</div>
         </div>
         <div class="p-6 shadow-xl rounded mx-4 w-3/12">
           <div class="vis text-center">
-            <img src="/forming_ideas.png" class="sm:w-48 w-64 mx-auto my-2 sm:my-0"/>
+            <img src="/forming_ideas.png" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
-          <div class="text-center font-bold text-xl">
-            Sell
-          </div>
-          <div class="text-center text-gray-600">
-            Share it to the world and start earning.
-          </div>
+          <div class="text-center font-bold text-xl">Sell</div>
+          <div class="text-center text-gray-600">Share it to the world and start earning.</div>
         </div>
       </div>
     </div>
@@ -105,78 +102,77 @@
 </template>
 
 <script>
-import VueTailwindModal from '@/components/VueTailwindModal'
-import AvailableProducts from '@/components/Designer/AvailableProducts'
-import AuthModal from '@/components/Auth/AuthModal'
-import { mapGetters } from 'vuex'
+import VueTailwindModal from "@/components/VueTailwindModal";
+import AvailableProducts from "@/components/Designer/AvailableProducts";
+import AuthModal from "@/components/Auth/AuthModal";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
     VueTailwindModal,
     AvailableProducts,
-    AuthModal
+    AuthModal,
   },
-  middleware: 'authenticated',
+  middleware: "authenticated",
   data() {
     return {
       isLoading: false,
-      tmpSelectedProducts: []
-    }
+      tmpSelectedProducts: [],
+    };
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user',
-      designMeta: 'designer/designMeta'
-    })
+      isLoggedIn: "isLoggedIn",
+      user: "user",
+      designMeta: "designer/designMeta",
+    }),
   },
   async mounted() {
-    if(!this.isLoggedIn) this.$storage.removeLocalStorage('current_design_id')
-    if (this.$storage.getLocalStorage('current_design_id')) {
-      this.isLoading = true
+    if (this.$storage.getLocalStorage("current_design_id") && this.isLoggedIn) {
+      this.isLoading = true;
       const design = await this.$store.dispatch(
-        'designer/fetchDesignDataAndCommit',
-        this.$storage.getLocalStorage('current_design_id')
-      )
-      this.isLoading = false
+        "designer/fetchDesignDataAndCommit",
+        this.$storage.getLocalStorage("current_design_id")
+      );
+      this.isLoading = false;
     }
   },
   methods: {
     async showAvailableProducts() {
-      if(!this.isLoggedIn) return this.$refs.authModal.show();
-      if (this.$storage.getLocalStorage('current_design_id')) {
-        this.isLoading = true
+      if (!this.isLoggedIn) return this.$refs.authModal.show();
+      if (this.$storage.getLocalStorage("current_design_id")) {
+        this.isLoading = true;
         const design = await this.$store.dispatch(
-          'designer/fetchDesignDataAndCommit',
-          this.$storage.getLocalStorage('current_design_id')
-        )
+          "designer/fetchDesignDataAndCommit",
+          this.$storage.getLocalStorage("current_design_id")
+        );
         if (design.user_id == (this.user && this.user.uid))
-          return this.$router.push('/collection/designer')
+          return this.$router.push("/collection/designer");
       }
-      this.isLoading = false
-      this.$refs.availableProductsModal.show()
+      this.isLoading = false;
+      this.$refs.availableProductsModal.show();
     },
     async createNewDesign() {
       if (!this.isLoggedIn) {
-        this.$refs.authModal.show()
-        return
-      }
-      this.$refs.authModal.hide()
-      if(this.tmpSelectedProducts.length){
-        this.isLoading = true
-        let design = await this.$store.dispatch('designer/createNewDesign', {
-          user: this.user,
-          products: this.tmpSelectedProducts
-        })
-        this.tmpSelectedProducts = []
-        this.$storage.setLocalStorage('current_design_id', design._id)
-        this.$router.push('/collection/designer')
+        this.$refs.authModal.show();
         return;
       }
-      this.$router.push('/dashboard/collections')
-    }
-  }
-}
+      this.$refs.authModal.hide();
+      if (this.tmpSelectedProducts.length) {
+        this.isLoading = true;
+        let design = await this.$store.dispatch("designer/createNewDesign", {
+          user: this.user,
+          products: this.tmpSelectedProducts,
+        });
+        this.tmpSelectedProducts = [];
+        this.$storage.setLocalStorage("current_design_id", design._id);
+        this.$router.push("/collection/designer");
+        return;
+      }
+      this.$router.push("/dashboard/collections");
+    },
+  },
+};
 </script>
 
 <style lang="scss">
