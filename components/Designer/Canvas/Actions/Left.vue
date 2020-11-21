@@ -1,11 +1,13 @@
 <template>
-  <div class="left-actions absolute z-10 flex flex-shrink justify-center flex-col">
+  <div
+    class="left-actions absolute z-10 flex flex-shrink justify-center flex-col"
+  >
     <div class="flex bg-white mb-4 rounded border">
       <div class="flex flex-col py-1">
         <button
           type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          @click="$emit('action-clicked', {action: 'add_text'})"
+          @click="$emit('action-clicked', { action: 'add_text' })"
           title="Add a Text"
           v-tippy="{ arrow: true }"
         >
@@ -25,7 +27,7 @@
         <button
           type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          @click="$emit('action-clicked', {action: 'add_art'})"
+          @click="$emit('action-clicked', { action: 'add_art' })"
           title="Add an Asset"
           v-tippy="{ arrow: true }"
         >
@@ -41,7 +43,7 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Duplicate"
           v-tippy="{ arrow: true }"
-          @click="$emit('action-clicked', {action: 'duplicate'})"
+          @click="$emit('action-clicked', { action: 'duplicate' })"
         >
           <font-awesome-icon :icon="['fas', 'clone']" class="text-xs" />
         </button>
@@ -50,7 +52,9 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="To Front"
           v-tippy="{ arrow: true }"
-          @click="$emit('action-clicked', {action: 'move_position', args: 'front'})"
+          @click="
+            $emit('action-clicked', { action: 'move_position', args: 'front' })
+          "
         >
           <svg
             width="13"
@@ -86,7 +90,12 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Forward"
           v-tippy="{ arrow: true }"
-          @click="$emit('action-clicked', {action: 'move_position', args: 'forward'})"
+          @click="
+            $emit('action-clicked', {
+              action: 'move_position',
+              args: 'forward',
+            })
+          "
         >
           <svg
             width="13"
@@ -122,7 +131,12 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="Backward"
           v-tippy="{ arrow: true }"
-          @click="$emit('action-clicked', {action: 'move_position', args: 'backward'})"
+          @click="
+            $emit('action-clicked', {
+              action: 'move_position',
+              args: 'backward',
+            })
+          "
         >
           <svg
             width="13"
@@ -149,7 +163,9 @@
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           title="To Back"
           v-tippy="{ arrow: true }"
-          @click="$emit('action-clicked', {action: 'move_position', args: 'back'})"
+          @click="
+            $emit('action-clicked', { action: 'move_position', args: 'back' })
+          "
         >
           <svg
             width="13"
@@ -182,7 +198,7 @@
         </button>
       </div>
     </div>
-
+    <!-- 
     <div class="flex bg-white mt-4 rounded border justify-center">
       <div class="flex flex-col py-1">
         <button
@@ -204,7 +220,7 @@
           <font-awesome-icon :icon="['fas', 'search-minus']" class="text-xs" />
         </button>
       </div>
-    </div>
+    </div> -->
 
     <div class="flex bg-white mt-4 rounded border justify-center">
       <div class="flex flex-col py-1">
@@ -215,10 +231,15 @@
             title="Tips"
             v-tippy="{ arrow: true }"
           >
-            <font-awesome-icon :icon="['fas', 'question-circle']" class="text-xs" />
+            <font-awesome-icon
+              :icon="['fas', 'question-circle']"
+              class="text-xs"
+            />
           </button>
           <template slot="popover">
-            <div class="bg-gray-900 text-xs text-white rounded border p-4 text-left">
+            <div
+              class="bg-gray-900 text-xs text-white rounded border p-4 text-left"
+            >
               <div class="font-bold mb-2">Tips:</div>
               <ul class="tips-list list-disc ml-4">
                 <li>Hold space + drag to start panning</li>

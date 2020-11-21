@@ -39,7 +39,7 @@ const mutations = {
   PAYOUTS(state, payouts) {
     state.payouts = payouts
   },
-  UPDATE_PAYOUT(state, payout){
+  UPDATE_PAYOUT(state, payout) {
     const index = _.findIndex(state.payouts, { _id: payout._id })
     state.payouts[index] = payout
   }
@@ -86,7 +86,7 @@ const actions = {
       status: data.status
     })
   },
-  async updateCollectionStatus(context, { _id, status }){
+  async updateCollectionStatus(context, { _id, status }) {
     await this.$api.admin.updateCollectionStatus({ _id, status })
     context.commit('UPDATE_COLLECTION_STATUS', {
       _id,
@@ -110,20 +110,30 @@ const actions = {
     }
     return reqStatus
   },
-  async getPayouts(context, query) {
-    const res = await adminDb.getAllPayouts(query)
-    if (res.status) {
-      context.commit('PAYOUTS', res.data)
-    }
+  async payoutRequests(context, data) {
+    const payouts = await this.$api.admin.payoutRequests(data)
+    context.commit('PAYOUTS', payouts)
+    return payouts
   },
   async updatePayoutStatusTo(context, { payout, status }) {
-    const res = await adminDb.updatePayoutStatusTo(payout, status)
-    if (res.status) {
-      context.commit('UPDATE_PAYOUT', res.data)
+    let res = null
+    switch(status){
+      case 'processing':
+        res = await this.$api.admin.processPayoutRequest(payout)
+        break;
+      case 'declined':
+        res = await this.$api.admin.declinePayoutRequest(payout)
+        break;
+      case 'paid':
+        res = await this.$api.admin.paidPayoutRequest(payout)
+        break;
+    }
+    if (res) {
+      context.commit('UPDATE_PAYOUT', res)
     }
     return res
   },
-  async markAsFeatured(context, data){
+  async markAsFeatured(context, data) {
     const res = await adminDb.markAsFeatured(data)
     return res
   }

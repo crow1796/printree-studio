@@ -287,5 +287,171 @@ export default {
             key
         }
     }
-  `
+  `,
+    ordersOfCurrentUser: `
+    query {
+        ordersOfCurrentUser{
+            _id
+            orderNum
+            vendor {
+                _id
+                name
+            }
+            fulfillmentStatus
+            financialStatus
+            statusUrl
+            created_at
+            updated_at
+            orderProducts {
+                _id
+                quantity
+                price
+                shopId
+                variant {
+                    _id
+                    fullThumb
+                    sizes {
+                        name
+                        shopId
+                        price
+                    }
+                    product {
+                        meta {
+                            name
+                        }
+                    }
+                }
+            }
+        }
+    }
+  `,
+  totalEarningsOfCurrentUser: `
+    query {
+        totalEarningsOfCurrentUser
+    }
+  `,
+  payoutsOfCurrentUser: `
+    query {
+        payoutsOfCurrentUser {
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+            created_at
+            updated_at
+        }
+    }
+  `,
+  payoutRequest: `
+    mutation($payout: PayoutRequestInput!){
+        payoutRequest(payout: $payout){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
+  cancelPayoutRequest: `
+    mutation ($id: ID!) {
+        cancelPayoutRequest(_id: $id){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
+  editPayoutRequest: `
+    mutation ($id: ID!, $payout: PayoutRequestInput!){
+        editPayoutRequest(_id: $id, payout: $payout){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
+  payoutRequests: `
+    query ($searchQuery: PayoutQueryInput) {
+        payoutRequests(query: $searchQuery) {
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+            created_at
+            updated_at
+        }
+    }
+  `,
+  processPayoutRequest: `
+    mutation ($id: ID!) {
+        processPayoutRequest(_id: $id){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
+  declinePayoutRequest: `
+    mutation ($id: ID!, $notes: String) {
+        declinePayoutRequest(_id: $id, notes: $notes){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
+  paidPayoutRequest: `
+    mutation ($id: ID!) {
+        paidPayoutRequest(_id: $id){
+            _id
+            recipient {
+                completeName
+                mobileNumber
+            }
+            amount
+            channel
+            notes
+            status
+        }
+    }
+  `,
 };

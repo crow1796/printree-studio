@@ -12,7 +12,7 @@
                 id="dropzone"
                 :style="{ border: 0 }"
                 :options="{
-            url: `http://localhost:4000/api/upload-art`,
+            url: `${apiUrl}/upload-art`,
               thumbnailWidth: 150,
               maxFiles: 1,
               acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload'
@@ -65,6 +65,7 @@
                   <drr
                     v-for="(obj, index) in objects"
                     :key="index"
+                    :enabled="!isHoldingSpace"
                     :aspectRatio="obj.editorData.aspectRatio"
                     :w="obj.bounds.width || 50"
                     :h="obj.bounds.height || 50"
@@ -171,6 +172,7 @@ export default {
   },
   data() {
     return {
+      apiUrl: process.env.apiUrl,
       activeObject: null,
       activeObjectIndex: 0,
       objects: this.value,
@@ -183,7 +185,6 @@ export default {
       canvasScale: 1.0,
       canvasSection: null,
       panzoomController: null,
-      isHoldingSpace: false,
       isPanning: false,
       arrowKeysTimeout: null
     };

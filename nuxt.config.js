@@ -3,7 +3,10 @@ const webpack = require("webpack");
 module.exports = {
   mode: "universal",
   server: {
-    port: 3333,
+    port: process.env.PORT || 3333
+  },
+  env: {
+    apiUrl: process.env.API_URL
   },
   /*
    ** Headers of the page

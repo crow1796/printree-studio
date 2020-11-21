@@ -19,7 +19,7 @@
           <div
             v-if="meta.plan === 'Sell'"
             class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"
-          >The collection will be reviewed first before publishing it into the store, you will be receiving an email once it is approved.</div>
+          >The collection will be reviewed first before publishing it into the store, you will receive an email once it's approved.</div>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
@@ -128,7 +128,7 @@
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 w-full ml-4">
+              <div class="flex flex-col mt-5 w-full ml-4" :key="`${selectedProduct._id}-meta`">
                 <div class="text-4xl">
                   <input
                     type="text"
@@ -146,10 +146,10 @@
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Profit*</div>
                     <div class="flex">
                       <div>PHP&nbsp;</div>
-                      <div
+                      <span
                         contenteditable="true"
                         @input="setProductProfit"
-                      >{{ selectedProductProfit }}</div>&nbsp;=&nbsp;
+                      >{{ selectedProductProfit }}</span>&nbsp;=&nbsp;
                     </div>
                   </div>
                   <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
@@ -368,7 +368,7 @@ export default {
         this.isLoading = true;
         this.$refs.publishConfirmationModal.hide();
         await this.$store.commit("designer/COLLECTION_STATUS", "pending");
-        await this.$store.dispatch("designer/saveData");
+        await this.$store.dispatch("designer/saveData", { shouldGenerateImages: false });
         this.$router.replace("/dashboard/collections");
         return;
       }

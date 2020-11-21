@@ -6,7 +6,8 @@
        @touchstart.stop.prevent="bodyMouseDown($event)">
     <slot></slot>
     <div
-      v-for="stick in sticks"
+      v-for="(stick, i) in sticks"
+      :key="i"
       class="drr-stick"
       :class="['drr-stick-' + stick]"
       @mousedown.stop.prevent="stickDown(stick, $event)"
@@ -40,6 +41,10 @@
   export default {
     name: 'drr',
     props: {
+      enabled: {
+        type: Boolean,
+        default: true
+      },
       x: {
         type: Number,
         required: true,
@@ -369,6 +374,7 @@
       },
 
       bodyMouseDown: function (e) {
+        if(!this.enabled) return;
         if (this.contentActive || !this.selectable) {
           return
         }
