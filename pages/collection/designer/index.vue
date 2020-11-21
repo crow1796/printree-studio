@@ -23,29 +23,22 @@
           <div class="flex modal-body flex-grow">
             <AvailableProducts v-model="tmpProducts" />
           </div>
-          <div
-            class="flex modal-footer justify-between p-4 border-t items-center"
-          >
+          <div class="flex modal-footer justify-between p-4 border-t items-center">
             <a
               href="#"
               class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400"
-              >{{ tmpProducts.length }} Products Selected</a
-            >
+            >{{ tmpProducts.length }} Products Selected</a>
             <button
               type="button"
               class="border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
               @click="manageProducts"
-            >
-              CONTINUE
-            </button>
+            >CONTINUE</button>
           </div>
         </div>
       </VueTailwindDrawer>
 
       <div class="flex w-1/4 border-r flex-grow flex-col">
-        <div
-          class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow"
-        >
+        <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
             class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
             @click="showAvailableProducts"
@@ -61,19 +54,12 @@
                 @click="showAvailableProducts"
               >
                 <div class="flex flex-col items-center justify-center">
-                  <font-awesome-icon
-                    :icon="['fas', 'plus-circle']"
-                    class="text-5xl"
-                  />
+                  <font-awesome-icon :icon="['fas', 'plus-circle']" class="text-5xl" />
                   <span class="font-bold mt-2 block">ADD PRODUCTS</span>
                 </div>
               </div>
             </div>
-            <div
-              class="p-1 w-6/12"
-              v-for="(product, index) in selectedProducts"
-              :key="index"
-            >
+            <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
               <div
                 class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
@@ -81,15 +67,10 @@
               >
                 <div class="flex w-full flex-col justify-center items-center">
                   <div class="flex justify-center items-center w-full">
-                    <img
-                      :src="_firstVariantPlaceholderOf(product)"
-                      style="height: 100px"
-                    />
+                    <img :src="_firstVariantPlaceholderOf(product)" style="height: 100px" />
                   </div>
                   <div class="flex-grow flex flex-col pt-2">
-                    <div class="font-bold text-gray-600">
-                      {{ product.meta.name }}
-                    </div>
+                    <div class="font-bold text-gray-600">{{ product.meta.name }}</div>
                     <div class="flex">
                       <v-popover class="flex" placement="right">
                         <div
@@ -112,9 +93,7 @@
                         <template slot="popover">
                           <div class="bg-white w-64 border rounded shadow-xl">
                             <div class="flex flex-col w-full">
-                              <div class="font-bold text-gray-600 p-2 border-b">
-                                Choose a color
-                              </div>
+                              <div class="font-bold text-gray-600 p-2 border-b">Choose a color</div>
                               <div class="flex p-2">
                                 <div
                                   class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
@@ -182,84 +161,14 @@
       </div>
 
       <div class="flex flex-grow h-full flex-col w-3/4">
-        <div
-          class="flex flex-grow w-full h-full justify-center printable-output p-2"
-          :class="{ '-maximized': isPreviewExpanded }"
-        >
-          <button
-            type="button"
-            class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute z-10 bg-white left-0 top-0 preview-resizer-btn"
-            @click="togglePreviewSize"
-            :title="isPreviewExpanded ? 'Minimize' : 'Expand'"
-            v-tippy="{ arrow: true }"
-          >
-            <font-awesome-icon
-              :icon="['fas', isPreviewExpanded ? 'compress-alt' : 'expand-alt']"
-              :rotation="90"
-            />
-          </button>
-          <div
-            class="outline-none select-none relative w-full h-full text-center overflow-hidden"
-          >
-            <div class="inline-block outline-none relative w-full h-full">
-              <div class="relative w-full h-full">
-                <div
-                  class="inline-block relative w-full h-full"
-                  :style="{ 'background-color': currentVariant.color }"
-                >
-                  <img
-                    draggable="false"
-                    class="relative"
-                    style="z-index: 2"
-                    :src="currentVariantContent.placeholder"
-                  />
-                </div>
-                <div class="printable-area-surface absolute"></div>
-                <div
-                  class="printable-area absolute"
-                  id="printable-area"
-                  :style="{
-                    left: `${currentVariantContent.bounds.left}px`,
-                    top: `${currentVariantContent.bounds.top}px`,
-                    width: `${currentVariantContent.bounds.width}px`,
-                    height: `${currentVariantContent.bounds.height}px`,
-                    zIndex: printableAreaZ,
-                    outlineColor: getCorrectColor(currentVariant.color),
-                  }"
-                  :class="{
-                    '-has-outline': isPrintableAreaHovered || isMoving,
-                  }"
-                  @mouseenter="isPrintableAreaHovered = true"
-                  @mouseleave="
-                    printableAreaZ = 1;
-                    isPrintableAreaHovered = false;
-                  "
-                >
-                  <Output
-                    :objects="currentVariantContent.objects"
-                    :width="currentVariantContent.bounds.width"
-                    :height="currentVariantContent.bounds.height"
-                  />
-                </div>
-                <div
-                  class="printable-area-label"
-                  v-if="isPrintableAreaHovered"
-                  :style="{
-                    top: `${
-                      currentVariantContent.bounds.top +
-                      currentVariantContent.bounds.height +
-                      5
-                    }px`,
-                    color: getCorrectColor(currentVariant.color),
-                  }"
-                >
-                  Printable Area
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <Preview
+          :scale="0.4"
+          :variant="currentVariant"
+          :content="currentVariantContent"
+          :resizable="true"
+          :has-outline="true"
+          class="designer-preview"
+        />
         <Canvas
           :key="currentProductIndex"
           v-model="currentVariantContent.objects"
@@ -267,9 +176,7 @@
           :height="currentVariantContent.bounds.height * 4"
           :backgroundColor="currentVariant.color"
         >
-          <div
-            class="bottom-actions absolute z-10 flex flex-shrink justify-center"
-          >
+          <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded border">
               <div class="flex p-4">
                 <ToggleSwitch
@@ -284,9 +191,7 @@
                   <template v-slot:default="{ option }">
                     <div class="flex flex-col">
                       <img :src="option.label" width="50" />
-                      <div class="text-center mt-1 text-xs">
-                        {{ option.value.toUpperCase() }}
-                      </div>
+                      <div class="text-center mt-1 text-xs">{{ option.value.toUpperCase() }}</div>
                     </div>
                   </template>
                 </ToggleSwitch>
@@ -340,28 +245,22 @@
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
                   v-if="errors.has('product_name')"
-                  >{{ errors.first("product_name") }}</span
-                >
+                >{{ errors.first("product_name") }}</span>
               </div>
               <div>
-                <label for="product_description" class="font-bold"
-                  >Product Description</label
-                >
+                <label for="product_description" class="font-bold">Product Description</label>
                 <div>
                   <WrappedEditor v-model="tmpProductMetadata.description" />
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
                   v-if="errors.has('product_description')"
-                  >{{ errors.first("product_description") }}</span
-                >
+                >{{ errors.first("product_description") }}</span>
               </div>
             </div>
           </div>
           <div class="flex p-4 justify-end border-t">
-            <PTButton color="primary" @click="saveProductMetadata"
-              >SAVE</PTButton
-            >
+            <PTButton color="primary" @click="saveProductMetadata">SAVE</PTButton>
           </div>
         </div>
       </VueTailwindDrawer>
@@ -380,7 +279,11 @@ import VueTailwindAccordion from "@/components/VueTailwindAccordion";
 import WrappedEditor from "@/components/WrappedEditor";
 import draggable from "vuedraggable";
 import Konva from "@/components/Designer/Canvas/Konva";
-import { Canvas, Output } from "@/components/Designer/Canvas/Default/index.js";
+import {
+  Canvas,
+  Output,
+  Preview,
+} from "@/components/Designer/Canvas/Default/index.js";
 
 let WebFontLoader = null;
 if (process.client) {
@@ -400,6 +303,7 @@ export default {
     Konva,
     Canvas,
     Output,
+    Preview,
   },
   async mounted() {
     WebFontLoader.load({
@@ -434,7 +338,6 @@ export default {
         description: "",
         tags: "",
       },
-      isPreviewExpanded: false,
     };
   },
   computed: {
@@ -458,9 +361,6 @@ export default {
     },
   },
   methods: {
-    togglePreviewSize() {
-      this.isPreviewExpanded = !this.isPreviewExpanded;
-    },
     _firstVariantPlaceholderOf(product) {
       return _.find(product.variants[0].contents, {
         side: this._firstPrintableArea(product.variants[0]),

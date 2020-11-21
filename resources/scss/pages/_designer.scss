@@ -209,21 +209,23 @@
   margin: 0 auto !important;
 }
 
-.printable-output{
+.designer-preview {
   position: absolute;
-  z-index: 20;
-  width: auto;
-  background: white;
-  transform: scale(0.4);
-  border-radius: 10px;
-  border: 1px solid rgba(0, 0,0 , 0.4);
-  transform-origin: bottom right;
-  margin-right: 10px;
-  margin-bottom: 10px;
   right: 0;
   bottom: 0;
+  z-index: 20;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0,0 , 0.4);
+}
+
+.printable-output{
+  width: auto;
+  background: white;
+  transform-origin: bottom right;
   transition: all .3s ease;
-  height: 620px;
+  height: auto;
 
   .preview-resizer-btn{
     transform: scale(2.4);
@@ -232,10 +234,10 @@
   }
 
   &.-maximized {
-    transform: scale(0.9);
+    transform: scale(0.9) !important;
   }
 
   &.-maximized .preview-resizer-btn {
-    transform: scale(1.4);
+    transform: scale(1.4) !important;
   }
 }
