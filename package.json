@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "test": "jest",
-    "dev": "./node_modules/.bin/cross-env API_URL=http://localhost:4000/api NODE_ENV=development nodemon server/index.js --watch server",
+    "dev": "./node_modules/.bin/cross-env API_URL=http://localhost:4000/api NODE_ENV=development SHOPIFY_URL=https://printree-studio-marketplace.myshopify.com/ nodemon server/index.js --watch server",
     "build": "nuxt build",
     "start": "node server/index.js",
     "generate": "nuxt generate",
