@@ -25,16 +25,21 @@
         <div class="flex modal-body flex-grow h-full">
           <AvailableProducts v-model="tmpSelectedProducts" />
         </div>
-        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+        <div
+          class="flex modal-footer justify-between flex-shrink p-4 border-t items-center"
+        >
           <a
             href="#"
             class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400"
-          >{{ tmpSelectedProducts.length || 'No' }} Products Selected</a>
+            >{{ tmpSelectedProducts.length || "No" }} Products Selected</a
+          >
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
             @click="createNewDesign"
-          >CONTINUE</button>
+          >
+            CONTINUE
+          </button>
         </div>
       </div>
     </VueTailwindModal>
@@ -51,19 +56,27 @@
             </div>
           </div>
         </div>
-        <div class="modal-body p-4 text-center">Are you sure you want to delete this collection?</div>
-        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+        <div class="modal-body p-4 text-center">
+          Are you sure you want to delete this collection?
+        </div>
+        <div
+          class="flex modal-footer justify-between flex-shrink p-4 border-t items-center"
+        >
           <button
             type="button"
             class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
             @click="hideDeleteCollectionConfirmation"
-          >No</button>
+          >
+            No
+          </button>
 
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
             @click="deleteCollection"
-          >Yes</button>
+          >
+            Yes
+          </button>
         </div>
       </div>
     </VueTailwindModal>
@@ -75,7 +88,8 @@
         >
           <span class="mr-3">
             <font-awesome-icon :icon="['fas', 'boxes']" />
-          </span> Orders
+          </span>
+          Orders
         </nuxt-link>
       </div>
     </div>
@@ -86,7 +100,9 @@
           type="button"
           class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
           @click="showAvailableProducts"
-        >Create New Collection</button>
+        >
+          Create New Collection
+        </button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -95,13 +111,19 @@
               <tr>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >Name</th>
+                >
+                  Name
+                </th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >Status</th>
+                >
+                  Status
+                </th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >Actions</th>
+                >
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -109,21 +131,31 @@
                 <td
                   colspan="3"
                   class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >You have no collection(s).</td>
+                >
+                  You have no collection(s).
+                </td>
               </tr>
               <tr v-for="col in userCollections" :key="col.id">
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td
+                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                >
                   <div class="flex items-center">
                     <div class="ml-3">
                       <p class="text-gray-900 whitespace-no-wrap">
                         <span
                           class="relative text-xs inline-block px-3 py-1 font-semibold leading-tight mr-1"
-                          :class="{'text-white': col.plan === 'Sell', 'text-blue-800': col.plan === 'Buy'}"
+                          :class="{
+                            'text-white': col.plan === 'Sell',
+                            'text-blue-800': col.plan === 'Buy',
+                          }"
                         >
                           <span
                             aria-hidden
                             class="absolute inset-0 rounded-full"
-                            :class="{'bg-primary': col.plan === 'Sell', 'bg-blue-400': col.plan === 'Buy'}"
+                            :class="{
+                              'bg-primary': col.plan === 'Sell',
+                              'bg-blue-400': col.plan === 'Buy',
+                            }"
                           ></span>
                           <span class="relative uppercase">{{ col.plan }}</span>
                         </span>
@@ -143,7 +175,9 @@
                     </div>
                   </div>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td
+                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                >
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
                   >
@@ -151,21 +185,24 @@
                       aria-hidden
                       class="absolute inset-0 opacity-50 rounded-full"
                       :class="{
-                      'bg-green-200': col.status === 'approved',
-                      'bg-blue-200': col.status === 'pending',
-                      'bg-red-200': col.status === 'draft',
-                    }"
+                        'bg-green-200': col.status === 'approved',
+                        'bg-blue-200': col.status === 'pending',
+                        'bg-red-200': col.status === 'draft',
+                      }"
                     ></span>
                     <span class="relative uppercase">{{ col.status }}</span>
                   </span>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td
+                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                >
                   <div>
                     <button
+                      v-if="col.status != 'approved'"
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Delete"
-                      v-tippy="{arrow: true}"
+                      v-tippy="{ arrow: true }"
                       @click="showDeleteCollectionConfirmation(col)"
                     >
                       <font-awesome-icon :icon="['fas', 'trash']" />
@@ -174,7 +211,7 @@
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Share"
-                      v-tippy="{arrow: true}"
+                      v-tippy="{ arrow: true }"
                     >
                       <font-awesome-icon :icon="['fas', 'share-alt']" />
                     </button>
@@ -198,7 +235,7 @@ export default {
   layout: "user_dashboard",
   components: {
     VueTailwindModal,
-    AvailableProducts
+    AvailableProducts,
   },
   async mounted() {
     const collections = await this.$store.dispatch(
@@ -211,15 +248,15 @@ export default {
     return {
       isLoading: true,
       isLoadingFull: false,
-      tmpSelectedProducts: []
+      tmpSelectedProducts: [],
     };
   },
   computed: {
     ...mapGetters({
       userCollections: "user_dashboard/userCollections",
       isLoggedIn: "isLoggedIn",
-      user: "user"
-    })
+      user: "user",
+    }),
   },
   methods: {
     async showAvailableProducts() {
@@ -232,7 +269,7 @@ export default {
       this.isLoading = true;
       let collection = await this.$store.dispatch("designer/createNewDesign", {
         user: this.user,
-        products: this.tmpSelectedProducts
+        products: this.tmpSelectedProducts,
       });
       if (!collection) this.isLoadingFull = false;
       this.tmpSelectedProducts = [];
@@ -264,7 +301,7 @@ export default {
         this.collectionToDelete.id
       );
       this.isLoading = false;
-    }
-  }
+    },
+  },
 };
 </script>
