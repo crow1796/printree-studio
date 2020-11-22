@@ -35,12 +35,12 @@ const actions = {
     const response = await auth.signInAsAGuest();
     return response;
   },
-  async updateProfile(context, data) {
-    const response = await auth.updateProfile({
+  async updateAccount(context, data) {
+    const response = await this.$api.userDashboard.updateAccount({
       email: data.email,
-      displayName: data.displayName,
+      name: data.name,
     });
-    context.commit("USER_NAME", data.displayName);
+    context.commit("USER_NAME", data.name);
     context.commit("USER_EMAIL", data.email);
     return response;
   },

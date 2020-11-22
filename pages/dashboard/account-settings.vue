@@ -5,23 +5,23 @@
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">Account Settings</h2>
       </div>
-      <form @submit.prevent="updateProfile" class="w-6/12 mx-auto">
+      <form @submit.prevent="updateAccount" class="w-6/12 mx-auto">
         <div class="mb-3">
-          <label for="displayName" class="font-bold">Full Name</label>
+          <label for="name" class="font-bold">Full Name</label>
           <div>
             <input
               type="text"
-              name="displayName"
+              name="name"
               class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-              :class="{ 'border-red-400': errors.has('displayName'), 'focus:border-gray-600': !errors.has('displayName') }"
+              :class="{ 'border-red-400': errors.has('name'), 'focus:border-gray-600': !errors.has('name') }"
               placeholder="Your Name"
-              v-model="formData.displayName"
+              v-model="formData.name"
             />
           </div>
           <span
             class="text-red-700 text-xs pt-1 font-bold inline-block"
-            v-if="errors.has('displayName')"
-          >{{ errors.first('displayName') }}</span>
+            v-if="errors.has('name')"
+          >{{ errors.first('name') }}</span>
         </div>
         <div class="mb-3">
           <label for="email" class="font-bold">Email Address</label>
@@ -63,24 +63,24 @@
           >{{ errors.first('password') }}</span>
         </div>
         <div class="mb-3">
-          <label for="password_confirmation" class="font-bold">Confirm Password</label>
+          <label for="passwordConfirmation" class="font-bold">Confirm Password</label>
           <div>
             <input
               type="password"
-              name="password_confirmation"
+              name="passwordConfirmation"
               class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
               ref="confirmPasswordRef"
-              :class="{ 'border-red-400': errors.has('password_confirmation'), 'focus:border-gray-600': !errors.has('password_confirmation') }"
+              :class="{ 'border-red-400': errors.has('passwordConfirmation'), 'focus:border-gray-600': !errors.has('passwordConfirmation') }"
               placeholder="Password Confirmation"
-              v-model="formData.password_confirmation"
+              v-model="formData.passwordConfirmation"
               data-vv-as="Password"
               v-validate="'confirmed:passwordRef'"
             />
           </div>
           <span
             class="text-red-700 text-xs pt-1 font-bold inline-block"
-            v-if="errors.has('password_confirmation')"
-          >{{ errors.first('password_confirmation') }}</span>
+            v-if="errors.has('passwordConfirmation')"
+          >{{ errors.first('passwordConfirmation') }}</span>
         </div>
         <div class="flex justify-end">
           <button
@@ -98,7 +98,7 @@ import { mapGetters } from 'vuex'
 export default {
   layout: 'user_dashboard',
   async mounted() {
-    this.formData.displayName = this.user.displayName
+    this.formData.name = this.user.name
     this.formData.email = this.user.email
     this.isLoading = false
   },
@@ -106,10 +106,10 @@ export default {
     return {
       isLoading: true,
       formData: {
-        displayName: null,
+        name: null,
         email: null,
         password: null,
-        password_confirmation: null
+        passwordConfirmation: null
       }
     }
   },
@@ -119,17 +119,18 @@ export default {
     })
   },
   methods: {
-    async updateProfile(){
+    async updateAccount(){
       let res = await this.$validator.validateAll()
-      if (!res || this.isLoading) return
+      if (this.isLoading) return
+      if(!res){
+        this.$toast.error('Please fix the errors below.', { position: 'top'})
+        return
+      }
       this.isLoading = true
-      const response = await this.$store.dispatch('user/updateProfile', this.formData)
+      const response = await this.$store.dispatch('user/updateAccount', this.formData)
       let passwordResponse = null
 
-      if(this.formData.password && this.formData.password === this.formData.password_confirmation){
-        passwordResponse = await this.$store.dispatch('user/updatePassword', this.formData.password)
-      }
-      if(!response.status || (passwordResponse && !passwordResponse.status)){
+      if(!response){
         this.isLoading = false
         this.$toast.error('Updating the profile failed! Please try again.', {
           position: 'bottom'
@@ -137,7 +138,7 @@ export default {
         return
       }
       this.formData.password = null
-      this.formData.password_confirmation = null
+      this.formData.passwordConfirmation = null
       this.$toast.success('Profile updated successfully!', {
         position: 'top'
       })

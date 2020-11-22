@@ -456,4 +456,16 @@ export default {
         }
     }
   `,
+  updateAccount: `
+    mutation ($userInfo: AccountInfoInput!) {
+        updateAccount(userInfo: $userInfo) {
+            _id
+            name
+            shopName
+            email
+            created_at
+            updated_at
+        }
+    }
+  `
 };

@@ -30,7 +30,7 @@
                   <div
                     class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
                   >
-                    <span class="text-sm mr-1">{{ user.email }}</span>
+                    <span class="text-sm mr-1">{{ user.shopName }}'s</span>
                     <div>
                       <font-awesome-icon :icon="['fas', 'chevron-down']" />
                     </div>
