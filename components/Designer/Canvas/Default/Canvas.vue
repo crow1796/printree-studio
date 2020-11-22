@@ -15,7 +15,8 @@
             url: `${apiUrl}/upload-art`,
               thumbnailWidth: 150,
               maxFiles: 1,
-              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload. \nMust have a minimum of 1000px. White areas on non-transparent images will also get printed.'
+              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload. \nMust have a minimum size of 1000x1000. White areas on non-transparent images will also get printed.',
+              accept: acceptFiles,
               }"
                 @vdropzone-success="assetAdded"
                 @vdropzone-sending="assetSending"
@@ -151,24 +152,24 @@ import { mapGetters } from "vuex";
 export default {
   props: {
     width: {
-      required: true
+      required: true,
     },
     height: {
-      required: true
+      required: true,
     },
     backgroundColor: {
-      required: true
+      required: true,
     },
     value: {
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
     VueTailwindDrawer,
     ArtsList,
     LeftActions,
     TopActions,
-    DesignerActions
+    DesignerActions,
   },
   data() {
     return {
@@ -186,7 +187,7 @@ export default {
       canvasSection: null,
       panzoomController: null,
       isPanning: false,
-      arrowKeysTimeout: null
+      arrowKeysTimeout: null,
     };
   },
   mounted() {
@@ -197,8 +198,8 @@ export default {
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
-      user: "user"
-    })
+      user: "user",
+    }),
   },
   methods: {
     leftActionClicked({ action, args }) {
@@ -252,7 +253,7 @@ export default {
       }
     },
     _registerCanvasKeyEvents() {
-      document.addEventListener("keydown", evt => {
+      document.addEventListener("keydown", (evt) => {
         // Left
         if (evt.which == 37 && this.activeObject) {
           this._updateActiveObjectProps(
@@ -291,7 +292,7 @@ export default {
         }
       });
 
-      document.addEventListener("keyup", evt => {
+      document.addEventListener("keyup", (evt) => {
         if (_.includes([37, 38, 39, 40], evt.which) && this.activeObject) {
           clearTimeout(this.arrowKeysTimeout);
           this.arrowKeysTimeout = setTimeout(() => {
@@ -312,7 +313,7 @@ export default {
     activated(obj) {
       this.activeObject = obj;
       this.activeObjectIndex = _.findIndex(this.objects, { id: obj.id });
-      _.map(this.objects, ob => {
+      _.map(this.objects, (ob) => {
         this._updateActiveObjectProps("editorData.isActive", false, ob);
       });
       this._updateActiveObjectProps("editorData.isActive", true);
@@ -323,7 +324,7 @@ export default {
       this.$store.commit("designer/OBJECT_PROPERTIES", {
         id: ob.id,
         path: path,
-        value: value
+        value: value,
       });
     },
     deactivated() {
@@ -374,6 +375,20 @@ export default {
     assetSending(e, xhr) {
       xhr.setRequestHeader("Authorization", this.$auth.getToken("local"));
     },
+    acceptFiles(file, done) {
+      var reader = new FileReader();
+      reader.onload = function (entry) {
+        var image = new Image();
+        image.src = entry.target.result;
+        image.onload = function () {
+          if (this.width < 1000 || this.height < 1000)
+            return done("Must be at least 1000x1000.");
+          done();
+        };
+      };
+
+      reader.readAsDataURL(file);
+    },
     assetAdded(file, res) {
       let type = "image";
       let value = res.data.location;
@@ -396,36 +411,35 @@ export default {
         el = null;
       }
       this.addObject(type, value, file.name, {
-        bounds: { width: scaleDown(file.width), height: scaleDown(file.height) }
+        bounds: {
+          width: scaleDown(file.width),
+          height: scaleDown(file.height),
+        },
       });
-      this.$store.commit('designer/ADD_ASSET', res.data)
+      this.$store.commit("designer/ADD_ASSET", res.data);
       this.$refs.artsModal.hide();
     },
     async useAsset(asset) {
-      const ext = asset.location
-        .split(/[#?]/)[0]
-        .split(".")
-        .pop()
-        .trim();
+      const ext = asset.location.split(/[#?]/)[0].split(".").pop().trim();
       const img = new Image();
       img.src = asset.location;
       const imgData = await new Promise((resolve, reject) => {
-        img.onload = function() {
+        img.onload = function () {
           resolve(this);
         };
       });
       this.addObject(ext === "svg" ? "svg" : "image", asset.location, "", {
         bounds: {
           width: scaleDown(imgData.width),
-          height: scaleDown(imgData.height)
-        }
+          height: scaleDown(imgData.height),
+        },
       });
       this.$refs.artsModal.hide();
     },
     async addObject(type, value = "", name = null, props = {}) {
       let newObject = await this.$store.dispatch("designer/addObject", {
         type,
-        value
+        value,
       });
       newObject = JSON.parse(JSON.stringify({ ...newObject, ...props }));
       newObject.name = name;
@@ -630,7 +644,7 @@ export default {
         "designer/moveObjectPosition",
         {
           obj: obj,
-          newIndex
+          newIndex,
         }
       );
       this.objects = JSON.parse(JSON.stringify(newObjects));
@@ -661,17 +675,17 @@ export default {
           },
           onDoubleClick(e) {
             return false;
-          }
+          },
         }
       );
       this.moveTo(-(this.width / 2), 0);
       this.panzoomController.pause();
 
-      this.canvasSection.addEventListener("dblclick", evt => {
+      this.canvasSection.addEventListener("dblclick", (evt) => {
         this.panzoomController.pause();
       });
 
-      this.canvasSection.addEventListener("keypress", evt => {
+      this.canvasSection.addEventListener("keypress", (evt) => {
         if (evt.which == 32) {
           this.isHoldingSpace = true;
           this.stageCursor = "grab";
@@ -680,7 +694,7 @@ export default {
         this.isHoldingSpace = false;
       });
 
-      this.canvasSection.addEventListener("mousemove", e => {
+      this.canvasSection.addEventListener("mousemove", (e) => {
         if (this.isHoldingSpace) {
           this.isPanning = true;
           this.panzoomController.resume();
@@ -688,7 +702,7 @@ export default {
         }
       });
 
-      this.canvasSection.addEventListener("keydown", evt => {
+      this.canvasSection.addEventListener("keydown", (evt) => {
         if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
           evt.preventDefault();
           this.zoomTo(0.1);
@@ -734,7 +748,7 @@ export default {
         }
       });
 
-      this.canvasSection.addEventListener("keyup", evt => {
+      this.canvasSection.addEventListener("keyup", (evt) => {
         if (evt.which == 32) {
           this.isHoldingSpace = false;
           this.stageCursor = "initial";
@@ -773,7 +787,7 @@ export default {
         this.$refs[`textContainer_${obj.id}`][0].contentEditable = false;
         this.$refs[`obj_${obj.id}_drr`][0].$emit("content-inactive");
       }
-    }
+    },
   },
   watch: {
     stageCursor(newCursor) {
@@ -794,8 +808,8 @@ export default {
       deep: true,
       handler(to) {
         this.$emit("input", to);
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
