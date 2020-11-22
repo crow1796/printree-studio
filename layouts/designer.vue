@@ -1,22 +1,31 @@
 <template>
   <client-only>
     <div class="flex-grow flex flex-col text-sm">
-      <AreaLoader v-if="isLoading" fullscreen :text="loadingText"/>
+      <AreaLoader v-if="isLoading" fullscreen :text="loadingText" />
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">
         <div class="flex w-1/3">
           <img src="~/assets/images/logo.png" alt="Printree" class="w-24" />
         </div>
         <div class="flex w-1/3 justify-center items-center">
-          <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">
+          <div
+            class="flex"
+            v-if="!isEditingDesignName"
+            style="animation-duration: 0.2s"
+          >
             <span class="text-primary uppercase font-bold">Designer</span>
             <span class="mx-1">/</span>
             <span
               class="font-normal text-gray-600 hover:underline hover:text-gray-700"
               @click="startEditingName"
-            >{{ currentDesignName }}</span>
+              >{{ currentDesignName }}</span
+            >
           </div>
-          <div class="flex" v-if="isEditingDesignName" style="animation-duration: 0.2s">
+          <div
+            class="flex"
+            v-if="isEditingDesignName"
+            style="animation-duration: 0.2s"
+          >
             <input
               type="text"
               ref="designNameField"
@@ -28,7 +37,9 @@
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <nuxt-link to="/dashboard" class="text-blue-400">Go to Dashboard</nuxt-link>
+          <nuxt-link to="/dashboard" class="text-blue-400"
+            >Go to Dashboard</nuxt-link
+          >
           <div class="w-4"></div>
           <PTButton color="primary" @click="nextStep">NEXT</PTButton>
         </div>
@@ -56,13 +67,13 @@ export default {
   head: {
     title: "Printree Studio",
     bodyAttrs: {
-      class: "no-scroll"
-    }
+      class: "no-scroll",
+    },
   },
   components: {
     VueTailwindModal,
     AuthModal,
-    ProductsPreviewDrawer
+    ProductsPreviewDrawer,
   },
   middleware: "authenticated",
   computed: {
@@ -71,8 +82,10 @@ export default {
       designMeta: "designer/designMeta",
       user: "user",
       currentDesignName: "designer/currentDesignName",
-      currentDesignId: "designer/currentDesignId"
-    })
+      currentDesignId: "designer/currentDesignId",
+      selectedProducts: "designer/selectedProducts",
+      currentProductIndex: "designer/currentProductIndex",
+    }),
   },
   async created() {
     if (process.client) {
@@ -95,7 +108,7 @@ export default {
     }
   },
   mounted() {
-    window.onbeforeunload = e => {
+    window.onbeforeunload = (e) => {
       e = e || window.event;
       // For IE and Firefox prior to version 4
       if (e) {
@@ -113,7 +126,7 @@ export default {
       loadingText: "",
       isLoading: true,
       isEditingDesignName: false,
-      generatedImages: []
+      generatedImages: [],
     };
   },
   methods: {
@@ -133,16 +146,29 @@ export default {
       this.isEditingDesignName = false;
     },
     async nextStep() {
+      if (
+        _.isEmpty(
+          this.selectedProducts[this.currentProductIndex].variants[
+            this.currentProductIndex
+          ].contents[this.currentProductIndex].objects
+        )
+      ) {
+        this.$toast.error("Cannot Proceed. Canvas is empty", {
+          position: "bottom",
+        });
+        return false;
+      }
+
       if (!this.isLoggedIn) return this.$refs.authModal.show();
-      this.loadingText = "Generating Images..."
+      this.loadingText = "Generating Images...";
       this.isLoading = true;
       const generatedImages = await this.$store.dispatch("designer/saveData");
       this.isLoading = false;
       this.generatedImages = generatedImages;
-      this.loadingText = ""
+      this.loadingText = "";
       this.$refs.productsPreviewDrawer.show();
       this.$forceUpdate();
-    }
-  }
+    },
+  },
 };
 </script>
