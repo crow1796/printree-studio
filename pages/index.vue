@@ -116,7 +116,7 @@ export default {
   middleware: "authenticated",
   data() {
     return {
-      isLoading: false,
+      isLoading: true,
       tmpSelectedProducts: [],
     };
   },
@@ -129,13 +129,12 @@ export default {
   },
   async mounted() {
     if (this.$storage.getLocalStorage("current_design_id") && this.isLoggedIn) {
-      this.isLoading = true;
       const design = await this.$store.dispatch(
         "designer/fetchDesignDataAndCommit",
         this.$storage.getLocalStorage("current_design_id")
       );
-      this.isLoading = false;
     }
+    this.isLoading = false;
   },
   methods: {
     async showAvailableProducts() {

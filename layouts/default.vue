@@ -12,17 +12,18 @@
             </div>
 
             <div class="flex flex-grow hidden sm:flex sm:items-center justify-end">
-              <nuxt-link
-                to="/marketplace"
+              <a
+                :href="shopifyUrl"
+                target="_blank"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Marketplace</nuxt-link>
+              >Marketplace</a>
               <nuxt-link
                 :to="dashboardLink"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 v-if="isLoggedIn && user"
               >
                 <span>
-                  <span>{{ user.email }}</span>
+                  <span>{{ user.shopName }}'s</span>
                   <span class="ml-3">
                     <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </span>
@@ -69,35 +70,40 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AuthModal from '@/components/Auth/AuthModal'
-import Footer from '@/components/Footer'
+import { mapGetters } from "vuex";
+import AuthModal from "@/components/Auth/AuthModal";
+import Footer from "@/components/Footer";
 
 export default {
   head: {
-    title: 'Printree'
+    title: "Printree",
   },
   components: {
     Footer,
-    AuthModal
+    AuthModal,
+  },
+  data() {
+    return {
+      shopifyUrl: process.env.shopifyUrl,
+    };
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user'
+      isLoggedIn: "isLoggedIn",
+      user: "user",
     }),
-    dashboardLink(){
-      if(!this.user) return '/dashboard';
-      const isAdmin = _.includes(_.map(this.user.roles, 'name'), 'admin')
-      if(isAdmin) return '/admin/collections';
-      return '/dashboard';
-    }
+    dashboardLink() {
+      if (!this.user) return "/dashboard";
+      const isAdmin = _.includes(_.map(this.user.roles, "name"), "admin");
+      if (isAdmin) return "/admin/collections";
+      return "/dashboard";
+    },
   },
   methods: {
     async signOut() {
-      this.$router.replace('/')
-      await this.$store.dispatch('user/signOut')
-    }
-  }
-}
+      this.$router.replace("/");
+      await this.$store.dispatch("user/signOut");
+    },
+  },
+};
 </script>

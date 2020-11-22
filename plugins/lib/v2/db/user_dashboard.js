@@ -58,3 +58,14 @@ export const cancelPayoutRequest = async (axios, id) => {
   const cancelPayoutRequest = data.data.cancelPayoutRequest;
   return cancelPayoutRequest;
 }
+
+export const updateAccount = async (axios, userInfo) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.updateAccount,
+    variables: {
+      userInfo,
+    }
+  });
+  const updateAccount = data.data.updateAccount;
+  return updateAccount;
+}
