@@ -72,69 +72,69 @@
                   <div class="flex-grow flex flex-col pt-2">
                     <div class="font-bold text-gray-600">{{ product.meta.name }}</div>
                     <div class="flex">
-                      <v-popover class="flex" placement="right">
-                        <div
-                          class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700"
-                          v-if="
+                      <tippy trigger="click" arrow interactive>
+                        <template v-slot:trigger>
+                          <div
+                            class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700"
+                            v-if="
                             product.customizableProduct.customizableVariants
                               .length > 1
                           "
-                        >
-                          <div
-                            class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 bg-white"
                           >
-                            <font-awesome-icon
-                              :icon="['fas', 'plus']"
-                              class="text-xs"
-                              :style="{ fontSize: '.6em' }"
-                            />
+                            <div
+                              class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 bg-white"
+                            >
+                              <font-awesome-icon
+                                :icon="['fas', 'plus']"
+                                class="text-xs"
+                                :style="{ fontSize: '.6em' }"
+                              />
+                            </div>
                           </div>
-                        </div>
-                        <template slot="popover">
-                          <div class="bg-white w-64 border rounded shadow-xl">
-                            <div class="flex flex-col w-full">
-                              <div class="font-bold text-gray-600 p-2 border-b">Choose a color</div>
-                              <div class="flex p-2">
-                                <div
-                                  class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-                                  v-for="(variant,
+                        </template>
+                        <div class="w-64">
+                          <div class="flex flex-col w-full">
+                            <div class="font-bold text-white p-2 border-b border-gray-700">Choose a color</div>
+                            <div class="flex p-2 flex-wrap">
+                              <div
+                                class="rounded-full border border-white w-5 h-5 flex justify-center items-center hover:border-gray-300 border-gray-300 mx-1"
+                                v-for="(variant,
                                   variantIndex) in currentProduct
                                     .customizableProduct.customizableVariants"
-                                  :key="variantIndex"
-                                  :class="{
+                                :key="variantIndex"
+                                :class="{
                                     'border-gray-300 bg-white': _colorIsInVariantsOf(
                                       currentProduct,
                                       variant.color
                                     ),
                                   }"
-                                  @click="addVariant(variant)"
-                                >
-                                  <div
-                                    class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
-                                    :style="{
+                                @click="addVariant(variant)"
+                              >
+                                <div
+                                  class="w-full h-full rounded-full flex items-center justify-center"
+                                  :style="{
                                       'background-color': variant.color,
                                     }"
-                                  >
-                                    <font-awesome-icon
-                                      :icon="['fas', 'check']"
-                                      :style="{
+                                >
+                                  <font-awesome-icon
+                                    :icon="['fas', 'check']"
+                                    :style="{
                                         color: getCorrectColor(variant.color),
                                         fontSize: '.4em',
                                       }"
-                                      v-if="
+                                    v-if="
                                         _colorIsInVariantsOf(
                                           currentProduct,
                                           variant.color
                                         )
                                       "
-                                    />
-                                  </div>
+                                  />
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </template>
-                      </v-popover>
+                        </div>
+                      </tippy>
                       <div
                         class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
                         v-for="(variant, variantIndex) in product.variants"
@@ -148,7 +148,7 @@
                       >
                         <div
                           class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
-                          :style="{ 'background-color': variant.color }"
+                          :style="{ 'background-color': variant.customizableVariant.color }"
                         ></div>
                       </div>
                     </div>
@@ -161,6 +161,13 @@
       </div>
 
       <div class="flex flex-grow h-full flex-col w-3/4">
+        <transition name="fade">
+          <div
+            class="auto-save uppercase font-bold absolute rounded top-0 right-0 w-24 py-1 mt-4 mr-4 text-gray-600 text-xs border bg-white"
+            v-if="autoSaving"
+            style="animation-duration: .3s;"
+          >{{ autoSavingText }}</div>
+        </transition>
         <Preview
           :scale="0.4"
           :variant="currentVariant"
@@ -170,11 +177,11 @@
           class="designer-preview"
         />
         <Canvas
-          :key="currentProductIndex"
+          :key="`${currentVariantIndex}-${currentSide}`"
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
           :height="currentVariantContent.bounds.height * 4"
-          :backgroundColor="currentVariant.color"
+          :backgroundColor="currentVariant.customizableVariant.color"
         >
           <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded border">
@@ -190,7 +197,7 @@
                 >
                   <template v-slot:default="{ option }">
                     <div class="flex flex-col">
-                      <img :src="option.label" width="50" />
+                      <img :style="{backgroundColor: option.color}" :src="option.label" width="50" />
                       <div class="text-center mt-1 text-xs">{{ option.value.toUpperCase() }}</div>
                     </div>
                   </template>
@@ -317,6 +324,9 @@ export default {
   },
   data() {
     return {
+      autoSavingTimeout: null,
+      autoSaving: false,
+      autoSavingText: "Saving...",
       isAvailableProductsLoading: false,
       isLayersCollapsed: false,
       productDescriptionEditor: null,
@@ -354,6 +364,7 @@ export default {
       return _.map(_.map(this.currentVariant.contents, "side"), (area) => ({
         label: _.find(this.currentVariant.contents, { side: area }).placeholder,
         value: area,
+        color: this.currentVariant.customizableVariant.color,
       }));
     },
     currentVariantContent() {
@@ -472,12 +483,8 @@ export default {
       this.$refs.availableProductsModal.hide();
     },
     async addVariant(variant) {
-      if (
-        _.find(this.currentProduct.variants, { color: variant.color }) &&
-        this.currentProduct.variants.length == 1
-      )
-        return;
-      if (_.find(this.currentProduct.variants, { color: variant.color })) {
+      if (this._colorIsInVariantsOf(this.currentProduct, variant.color)) {
+        if (this.currentProduct.variants.length === 1) return;
         let variantIndex = await this.$store.dispatch(
           "designer/removeVariant",
           variant
@@ -490,13 +497,10 @@ export default {
         return;
       }
       let newVariant = await this.$store.dispatch("designer/addVariant", {
-        ...variant,
-        ...{
-          id: null,
-          parent_id: variant._id,
-        },
+        ..._.omit(this.currentVariant, "_id"),
+        customizableVariant: variant,
       });
-      this.currentProduct.variants.push(JSON.parse(JSON.stringify(newVariant)));
+      this.currentProduct.variants.push({ ...newVariant });
       this.selectVariant(
         this.currentProduct.variants.length - 1,
         this.currentProductIndex
@@ -504,8 +508,9 @@ export default {
     },
     _colorIsInVariantsOf(product, color) {
       return _.find(
-        product.customizableProduct.customizableVariants,
-        (variant) => variant.color.toLowerCase() == color.toLowerCase()
+        product.variants,
+        (variant) =>
+          variant.customizableVariant.color.toLowerCase() == color.toLowerCase()
       );
     },
     selectProduct(index) {
@@ -559,9 +564,8 @@ export default {
     selectedProducts: {
       deep: true,
       handler(to) {
-        if (this.autoSaveTimeout) clearTimeout(this.autoSaveTimeout);
         if (this.autoSavingTimeout) clearTimeout(this.autoSavingTimeout);
-        this.autoSaveTimeout = setTimeout(async () => {
+        this.autoSavingTimeout = setTimeout(async () => {
           this.autoSaving = true;
           this.autoSavingText = "Saving...";
           await this.$store.dispatch("designer/saveData", {

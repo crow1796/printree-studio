@@ -25,21 +25,16 @@
         <div class="flex modal-body flex-grow h-full">
           <AvailableProducts v-model="tmpSelectedProducts" />
         </div>
-        <div
-          class="flex modal-footer justify-between flex-shrink p-4 border-t items-center"
-        >
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <a
             href="#"
             class="text-blue-400 cursor-help border-dashed border-b hover:border-blue-400"
-            >{{ tmpSelectedProducts.length || "No" }} Products Selected</a
-          >
+          >{{ tmpSelectedProducts.length || "No" }} Products Selected</a>
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
             @click="createNewDesign"
-          >
-            CONTINUE
-          </button>
+          >CONTINUE</button>
         </div>
       </div>
     </VueTailwindModal>
@@ -56,27 +51,68 @@
             </div>
           </div>
         </div>
-        <div class="modal-body p-4 text-center">
-          Are you sure you want to delete this collection?
-        </div>
-        <div
-          class="flex modal-footer justify-between flex-shrink p-4 border-t items-center"
-        >
+        <div class="modal-body p-4 text-center">Are you sure you want to delete this collection?</div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
             type="button"
             class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
             @click="hideDeleteCollectionConfirmation"
-          >
-            No
-          </button>
+          >No</button>
 
           <button
             type="button"
             class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
             @click="deleteCollection"
-          >
-            Yes
-          </button>
+          >Yes</button>
+        </div>
+      </div>
+    </VueTailwindModal>
+    <VueTailwindModal
+      ref="collectionRenameModal"
+      width="30%"
+      :backdrop="false"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <AreaLoader v-if="isRenameLoading"/>
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase justify-center flex-grow">
+              <strong>Collection Rename</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body p-4">
+          <div>
+            <label for="collectionName" class="font-bold mb-3 block">New Collection Name</label>
+            <div v-if="collectionToRename">
+              <input
+                type="text"
+                name="collectionName"
+                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                :class="{ 'border-red-400': errors.has('collectionName'), 'focus:border-gray-600': !errors.has('collectionName') }"
+                :placeholder="collectionToRename.name"
+                v-model="newCollectionName"
+              />
+            </div>
+            <span
+              class="text-red-700 text-xs pt-1 font-bold inline-block"
+              v-if="errors.has('collectionName')"
+            >{{ errors.first('collectionName') }}</span>
+          </div>
+        </div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="hideCollectionRenameModal"
+          >Cancel</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="renameCollection"
+          >Save</button>
         </div>
       </div>
     </VueTailwindModal>
@@ -100,9 +136,7 @@
           type="button"
           class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
           @click="showAvailableProducts"
-        >
-          Create New Collection
-        </button>
+        >Create New Collection</button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -111,19 +145,13 @@
               <tr>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >
-                  Name
-                </th>
+                >Name</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >
-                  Status
-                </th>
+                >Status</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >
-                  Actions
-                </th>
+                >Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -131,14 +159,10 @@
                 <td
                   colspan="3"
                   class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >
-                  You have no collection(s).
-                </td>
+                >You have no collection(s).</td>
               </tr>
               <tr v-for="col in userCollections" :key="col.id">
-                <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div class="flex items-center">
                     <div class="ml-3">
                       <p class="text-gray-900 whitespace-no-wrap">
@@ -166,18 +190,19 @@
                         >
                           <span>{{ col.name }}</span>
                         </a>
-                        <!-- TODO: Add a function to edit the collection name use the template:
-                          <a href="#" class="text-xs ml-1 hover:text-gray-800 text-gray-700" title="Edit Name">
-                          <font-awesome-icon :icon="['fas', 'edit']"/>
+                        <a
+                          href="#"
+                          class="text-xs ml-1 hover:text-gray-800 text-gray-700"
+                          title="Edit Name"
+                          @click.prevent="showCollectionRenameModal(col)"
+                        >
+                          <font-awesome-icon :icon="['fas', 'edit']" />
                         </a>
-                        -->
                       </p>
                     </div>
                   </div>
                 </td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
                   >
@@ -270,7 +295,11 @@ export default {
     return {
       isLoading: true,
       isLoadingFull: false,
+      isRenameLoading: false,
       tmpSelectedProducts: [],
+      collectionToDelete: null,
+      collectionToRename: null,
+      newCollectionName: null
     };
   },
   computed: {
@@ -296,8 +325,8 @@ export default {
     },
     async createNewDesign() {
       if (!this.tmpSelectedProducts.length) return;
-      this.isLoadingFull = true;
       this.isLoading = true;
+      this.isLoadingFull = true;
       let collection = await this.$store.dispatch("designer/createNewDesign", {
         user: this.user,
         products: this.tmpSelectedProducts,
@@ -308,6 +337,7 @@ export default {
       this.$router.push("/collection/designer");
     },
     editCollection(collection) {
+      if(collection.status === "approved") return;
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$router.replace("/collection/designer");
     },
@@ -332,6 +362,26 @@ export default {
         this.collectionToDelete.id
       );
       this.isLoading = false;
+    },
+    showCollectionRenameModal(col){
+      this.collectionToRename = {...col}
+      this.$refs.collectionRenameModal.show();
+    },
+    async renameCollection(){
+      if(this.collectionToRename.name === this.newCollectionName) return;
+      this.isRenameLoading = true;
+      // TODO: Rename collection
+      await this.$store.dispatch('user_dashboard/updateCollectionName', {
+        _id: this.collectionToRename._id,
+        newName: this.newCollectionName,
+      })
+      this.isRenameLoading = false;
+      this.hideCollectionRenameModal()
+    },
+    hideCollectionRenameModal() {
+      this.$refs.collectionRenameModal.hide();
+      this.collectionToRename = null;
+      this.newCollectionName = null;
     },
   },
 };

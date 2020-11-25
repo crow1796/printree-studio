@@ -114,8 +114,10 @@ export const updateCollectionName = async (axios, { _id, name }) => {
   const { data } = await axios.post("/gql", {
     query: queries.updateCollectionName,
     variables: {
-      _id,
-      name
+      collection: {
+        _id,
+        name
+      }
     },
   });
   const { updateCollectionName } = data.data;

@@ -7,6 +7,11 @@ const state = () => ({
 })
 
 const mutations = {
+  UPDATE_NAME_OF_COLLECTION(state, { _id, name }) {
+    state.userCollections[
+      _.findIndex(state.userCollections, { _id })
+    ].name = name;
+  },
   USER_COLLECTIONS(state, userCollections) {
     state.userCollections = userCollections
   },
@@ -73,6 +78,13 @@ const actions = {
     const collections = await this.$api.getUserCollectionsOf(userId)
     context.commit('USER_COLLECTIONS', collections)
     return collections
+  },
+  async updateCollectionName(context, { _id, newName }) {
+    await this.$api.updateCollectionName({ _id, name: newName });
+    context.commit("UPDATE_NAME_OF_COLLECTION", {
+      _id,
+      name: newName
+    })
   },
   removeCollectionById(context, id) {
     const tmpCollection = JSON.parse(

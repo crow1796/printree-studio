@@ -8,7 +8,7 @@
     <button
       v-if="resizable"
       type="button"
-      class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute bg-white left-0 top-0 preview-resizer-btn"
+      class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute bg-white left-0 top-0 preview-resizer-btn z-10"
       @click="togglePreviewSize"
       :title="isPreviewExpanded ? 'Minimize' : 'Expand'"
       v-tippy="{ arrow: true }"
@@ -23,7 +23,7 @@
         <div class="relative w-full h-full">
           <div
             class="inline-block relative w-full h-full"
-            :style="{ 'background-color': variant.color }"
+            :style="{ 'background-color': variant.customizableVariant.color }"
           >
             <img draggable="false" class="relative" style="z-index: 2" :src="content.placeholder" />
           </div>

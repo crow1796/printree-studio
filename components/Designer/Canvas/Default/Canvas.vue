@@ -16,7 +16,6 @@
               thumbnailWidth: 150,
               maxFiles: 1,
               acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload. \nMust have a minimum size of 1000x1000. White areas on non-transparent images will also get printed.',
-              accept: acceptFiles,
               }"
                 @vdropzone-success="assetAdded"
                 @vdropzone-sending="assetSending"
@@ -37,14 +36,6 @@
     <div class="outline-none select-none relative w-full h-full text-center">
       <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
         <div class="canvas-section outline-none select-none relative w-full h-full text-center">
-          <transition name="fade">
-            <div
-              class="auto-save uppercase font-bold absolute rounded top-0 right-0 w-24 py-1 mt-4 mr-4 text-gray-600 text-xs border bg-white"
-              v-if="autoSaving"
-              style="animation-duration: .3s;"
-            >{{ autoSavingText }}</div>
-          </transition>
-
           <DesignerActions>
             <TopActions
               @action-clicked="topActionClicked"
@@ -65,7 +56,7 @@
                 <div class="h-full w-full z-10 relative">
                   <drr
                     v-for="(obj, index) in objects"
-                    :key="index"
+                    :key="obj._id"
                     :enabled="!isHoldingSpace"
                     :aspectRatio="obj.editorData.aspectRatio"
                     :w="obj.bounds.width || 50"
@@ -177,9 +168,6 @@ export default {
       activeObject: null,
       activeObjectIndex: 0,
       objects: this.value,
-      autoSavingText: "Saving...",
-      autoSaving: false,
-      autoSaveTimeout: null,
       isHoldingSpace: false,
       stageCursor: "initial",
       stageContainer: null,
@@ -396,7 +384,7 @@ export default {
         let el = document.createElement("canvas");
         let ctx = el.getContext("2d");
 
-        const v = Canvg.fromString(ctx, res.files.file);
+        const v = Canvg.fromString(ctx, file);
         v.start();
 
         el.innerHTML = value;
@@ -404,9 +392,6 @@ export default {
         el.style.visibility = "hidden";
         el.style.display = "block";
         document.body.appendChild(el);
-
-        value = el.toDataURL("image/png");
-
         document.body.removeChild(el);
         el = null;
       }
