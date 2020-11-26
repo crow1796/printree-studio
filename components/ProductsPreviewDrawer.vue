@@ -525,7 +525,6 @@ export default {
     },
     _calculateEstProfit() {
       let totalProfit = 0;
-      console.log(this.generatedProducts)
       _.map(this.generatedProducts, (product) => {
         _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {

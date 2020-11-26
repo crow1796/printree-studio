@@ -170,7 +170,7 @@
         </transition>
         <Preview
           :scale="0.4"
-          :variant="currentVariant"
+          :variant="currentProduct.variants[currentVariantIndex]"
           :content="currentVariantContent"
           :resizable="true"
           :has-outline="true"
@@ -181,7 +181,7 @@
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
           :height="currentVariantContent.bounds.height * 4"
-          :backgroundColor="currentVariant.customizableVariant.color"
+          :backgroundColor="currentProduct.variants[currentVariantIndex].customizableVariant.color"
         >
           <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
             <div class="flex bg-white mt-4 rounded border">
@@ -364,7 +364,7 @@ export default {
       return _.map(_.map(this.currentVariant.contents, "side"), (area) => ({
         label: _.find(this.currentVariant.contents, { side: area }).placeholder,
         value: area,
-        color: this.currentVariant.customizableVariant.color,
+        color: this.currentProduct.variants[this.currentVariantIndex].customizableVariant.color,
       }));
     },
     currentVariantContent() {
@@ -559,23 +559,6 @@ export default {
           )
         );
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
-      },
-    },
-    selectedProducts: {
-      deep: true,
-      handler(to) {
-        if (this.autoSavingTimeout) clearTimeout(this.autoSavingTimeout);
-        this.autoSavingTimeout = setTimeout(async () => {
-          this.autoSaving = true;
-          this.autoSavingText = "Saving...";
-          await this.$store.dispatch("designer/saveData", {
-            shouldGenerateImages: false,
-          });
-          this.autoSavingText = "Saved!";
-          this.autoSavingTimeout = setTimeout(() => {
-            this.autoSaving = false;
-          }, 1000);
-        }, 3000);
       },
     },
   },

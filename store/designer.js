@@ -647,16 +647,6 @@ const actions = {
         status: context.getters.designMeta.status,
       });
 
-      
-      context.commit("DESIGN_META", {
-        id: updatedCollection._id,
-        name: updatedCollection.name,
-        user_id: updatedCollection.user_id,
-        plan: updatedCollection.plan,
-        status: updatedCollection.status,
-      });
-      context.commit("SELECTED_PRODUCTS", updatedCollection.products);
-
       const res = newParams.shouldGenerateImages
         ? await this.$axios.post("/create-images", {
           products: updatedCollection.products,

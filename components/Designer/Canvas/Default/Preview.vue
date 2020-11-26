@@ -36,7 +36,7 @@
                     top: `${content.bounds.top}px`,
                     width: `${content.bounds.width}px`,
                     height: `${content.bounds.height}px`,
-                    outlineColor: hasOutline ? getCorrectColor(variant.color) : 'transparent',
+                    outlineColor: hasOutline ? getCorrectColor(variant.customizableVariant.color) : 'transparent',
                   }"
           >
             <Output
@@ -54,7 +54,7 @@
                       content.bounds.height +
                       5
                     }px`,
-                    color: getCorrectColor(variant.color),
+                    color: getCorrectColor(variant.customizableVariant.color),
                   }"
           >Printable Area</div>
         </div>
@@ -100,7 +100,7 @@ export default {
     },
     getCorrectColor(hex) {
       if (!hex) return;
-      return ColorRegulator.getContrastOf(hex);
+      return ColorRegulator.invertColor(hex, true);
     },
   },
 };

@@ -84,21 +84,23 @@
         </div>
         <div class="modal-body p-4">
           <div>
-            <label for="collectionName" class="font-bold mb-3 block">New Collection Name</label>
+            <label for="newCollectionName" class="font-bold mb-3 block">New Collection Name</label>
             <div v-if="collectionToRename">
               <input
                 type="text"
-                name="collectionName"
+                name="newCollectionName"
                 class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                :class="{ 'border-red-400': errors.has('collectionName'), 'focus:border-gray-600': !errors.has('collectionName') }"
+                :class="{ 'border-red-400': errors.has('newCollectionName'), 'focus:border-gray-600': !errors.has('newCollectionName') }"
                 :placeholder="collectionToRename.name"
+                v-validate="'required'"
+                data-vv-as="Collection Name"
                 v-model="newCollectionName"
               />
             </div>
             <span
               class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('collectionName')"
-            >{{ errors.first('collectionName') }}</span>
+              v-if="errors.has('newCollectionName')"
+            >{{ errors.first('newCollectionName') }}</span>
           </div>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
@@ -368,14 +370,18 @@ export default {
       this.$refs.collectionRenameModal.show();
     },
     async renameCollection(){
+      let validationResponse = await this.$validator.validateAll({
+        newCollectionName: this.newCollectionName
+      })
+      if (!validationResponse) return
       if(this.collectionToRename.name === this.newCollectionName) return;
       this.isRenameLoading = true;
-      // TODO: Rename collection
       await this.$store.dispatch('user_dashboard/updateCollectionName', {
         _id: this.collectionToRename._id,
         newName: this.newCollectionName,
       })
       this.isRenameLoading = false;
+      this.$validator.reset()
       this.hideCollectionRenameModal()
     },
     hideCollectionRenameModal() {
