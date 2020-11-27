@@ -288,6 +288,7 @@ export default {
         assetsOfCurrentUser {
             _id
             location
+            imageKitLocation
             key
         }
     }

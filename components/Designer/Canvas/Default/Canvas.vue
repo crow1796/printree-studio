@@ -379,7 +379,7 @@ export default {
     },
     assetAdded(file, res) {
       let type = "image";
-      let value = res.data.location;
+      let value = res.data.imageKitLocation;
       if (file.type == "image/svg+xml") {
         let el = document.createElement("canvas");
         let ctx = el.getContext("2d");
@@ -405,15 +405,15 @@ export default {
       this.$refs.artsModal.hide();
     },
     async useAsset(asset) {
-      const ext = asset.location.split(/[#?]/)[0].split(".").pop().trim();
+      const ext = asset.imageKitLocation.split(/[#?]/)[0].split(".").pop().trim();
       const img = new Image();
-      img.src = asset.location;
+      img.src = asset.imageKitLocation;
       const imgData = await new Promise((resolve, reject) => {
         img.onload = function () {
           resolve(this);
         };
       });
-      this.addObject(ext === "svg" ? "svg" : "image", asset.location, "", {
+      this.addObject(ext === "svg" ? "svg" : "image", asset.imageKitLocation, "", {
         bounds: {
           width: scaleDown(imgData.width),
           height: scaleDown(imgData.height),
