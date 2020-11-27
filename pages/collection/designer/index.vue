@@ -169,6 +169,7 @@
           >{{ autoSavingText }}</div>
         </transition>
         <Preview
+          :key="`preview-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           :scale="0.4"
           :variant="currentProduct.variants[currentVariantIndex]"
           :content="currentVariantContent"
@@ -177,7 +178,7 @@
           class="designer-preview"
         />
         <Canvas
-          :key="`${currentVariantIndex}-${currentSide}`"
+          :key="`canvas-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
           :height="currentVariantContent.bounds.height * 4"
@@ -553,11 +554,7 @@ export default {
       immediate: true,
       handler(to) {
         if (!this.selectedProducts.length) return;
-        this.currentVariant = JSON.parse(
-          JSON.stringify(
-            this.selectedProducts[this.currentProductIndex].variants[to]
-          )
-        );
+        this.currentVariant = JSON.parse(JSON.stringify(this.selectedProducts[this.currentProductIndex].variants[to]));
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
       },
     },
