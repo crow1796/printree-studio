@@ -6,7 +6,7 @@
         @click="$emit('selected', art)"
       >
         <div class="flex w-full h-full items-center justify-center overflow-hidden">
-          <img :src="art.location" class="object-scale-down w-full h-full" />
+          <img :src="art.imageKitLocation" class="object-scale-down w-full h-full" />
         </div>
       </div>
     </div>

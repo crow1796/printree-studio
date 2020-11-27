@@ -2,6 +2,11 @@ import ColorRegulator from "~/plugins/color-regulator";
 import db from "~/plugins/lib/db/index";
 import { scaleUp } from "~/plugins/scaler";
 
+const generatedId = () => "_" +
+  Math.random()
+    .toString(36)
+    .substr(2, 9);
+
 const state = () => ({
   currentSide: "front",
   designMeta: {
@@ -433,36 +438,25 @@ const mutations = {
 
 const actions = {
   addVariant(context, variant) {
-    let sizes = {};
-    _.map(variant.available_sizes, (size) => {
-      sizes[size.name] = {
-        quantity: 0,
-        price: size.base_cost,
-      };
-    });
     variant = {
       ...variant,
-      sizes,
-      contents: _.map(variant.contents, (content) => {
+      contents: _.map(variant.contents, (area) => {
         return {
-          ..._.omit(content, "_id"),
-          contents: JSON.parse(JSON.stringify(content.objects)),
-        };
-      }),
-    };
-    _.map(variant.contents, (area) => {
-      _.map(
-        area.objects,
-        (obj) =>
-          (obj.style.color = ColorRegulator.getContrastOf(
-            variant.customizableVariant.color,
-            {
-              dark: "#012F56",
-              light: "#FEFEFE",
+          ..._.omit(area, '_id'),
+          objects: _.map(
+            area.objects,
+            (obj) => {
+              obj._id = generatedId();
+              obj.style.color = ColorRegulator.invertColor(
+                obj.style.color,
+                true
+              )
+              return obj
             }
-          ))
-      );
-    });
+          )
+        }
+      })
+    };
     context.commit("ADD_VARIANT", variant);
     return variant;
   },
@@ -470,20 +464,16 @@ const actions = {
     let variantIndex = _.findIndex(
       context.state.selectedProducts[context.state.currentProductIndex]
         .variants,
-      { color: variant.customizableVariant.color }
+      (v) => v.customizableVariant.color === variant.color
     );
     context.commit("REMOVE_VARIANT_BY_INDEX", variantIndex);
     return variantIndex;
   },
   addObject(context, { type, value }) {
-    let id =
-      "_" +
-      Math.random()
-        .toString(36)
-        .substr(2, 9);
+    let id = generatedId();
     let obj = JSON.parse(
       JSON.stringify(context.getters.objectBoilerplates[type])
-    );
+    )
     let variant =
       context.state.selectedProducts[context.state.currentProductIndex]
         .variants[context.state.currentVariantIndex];

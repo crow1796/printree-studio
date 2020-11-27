@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import VueTippy from 'vue-tippy'
+import VueTippy, { TippyComponent } from 'vue-tippy'
 import simplebar from 'simplebar-vue'
 import 'simplebar/dist/simplebar.min.css'
 import VueVirtualScroller from 'vue-virtual-scroller'
@@ -15,6 +15,7 @@ Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
 Vue.component('AreaLoader', AreaLoader)
 Vue.use(VueTippy)
+Vue.component("tippy", TippyComponent);
 Vue.use(PTForm)
 Vue.use(VueVirtualScroller)
 const pluginOptions = {

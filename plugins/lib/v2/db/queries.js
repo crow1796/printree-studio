@@ -149,11 +149,7 @@ export default {
             _id
             name
             plan
-            approved_at
-            declined_at
             status
-            created_at
-            updated_at
             products {
                 _id
                 meta {
@@ -174,12 +170,18 @@ export default {
                 }
                 variants {
                     _id
+                    customizableVariant {
+                        _id
+                        color
+                        sizes {
+                            name
+                            baseCost
+                        }
+                    }
                     sizes {
                         name
                         quantity
-                    }
-                    customizableVariant {
-                        color
+                        price
                     }
                     contents {
                         _id
@@ -286,6 +288,7 @@ export default {
         assetsOfCurrentUser {
             _id
             location
+            imageKitLocation
             key
         }
     }
@@ -327,12 +330,12 @@ export default {
         }
     }
   `,
-  totalEarningsOfCurrentUser: `
+    totalEarningsOfCurrentUser: `
     query {
         totalEarningsOfCurrentUser
     }
   `,
-  payoutsOfCurrentUser: `
+    payoutsOfCurrentUser: `
     query {
         payoutsOfCurrentUser {
             _id
@@ -349,7 +352,7 @@ export default {
         }
     }
   `,
-  payoutRequest: `
+    payoutRequest: `
     mutation($payout: PayoutRequestInput!){
         payoutRequest(payout: $payout){
             _id
@@ -364,7 +367,7 @@ export default {
         }
     }
   `,
-  cancelPayoutRequest: `
+    cancelPayoutRequest: `
     mutation ($id: ID!) {
         cancelPayoutRequest(_id: $id){
             _id
@@ -379,7 +382,7 @@ export default {
         }
     }
   `,
-  editPayoutRequest: `
+    editPayoutRequest: `
     mutation ($id: ID!, $payout: PayoutRequestInput!){
         editPayoutRequest(_id: $id, payout: $payout){
             _id
@@ -394,7 +397,7 @@ export default {
         }
     }
   `,
-  payoutRequests: `
+    payoutRequests: `
     query ($searchQuery: PayoutQueryInput) {
         payoutRequests(query: $searchQuery) {
             _id
@@ -411,7 +414,7 @@ export default {
         }
     }
   `,
-  processPayoutRequest: `
+    processPayoutRequest: `
     mutation ($id: ID!) {
         processPayoutRequest(_id: $id){
             _id
@@ -426,7 +429,7 @@ export default {
         }
     }
   `,
-  declinePayoutRequest: `
+    declinePayoutRequest: `
     mutation ($id: ID!, $notes: String) {
         declinePayoutRequest(_id: $id, notes: $notes){
             _id
@@ -441,7 +444,7 @@ export default {
         }
     }
   `,
-  paidPayoutRequest: `
+    paidPayoutRequest: `
     mutation ($id: ID!) {
         paidPayoutRequest(_id: $id){
             _id
@@ -456,7 +459,7 @@ export default {
         }
     }
   `,
-  updateAccount: `
+    updateAccount: `
     mutation ($userInfo: AccountInfoInput!) {
         updateAccount(userInfo: $userInfo) {
             _id

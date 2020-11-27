@@ -146,18 +146,19 @@ export default {
       this.isEditingDesignName = false;
     },
     async nextStep() {
-      if (
-        _.isEmpty(
-          this.selectedProducts[this.currentProductIndex].variants[
-            this.currentProductIndex
-          ].contents[this.currentProductIndex].objects
-        )
-      ) {
-        this.$toast.error("Cannot Proceed. Canvas is empty", {
-          position: "bottom",
-        });
-        return false;
-      }
+      // TODO: Replace validation. Should check all of the products and its variants
+      // if (
+      //   _.isEmpty(
+      //     this.selectedProducts[this.currentProductIndex].variants[
+      //       this.currentProductIndex
+      //     ].contents[this.currentProductIndex].objects
+      //   )
+      // ) {
+      //   this.$toast.error("Cannot Proceed. Canvas is empty", {
+      //     position: "bottom",
+      //   });
+      //   return false;
+      // }
 
       if (!this.isLoggedIn) return this.$refs.authModal.show();
       this.loadingText = "Generating Images...";

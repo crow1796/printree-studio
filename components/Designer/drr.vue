@@ -633,7 +633,7 @@
           pn = p.rotate(-phi)
           this.width = stickStartPos.width + dirX * pn.x
           this.height = stickStartPos.height + dirY * pn.y
-
+          console.log(this.width)
           if (!this.resizeStartEmitted) {
             this.$emit('resizestart', this.startRect);
             this.resizeStartEmitted = true
