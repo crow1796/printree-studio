@@ -73,7 +73,7 @@
       :backdrop="false"
       content-class="rounded-none shadow-none text-gray-600"
     >
-      <AreaLoader v-if="isRenameLoading"/>
+      <AreaLoader v-if="isRenameLoading" />
       <div class="flex flex-col">
         <div class="modal-heading border-b w-full p-4">
           <div class="flex justify-between w-full items-center">
@@ -301,7 +301,7 @@ export default {
       tmpSelectedProducts: [],
       collectionToDelete: null,
       collectionToRename: null,
-      newCollectionName: null
+      newCollectionName: null,
     };
   },
   computed: {
@@ -339,8 +339,9 @@ export default {
       this.$router.push("/collection/designer");
     },
     editCollection(collection) {
-      if(collection.status === "approved") return;
+      if (collection.status === "approved") return;
       this.$storage.setLocalStorage("current_design_id", collection._id);
+      this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
       this.$router.replace("/collection/designer");
     },
     showDeleteCollectionConfirmation(collection) {
@@ -365,24 +366,24 @@ export default {
       );
       this.isLoading = false;
     },
-    showCollectionRenameModal(col){
-      this.collectionToRename = {...col}
+    showCollectionRenameModal(col) {
+      this.collectionToRename = { ...col };
       this.$refs.collectionRenameModal.show();
     },
-    async renameCollection(){
+    async renameCollection() {
       let validationResponse = await this.$validator.validateAll({
-        newCollectionName: this.newCollectionName
-      })
-      if (!validationResponse) return
-      if(this.collectionToRename.name === this.newCollectionName) return;
+        newCollectionName: this.newCollectionName,
+      });
+      if (!validationResponse) return;
+      if (this.collectionToRename.name === this.newCollectionName) return;
       this.isRenameLoading = true;
-      await this.$store.dispatch('user_dashboard/updateCollectionName', {
+      await this.$store.dispatch("user_dashboard/updateCollectionName", {
         _id: this.collectionToRename._id,
         newName: this.newCollectionName,
-      })
+      });
       this.isRenameLoading = false;
-      this.$validator.reset()
-      this.hideCollectionRenameModal()
+      this.$validator.reset();
+      this.hideCollectionRenameModal();
     },
     hideCollectionRenameModal() {
       this.$refs.collectionRenameModal.hide();

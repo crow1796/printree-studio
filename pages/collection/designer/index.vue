@@ -37,6 +37,38 @@
         </div>
       </VueTailwindDrawer>
 
+      <VueTailwindModal
+        ref="productDeletionModal"
+        width="30%"
+        content-class="rounded-none shadow-none text-gray-600"
+        :backdrop="false"
+      >
+        <AreaLoader v-if="isProductDeleteLoading" />
+        <div class="flex flex-col">
+          <div class="modal-heading border-b w-full p-4">
+            <div class="flex justify-between w-full items-center">
+              <div class="flex uppercase justify-center flex-grow">
+                <strong>Confirmation</strong>
+              </div>
+            </div>
+          </div>
+          <div class="modal-body p-4 text-center">Are you sure you want to delete this product?</div>
+          <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+            <button
+              type="button"
+              class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              @click="hideDeleteCollectionConfirmation"
+            >No</button>
+
+            <button
+              type="button"
+              class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+              @click="productDeleteConfirm"
+            >Yes</button>
+          </div>
+        </div>
+      </VueTailwindModal>
+
       <div class="flex w-1/4 border-r flex-grow flex-col">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
@@ -61,10 +93,21 @@
             </div>
             <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
               <div
-                class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded"
+                class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded relative"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
                 @click="selectProduct(index)"
               >
+                <div class="absolute right-0 top-0" v-if="selectedProducts.length > 1">
+                  <button
+                    type="button"
+                    class="cursor-pointer rounded hover:bg-gray-200 w-8 h-8 flex justify-center items-center"
+                    v-tippy="{arrow: true}"
+                    title="Delete this product"
+                    @click.stop="showProductDeletionModal(index)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'trash']" class="text-xs" />
+                  </button>
+                </div>
                 <div class="flex w-full flex-col justify-center items-center">
                   <div class="flex justify-center items-center w-full">
                     <img :src="_firstVariantPlaceholderOf(product)" style="height: 100px" />
@@ -94,7 +137,9 @@
                         </template>
                         <div class="w-64">
                           <div class="flex flex-col w-full">
-                            <div class="font-bold text-white p-2 border-b border-gray-700">Choose a color</div>
+                            <div
+                              class="font-bold text-white p-2 border-b border-gray-700"
+                            >Choose a color</div>
                             <div class="flex p-2 flex-wrap">
                               <div
                                 class="rounded-full border border-white w-5 h-5 flex justify-center items-center hover:border-gray-300 border-gray-300 mx-1"
@@ -169,7 +214,7 @@
           >{{ autoSavingText }}</div>
         </transition>
         <Preview
-          :key="`preview-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
+          :key="`preview-${currentProduct._id}-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           :scale="0.4"
           :variant="currentProduct.variants[currentVariantIndex]"
           :content="currentVariantContent"
@@ -178,7 +223,7 @@
           class="designer-preview"
         />
         <Canvas
-          :key="`canvas-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
+          :key="`canvas-${currentProduct._id}-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
           :height="currentVariantContent.bounds.height * 4"
@@ -277,6 +322,7 @@
 </template>
 
 <script>
+import VueTailwindModal from "@/components/VueTailwindModal";
 import Select from "@/components/Select";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import ColorRegulator from "~/plugins/color-regulator.js";
@@ -312,6 +358,7 @@ export default {
     Canvas,
     Output,
     Preview,
+    VueTailwindModal,
   },
   async mounted() {
     WebFontLoader.load({
@@ -325,6 +372,7 @@ export default {
   },
   data() {
     return {
+      isProductDeleteLoading: false,
       autoSavingTimeout: null,
       autoSaving: false,
       autoSavingText: "Saving...",
@@ -349,6 +397,7 @@ export default {
         description: "",
         tags: "",
       },
+      productToDeleteIndex: -1,
     };
   },
   computed: {
@@ -365,7 +414,8 @@ export default {
       return _.map(_.map(this.currentVariant.contents, "side"), (area) => ({
         label: _.find(this.currentVariant.contents, { side: area }).placeholder,
         value: area,
-        color: this.currentProduct.variants[this.currentVariantIndex].customizableVariant.color,
+        color: this.currentProduct.variants[this.currentVariantIndex]
+          .customizableVariant.color,
       }));
     },
     currentVariantContent() {
@@ -373,6 +423,36 @@ export default {
     },
   },
   methods: {
+    hideDeleteCollectionConfirmation() {
+      this.productToDeleteIndex = -1;
+      this.$refs.productDeletionModal.hide();
+    },
+    async productDeleteConfirm() {
+      if (this.productToDeleteIndex === -1) return;
+      this.isProductDeleteLoading = true;
+      try {
+        const prod = this.selectedProducts[this.productToDeleteIndex];
+        if (prod._id) {
+          await this.$store.dispatch("designer/removeProduct", prod);
+        }
+        this.$store.commit(
+          "designer/REMOVE_PRODUCT_BY_INDEX",
+          this.productToDeleteIndex
+        );
+      } catch (e) {
+        this.$refs.productDeletionModal.show();
+        this.$toast.error(`Something went wrong: ${e}`, {
+          position: "top",
+        });
+        console.error(e);
+      }
+      this.$refs.productDeletionModal.hide();
+      this.isProductDeleteLoading = false;
+    },
+    showProductDeletionModal(index) {
+      this.productToDeleteIndex = index;
+      this.$refs.productDeletionModal.show();
+    },
     _firstVariantPlaceholderOf(product) {
       return _.find(product.variants[0].contents, {
         side: this._firstPrintableArea(product.variants[0]),
@@ -469,9 +549,9 @@ export default {
 
       let productIndex = this.currentProductIndex;
       if (!this.selectedProducts[productIndex]) productIndex = 0;
-      this.currentProduct = JSON.parse(
-        JSON.stringify(this.selectedProducts[productIndex])
-      );
+      this.currentProduct = {
+        ...this.selectedProducts[productIndex],
+      };
       this.currentVariant = this.currentProduct.variants[0];
       this.tmpProducts = [];
       this.isAvailableProductsLoading = false;
@@ -543,9 +623,9 @@ export default {
       immediate: true,
       handler(to) {
         if (!this.selectedProducts.length) return;
-        this.currentProduct = JSON.parse(
-          JSON.stringify(this.selectedProducts[to])
-        );
+        this.currentProduct = {
+          ...this.selectedProducts[to],
+        };
         this.currentVariant = this.currentProduct.variants[0];
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
       },
@@ -554,7 +634,11 @@ export default {
       immediate: true,
       handler(to) {
         if (!this.selectedProducts.length) return;
-        this.currentVariant = JSON.parse(JSON.stringify(this.selectedProducts[this.currentProductIndex].variants[to]));
+        this.currentVariant = JSON.parse(
+          JSON.stringify(
+            this.selectedProducts[this.currentProductIndex].variants[to]
+          )
+        );
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
       },
     },

@@ -470,5 +470,12 @@ export default {
             updated_at
         }
     }
+  `,
+    removeProductFromCollection: `
+    mutation($id: ID!) {
+        removeProductFromCollection(_id: $id) {
+            _id
+        }
+    }
   `
 };

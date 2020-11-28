@@ -8,24 +8,15 @@
           <img src="~/assets/images/logo.png" alt="Printree" class="w-24" />
         </div>
         <div class="flex w-1/3 justify-center items-center">
-          <div
-            class="flex"
-            v-if="!isEditingDesignName"
-            style="animation-duration: 0.2s"
-          >
+          <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">
             <span class="text-primary uppercase font-bold">Designer</span>
             <span class="mx-1">/</span>
             <span
               class="font-normal text-gray-600 hover:underline hover:text-gray-700"
               @click="startEditingName"
-              >{{ currentDesignName }}</span
-            >
+            >{{ currentDesignName }}</span>
           </div>
-          <div
-            class="flex"
-            v-if="isEditingDesignName"
-            style="animation-duration: 0.2s"
-          >
+          <div class="flex" v-if="isEditingDesignName" style="animation-duration: 0.2s">
             <input
               type="text"
               ref="designNameField"
@@ -37,9 +28,7 @@
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <nuxt-link to="/dashboard" class="text-blue-400"
-            >Go to Dashboard</nuxt-link
-          >
+          <nuxt-link to="/dashboard" class="text-blue-400">Go to Dashboard</nuxt-link>
           <div class="w-4"></div>
           <PTButton color="primary" @click="nextStep">NEXT</PTButton>
         </div>
@@ -147,18 +136,24 @@ export default {
     },
     async nextStep() {
       // TODO: Replace validation. Should check all of the products and its variants
-      // if (
-      //   _.isEmpty(
-      //     this.selectedProducts[this.currentProductIndex].variants[
-      //       this.currentProductIndex
-      //     ].contents[this.currentProductIndex].objects
-      //   )
-      // ) {
-      //   this.$toast.error("Cannot Proceed. Canvas is empty", {
-      //     position: "bottom",
-      //   });
-      //   return false;
-      // }
+      const contentsValidation = await new Promise((resolve) => {
+        _.map(this.selectedProducts, (product) => {
+          _.map(product.variants, (variant) => {
+            _.map(variant.contents, (content) => {
+              if (!content.objects.length) return resolve(false);
+
+              resolve(true);
+            });
+          });
+        });
+      });
+
+      if(!contentsValidation){
+        this.$toast.error("Cannot Proceed. Please make sure to add designs on all of your products.", {
+          position: "top",
+        });
+        return;
+      }
 
       if (!this.isLoggedIn) return this.$refs.authModal.show();
       this.loadingText = "Generating Images...";

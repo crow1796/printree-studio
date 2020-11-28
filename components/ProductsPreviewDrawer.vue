@@ -127,21 +127,23 @@
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
                   <div class="relative flex flex-col">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-3">Base Cost</div>
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
                     <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
                   </div>
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
-                      <span
-                        class="border rounded px-4 py-2"
-                        contenteditable="true"
-                        @input="setProductProfit"
-                      >{{ selectedProductProfit }}</span>&nbsp;=&nbsp;
+                      <autosize-input
+                        input-class="border rounded px-4 py-2 text-center"
+                        placeholder="0.00"
+                        @change="setProductProfit"
+                        :minWidth="60"
+                        v-model="selectedProductProfit"
+                      />&nbsp;=&nbsp;
                     </div>
                   </div>
-                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
+                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center">
                     <div
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
@@ -202,7 +204,9 @@
                         </div>
                       </div>
                     </div>
-                    <div class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4">
+                    <div
+                      class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
+                    >
                       <div>TOTAL ESTIMATED PROFIT</div>
                       <div>
                         <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
@@ -287,6 +291,7 @@ import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueTailwindToast from "@/components/VueTailwindToast";
 import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
+import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
 
 export default {
@@ -305,6 +310,7 @@ export default {
     OptionButtons,
     VueTailwindModal,
     VueTailwindToast,
+    AutosizeInput,
   },
   data() {
     return {
@@ -561,7 +567,7 @@ export default {
       }, 2000);
     },
     setProductProfit(e) {
-      this.selectedProductProfit = parseFloat(e.target.innerHTML);
+      this.selectedProductProfit = e.target.value ? parseFloat(e.target.value) : 0;
 
       _.keys(this.selectedProductSizes).map(
         (s) => (this.selectedProductSizes[s].price = e)

@@ -397,6 +397,10 @@ const mutations = {
   REMOVE_VARIANT_BY_INDEX(state, index) {
     state.selectedProducts[state.currentProductIndex].variants.splice(index, 1);
   },
+  REMOVE_PRODUCT_BY_INDEX(state, index) {
+    state.selectedProducts.splice(index, 1)
+    state.currentProductIndex = state.currentProductIndex === index && index > 0 ? index - 1 : 0
+  },
   WEBFONTS(state, webfonts) {
     state.webfonts = webfonts;
   },
@@ -437,6 +441,15 @@ const mutations = {
 };
 
 const actions = {
+  async removeProduct(context, product) {
+    if (!product) return false;
+
+    const index = _.findIndex(context.state.selectedProducts, { _id: product._id })
+
+    if (index === -1) return
+
+    this.$api.userDashboard.removeProductFromCollection(product._id)
+  },
   addVariant(context, variant) {
     variant = {
       ...variant,
@@ -606,6 +619,8 @@ const actions = {
       plan: design.plan,
       status: design.status,
     });
+
+    context.commit("CURRENT_PRODUCT_INDEX", 0)
     return design;
   },
   async saveProducts(context, products) {
