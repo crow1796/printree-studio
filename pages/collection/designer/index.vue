@@ -368,6 +368,7 @@ export default {
     });
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]));
     this.currentVariant = this.currentProduct.variants[0];
+    this.$store.commit("designer/CURRENT_VARIANT_INDEX", 0);
     this.isLoading = false;
   },
   data() {
@@ -458,9 +459,6 @@ export default {
         side: this._firstPrintableArea(product.variants[0]),
       }).placeholder;
     },
-    _reverseObjects(objects) {
-      return JSON.parse(JSON.stringify(objects)).reverse();
-    },
     startEditingMetadata() {
       this.toggleDrawer("productMetaDrawer");
       this.tmpProductMetadata = JSON.parse(
@@ -529,18 +527,20 @@ export default {
           description: "",
           tags: [],
         },
-        variants: _.map(product.customizableVariants, (variant) => ({
-          customizableVariant: variant,
-          sizes: _.map(variant.sizes, (size) => ({
-            name: size.name,
-            quantity: 0,
-            price: 0,
-          })),
-          contents: _.map(variant.printableArea, (side) => ({
-            printableArea: side.side,
-            objects: [],
-          })),
-        })),
+        variants: [
+          {
+            customizableVariant: product.customizableVariants[0],
+            sizes: _.map(product.customizableVariants[0].sizes, (size) => ({
+              name: size.name,
+              quantity: 0,
+              price: 0,
+            })),
+            contents: _.map(product.customizableVariants[0].printableArea, (side) => ({
+              printableArea: side.side,
+              objects: [],
+            })),
+          },
+        ],
       }));
       const updatedCollection = await this.$store.dispatch(
         "designer/saveProducts",
@@ -549,9 +549,9 @@ export default {
 
       let productIndex = this.currentProductIndex;
       if (!this.selectedProducts[productIndex]) productIndex = 0;
-      this.currentProduct = {
-        ...this.selectedProducts[productIndex],
-      };
+      this.currentProduct = JSON.parse(
+        JSON.stringify(this.selectedProducts[productIndex])
+      );
       this.currentVariant = this.currentProduct.variants[0];
       this.tmpProducts = [];
       this.isAvailableProductsLoading = false;
@@ -623,9 +623,9 @@ export default {
       immediate: true,
       handler(to) {
         if (!this.selectedProducts.length) return;
-        this.currentProduct = {
-          ...this.selectedProducts[to],
-        };
+        this.currentProduct = JSON.parse(
+          JSON.stringify(this.selectedProducts[to])
+        );
         this.currentVariant = this.currentProduct.variants[0];
         if (this.$refs.canvas) this.$refs.canvas.deactivated();
       },

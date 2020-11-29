@@ -95,6 +95,7 @@
                 v-validate="'required'"
                 data-vv-as="Collection Name"
                 v-model="newCollectionName"
+                @keyup.enter="renameCollection"
               />
             </div>
             <span
@@ -187,7 +188,9 @@
                         </span>
                         <a
                           href="#"
-                          class="text-blue-600 hover:underline"
+                          :class="{
+                            'text-blue-600 hover:underline': col.status !== 'approved', 'cursor-default' : col.status === 'approved',
+                          }"
                           @click.prevent="editCollection(col)"
                         >
                           <span>{{ col.name }}</span>
@@ -195,8 +198,9 @@
                         <a
                           href="#"
                           class="text-xs ml-1 hover:text-gray-800 text-gray-700"
-                          title="Edit Name"
                           @click.prevent="showCollectionRenameModal(col)"
+                          v-tippy="{arrow: true}"
+                          title="Edit Collection Name"
                         >
                           <font-awesome-icon :icon="['fas', 'edit']" />
                         </a>
@@ -340,6 +344,7 @@ export default {
     },
     editCollection(collection) {
       if (collection.status === "approved") return;
+      localStorage.removeItem("_stored_ptree");
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
       this.$router.replace("/collection/designer");
@@ -374,7 +379,7 @@ export default {
       let validationResponse = await this.$validator.validateAll({
         newCollectionName: this.newCollectionName,
       });
-      if (!validationResponse) return;
+      if (!validationResponse || this.isRenameLoading) return;
       if (this.collectionToRename.name === this.newCollectionName) return;
       this.isRenameLoading = true;
       await this.$store.dispatch("user_dashboard/updateCollectionName", {
