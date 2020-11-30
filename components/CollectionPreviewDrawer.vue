@@ -82,16 +82,7 @@
                   >
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
-                  <button
-                    type="button"
-                    class="absolute bottom-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
-                    @click="downloadDesign"
-                    :title="`Download (${selectedProductSide.toUpperCase()})`"
-                    v-tippy="{arrow: true}"
-                    v-if="!selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].is_empty"
-                  >
-                    <font-awesome-icon :icon="['fas', 'download']" />
-                  </button>
+                  <!-- TODO: Add another button for downloading the design -->
                   <img
                     :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
                     class="w-3/5"

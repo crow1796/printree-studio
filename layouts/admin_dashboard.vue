@@ -120,7 +120,9 @@ export default {
   methods: {
     async signOut(e) {
       this.$router.replace("/");
-      await this.$store.dispatch("user/signOut");
+      setTimeout(() => {
+        this.$store.dispatch("user/signOut");
+      })
     }
   }
 };

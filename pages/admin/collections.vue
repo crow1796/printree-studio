@@ -1,6 +1,6 @@
 <template>
   <div class="sm:px-8 relative">
-    <AreaLoader v-if="isLoading"/>
+    <AreaLoader v-if="isLoading" fullscreen/>
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
       v-if="generatedImages.length"

@@ -477,5 +477,15 @@ export default {
             _id
         }
     }
+  `,
+    generateVariantImages: `
+    query($id: ID!) {
+        generateVariantImages(_id: $id){
+            design
+            isEmpty
+            side
+            fullThumb
+        }
+    }
   `
 };
