@@ -8,7 +8,7 @@
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
-                  <img src="~/assets/images/logo.png" alt="Printree" class="w-24" />
+                  <img src="~/assets/images/logo.png" alt="Bizeno" class="w-24" />
                 </nuxt-link>
               </div>
 
@@ -124,7 +124,7 @@ import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 
 export default {
   head: {
-    title: 'Printree'
+    title: 'Bizeno'
   },
   components: {
     AuthModal,

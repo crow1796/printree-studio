@@ -2,30 +2,58 @@
   <client-only>
     <div class="flex-grow flex flex-col text-sm">
       <AreaLoader v-if="isLoading" fullscreen :text="loadingText" />
+      <VueTailwindModal
+        ref="saveConfirmationModal"
+        width="30%"
+        content-class="rounded-none shadow-none text-gray-600"
+        :backdrop="false"
+      >
+        <div class="flex flex-col">
+          <div class="modal-heading border-b w-full p-4">
+            <div class="flex justify-between w-full items-center">
+              <div class="flex uppercase justify-center flex-grow">
+                <strong>Confirmation</strong>
+              </div>
+            </div>
+          </div>
+          <div class="modal-body p-4 text-center">Do you want to save your changes?</div>
+          <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+            <button
+              type="button"
+              class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+              @click="hideSaveConfirmationModal"
+            >Cancel</button>
+
+            <div>
+              <button
+                type="button"
+                class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+                @click="dontSave"
+              >Don't Save</button>
+              <button
+                type="button"
+                class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+                @click="saveChanges"
+              >Save</button>
+            </div>
+          </div>
+        </div>
+      </VueTailwindModal>
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">
         <div class="flex w-1/3">
-          <img src="~/assets/images/logo.png" alt="Printree" class="w-24" />
+          <img src="~/assets/images/logo.png" alt="Bizeno" class="w-20 object-contain" />
         </div>
         <div class="flex w-1/3 justify-center items-center">
-          <div
-            class="flex"
-            v-if="!isEditingDesignName"
-            style="animation-duration: 0.2s"
-          >
+          <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">
             <span class="text-primary uppercase font-bold">Designer</span>
             <span class="mx-1">/</span>
             <span
               class="font-normal text-gray-600 hover:underline hover:text-gray-700"
               @click="startEditingName"
-              >{{ currentDesignName }}</span
-            >
+            >{{ currentDesignName }}</span>
           </div>
-          <div
-            class="flex"
-            v-if="isEditingDesignName"
-            style="animation-duration: 0.2s"
-          >
+          <div class="flex" v-if="isEditingDesignName" style="animation-duration: 0.2s">
             <input
               type="text"
               ref="designNameField"
@@ -37,9 +65,7 @@
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <nuxt-link to="/dashboard" class="text-blue-400"
-            >Go to Dashboard</nuxt-link
-          >
+          <a href="#" @click.stop="goToDashboard" class="text-blue-400">Go to Dashboard</a>
           <div class="w-4"></div>
           <PTButton color="primary" @click="nextStep">NEXT</PTButton>
         </div>
@@ -65,7 +91,7 @@ import { mapGetters } from "vuex";
 
 export default {
   head: {
-    title: "Printree Studio",
+    title: "Bizeno",
     bodyAttrs: {
       class: "no-scroll",
     },
@@ -130,6 +156,25 @@ export default {
     };
   },
   methods: {
+    hideSaveConfirmationModal() {
+      this.$refs.saveConfirmationModal.hide();
+    },
+    dontSave() {
+      this.$refs.saveConfirmationModal.hide();
+      this.$router.push("/dashboard");
+    },
+    async saveChanges() {
+      this.$refs.saveConfirmationModal.hide();
+      this.isLoading = true;
+      const generatedImages = await this.$store.dispatch("designer/saveData", {
+        shouldGenerateImages: false,
+      });
+      this.isLoading = false;
+      this.$router.push("/dashboard");
+    },
+    goToDashboard() {
+      this.$refs.saveConfirmationModal.show();
+    },
     startEditingName() {
       this.isEditingDesignName = true;
       this.$nextTick(() => {
@@ -146,19 +191,27 @@ export default {
       this.isEditingDesignName = false;
     },
     async nextStep() {
-      // TODO: Replace validation. Should check all of the products and its variants
-      // if (
-      //   _.isEmpty(
-      //     this.selectedProducts[this.currentProductIndex].variants[
-      //       this.currentProductIndex
-      //     ].contents[this.currentProductIndex].objects
-      //   )
-      // ) {
-      //   this.$toast.error("Cannot Proceed. Canvas is empty", {
-      //     position: "bottom",
-      //   });
-      //   return false;
-      // }
+      let contentsValidation = true;
+      _.map(this.selectedProducts, (product) => {
+        _.map(product.variants, (variant) => {
+          const sidesThatHasContents = _.filter(
+            variant.contents,
+            (content) => content.objects.length
+          );
+
+          if (sidesThatHasContents.length === 0) contentsValidation = false;
+        });
+      });
+
+      if (!contentsValidation) {
+        this.$toast.error(
+          "Cannot Proceed. Please make sure to add designs on all of your products.",
+          {
+            position: "top",
+          }
+        );
+        return;
+      }
 
       if (!this.isLoggedIn) return this.$refs.authModal.show();
       this.loadingText = "Generating Images...";

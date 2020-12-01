@@ -35,30 +35,6 @@
     <div class="flex flex-grow text-gray-600 overflow-hidden">
       <div class="flex flex-col flex-grow">
         <div class="flex flex-grow-0 items-center border-b p-4">
-          <div class="flex w-4/12 uppercase font-bold">
-            <div class="flex flex-col items-center">
-              <div>TOTAL ESTIMATED PROFIT</div>
-              <div class="text-primary">
-                <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
-                <number
-                  v-if="estimatedMinProfit"
-                  animationPaused
-                  ref="estMinProfit"
-                  :to="estimatedMinProfit"
-                  :format="(num) => num.formatMoney('₱ ')"
-                  :duration=".4"
-                />
-                <font-awesome-icon v-if="estimatedMinProfit" :icon="['fas', 'minus']" />
-                <number
-                  animationPaused
-                  ref="estMaxProfit"
-                  :to="estimatedMaxProfit"
-                  :format="(num) => num.formatMoney('₱ ')"
-                  :duration=".4"
-                />
-              </div>
-            </div>
-          </div>
           <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
@@ -82,16 +58,7 @@
                   >
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
-                  <button
-                    type="button"
-                    class="absolute bottom-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
-                    @click="downloadDesign"
-                    :title="`Download (${selectedProductSide.toUpperCase()})`"
-                    v-tippy="{arrow: true}"
-                    v-if="!selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].is_empty"
-                  >
-                    <font-awesome-icon :icon="['fas', 'download']" />
-                  </button>
+                  <!-- TODO: Add another button for downloading the design -->
                   <img
                     :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
                     class="w-3/5"
@@ -147,21 +114,6 @@
                   </div>
                 </div>
                 <div>
-                  <div class="font-bold"></div>
-                  <div class="flex flex-wrap">
-                    <div
-                      class="mr-2 rounded font-bold mt-2"
-                      v-for="(variant, i) in selectedProduct
-                        .variants[selectedProductVariantKey].sizes"
-                      :key="i"
-                      :class="{'px-4 py-2 border hover:border-gray-600': selectedProductSizes[i].quantity}"
-                    >
-                      <div class="flex items-center" v-if="selectedProductSizes[i].quantity">
-                        <div class="text-center mr-2">{{ selectedProductSizes[i].name }}:</div>
-                        <div>{{selectedProductSizes[i].quantity}}</div>
-                      </div>
-                    </div>
-                  </div>
                   <div class="mt-2" v-if="selectedProduct.meta.description">
                     <div
                       class="w-full border rounded p-4 outine-none resize-none"
@@ -346,10 +298,10 @@ export default {
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
-            let totalForPrintree = baseCost * size.quantity;
+            let totalForBizeno = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
-            let net = totalWithCustomerPrice - totalForPrintree;
+            let net = totalWithCustomerPrice - totalForBizeno;
             totalProfit += net;
           });
         });

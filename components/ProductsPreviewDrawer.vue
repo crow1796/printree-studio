@@ -123,25 +123,30 @@
                     class="font-bold w-full outline-none border rounded px-4 py-2"
                     placeholder="What's the name of this product?*"
                     v-model="selectedProduct.meta.name"
+                    @keyup="updateProductMeta"
                   />
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
                   <div class="relative flex flex-col">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-3">Base Cost</div>
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
                     <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
                   </div>
                   <div class="relative flex flex-col">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
-                      <span
-                        class="border rounded px-4 py-2"
-                        contenteditable="true"
-                        @input="setProductProfit"
-                      >{{ selectedProductProfit }}</span>&nbsp;=&nbsp;
+                      <autosize-input
+                        input-class="border rounded px-4 py-2 text-center"
+                        placeholder="0.00"
+                        @change="setProductProfit"
+                        :minWidth="60"
+                        :value="selectedProductProfit"
+                      />&nbsp;=&nbsp;
                     </div>
                   </div>
-                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
+                  <div
+                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center"
+                  >
                     <div
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
@@ -156,16 +161,6 @@
                   </div>
                 </div>
                 <div>
-                  <!-- <div class="font-bold mt-2">
-                    <span>Printing Options</span>
-                    <span title="Quality & Price may vary" v-tippy="{ arrow: true }">
-                      <font-awesome-icon :icon="['fas', 'question-circle']" />
-                    </span>
-                  </div>
-                  <OptionButtons
-                    :options="printingOptions"
-                    v-model="selectedProduct.meta.printing_option"
-                  />-->
                   <div class="my-2">
                     <textarea
                       name="product_description"
@@ -202,7 +197,9 @@
                         </div>
                       </div>
                     </div>
-                    <div class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4">
+                    <div
+                      class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
+                    >
                       <div>TOTAL ESTIMATED PROFIT</div>
                       <div>
                         <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
@@ -214,14 +211,14 @@
                           :format="(num) => num.formatMoney('₱ ')"
                           :duration=".4"
                         />
-                        <font-awesome-icon v-if="estimatedMinProfit" :icon="['fas', 'minus']" />
-                        <number
-                          animationPaused
-                          ref="estMaxProfit"
-                          :to="estimatedMaxProfit"
-                          :format="(num) => num.formatMoney('₱ ')"
-                          :duration=".4"
-                        />
+                        <span class="ml-2">
+                          <span v-tippy="{arrow: true}" title="-7% service fee">
+                            <font-awesome-icon
+                              v-if="estimatedMinProfit"
+                              :icon="['fas', 'question-circle']"
+                            />
+                          </span>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -287,7 +284,9 @@ import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueTailwindToast from "@/components/VueTailwindToast";
 import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
+import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
+const SERVICE_FEE = 0.07;
 
 export default {
   props: {
@@ -305,6 +304,7 @@ export default {
     OptionButtons,
     VueTailwindModal,
     VueTailwindToast,
+    AutosizeInput,
   },
   data() {
     return {
@@ -333,7 +333,6 @@ export default {
       selectedProductProfit: 0,
       selectedProductSizes: [],
       estimatedMinProfit: 0,
-      estimatedMaxProfit: 0,
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
       isCalculating: false,
@@ -435,6 +434,9 @@ export default {
       this.$store.commit("designer/DESIGN_PLAN", plan);
     },
     previousProduct() {
+      const isValidated = this.validateAndSaveMeta();
+      if (!isValidated) return;
+
       const previousProductIndex =
         _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) -
         1;
@@ -464,6 +466,19 @@ export default {
 
       this.selectProduct(product);
     },
+    updateProductMeta() {
+      this.generatedProducts[
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
+      ].meta = this.selectedProduct.meta;
+
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+        _id: this.selectedProduct._id,
+        props: {
+          path: `meta`,
+          value: this.selectedProduct.meta,
+        },
+      });
+    },
     validateAndSaveMeta() {
       let isDirty = false;
       this.productErrors = [];
@@ -483,10 +498,6 @@ export default {
         return false;
       }
 
-      this.$store.commit("designer/CURRENT_PRODUCT_META", {
-        _id: this.selectedProduct._id,
-        meta: this.selectedProduct.meta,
-      });
       return true;
     },
     nextProduct() {
@@ -516,10 +527,6 @@ export default {
       this.selectProduct(nextProduct);
     },
     setQuantityAndPrice(n, p, v) {
-      this.$store.commit("designer/CURRENT_VARIANT_PROPERTIES", {
-        path: `sizes.${n}.${p}`,
-        value: v,
-      });
       if (this.meta.plan == "buy") return;
       this._calculateEstProfit();
     },
@@ -534,21 +541,18 @@ export default {
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
-            let totalForPrintree = baseCost * size.quantity;
+            let totalForBizeno = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
-            let net = totalWithCustomerPrice - totalForPrintree;
+            let net = totalWithCustomerPrice - totalForBizeno;
             totalProfit += net;
           });
         });
       });
-      let minProfit = totalProfit - totalProfit * 0.05;
-      let maxProfit = totalProfit + totalProfit * 0.05;
+      let minProfit = totalProfit - totalProfit * SERVICE_FEE;
       this.estimatedMinProfit = minProfit;
-      this.estimatedMaxProfit = maxProfit;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play();
       });
     },
     calculateProfit(size) {
@@ -561,11 +565,41 @@ export default {
       }, 2000);
     },
     setProductProfit(e) {
-      this.selectedProductProfit = parseFloat(e.target.innerHTML);
+      this.selectedProductProfit = e.target.value
+        ? parseFloat(e.target.value)
+        : 0;
 
       _.keys(this.selectedProductSizes).map(
         (s) => (this.selectedProductSizes[s].price = e)
       );
+
+      const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
+      this.selectedProductSizes = this.selectedProduct.variants[
+        firstVariantKey
+      ].sizes;
+
+      _.keys(this.selectedProductSizes).map(
+        (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
+      );
+
+      this.generatedProducts[
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
+      ].variants[
+        this.selectedProductVariantKey
+      ].sizes = this.selectedProductSizes;
+
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+        _id: this.selectedProduct._id,
+        props: {
+          path: `variants[${this.selectedVariantIndex}].sizes`,
+          value: _.map(this.selectedProductSizes, (s) => ({
+            ...s,
+            quantity: 0,
+          })),
+        },
+      });
+
+      this.calculateProfit();
     },
   },
   watch: {
@@ -621,35 +655,6 @@ export default {
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
-      },
-    },
-    selectedProductProfit: {
-      immediate: true,
-      handler(to) {
-        if (!this.selectedProduct) return;
-        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
-        this.selectedProductSizes = this.selectedProduct.variants[
-          firstVariantKey
-        ].sizes;
-
-        _.keys(this.selectedProductSizes).map(
-          (s) => (this.selectedProductSizes[s].price = to)
-        );
-
-        this.generatedProducts[
-          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
-        ].variants[
-          this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes;
-
-        this.$store.commit("designer/PRODUCT_PROPERTIES", {
-          _id: this.selectedProduct._id,
-          props: {
-            path: `variants.${this.selectedVariantIndex}.sizes`,
-            value: this.selectedProductSizes,
-          },
-        });
-        this.calculateProfit();
       },
     },
   },

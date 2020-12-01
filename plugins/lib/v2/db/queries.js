@@ -470,5 +470,23 @@ export default {
             updated_at
         }
     }
+  `,
+    removeProductFromCollection: `
+    mutation($id: ID!) {
+        removeProductFromCollection(_id: $id) {
+            _id
+        }
+    }
+  `,
+    generateVariantImages: `
+    query($id: ID!) {
+        generateVariantImages(_id: $id){
+            color
+            design
+            isEmpty
+            side
+            fullThumb
+        }
+    }
   `
 };
