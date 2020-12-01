@@ -211,14 +211,14 @@
                           :format="(num) => num.formatMoney('₱ ')"
                           :duration=".4"
                         />
-                        <font-awesome-icon v-if="estimatedMinProfit" :icon="['fas', 'minus']" />
-                        <number
-                          animationPaused
-                          ref="estMaxProfit"
-                          :to="estimatedMaxProfit"
-                          :format="(num) => num.formatMoney('₱ ')"
-                          :duration=".4"
-                        />
+                        <span class="ml-2">
+                          <span v-tippy="{arrow: true}" title="-7% service fee">
+                            <font-awesome-icon
+                              v-if="estimatedMinProfit"
+                              :icon="['fas', 'question-circle']"
+                            />
+                          </span>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -286,6 +286,7 @@ import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
 import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
+const SERVICE_FEE = 0.07;
 
 export default {
   props: {
@@ -332,7 +333,6 @@ export default {
       selectedProductProfit: 0,
       selectedProductSizes: [],
       estimatedMinProfit: 0,
-      estimatedMaxProfit: 0,
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
       isCalculating: false,
@@ -466,7 +466,7 @@ export default {
 
       this.selectProduct(product);
     },
-    updateProductMeta(){
+    updateProductMeta() {
       this.generatedProducts[
         _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
       ].meta = this.selectedProduct.meta;
@@ -475,9 +475,9 @@ export default {
         _id: this.selectedProduct._id,
         props: {
           path: `meta`,
-          value: this.selectedProduct.meta
-        }
-      })
+          value: this.selectedProduct.meta,
+        },
+      });
     },
     validateAndSaveMeta() {
       let isDirty = false;
@@ -497,7 +497,7 @@ export default {
         this.$refs.productValidationToast.show();
         return false;
       }
-      
+
       return true;
     },
     nextProduct() {
@@ -541,21 +541,18 @@ export default {
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
-            let totalForPrintree = baseCost * size.quantity;
+            let totalForBizeno = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
-            let net = totalWithCustomerPrice - totalForPrintree;
+            let net = totalWithCustomerPrice - totalForBizeno;
             totalProfit += net;
           });
         });
       });
-      let minProfit = totalProfit - totalProfit * 0.05;
-      let maxProfit = totalProfit + totalProfit * 0.05;
+      let minProfit = totalProfit - totalProfit * SERVICE_FEE;
       this.estimatedMinProfit = minProfit;
-      this.estimatedMaxProfit = maxProfit;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play();
       });
     },
     calculateProfit(size) {
@@ -595,7 +592,10 @@ export default {
         _id: this.selectedProduct._id,
         props: {
           path: `variants[${this.selectedVariantIndex}].sizes`,
-          value: _.map(this.selectedProductSizes, s => ({...s, quantity: 0})),
+          value: _.map(this.selectedProductSizes, (s) => ({
+            ...s,
+            quantity: 0,
+          })),
         },
       });
 

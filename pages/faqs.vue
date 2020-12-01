@@ -4,10 +4,10 @@
       Frequently Asked Questions
     </div>
     <div class="mb-3">
-      <div class="text-xl font-black">What is Printree?</div>
+      <div class="text-xl font-black">What is Bizeno?</div>
       <div
         class="ml-4"
-      >Printree is a place for people who wants to to sell and earn with their designs and also for those people who wants to find and buy apparels with custom designs.</div>
+      >Bizeno is a place for people who wants to to sell and earn with their designs and also for those people who wants to find and buy apparels with custom designs.</div>
     </div>
 
     <div class="mb-3">
@@ -89,7 +89,7 @@
       <div class="text-xl font-black">How can I report someone as not the creator?</div>
       <div
         class="ml-4"
-      >Please contact us as soon as possible at <a class="text-primary" href="mailto:support@printreestudio.com">support@printreestudio.com</a> and explain why the person is a fraud with a link to the post.</div>
+      >Please contact us as soon as possible at <a class="text-primary" href="mailto:bizenoph@gmail.com">bizenoph@gmail.com</a> and explain why the person is a fraud with a link to the post.</div>
     </div>
   </div>
 </template>

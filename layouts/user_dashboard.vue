@@ -19,8 +19,8 @@
               <nuxt-link to="/">
                 <img
                   src="~/assets/images/logo-nav.png"
-                  alt="Printree"
-                  class="w-24"
+                  alt="Bizeno"
+                  class="w-20 object-fit"
                 />
               </nuxt-link>
             </div>
