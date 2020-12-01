@@ -123,6 +123,7 @@
                     class="font-bold w-full outline-none border rounded px-4 py-2"
                     placeholder="What's the name of this product?*"
                     v-model="selectedProduct.meta.name"
+                    @keyup="updateProductMeta"
                   />
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
@@ -139,11 +140,13 @@
                         placeholder="0.00"
                         @change="setProductProfit"
                         :minWidth="60"
-                        v-model="selectedProductProfit"
+                        :value="selectedProductProfit"
                       />&nbsp;=&nbsp;
                     </div>
                   </div>
-                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center">
+                  <div
+                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center"
+                  >
                     <div
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
@@ -158,16 +161,6 @@
                   </div>
                 </div>
                 <div>
-                  <!-- <div class="font-bold mt-2">
-                    <span>Printing Options</span>
-                    <span title="Quality & Price may vary" v-tippy="{ arrow: true }">
-                      <font-awesome-icon :icon="['fas', 'question-circle']" />
-                    </span>
-                  </div>
-                  <OptionButtons
-                    :options="printingOptions"
-                    v-model="selectedProduct.meta.printing_option"
-                  />-->
                   <div class="my-2">
                     <textarea
                       name="product_description"
@@ -441,6 +434,9 @@ export default {
       this.$store.commit("designer/DESIGN_PLAN", plan);
     },
     previousProduct() {
+      const isValidated = this.validateAndSaveMeta();
+      if (!isValidated) return;
+
       const previousProductIndex =
         _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) -
         1;
@@ -470,6 +466,19 @@ export default {
 
       this.selectProduct(product);
     },
+    updateProductMeta(){
+      this.generatedProducts[
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
+      ].meta = this.selectedProduct.meta;
+
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+        _id: this.selectedProduct._id,
+        props: {
+          path: `meta`,
+          value: this.selectedProduct.meta
+        }
+      })
+    },
     validateAndSaveMeta() {
       let isDirty = false;
       this.productErrors = [];
@@ -488,11 +497,7 @@ export default {
         this.$refs.productValidationToast.show();
         return false;
       }
-
-      this.$store.commit("designer/CURRENT_PRODUCT_META", {
-        _id: this.selectedProduct._id,
-        meta: this.selectedProduct.meta,
-      });
+      
       return true;
     },
     nextProduct() {
@@ -522,10 +527,6 @@ export default {
       this.selectProduct(nextProduct);
     },
     setQuantityAndPrice(n, p, v) {
-      this.$store.commit("designer/CURRENT_VARIANT_PROPERTIES", {
-        path: `sizes.${n}.${p}`,
-        value: v,
-      });
       if (this.meta.plan == "buy") return;
       this._calculateEstProfit();
     },
@@ -567,11 +568,38 @@ export default {
       }, 2000);
     },
     setProductProfit(e) {
-      this.selectedProductProfit = e.target.value ? parseFloat(e.target.value) : 0;
+      this.selectedProductProfit = e.target.value
+        ? parseFloat(e.target.value)
+        : 0;
 
       _.keys(this.selectedProductSizes).map(
         (s) => (this.selectedProductSizes[s].price = e)
       );
+
+      const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
+      this.selectedProductSizes = this.selectedProduct.variants[
+        firstVariantKey
+      ].sizes;
+
+      _.keys(this.selectedProductSizes).map(
+        (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
+      );
+
+      this.generatedProducts[
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
+      ].variants[
+        this.selectedProductVariantKey
+      ].sizes = this.selectedProductSizes;
+
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+        _id: this.selectedProduct._id,
+        props: {
+          path: `variants[${this.selectedVariantIndex}].sizes`,
+          value: _.map(this.selectedProductSizes, s => ({...s, quantity: 0})),
+        },
+      });
+
+      this.calculateProfit();
     },
   },
   watch: {
@@ -627,35 +655,6 @@ export default {
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
-      },
-    },
-    selectedProductProfit: {
-      immediate: true,
-      handler(to) {
-        if (!this.selectedProduct) return;
-        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
-        this.selectedProductSizes = this.selectedProduct.variants[
-          firstVariantKey
-        ].sizes;
-
-        _.keys(this.selectedProductSizes).map(
-          (s) => (this.selectedProductSizes[s].price = to)
-        );
-
-        this.generatedProducts[
-          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
-        ].variants[
-          this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes;
-
-        this.$store.commit("designer/PRODUCT_PROPERTIES", {
-          _id: this.selectedProduct._id,
-          props: {
-            path: `variants.${this.selectedVariantIndex}.sizes`,
-            value: this.selectedProductSizes,
-          },
-        });
-        this.calculateProfit();
       },
     },
   },

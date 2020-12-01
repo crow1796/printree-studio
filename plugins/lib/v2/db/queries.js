@@ -481,6 +481,7 @@ export default {
     generateVariantImages: `
     query($id: ID!) {
         generateVariantImages(_id: $id){
+            color
             design
             isEmpty
             side

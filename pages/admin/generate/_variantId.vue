@@ -4,11 +4,11 @@
 
     <div class="flex flex-wrap justify-center">
       <div
-        class="flex border-rounded border w-4/12 mx-4 relative"
+        class="flex border-rounded border w-4/12 mx-4 relative flex-col"
         v-for="(img, i) in generatedVariantImages"
         :key="i"
       >
-        <div class="absolute top-0 right-0 px-4 mt-4 flex w-full justify-between">
+        <div class="flex w-full justify-between p-4">
           <div class="uppercase font-bold">{{img.side}}</div>
           <div>
             <button
@@ -21,7 +21,7 @@
             </button>
           </div>
         </div>
-        <div class="generated-image" v-html="img.design"></div>
+        <div class="generated-image" :style="{backgroundColor: img.color}" v-html="img.design"></div>
       </div>
     </div>
   </div>
