@@ -26,13 +26,7 @@
           :style="{ fontFamily: obj.style.fontFamily }"
         >{{ obj.value || '' }}</pre>
       </div>
-      <div
-        v-if="obj.type == 'svg'"
-        v-html="obj.value"
-        class="svg-object"
-        :style="{ fill: obj.style.color }"
-      ></div>
-      <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image'">
+      <div class="flex w-full h-full items-center justify-center" v-if="obj.type == 'image' || obj.type == 'svg'">
         <img width="100%" :src="obj.value" />
       </div>
     </div>

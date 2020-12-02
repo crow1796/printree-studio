@@ -97,15 +97,8 @@
                       >{{ obj.value || '' }}</pre>
                     </div>
                     <div
-                      v-if="obj.type == 'svg'"
-                      v-html="obj.value"
-                      class="svg-object"
-                      :ref="`svgContainer_${obj.id}`"
-                      :style="{ fill: obj.style.color }"
-                    ></div>
-                    <div
                       class="flex w-full h-full items-center justify-center"
-                      v-if="obj.type == 'image'"
+                      v-if="obj.type == 'image' || obj.type == 'svg'"
                     >
                       <img width="100%" :src="obj.value" />
                     </div>
@@ -380,28 +373,37 @@ export default {
     assetAdded(file, res) {
       let type = "image";
       let value = res.data.imageKitLocation;
+      let width = file.width
+      let height = file.height
       if (file.type == "image/svg+xml") {
+        type = "svg";
         let el = document.createElement("img");
-
-        el.src = value;
+        el.src = file.dataURL;
         el.style.position = "absolute";
         el.style.visibility = "hidden";
         el.style.display = "block";
         document.body.appendChild(el);
         document.body.removeChild(el);
+        width = el.width
+        height = el.height
         el = null;
+
       }
       this.addObject(type, value, file.name, {
         bounds: {
-          width: scaleDown(file.width),
-          height: scaleDown(file.height),
+          width: scaleDown(width),
+          height: scaleDown(height),
         },
       });
       this.$store.commit("designer/ADD_ASSET", res.data);
       this.$refs.artsModal.hide();
     },
     async useAsset(asset) {
-      const ext = asset.imageKitLocation.split(/[#?]/)[0].split(".").pop().trim();
+      const ext = asset.imageKitLocation
+        .split(/[#?]/)[0]
+        .split(".")
+        .pop()
+        .trim();
       const img = new Image();
       img.src = asset.imageKitLocation;
       const imgData = await new Promise((resolve, reject) => {
@@ -409,12 +411,17 @@ export default {
           resolve(this);
         };
       });
-      this.addObject(ext === "svg" ? "svg" : "image", asset.imageKitLocation, "", {
-        bounds: {
-          width: scaleDown(imgData.width),
-          height: scaleDown(imgData.height),
-        },
-      });
+      this.addObject(
+        ext === "svg" ? "svg" : "image",
+        asset.imageKitLocation,
+        "",
+        {
+          bounds: {
+            width: scaleDown(imgData.width),
+            height: scaleDown(imgData.height),
+          },
+        }
+      );
       this.$refs.artsModal.hide();
     },
     async addObject(type, value = "", name = null, props = {}) {

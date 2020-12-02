@@ -573,11 +573,6 @@ export default {
         (s) => (this.selectedProductSizes[s].price = e)
       );
 
-      const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
-      this.selectedProductSizes = this.selectedProduct.variants[
-        firstVariantKey
-      ].sizes;
-
       _.keys(this.selectedProductSizes).map(
         (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
       );
