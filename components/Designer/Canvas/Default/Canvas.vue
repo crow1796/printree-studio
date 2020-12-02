@@ -381,13 +381,9 @@ export default {
       let type = "image";
       let value = res.data.imageKitLocation;
       if (file.type == "image/svg+xml") {
-        let el = document.createElement("canvas");
-        let ctx = el.getContext("2d");
+        let el = document.createElement("img");
 
-        const v = Canvg.fromString(ctx, file);
-        v.start();
-
-        el.innerHTML = value;
+        el.src = value;
         el.style.position = "absolute";
         el.style.visibility = "hidden";
         el.style.display = "block";

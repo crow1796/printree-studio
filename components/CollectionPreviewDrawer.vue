@@ -47,7 +47,7 @@
         <div class="flex flex-grow">
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
-              <div class="large-thumbnail w-6/12 flex flex-col">
+              <div class="large-thumbnail w-4/12 flex flex-col">
                 <div class="flex relative justify-center items-center">
                   <button
                     type="button"
@@ -58,10 +58,9 @@
                   >
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
-                  <!-- TODO: Add another button for downloading the design -->
                   <img
                     :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
-                    class="w-3/5"
+                    class="w-full"
                   />
                 </div>
                 <div class="variants flex mt-4">
