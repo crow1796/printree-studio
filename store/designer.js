@@ -337,6 +337,7 @@ const mutations = {
       )
     );
     _.set(tmpProduct, props.path, props.value);
+    console.log(tmpProduct)
     state.selectedProducts[
       _.findIndex(state.selectedProducts, { _id })
     ] = tmpProduct;

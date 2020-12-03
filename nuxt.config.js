@@ -81,10 +81,10 @@ module.exports = {
   ],
   storage: {
     cookie: {
-      prefix: "bizeno:",
+      prefix: "printreestudio:",
     },
     localStorage: {
-      prefix: "bizeno:",
+      prefix: "printreestudio:",
     },
   },
   /*

@@ -19,7 +19,7 @@
               <nuxt-link to="/">
                 <img
                   src="~/assets/images/logo-nav.png"
-                  alt="Bizeno"
+                  alt="Printree Studio"
                   class="w-20 object-fit"
                 />
               </nuxt-link>

@@ -32,7 +32,7 @@
         </div>
       </div>
     </VueTailwindModal>
-    <div class="flex flex-grow text-gray-600 overflow-hidden">
+    <div class="flex flex-grow text-gray-600">
       <div class="flex flex-col flex-grow">
         <div class="flex flex-grow-0 items-center border-b p-4">
           <div class="flex flex-grow justify-end">
@@ -58,6 +58,16 @@
                   >
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
+
+                  <a
+                    :href="`/admin/generate/${selectedProductVariantKey}`"
+                    class="absolute top-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
+                    title="View Design"
+                    target="_blank"
+                    v-tippy="{arrow: true}"
+                  >
+                    <font-awesome-icon :icon="['fas', 'eye']" />
+                  </a>
                   <img
                     :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
                     class="w-full"
@@ -297,10 +307,10 @@ export default {
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
-            let totalForBizeno = baseCost * size.quantity;
+            let totalForPrintree = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
-            let net = totalWithCustomerPrice - totalForBizeno;
+            let net = totalWithCustomerPrice - totalForPrintree;
             totalProfit += net;
           });
         });
