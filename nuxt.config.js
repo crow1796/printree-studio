@@ -96,6 +96,7 @@ module.exports = {
   },
   auth: {
     localStorage: false,
+    resetOnError: true,
     cookie: {
       options: {
         expires: 7

@@ -196,6 +196,7 @@
                           <span>{{ col.name }}</span>
                         </a>
                         <a
+                          v-if="col.status !== 'approved'"
                           href="#"
                           class="text-xs ml-1 hover:text-gray-800 text-gray-700"
                           @click.prevent="showCollectionRenameModal(col)"
