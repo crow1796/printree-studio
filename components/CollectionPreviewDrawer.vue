@@ -307,10 +307,10 @@ export default {
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
-            let totalForBizeno = baseCost * size.quantity;
+            let totalForPrintree = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
-            let net = totalWithCustomerPrice - totalForBizeno;
+            let net = totalWithCustomerPrice - totalForPrintree;
             totalProfit += net;
           });
         });

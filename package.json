@@ -1,7 +1,7 @@
 {
-  "name": "bizeno",
+  "name": "printreestudio",
   "version": "1.0.0",
-  "description": "Bizeno",
+  "description": "Printree Studio",
   "author": "Joshua Tundag",
   "private": true,
   "scripts": {

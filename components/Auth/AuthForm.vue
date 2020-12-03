@@ -114,7 +114,7 @@
     <div class="bot-text flex">
       <div class="text-center">
         By using
-        <strong>bizeno</strong> you also agree to our
+        <strong>printree studio</strong> you also agree to our
         <a href="#" class="text-blue-400">Terms of Service</a> and
         <a href="#" class="text-blue-400">Privacy Policy</a>.
       </div>
