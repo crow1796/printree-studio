@@ -42,7 +42,7 @@
         <li v-for="(error, i) in productErrors" :key="i">{{ error }}</li>
       </ul>
     </VueTailwindToast>
-    <div class="flex h-full w-full text-gray-600 overflow-hidden" v-if="selectedProduct">
+    <div class="flex h-full w-full text-gray-600" v-if="selectedProduct">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4">
           <!-- <div class="flex w-4/12 uppercase flex-col">
@@ -504,16 +504,6 @@ export default {
       const isValidated = this.validateAndSaveMeta();
       if (!isValidated) return;
 
-      const variationKeys = _.keys(this.selectedProduct.variants);
-      const nextVariationKey =
-        variationKeys[
-          variationKeys.indexOf(this.selectedProductVariantKey) + 1
-        ];
-      if (nextVariationKey) {
-        this.selectedProductVariantKey = nextVariationKey;
-        return;
-      }
-
       const nextProductIndex =
         _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) +
         1;
@@ -570,28 +560,34 @@ export default {
         : 0;
 
       _.keys(this.selectedProductSizes).map(
-        (s) => (this.selectedProductSizes[s].price = e)
-      );
-
-      _.keys(this.selectedProductSizes).map(
         (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
       );
 
-      this.generatedProducts[
-        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
-      ].variants[
-        this.selectedProductVariantKey
-      ].sizes = this.selectedProductSizes;
-
-      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+      console.log(this.selectedProduct.variants);
+      const productIndex = _.findIndex(this.selectedProducts, {
         _id: this.selectedProduct._id,
-        props: {
-          path: `variants[${this.selectedVariantIndex}].sizes`,
-          value: _.map(this.selectedProductSizes, (s) => ({
-            ...s,
-            quantity: 0,
-          })),
-        },
+      });
+      _.map(this.selectedProduct.variants, (v, vi) => {
+        const variantIndex = _.findIndex(
+          this.selectedProducts[productIndex].variants,
+          { _id: vi }
+        );
+        this.$store.commit("designer/PRODUCT_PROPERTIES", {
+          _id: this.selectedProduct._id,
+          props: {
+            path: `variants[${variantIndex}].sizes`,
+            value: _.map(
+              this.selectedProducts[productIndex].variants[variantIndex].sizes,
+              (s) => {
+                return {
+                  ...s,
+                  price: (_.find(this.selectedProductSizes, { name: s.name }))?.price,
+                  quantity: 0,
+                };
+              }
+            ),
+          },
+        });
       });
 
       this.calculateProfit();
