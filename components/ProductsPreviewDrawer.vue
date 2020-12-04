@@ -563,7 +563,6 @@ export default {
         (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
       );
 
-      console.log(this.selectedProduct.variants);
       const productIndex = _.findIndex(this.selectedProducts, {
         _id: this.selectedProduct._id,
       });
