@@ -130,7 +130,6 @@ import LeftActions from "@/components/Designer/Canvas/Actions/Left";
 import TopActions from "@/components/Designer/Canvas/Actions/Top";
 import DesignerActions from "@/components/Designer/Canvas/Actions/index";
 import { scaleDown } from "~/plugins/scaler";
-import Canvg from "canvg";
 import { mapGetters } from "vuex";
 
 export default {
@@ -405,7 +404,7 @@ export default {
         .pop()
         .trim();
       const img = new Image();
-      img.src = asset.imageKitLocation;
+      img.src = ext === 'svg' ? asset.location : asset.imageKitLocation;
       const imgData = await new Promise((resolve, reject) => {
         img.onload = function () {
           resolve(this);
@@ -413,7 +412,7 @@ export default {
       });
       this.addObject(
         ext === "svg" ? "svg" : "image",
-        asset.imageKitLocation,
+        ext === 'svg' ? asset.location : asset.imageKitLocation,
         "",
         {
           bounds: {

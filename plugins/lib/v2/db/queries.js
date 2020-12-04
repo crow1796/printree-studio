@@ -288,6 +288,9 @@ export default {
         assetsOfCurrentUser {
             _id
             location
+            originalName
+            mimetype
+            location
             imageKitLocation
             key
         }
@@ -481,6 +484,7 @@ export default {
     generateVariantImages: `
     query($id: ID!) {
         generateVariantImages(_id: $id){
+            _id
             color
             design
             isEmpty
