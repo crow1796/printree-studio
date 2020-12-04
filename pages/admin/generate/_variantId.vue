@@ -16,12 +16,25 @@
               class="px-2 py-1 text-xs bg-white hover:bg-gray-200 border rounded mx-1"
               @click="download(img)"
             >
-              <span class="mr-1">Download</span>
+              <span class="mr-1">Download as PNG</span>
+              <font-awesome-icon :icon="['fas', 'file-download']" />
+            </button>
+            <button
+              type="button"
+              class="px-2 py-1 text-xs bg-white hover:bg-gray-200 border rounded mx-1"
+              @click="download(img, 'svg')"
+            >
+              <span class="mr-1">Download as SVG</span>
               <font-awesome-icon :icon="['fas', 'file-download']" />
             </button>
           </div>
         </div>
-        <div class="generated-image" :style="{backgroundColor: img.color}" v-html="img.design"></div>
+        <div
+          class="generated-image"
+          :style="{backgroundColor: img.color}"
+          v-html="img.design"
+          :ref="`design-${img.side}`"
+        ></div>
       </div>
     </div>
   </div>
@@ -29,6 +42,7 @@
 
 <script>
 import AreaLoader from "@/components/AreaLoader";
+import { saveSvgAsPng, svgAsPngUri } from "save-svg-as-png";
 
 export default {
   layout: "admin_dashboard",
@@ -48,12 +62,28 @@ export default {
     };
   },
   methods: {
-    download(img) {
+    async download(img, type = "png") {
+      let content = "";
+
+      switch (type) {
+        case "png":
+          content = await svgAsPngUri(
+            this.$refs[`design-${img.side}`][0].children[0],
+            `${img._id}-${img.side}.png`,
+            {
+              encoderOptions: 1.0,
+            }
+          );
+          break;
+        case "svg":
+          content = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
+            img.design
+          )}`;
+          break;
+      }
       const elem = window.document.createElement("a");
-      elem.href = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-        img.design
-      )}`;
-      elem.download = `${img.side}.svg`;
+      elem.href = content;
+      elem.download = `${img._id}-${img.side}.${type}`;
       document.body.appendChild(elem);
       elem.click();
       document.body.removeChild(elem);
