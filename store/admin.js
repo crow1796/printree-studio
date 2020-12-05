@@ -75,8 +75,8 @@ const actions = {
     const users = await this.$api.admin.getUsers()
     context.commit('USERS', users)
   },
-  async getCollections(context) {
-    const collections = await this.$api.admin.getCollections()
+  async getCollections(context, searchQuery) {
+    const collections = await this.$api.admin.getCollections(searchQuery)
     context.commit('COLLECTIONS', collections)
   },
   async updateUser(context, data) {
