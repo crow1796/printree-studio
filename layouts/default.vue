@@ -7,7 +7,7 @@
           <div class="flex items-center justify-between py-4">
             <div class="flex flex-grow">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree" class="w-24" />
+                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-20 object-fit" />
               </nuxt-link>
             </div>
 
@@ -23,7 +23,7 @@
                 v-if="isLoggedIn && user"
               >
                 <span>
-                  <span>{{ user.shopName }}'s</span>
+                  <span>{{ user.shopName ? `${user.shopName}'s` : user.email  }}</span>
                   <span class="ml-3">
                     <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </span>
@@ -76,7 +76,7 @@ import Footer from "@/components/Footer";
 
 export default {
   head: {
-    title: "Printree",
+    title: "Printree Studio",
   },
   components: {
     Footer,

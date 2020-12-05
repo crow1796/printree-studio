@@ -68,7 +68,7 @@
     <div class="how-it-works mb-12">
       <div class="text-center text-4xl font-black tracking-widest my-6">
         HOW DOES
-        <span class="text-primary">PRINTREE</span> WORKS?
+        <span class="text-primary">PRINTREE STUDIO</span> WORKS?
       </div>
       <div class="flex sm:flex-row flex-col justify-center items-center">
         <div class="p-6 shadow-xl rounded mx-4 w-3/12">

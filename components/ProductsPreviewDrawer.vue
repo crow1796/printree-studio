@@ -42,7 +42,7 @@
         <li v-for="(error, i) in productErrors" :key="i">{{ error }}</li>
       </ul>
     </VueTailwindToast>
-    <div class="flex h-full w-full text-gray-600 overflow-hidden" v-if="selectedProduct">
+    <div class="flex h-full w-full text-gray-600" v-if="selectedProduct">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4">
           <!-- <div class="flex w-4/12 uppercase flex-col">
@@ -66,30 +66,6 @@
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
           </div>-->
-          <div class="flex flex-grow uppercase font-bold justify-start">
-            <div class="flex flex-col items-center">
-              <div>TOTAL ESTIMATED PROFIT</div>
-              <div class="text-primary">
-                <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
-                <number
-                  v-if="estimatedMinProfit"
-                  animationPaused
-                  ref="estMinProfit"
-                  :to="estimatedMinProfit"
-                  :format="(num) => num.formatMoney('₱ ')"
-                  :duration=".4"
-                />
-                <font-awesome-icon v-if="estimatedMinProfit" :icon="['fas', 'minus']" />
-                <number
-                  animationPaused
-                  ref="estMaxProfit"
-                  :to="estimatedMaxProfit"
-                  :format="(num) => num.formatMoney('₱ ')"
-                  :duration=".4"
-                />
-              </div>
-            </div>
-          </div>
           <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
@@ -103,11 +79,23 @@
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
-                <img
-                  :src="`${_firstFullThumbnailOf(selectedProduct)}`"
-                  :key="`full_${selectedProduct._id}_${drawerId}`"
-                  :id="`full_${selectedProduct._id}_${drawerId}`"
-                />
+                <div class="flex relative justify-center items-center">
+                  <button
+                    type="button"
+                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
+                    @click="switchSides"
+                    title="Rotate"
+                    v-tippy="{arrow: true}"
+                  >
+                    <font-awesome-icon :icon="['fas', 'sync-alt']" />
+                  </button>
+
+                  <img
+                    :src="`${_firstFullThumbnailOf(selectedProduct)}`"
+                    :key="`full_${selectedProduct._id}_${drawerId}`"
+                    :id="`full_${selectedProduct._id}_${drawerId}`"
+                  />
+                </div>
                 <div class="variants flex">
                   <div
                     class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
@@ -135,25 +123,30 @@
                     class="font-bold w-full outline-none border rounded px-4 py-2"
                     placeholder="What's the name of this product?*"
                     v-model="selectedProduct.meta.name"
+                    @keyup="updateProductMeta"
                   />
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
                   <div class="relative flex flex-col">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-3">Base Price</div>
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
                     <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
                   </div>
                   <div class="relative flex flex-col">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Profit*</div>
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
-                      <span
-                        class="border rounded px-4 py-2"
-                        contenteditable="true"
-                        @input="setProductProfit"
-                      >{{ selectedProductProfit }}</span>&nbsp;=&nbsp;
+                      <autosize-input
+                        input-class="border rounded px-4 py-2 text-center"
+                        placeholder="0.00"
+                        @change="setProductProfit"
+                        :minWidth="60"
+                        :value="selectedProductProfit"
+                      />&nbsp;=&nbsp;
                     </div>
                   </div>
-                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
+                  <div
+                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center"
+                  >
                     <div
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
@@ -168,40 +161,7 @@
                   </div>
                 </div>
                 <div>
-                  <div class="font-bold"></div>
-                  <div class="flex flex-wrap">
-                    <div
-                      class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-2"
-                      v-for="(size, i) in selectedProduct
-                        .variants[selectedProductVariantKey].sizes"
-                      :key="i"
-                    >
-                      <div class="flex items-center">
-                        <div class="text-center mr-2">{{ size.name }}:</div>
-                        <div>
-                          <VueNumericInput
-                            align="center"
-                            style="width: 90px"
-                            class="ml-1"
-                            :min="1"
-                            v-model="size.quantity"
-                            @input="calculateProfit(size.name)"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- <div class="font-bold mt-2">
-                    <span>Printing Options</span>
-                    <span title="Quality & Price may vary" v-tippy="{ arrow: true }">
-                      <font-awesome-icon :icon="['fas', 'question-circle']" />
-                    </span>
-                  </div>
-                  <OptionButtons
-                    :options="printingOptions"
-                    v-model="selectedProduct.meta.printing_option"
-                  />-->
-                  <div class="mt-2">
+                  <div class="my-2">
                     <textarea
                       name="product_description"
                       id="product_description"
@@ -211,6 +171,56 @@
                       placeholder="Describe this product (optional)"
                       v-model="selectedProduct.meta.description"
                     ></textarea>
+                  </div>
+
+                  <div class="bg-gray-200 rounded p-4 shadow mt-8">
+                    <div class="font-bold uppercase">Profit Calculator</div>
+                    <div class="flex flex-wrap">
+                      <div
+                        class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-4 bg-white"
+                        v-for="(size, i) in selectedProduct
+                          .variants[selectedProductVariantKey].sizes"
+                        :key="i"
+                      >
+                        <div class="flex items-center">
+                          <div class="text-center mr-2">{{ size.name }}:</div>
+                          <div>
+                            <VueNumericInput
+                              align="center"
+                              style="width: 90px"
+                              class="ml-1"
+                              :min="0"
+                              v-model="size.quantity"
+                              @input="calculateProfit(size.name)"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
+                    >
+                      <div>TOTAL ESTIMATED PROFIT</div>
+                      <div>
+                        <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
+                        <number
+                          v-if="estimatedMinProfit"
+                          animationPaused
+                          ref="estMinProfit"
+                          :to="estimatedMinProfit"
+                          :format="(num) => num.formatMoney('₱ ')"
+                          :duration=".4"
+                        />
+                        <span class="ml-2">
+                          <span v-tippy="{arrow: true}" title="-7% service fee">
+                            <font-awesome-icon
+                              v-if="estimatedMinProfit"
+                              :icon="['fas', 'question-circle']"
+                            />
+                          </span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -274,27 +284,31 @@ import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueTailwindToast from "@/components/VueTailwindToast";
 import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
+import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
+const SERVICE_FEE = 0.07;
 
 export default {
   props: {
     products: {
       required: true,
-      default: () => ([])
+      default: () => [],
     },
     meta: {
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
     VueTailwindDrawer,
     VueNumericInput,
     OptionButtons,
     VueTailwindModal,
-    VueTailwindToast
+    VueTailwindToast,
+    AutosizeInput,
   },
   data() {
     return {
+      selectedProductSide: "front",
       isLoading: false,
       productErrors: [],
       generatedProducts: [],
@@ -305,29 +319,28 @@ export default {
       printingOptions: [
         {
           label: "Screen Printing",
-          value: "Screen Printing"
+          value: "Screen Printing",
         },
         {
           label: "Direct To Garments (DTG)",
-          value: "Direct To Garments (DTG)"
+          value: "Direct To Garments (DTG)",
         },
         {
           label: "Heat Press",
-          value: "Heat Press"
-        }
+          value: "Heat Press",
+        },
       ],
       selectedProductProfit: 0,
       selectedProductSizes: [],
       estimatedMinProfit: 0,
-      estimatedMaxProfit: 0,
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
-      isCalculating: false
+      isCalculating: false,
     };
   },
   computed: {
     ...mapGetters({
-      selectedProducts: "designer/selectedProducts"
+      selectedProducts: "designer/selectedProducts",
     }),
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);
@@ -345,13 +358,27 @@ export default {
       return this.selectedProductBasePrice + this.selectedProductProfit;
     },
     selectedVariantIndex() {
-      const product = {..._.find(this.selectedProducts, { _id: this.selectedProduct._id })};
+      const product = {
+        ..._.find(this.selectedProducts, { _id: this.selectedProduct._id }),
+      };
       return _.findIndex(product.variants, {
-        _id: this.selectedProductVariantKey
+        _id: this.selectedProductVariantKey,
       });
-    }
+    },
   },
   methods: {
+    switchSides() {
+      const sides = _.keys(
+        this.selectedProduct.variants[this.selectedProductVariantKey].sides
+      );
+      const sideIndex = sides.indexOf(this.selectedProductSide);
+      const nextSide = sides[sideIndex + 1];
+      if (nextSide) {
+        this.selectedProductSide = nextSide;
+        return;
+      }
+      this.selectedProductSide = _.first(sides);
+    },
     makeId(length = 5) {
       var result = "";
       var characters =
@@ -369,17 +396,17 @@ export default {
         this.isLoading = true;
         this.$refs.publishConfirmationModal.hide();
         await this.$store.commit("designer/COLLECTION_STATUS", "pending");
-        await this.$store.dispatch("designer/saveData", { shouldGenerateImages: false });
+        await this.$store.dispatch("designer/saveData", {
+          shouldGenerateImages: false,
+        });
         this.$router.replace("/dashboard/collections");
         return;
       }
     },
-    _firstFullThumbnailOf(product){
+    _firstFullThumbnailOf(product) {
       return product.variants[this.selectedProductVariantKey].sides[
-        this._firstPrintableAreaOf(
-          product.variants[this.selectedProductVariantKey].sides
-        )
-      ].with_placeholder
+        this.selectedProductSide
+      ]?.with_placeholder;
     },
     _placeholderOfFirstVariantOf(product) {
       const firstKey = _.first(_.keys(product.variants));
@@ -407,6 +434,9 @@ export default {
       this.$store.commit("designer/DESIGN_PLAN", plan);
     },
     previousProduct() {
+      const isValidated = this.validateAndSaveMeta();
+      if (!isValidated) return;
+
       const previousProductIndex =
         _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) -
         1;
@@ -436,6 +466,19 @@ export default {
 
       this.selectProduct(product);
     },
+    updateProductMeta() {
+      this.generatedProducts[
+        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
+      ].meta = this.selectedProduct.meta;
+
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+        _id: this.selectedProduct._id,
+        props: {
+          path: `meta`,
+          value: this.selectedProduct.meta,
+        },
+      });
+    },
     validateAndSaveMeta() {
       let isDirty = false;
       this.productErrors = [];
@@ -450,49 +493,16 @@ export default {
         this.productErrors.push("How much would your profit be?");
       }
 
-      const totalQuantity = _.sum(
-        _.map(
-          this.selectedProduct.variants[this.selectedProductVariantKey].sizes,
-          "quantity"
-        )
-      );
-
-      if (!totalQuantity) {
-        isDirty = true;
-        this.productErrors.push(
-          `How many of this variant would you like to ${this.meta.plan}?`
-        );
-      }
-
-      if (totalQuantity < 5) {
-        isDirty = true;
-        this.productErrors.push(`Must have a minimum quantity of 5`);
-      }
-
       if (isDirty) {
         this.$refs.productValidationToast.show();
         return false;
       }
 
-      this.$store.commit("designer/CURRENT_PRODUCT_META", {
-        _id: this.selectedProduct._id,
-        meta: this.selectedProduct.meta
-      });
       return true;
     },
     nextProduct() {
       const isValidated = this.validateAndSaveMeta();
       if (!isValidated) return;
-
-      const variationKeys = _.keys(this.selectedProduct.variants);
-      const nextVariationKey =
-        variationKeys[
-          variationKeys.indexOf(this.selectedProductVariantKey) + 1
-        ];
-      if (nextVariationKey) {
-        this.selectedProductVariantKey = nextVariationKey;
-        return;
-      }
 
       const nextProductIndex =
         _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) +
@@ -507,21 +517,17 @@ export default {
       this.selectProduct(nextProduct);
     },
     setQuantityAndPrice(n, p, v) {
-      this.$store.commit("designer/CURRENT_VARIANT_PROPERTIES", {
-        path: `sizes.${n}.${p}`,
-        value: v
-      });
       if (this.meta.plan == "buy") return;
       this._calculateEstProfit();
     },
     _calculateEstProfit() {
       let totalProfit = 0;
-      _.map(this.generatedProducts, product => {
-        _.map(product.variants, variant => {
+      _.map(this.generatedProducts, (product) => {
+        _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
               variant.available_sizes,
-              s => s.name === size.name
+              (s) => s.name === size.name
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
@@ -533,29 +539,15 @@ export default {
           });
         });
       });
-      let minProfit = totalProfit - totalProfit * 0.05;
-      let maxProfit = totalProfit + totalProfit * 0.05;
+      let minProfit = totalProfit - totalProfit * SERVICE_FEE;
       this.estimatedMinProfit = minProfit;
-      this.estimatedMaxProfit = maxProfit;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play();
       });
     },
     calculateProfit(size) {
       clearTimeout(this.calculatorTimeout);
       this.isCalculating = true;
-      if (size) {
-        this.$store.commit("designer/PRODUCT_PROPERTIES", {
-          _id: this.selectedProduct._id,
-          props: {
-            path: `variants.${this.selectedVariantIndex}.sizes.${size}.quantity`,
-            value: this.selectedProductSizes[
-              _.findIndex(this.selectedProductSizes, { name: size })
-            ].quantity
-          }
-        });
-      }
 
       this.calculatorTimeout = setTimeout(() => {
         this._calculateEstProfit();
@@ -563,26 +555,58 @@ export default {
       }, 2000);
     },
     setProductProfit(e) {
-      this.selectedProductProfit = parseFloat(e.target.innerHTML);
+      this.selectedProductProfit = e.target.value
+        ? parseFloat(e.target.value)
+        : 0;
 
       _.keys(this.selectedProductSizes).map(
-        s => (this.selectedProductSizes[s].price = e)
+        (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
       );
-    }
+
+      const productIndex = _.findIndex(this.selectedProducts, {
+        _id: this.selectedProduct._id,
+      });
+      _.map(this.selectedProduct.variants, (v, vi) => {
+        const variantIndex = _.findIndex(
+          this.selectedProducts[productIndex].variants,
+          { _id: vi }
+        );
+        this.$store.commit("designer/PRODUCT_PROPERTIES", {
+          _id: this.selectedProduct._id,
+          props: {
+            path: `variants[${variantIndex}].sizes`,
+            value: _.map(
+              this.selectedProducts[productIndex].variants[variantIndex].sizes,
+              (s) => {
+                return {
+                  ...s,
+                  price: (_.find(this.selectedProductSizes, { name: s.name }))?.price,
+                  quantity: 0,
+                };
+              }
+            ),
+          },
+        });
+      });
+
+      this.calculateProfit();
+    },
   },
   watch: {
     products: {
-      handler(to, from){
-        this.generatedProducts = [...to]
-        this.selectedProduct = to[0] || null
-        this.selectedProductVariantKey = this.selectedProduct ? _.first(_.keys(this.selectedProduct.variants)) : null
+      handler(to, from) {
+        this.generatedProducts = [...to];
+        this.selectedProduct = to[0] || null;
+        this.selectedProductVariantKey = this.selectedProduct
+          ? _.first(_.keys(this.selectedProduct.variants))
+          : null;
       },
-      immediate: true
+      immediate: true,
     },
     selectedProduct: {
       immediate: true,
       handler(to, from) {
-        if(!to) return;
+        if (!to) return;
         const firstVariantKey = _.first(_.keys(to.variants));
         this.selectedProductSizes = JSON.parse(
           JSON.stringify(to.variants[firstVariantKey].sizes)
@@ -596,56 +620,33 @@ export default {
           to.variants[firstVariantKey].sizes[0].price;
 
         _.keys(this.selectedProductSizes).map(
-          s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
+          (s) =>
+            (this.selectedProductSizes[s].price = this.selectedProductProfit)
         );
 
         this.selectedProduct.variants[
           this.selectedProductVariantKey
         ].sizes = this.selectedProductSizes;
 
+        const initialSide = this._firstPrintableAreaOf(
+          to.variants[this.selectedProductVariantKey].sides
+        );
+        this.selectedProductSide = initialSide;
+
         this._calculateEstProfit();
-      }
+      },
     },
     selectedProductVariantKey: {
       immediate: true,
       handler(to) {
-        if(!this.selectedProduct) return;
+        if (!this.selectedProduct) return;
         this.selectedProductSizes = this.selectedProduct.variants[to].sizes;
 
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
-      }
+      },
     },
-    selectedProductProfit: {
-      immediate: true,
-      handler(to) {
-        if(!this.selectedProduct) return;
-        const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
-        this.selectedProductSizes = this.selectedProduct.variants[
-          firstVariantKey
-        ].sizes;
-
-        _.keys(this.selectedProductSizes).map(
-          s => (this.selectedProductSizes[s].price = to)
-        );
-
-        this.generatedProducts[
-          _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
-        ].variants[
-          this.selectedProductVariantKey
-        ].sizes = this.selectedProductSizes;
-
-        this.$store.commit("designer/PRODUCT_PROPERTIES", {
-          _id: this.selectedProduct._id,
-          props: {
-            path: `variants.${this.selectedVariantIndex}.sizes`,
-            value: this.selectedProductSizes
-          }
-        });
-        this.calculateProfit();
-      }
-    }
-  }
+  },
 };
 </script>

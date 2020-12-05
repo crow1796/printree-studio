@@ -1,8 +1,8 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -27,6 +27,7 @@ export default (axios) => {
       processPayoutRequest: (payout) => processPayoutRequest(axios, payout),
       declinePayoutRequest: (payout) => declinePayoutRequest(axios, payout),
       paidPayoutRequest: (payout) => paidPayoutRequest(axios, payout),
+      generateVariantImages: (data) => generateVariantImages(axios, data)
     },
     // marketplace
     marketplace: {
@@ -40,6 +41,7 @@ export default (axios) => {
       editPayoutRequest: (data) => editPayoutRequest(axios, data),
       cancelPayoutRequest: (id) => cancelPayoutRequest(axios, id),
       updateAccount: (data) => updateAccount(axios, data),
+      removeProductFromCollection: (id) => removeProductFromCollection(axios, id),
     }
   };
 };

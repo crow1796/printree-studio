@@ -24,7 +24,9 @@ module.exports = {
       zIndex: {
         '50': 50,
         '60': 60,
-        '70': 70
+        '70': 70,
+        '100': 100,
+        'topmost': 99999
       },
       minHeight: {
         'area-loader': '370px'

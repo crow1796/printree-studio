@@ -111,3 +111,14 @@ export const paidPayoutRequest = async (axios, { _id }) => {
   const { paidPayoutRequest } = data.data;
   return paidPayoutRequest;
 }
+
+export const generateVariantImages = async (axios, { _id }) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.generateVariantImages,
+    variables: {
+      id: _id
+    },
+  });
+  const { generateVariantImages } = data.data;
+  return generateVariantImages;
+}

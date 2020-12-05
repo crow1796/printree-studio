@@ -67,6 +67,10 @@ const getters = {
 }
 
 const actions = {
+  async generateVariantImages(context, data) {
+    const generatedVariantImages = await this.$api.admin.generateVariantImages(data)
+    return generatedVariantImages
+  },
   async getUsers(context) {
     const users = await this.$api.admin.getUsers()
     context.commit('USERS', users)

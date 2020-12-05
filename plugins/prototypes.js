@@ -1,7 +1,7 @@
-const formatMoney = function(currSign, decPlaces, decSep, thouSep) {
+const formatMoney = function (currSign, decPlaces, decSep, thouSep) {
   let number = this.valueOf()
   decPlaces = isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces,
-  decSep = typeof decSep === "undefined" ? "." : decSep;
+    decSep = typeof decSep === "undefined" ? "." : decSep;
   thouSep = typeof thouSep === "undefined" ? "," : thouSep;
   var sign = number < 0 ? "-" : "";
   var i = String(parseInt(number = Math.abs(Number(number) || 0).toFixed(decPlaces)));

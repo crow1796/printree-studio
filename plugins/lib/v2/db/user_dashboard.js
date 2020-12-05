@@ -69,3 +69,14 @@ export const updateAccount = async (axios, userInfo) => {
   const updateAccount = data.data.updateAccount;
   return updateAccount;
 }
+
+export const removeProductFromCollection = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.removeProductFromCollection,
+    variables: {
+      id,
+    }
+  });
+  const removeProductFromCollection = data.data.removeProductFromCollection;
+  return removeProductFromCollection;
+}

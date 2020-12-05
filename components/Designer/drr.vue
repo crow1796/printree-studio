@@ -633,7 +633,7 @@
           pn = p.rotate(-phi)
           this.width = stickStartPos.width + dirX * pn.x
           this.height = stickStartPos.height + dirY * pn.y
-
+          // TODO: Add maximum object resize limit
           if (!this.resizeStartEmitted) {
             this.$emit('resizestart', this.startRect);
             this.resizeStartEmitted = true

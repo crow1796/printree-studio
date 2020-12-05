@@ -1,7 +1,6 @@
 const webpack = require("webpack");
 
 module.exports = {
-  mode: "universal",
   server: {
     port: process.env.PORT || 3333
   },
@@ -44,6 +43,7 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    { src: '~/plugins/vuex-persist', ssr: false },
     "~/plugins/prototypes.js",
     "~/plugins/external-installs.js",
     "~/plugins/api.js",
@@ -80,10 +80,10 @@ module.exports = {
   ],
   storage: {
     cookie: {
-      prefix: "printree:",
+      prefix: "printreestudio:",
     },
     localStorage: {
-      prefix: "printree:",
+      prefix: "printreestudio:",
     },
   },
   /*
@@ -95,6 +95,7 @@ module.exports = {
   },
   auth: {
     localStorage: false,
+    resetOnError: true,
     cookie: {
       options: {
         expires: 7
@@ -108,7 +109,7 @@ module.exports = {
       local: {
         endpoints: {
           login: { url: 'login', method: 'post', propertyName: 'token' },
-          user: { url: 'me', method: 'post', propertyName: 'user'  },
+          user: { url: 'me', method: 'post', propertyName: 'user' },
           logout: false
         }
       }
