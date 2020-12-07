@@ -76,7 +76,7 @@
             @click="showAvailableProducts"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
-            <span class="font-bold">MANAGE PRODUCTS</span>
+            <span class="font-bold">ADD MORE PRODUCTS</span>
           </div>
           <div class="flex flex-wrap flex mt-4 overflow-auto px-4 pb-4">
             <div class="p-1 w-6/12">
