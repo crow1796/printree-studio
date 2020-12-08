@@ -7,7 +7,7 @@
           <div class="flex items-center justify-between py-4">
             <div class="flex flex-grow">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-20 object-fit" />
+                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
               </nuxt-link>
             </div>
 

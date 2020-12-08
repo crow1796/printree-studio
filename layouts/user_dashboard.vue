@@ -20,7 +20,7 @@
                 <img
                   src="~/assets/images/logo-nav.png"
                   alt="Printree Studio"
-                  class="w-20 object-fit"
+                  class="w-28 object-fit"
                 />
               </nuxt-link>
             </div>
