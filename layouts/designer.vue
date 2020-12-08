@@ -42,7 +42,7 @@
       <AuthModal ref="authModal" />
       <div class="w-full p-4 flex border-b">
         <div class="flex w-1/3">
-          <img src="~/assets/images/logo.png" alt="Printree Studio" class="w-20 object-contain" />
+          <img src="~/assets/images/logo.png" alt="Printree Studio" class="w-24 object-contain" />
         </div>
         <div class="flex w-1/3 justify-center items-center">
           <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">

@@ -2,6 +2,9 @@
 module.exports = {
   theme: {
     extend: {
+      width: {
+        '28': '8rem'
+      },
       colors: {
         'smoke-darkest': 'rgba(0, 0, 0, 0.9)',
         'smoke-darker': 'rgba(0, 0, 0, 0.75)',

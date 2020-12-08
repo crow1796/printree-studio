@@ -17,7 +17,7 @@
             </div>
             <div class="w-1/2 md:w-auto text-center">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-24" />
+                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right" v-if="isLoggedIn && user">
