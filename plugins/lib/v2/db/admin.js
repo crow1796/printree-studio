@@ -1,12 +1,12 @@
 import queries from "./queries";
 
-export const getCollections = async (axios) => {
+export const getCollections = async (axios, searchQuery) => {
   const { data } = await axios.post("/gql", {
     query: queries.getCollections,
     variables: {
       searchQuery: {
         plan: "Sell",
-        status: ["pending", "approved", "reviewing"],
+        status: searchQuery,
         sorting: {
           field: "created_at",
           order: "ASC"
