@@ -2,6 +2,55 @@
   <VueTailwindDrawer ref="drawer" width="100%">
     <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
+      ref="collectionRenameModal"
+      width="30%"
+      :backdrop="false"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase justify-center flex-grow">
+              <strong>Collection Name</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body p-4">
+          <div>
+            <label for="newCollectionName" class="font-bold mb-3 block">Collection Name</label>
+            <input
+              type="text"
+              name="newCollectionName"
+              class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+              :class="{ 'border-red-400': errors.has('newCollectionName'), 'focus:border-gray-600': !errors.has('newCollectionName') }"
+              :placeholder="currentDesignName"
+              v-validate="'required'"
+              data-vv-as="Collection Name"
+              v-model="newCollectionName"
+              @keyup.enter="renameCollection"
+            />
+            <span
+              class="text-red-700 text-xs pt-1 font-bold inline-block"
+              v-if="errors.has('newCollectionName')"
+            >{{ errors.first('newCollectionName') }}</span>
+          </div>
+        </div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="hideCollectionRenameModal"
+          >Cancel</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="renameCollection"
+          >Save</button>
+        </div>
+      </div>
+    </VueTailwindModal>
+    <VueTailwindModal
       ref="publishConfirmationModal"
       width="30%"
       content-class="rounded-none shadow-none text-gray-600"
@@ -336,11 +385,13 @@ export default {
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
       isCalculating: false,
+      newCollectionName: this.currentDesignName,
     };
   },
   computed: {
     ...mapGetters({
       selectedProducts: "designer/selectedProducts",
+      currentDesignName: "designer/currentDesignName",
     }),
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);
@@ -510,6 +561,11 @@ export default {
       const nextProduct = this.generatedProducts[nextProductIndex];
 
       if (!nextProduct) {
+        if (
+          this.currentDesignName === "Untitled Collection" ||
+          !this.currentDesignName
+        )
+          return this.showCollectionRenameModal();
         this.$refs.publishConfirmationModal.show();
         return;
       }
@@ -580,7 +636,8 @@ export default {
               (s) => {
                 return {
                   ...s,
-                  price: (_.find(this.selectedProductSizes, { name: s.name }))?.price,
+                  price: _.find(this.selectedProductSizes, { name: s.name })
+                    ?.price,
                   quantity: 0,
                 };
               }
@@ -590,6 +647,25 @@ export default {
       });
 
       this.calculateProfit();
+    },
+    showCollectionRenameModal() {
+      this.$refs.collectionRenameModal.show();
+    },
+    async renameCollection() {
+      let validationResponse = await this.$validator.validateAll({
+        newCollectionName: this.newCollectionName,
+      });
+      if (!validationResponse || this.isRenameLoading) return;
+      if (this.currentDesignName === this.newCollectionName) return;
+
+      this.$store.commit("designer/DESIGN_NAME", this.newCollectionName);
+
+      this.$validator.reset();
+      this.hideCollectionRenameModal();
+      this.$refs.publishConfirmationModal.show();
+    },
+    hideCollectionRenameModal() {
+      this.$refs.collectionRenameModal.hide();
     },
   },
   watch: {

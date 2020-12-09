@@ -189,14 +189,14 @@
                         <a
                           href="#"
                           :class="{
-                            'text-blue-600 hover:underline': col.status !== 'approved', 'cursor-default' : col.status === 'approved',
+                            'text-blue-600 hover:underline': !['approved', 'reviewing'].includes(col.status), 'cursor-default' :['approved', 'reviewing'].includes(col.status),
                           }"
                           @click.prevent="editCollection(col)"
                         >
                           <span>{{ col.name }}</span>
                         </a>
                         <a
-                          v-if="col.status !== 'approved'"
+                          v-if="!['approved', 'reviewing'].includes(col.status)"
                           href="#"
                           class="text-xs ml-1 hover:text-gray-800 text-gray-700"
                           @click.prevent="showCollectionRenameModal(col)"
@@ -217,7 +217,7 @@
                       aria-hidden
                       class="absolute inset-0 opacity-50 rounded-full"
                       :class="{
-                        'bg-green-200': col.status === 'approved',
+                        'bg-green-200':['approved'].includes(col.status),
                         'bg-blue-200': col.status === 'pending',
                         'bg-red-200': col.status === 'draft',
                       }"
@@ -228,7 +228,7 @@
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div class="flex items-center justify-center">
                     <button
-                      v-if="col.status != 'approved'"
+                      v-if="!['approved', 'reviewing'].includes(col.status)"
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Delete"
@@ -237,7 +237,7 @@
                     >
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
-                    <tippy trigger="click" arrow interactive v-if="col.status === 'approved'">
+                    <tippy trigger="click" arrow interactive v-if="['approved'].includes(col.status)">
                       <template v-slot:trigger>
                         <button
                           type="button"
@@ -344,7 +344,7 @@ export default {
       this.$router.push("/collection/designer");
     },
     editCollection(collection) {
-      if (collection.status === "approved") return;
+      if (['approved', 'reviewing'].includes(collection.status)) return;
       localStorage.removeItem("_stored_ptree");
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
