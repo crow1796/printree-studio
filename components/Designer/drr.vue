@@ -73,6 +73,20 @@
           return val > 0
         }
       },
+      maxW: {
+        type: Number,
+        required: true,
+        validator: function (val) {
+          return val > 0
+        }
+      },
+      maxH: {
+        type: Number,
+        required: true,
+        validator: function (val) {
+          return val > 0
+        }
+      },
       angle: {
         type: Number,
         default: 0,
@@ -126,6 +140,7 @@
 
     data: function () {
       return {
+        isMaxSize: false,
         active: this.selected,
         contentActive: false,
         cx: this.x,
@@ -155,7 +170,8 @@
           active: this.active,
           inactive: !this.active,
           dragging: this.bodyDrag,
-          'content-active': this.contentActive
+          'content-active': this.contentActive,
+          '-error': this.isMaxSize
         }
       },
 
@@ -628,12 +644,17 @@
             }
           }
 
-          this.cx = stickStartPos.cx + p.x / 2
-          this.cy = stickStartPos.cy + p.y / 2
+          let newW = stickStartPos.width + dirX * pn.x
+          let newH = stickStartPos.height + dirY * pn.y
+          let newX = stickStartPos.cx + p.x / 2
+          let newY = stickStartPos.cy + p.y / 2
+          this.isMaxSize = false
+          if(newW >= this.maxW || newH >= this.maxH) this.isMaxSize = true
+          this.cx = this.isMaxSize ? this.cx : newX
+          this.cy = this.isMaxSize ? this.cy : newY
           pn = p.rotate(-phi)
-          this.width = stickStartPos.width + dirX * pn.x
-          this.height = stickStartPos.height + dirY * pn.y
-          // TODO: Add maximum object resize limit
+          this.width = this.isMaxSize ? this.maxW : newW
+          this.height = this.isMaxSize ? this.maxH : newH
           if (!this.resizeStartEmitted) {
             this.$emit('resizestart', this.startRect);
             this.resizeStartEmitted = true
@@ -698,6 +719,15 @@
     left: 0;
     box-sizing: border-box;
     outline: 2px dashed lightskyblue;
+  }
+
+  .drr.active.-error:before {
+    outline: 2px dashed #ff1206;
+  }
+
+  .drr.active.-error:after {
+    content: "Reached maximum size.";
+    color: #ff1206;
   }
 
   .drr-stick {

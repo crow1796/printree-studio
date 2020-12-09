@@ -1,6 +1,6 @@
 <template>
   <div class="sm:px-8 relative">
-    <AreaLoader v-if="isLoading" fullscreen/>
+    <AreaLoader v-if="isLoading" fullscreen />
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
       v-if="generatedImages.length"
@@ -31,7 +31,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="col in collections" :key="col._id" :class="{'bg-red-100': col.status === 'declined'}">
+              <tr
+                v-for="col in collections"
+                :key="col._id"
+                :class="{'bg-red-100': col.status === 'declined'}"
+              >
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center">
                     <div class="ml-3">
@@ -59,25 +63,28 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <div class="border bg-gray-200 w-full bg-grey-light rounded-full" v-if="col.plan === 'Sell'">
+                  <div
+                    class="border bg-gray-200 w-full bg-grey-light rounded-full"
+                    v-if="col.plan === 'Sell'"
+                  >
                     <div
                       class="bg-primary text-xs rounded-full leading-none py-1 text-center text-white"
                       style="width: 45%"
                     >45%</div>
                   </div>
-                  <div v-else>
-                    N/A
-                  </div>
+                  <div v-else>N/A</div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <span
-                    class="relative inline-block px-3 py-1 font-semibold leading-tight text-xs"
-                  >
-                    <span aria-hidden class="absolute inset-0 rounded-full" :class="{
+                  <span class="relative inline-block px-3 py-1 font-semibold leading-tight text-xs">
+                    <span
+                      aria-hidden
+                      class="absolute inset-0 rounded-full"
+                      :class="{
                       'bg-green-200': col.status === 'approved',
                       'bg-red-300': col.status === 'declined',
                       'bg-blue-200': col.status === 'pending',
-                    }"></span>
+                    }"
+                    ></span>
                     <span class="relative uppercase font-black">{{ col.status }}</span>
                   </span>
                 </td>
@@ -112,46 +119,60 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import CollectionPreviewDrawer from '@/components/CollectionPreviewDrawer'
+import { mapGetters } from "vuex";
+import CollectionPreviewDrawer from "@/components/CollectionPreviewDrawer";
 
 export default {
-  layout: 'admin_dashboard',
+  layout: "admin_dashboard",
   components: {
-    CollectionPreviewDrawer
+    CollectionPreviewDrawer,
   },
   async mounted() {
     try {
-      await this.$store.dispatch('admin/getCollections')
-      this.isLoading = false
+      await this.$store.dispatch("admin/getCollections");
+      this.isLoading = false;
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   },
   data() {
     return {
       isLoading: true,
       generatedImages: [],
-      collectionMeta: {}
-    }
+      collectionMeta: {},
+    };
   },
   computed: {
     ...mapGetters({
-      collections: 'admin/collections'
-    })
+      collections: "admin/collections",
+    }),
   },
   methods: {
-    async previewCollection(collection){
-      this.isLoading = true
-      const collectionData = await this.$store.dispatch('designer/fetchDesignData', collection._id)
-      const res = await this.$store.dispatch('designer/generatePreview', collectionData)
-      this.isLoading = false
-      this.generatedImages = res.data
-      this.collectionMeta = collection
+    async previewCollection(collection) {
+      this.isLoading = true;
+      const collectionData = await this.$store.dispatch(
+        "designer/fetchDesignData",
+        collection._id
+      );
+      const res = await this.$store.dispatch(
+        "designer/generatePreview",
+        collectionData
+      );
+
+      if (collection.status === "pending")
+        await this.$store.dispatch("admin/updateCollectionStatus", {
+          _id: collection._id,
+          status: "reviewing",
+        });
+
+      this.isLoading = false;
+      this.generatedImages = res.data;
+      this.collectionMeta = collection;
       this.$nextTick(() => {
-        if(this.$refs.collectionPreviewDrawer) this.$refs.collectionPreviewDrawer.show()
-      })
-    }
-  }
-}
+        if (this.$refs.collectionPreviewDrawer)
+          this.$refs.collectionPreviewDrawer.show();
+      });
+    },
+  },
+};
 </script>

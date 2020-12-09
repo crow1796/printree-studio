@@ -6,7 +6,7 @@ export const getCollections = async (axios) => {
     variables: {
       searchQuery: {
         plan: "Sell",
-        status: ["pending", "approved"],
+        status: ["pending", "approved", "reviewing"],
         sorting: {
           field: "created_at",
           order: "ASC"
