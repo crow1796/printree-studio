@@ -60,6 +60,8 @@
                     :enabled="!isHoldingSpace"
                     :aspectRatio="obj.editorData.aspectRatio"
                     :w="obj.bounds.width || 50"
+                    :maxW="obj.bounds.maxWidth"
+                    :maxH="obj.bounds.maxHeight"
                     :h="obj.bounds.height || 50"
                     :x="obj.bounds.left || 0"
                     :y="obj.bounds.top || 0"
@@ -386,12 +388,13 @@ export default {
         width = el.width
         height = el.height
         el = null;
-
       }
       this.addObject(type, value, file.name, {
         bounds: {
           width: scaleDown(width),
           height: scaleDown(height),
+          maxWidth: width,
+          maxHeight: height,
         },
       });
       this.$store.commit("designer/ADD_ASSET", res.data);
@@ -418,6 +421,8 @@ export default {
           bounds: {
             width: scaleDown(imgData.width),
             height: scaleDown(imgData.height),
+            maxWidth: imgData.width,
+            maxHeight: imgData.height,
           },
         }
       );

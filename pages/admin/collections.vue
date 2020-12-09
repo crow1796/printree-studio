@@ -21,6 +21,7 @@
               <option value="approved">Approved</option>
               <option value="declined">Declined</option>
               <option value="pending">Pending</option>
+              <option value="reviewing">Reviewing</option>
             </select>
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700"
@@ -37,16 +38,11 @@
             </div>
           </div>
           <div class="mx-2 block relative">
-            <span
-              class="h-full absolute inset-y-0 left-0 flex items-center pl-2"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                class="h-4 w-4 fill-current text-gray-500"
-              >
+            <span class="h-full absolute inset-y-0 left-0 flex items-center pl-2">
+              <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current text-gray-500">
                 <path
                   d="M10 4a6 6 0 100 12 6 6 0 000-12zm-8 6a8 8 0 1114.32 4.906l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387A8 8 0 012 10z"
-                ></path>
+                />
               </svg>
             </span>
             <input
@@ -63,40 +59,28 @@
               <tr>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >
-                  Name
-                </th>
+                >Name</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >
-                  Progress
-                </th>
+                >Progress</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >
-                  Status
-                </th>
+                >Status</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >
-                  Actions
-                </th>
+                >Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="col in collections"
                 :key="col._id"
-                :class="{ 'bg-red-100': col.status === 'declined' }"
+                :class="{'bg-red-100': col.status === 'declined'}"
               >
-                <td
-                  class="px-5 py-5 border-b border-gray-200 text-sm text-center"
-                >
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center">
                     <div class="ml-3">
-                      <p
-                        class="text-gray-900 whitespace-no-wrap flex items-center"
-                      >
+                      <p class="text-gray-900 whitespace-no-wrap flex items-center">
                         <span
                           class="relative text-xs inline-block px-3 py-1 font-semibold leading-tight mr-2"
                           :class="{
@@ -125,9 +109,7 @@
                     </div>
                   </div>
                 </td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 text-sm text-center"
-                >
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div
                     class="border bg-gray-200 w-full bg-grey-light rounded-full"
                     v-if="col.plan === 'Sell'"
@@ -135,35 +117,25 @@
                     <div
                       class="bg-primary text-xs rounded-full leading-none py-1 text-center text-white"
                       style="width: 45%"
-                    >
-                      45%
-                    </div>
+                    >45%</div>
                   </div>
                   <div v-else>N/A</div>
                 </td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 text-sm text-center"
-                >
-                  <span
-                    class="relative inline-block px-3 py-1 font-semibold leading-tight text-xs"
-                  >
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
+                  <span class="relative inline-block px-3 py-1 font-semibold leading-tight text-xs">
                     <span
                       aria-hidden
                       class="absolute inset-0 rounded-full"
                       :class="{
-                        'bg-green-200': col.status === 'approved',
-                        'bg-red-300': col.status === 'declined',
-                        'bg-blue-200': col.status === 'pending',
-                      }"
+                      'bg-green-200': col.status === 'approved',
+                      'bg-red-300': col.status === 'declined',
+                      'bg-blue-200': col.status === 'pending',
+                    }"
                     ></span>
-                    <span class="relative uppercase font-black">{{
-                      col.status
-                    }}</span>
+                    <span class="relative uppercase font-black">{{ col.status }}</span>
                   </span>
                 </td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 text-sm text-center"
-                >
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div>
                     <button
                       type="button"
@@ -210,6 +182,7 @@ export default {
         "approved",
         "declined",
         "pending",
+        "reviewing",
       ]);
       this.isLoading = false;
     } catch (error) {
@@ -241,6 +214,13 @@ export default {
         "designer/generatePreview",
         collectionData
       );
+
+      if (collection.status === "pending")
+        await this.$store.dispatch("admin/updateCollectionStatus", {
+          _id: collection._id,
+          status: "reviewing",
+        });
+
       this.isLoading = false;
       this.generatedImages = res.data;
       this.collectionMeta = collection;
@@ -252,8 +232,8 @@ export default {
     async filterCollection(event) {
       this.filterValues = [];
       this.filterValues.push(this.defaultValue);
-      if (_.isEmpty(this.filterValues))
-        this.filterValues = ["approved", "declined", "pending"];
+      if (!this.filterValues[0])
+        this.filterValues = ["approved", "declined", "pending", "reviewing"];
       try {
         await this.$store.dispatch("admin/getCollections", this.filterValues);
         this.isLoading = false;
