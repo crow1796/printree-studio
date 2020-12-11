@@ -121,9 +121,9 @@
             <tbody>
               <tr v-for="user in users" :key="user._id">
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <a href="#" class="text-blue-600 hover:underline">
+                  <nuxt-link :to="`/admin/users/${user._id}`" class="text-blue-600 hover:underline">
                     <span>{{ user._id }}</span>
-                  </a>
+                  </nuxt-link>
                 </td>
                 <td
                   class="px-5 py-5 border-b border-gray-200 bg-white text-sm"

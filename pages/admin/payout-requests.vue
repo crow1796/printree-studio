@@ -12,6 +12,9 @@
             <tr>
               <th
                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+              >Requested By</th>
+              <th
+                class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
               >Requested At</th>
               <th
                 class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
@@ -29,9 +32,16 @@
               <td
                 colspan="3"
                 class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-              >You have no collection(s).</td>
+              >You have no payout request(s).</td>
             </tr>
             <tr v-for="payout in payouts" :key="payout._id">
+              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-left">
+                <div
+                  class="text-gray-900 whitespace-no-wrap"
+                >
+                  <nuxt-link :to="`/admin/users/${payout.user._id}`" class="text-blue-600 hover:underline">{{ payout.user.name }}</nuxt-link>
+                </div>
+              </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-left">
                 <div
                   class="text-gray-900 whitespace-no-wrap"
