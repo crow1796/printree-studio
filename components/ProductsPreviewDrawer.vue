@@ -209,6 +209,16 @@
                     <div>PHP {{ selectedProductBasePrice }}</div>
                   </div>
                 </div>
+                <!-- TODO: Add Tags Field <div class="pt-4">
+                  <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
+                  <vue-tags-input
+                    v-model="tag"
+                    :max-tags="5"
+                    :tags="selectedProductTags"
+                    @tags-changed="newTags => selectedProductTags = newTags"
+                    class="custom-tags-input"
+                  />
+                </div> -->
                 <div>
                   <div class="my-2">
                     <textarea
@@ -364,6 +374,8 @@ export default {
       selectedProduct: null,
       selectedProductVariantKey: null,
       selectedSize: null,
+      tag: "",
+      selectedProductTags: [],
       drawerId: this.makeId(),
       printingOptions: [
         {

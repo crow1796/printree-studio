@@ -16,7 +16,21 @@
         </div>
         <div
           class="modal-body p-4 text-center"
-        >Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
+        >
+          <div>
+            Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?
+          </div>
+          <div class="mt-4">
+            <textarea
+              name="notes"
+              id="notes"
+              cols="30"
+              rows="5"
+              class="w-full border rounded p-4 outine-none resize-none"
+              placeholder="Notes to the designer"
+            ></textarea>
+          </div>
+        </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
             type="button"
@@ -164,9 +178,9 @@
         </div>
         <div
           class="flex p-4 items-center border-t"
-          :class="{'justify-end': meta.status === 'declined', 'justify-between': meta.status === 'pending'}"
+          :class="{'justify-end': meta.status === 'declined', 'justify-between': ['pending', 'reviewing'].includes(meta.status)}"
         >
-          <PTButton @click="confirmAction('decline')" v-if="meta.status === 'pending'">DECLINE</PTButton>
+          <PTButton @click="confirmAction('decline')" v-if="['pending', 'reviewing'].includes(meta.status)">DECLINE</PTButton>
           <PTButton
             color="primary"
             v-if="meta.status !== 'approved'"

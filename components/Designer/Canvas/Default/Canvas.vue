@@ -1,5 +1,20 @@
 <template>
   <div class="flex flex-grow w-full h-full justify-center overflow-hidden bg-gray-200 relative">
+    <vue-dropzone
+      class="h-full border-0 flex items-center justify-center"
+      :class="{'-uploading': isGlobalUploading}"
+      ref="globalDropzone"
+      id="global-dropzone"
+      :style="{ border: 0 }"
+      :options="{
+            url: `${apiUrl}/upload-art`,
+              thumbnailWidth: 150,
+              maxFiles: 1,
+              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Click here or drop file here to upload.',
+              }"
+      @vdropzone-success="assetAdded"
+      @vdropzone-sending="globalAssetSending"
+    />
     <VueTailwindDrawer ref="artsModal" width="40%">
       <div class="flex p-4 h-full flex-col w-full">
         <div class="flex w-1/3 flex-col w-full">
@@ -15,7 +30,7 @@
             url: `${apiUrl}/upload-art`,
               thumbnailWidth: 150,
               maxFiles: 1,
-              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Drop file here to upload. \nMust have a minimum size of 1000x1000. White areas on non-transparent images will also get printed.',
+              acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Click here or drop file here to upload.',
               }"
                 @vdropzone-success="assetAdded"
                 @vdropzone-sending="assetSending"
@@ -158,6 +173,7 @@ export default {
   },
   data() {
     return {
+      isGlobalUploading: false,
       apiUrl: process.env.apiUrl,
       activeObject: null,
       activeObjectIndex: 0,
@@ -175,6 +191,41 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this._registerCanvasEvents();
+    });
+    let lastTarget = null;
+    const isFile = (evt) => {
+      var dt = evt.dataTransfer;
+
+      for (var i = 0; i < dt.types.length; i++) {
+        if (dt.types[i] === "Files") {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    window.addEventListener("dragenter", (e) => {
+      if (isFile(e) && !this.$refs.artsModal?.isShown) {
+        lastTarget = e.target;
+        this.$refs.globalDropzone.$el.classList.add('-uploading')
+      }
+    });
+
+    window.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      if (e.target === this.$refs.globalDropzone.$el) {
+        this.$refs.globalDropzone.$el.classList.remove('-uploading')
+      }
+    });
+
+    window.addEventListener("dragover", function (e) {
+      e.preventDefault();
+    });
+
+    window.addEventListener("drop", (e) => {
+      e.preventDefault();
+      this.$refs.globalDropzone.$el.style.visibility = "hidden";
+      this.$refs.globalDropzone.$el.style.opacity = 0;
     });
   },
   computed: {
@@ -354,6 +405,10 @@ export default {
     showDrawer(modal) {
       this.$refs[modal].show();
     },
+    globalAssetSending(e, xhr) {
+      this.isGlobalUploading = true;
+      this.assetSending(e, xhr);
+    },
     assetSending(e, xhr) {
       xhr.setRequestHeader("Authorization", this.$auth.getToken("local"));
     },
@@ -374,8 +429,8 @@ export default {
     assetAdded(file, res) {
       let type = "image";
       let value = res.data.imageKitLocation;
-      let width = file.width
-      let height = file.height
+      let width = file.width;
+      let height = file.height;
       if (file.type == "image/svg+xml") {
         type = "svg";
         let el = document.createElement("img");
@@ -385,8 +440,8 @@ export default {
         el.style.display = "block";
         document.body.appendChild(el);
         document.body.removeChild(el);
-        width = el.width
-        height = el.height
+        width = el.width;
+        height = el.height;
         el = null;
       }
       this.addObject(type, value, file.name, {
@@ -399,6 +454,8 @@ export default {
       });
       this.$store.commit("designer/ADD_ASSET", res.data);
       this.$refs.artsModal.hide();
+      this.isGlobalUploading = false;
+      this.$refs.globalDropzone.removeAllFiles()
     },
     async useAsset(asset) {
       const ext = asset.imageKitLocation
@@ -407,7 +464,7 @@ export default {
         .pop()
         .trim();
       const img = new Image();
-      img.src = ext === 'svg' ? asset.location : asset.imageKitLocation;
+      img.src = ext === "svg" ? asset.location : asset.imageKitLocation;
       const imgData = await new Promise((resolve, reject) => {
         img.onload = function () {
           resolve(this);
@@ -415,7 +472,7 @@ export default {
       });
       this.addObject(
         ext === "svg" ? "svg" : "image",
-        ext === 'svg' ? asset.location : asset.imageKitLocation,
+        ext === "svg" ? asset.location : asset.imageKitLocation,
         "",
         {
           bounds: {

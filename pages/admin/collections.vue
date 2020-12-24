@@ -59,10 +59,10 @@
               <tr>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >Name</th>
+                >Collection Name</th>
                 <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >Progress</th>
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+                >Designer</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
                 >Status</th>
@@ -109,17 +109,12 @@
                     </div>
                   </div>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
                   <div
-                    class="border bg-gray-200 w-full bg-grey-light rounded-full"
-                    v-if="col.plan === 'Sell'"
+                    class="text-gray-900 whitespace-no-wrap"
                   >
-                    <div
-                      class="bg-primary text-xs rounded-full leading-none py-1 text-center text-white"
-                      style="width: 45%"
-                    >45%</div>
+                    <nuxt-link :to="`/admin/users/${col.user._id}`" class="text-blue-600 hover:underline">{{ col.user.name }}</nuxt-link>
                   </div>
-                  <div v-else>N/A</div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <span class="relative inline-block px-3 py-1 font-semibold leading-tight text-xs">

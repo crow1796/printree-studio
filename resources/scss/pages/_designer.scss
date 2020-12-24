@@ -1,64 +1,65 @@
-.no-scroll #__layout{
+.no-scroll #__layout {
   height: 100vh;
   overflow: hidden;
 }
 
-.printable-area-label{
+.printable-area-label {
   position: absolute;
   bottom: -27px;
   font-weight: bold;
   width: 100%;
   text-align: center;
-  font-size: .9em;
+  font-size: 0.9em;
 }
 
-.printable-area{
+.printable-area {
   outline-width: 0px;
   outline-style: dashed;
 
-  &.-has-outline{
+  &.-has-outline {
     outline-width: 1px;
   }
 }
 
-.canvas-object{
-  &:hover{
-    outline: 1px solid rgba(0, 0, 0, .1);
+.canvas-object {
+  &:hover {
+    outline: 1px solid rgba(0, 0, 0, 0.1);
   }
 }
 
 .ruler {
-  .horiz{
+  .horiz {
     height: 1px;
     top: 50%;
     transform: translateY(-50%);
   }
 
-  .vert{
+  .vert {
     width: 1px;
     left: 50%;
     transform: translateX(-50%);
   }
 
   .horiz.-highlighted,
-  .vert.-highlighted{
+  .vert.-highlighted {
     background: blue;
   }
 }
 
-.or-divider{
+.or-divider {
   width: 1px;
 
-  & > span{
-    font-size: .65rem;
+  & > span {
+    font-size: 0.65rem;
     position: absolute;
-    left: 50%; top: 50%;
+    left: 50%;
+    top: 50%;
     transform: translate(-50%, -50%);
   }
 
   &:before,
-  &:after{
-    content: '';
+  &:after {
+    content: "";
     display: block;
     position: absolute;
     height: 46%;
@@ -68,66 +69,66 @@
     width: 1px;
   }
 
-  &:before{
+  &:before {
     top: 0;
   }
 
-  &:after{
+  &:after {
     bottom: 0;
   }
 }
 
-.bottom-actions{
+.bottom-actions {
   width: auto;
   left: 50%;
   transform: translateX(-50%);
   bottom: 20px;
 }
 
-.bottom-tips{
+.bottom-tips {
   left: 20px;
   bottom: 20px;
 
-  .tips-list{
+  .tips-list {
     list-style: outside;
     margin-left: 20px;
   }
 }
 
-.left-actions{
+.left-actions {
   left: 10px;
   top: 10px;
 }
 
-.top-actions{
+.top-actions {
   left: 50%;
   transform: translateX(-50%);
 }
 
-.svg-object > svg{
+.svg-object > svg {
   width: 100%;
   height: 100%;
 }
 
-.cursor-help{
+.cursor-help {
   cursor: help;
 }
 
-.vue-numeric-input .numeric-input.no-control{
+.vue-numeric-input .numeric-input.no-control {
   padding: 0px 5px !important;
 }
 
-.vue-numeric-input .numeric-input{
+.vue-numeric-input .numeric-input {
   height: 100%;
   outline: none !important;
   border-color: #e2e8f0 !important;
 }
 
-.vue-numeric-input .btn{
+.vue-numeric-input .btn {
   background: transparent !important;
 }
 
-.ProseMirror{
+.ProseMirror {
   width: 100%;
   height: 100%;
   outline: none !important;
@@ -135,32 +136,79 @@
 
 .vue-numeric-input,
 .vue-numeric-input .numeric-input,
-.vue-numeric-input .btn{
+.vue-numeric-input .btn {
   border-radius: 0.25rem;
 }
 
-.editor__content{
-  h1, h2, h3, h4, h5, h6{font-weight:bold;}
-  h1{font-size:2em}
-  h2{font-size:1.6em}
-  h3{font-size:1.4em}
-  h4{font-size:1.2em}
-  h5{font-size:1.1em}
-  h6{font-size:1em}
+.editor__content {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: bold;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  h2 {
+    font-size: 1.6em;
+  }
+  h3 {
+    font-size: 1.4em;
+  }
+  h4 {
+    font-size: 1.2em;
+  }
+  h5 {
+    font-size: 1.1em;
+  }
+  h6 {
+    font-size: 1em;
+  }
 
-  small{font-size:.833em}
-  em, i{font-style:italic}
-  strong, b{font-weight:bold}
-  code, pre{font-family:monospace}
+  small {
+    font-size: 0.833em;
+  }
+  em,
+  i {
+    font-style: italic;
+  }
+  strong,
+  b {
+    font-weight: bold;
+  }
+  code,
+  pre {
+    font-family: monospace;
+  }
 
-  a{text-decoration:underline}
-  a:hover, a:focus{text-decoration:none}
-  a:hover, a:active{outline:none}
+  a {
+    text-decoration: underline;
+  }
+  a:hover,
+  a:focus {
+    text-decoration: none;
+  }
+  a:hover,
+  a:active {
+    outline: none;
+  }
 
-  hr{background-color:#fff; border:1px solid #fff; border-top:1px solid #aaa; clear:both; margin:.8em 0}
-  blockquote{padding:0.2em 1em 0.2em 2em; border-left:3px solid #eee}
+  hr {
+    background-color: #fff;
+    border: 1px solid #fff;
+    border-top: 1px solid #aaa;
+    clear: both;
+    margin: 0.8em 0;
+  }
+  blockquote {
+    padding: 0.2em 1em 0.2em 2em;
+    border-left: 3px solid #eee;
+  }
 
-  ol{
+  ol {
     display: block;
     list-style-type: decimal;
     margin-bottom: 1em;
@@ -169,7 +217,7 @@
     padding-left: 40px;
   }
 
-  ul{
+  ul {
     display: block;
     list-style-type: disc;
     margin-bottom: 1 em;
@@ -178,29 +226,30 @@
     padding-left: 40px;
   }
 
-  blockquote, q {
+  blockquote,
+  q {
     quotes: none;
   }
 }
 
-.tooltip{
-  &.popover{
+.tooltip {
+  &.popover {
     outline: none !important;
     z-index: 10;
   }
 }
 
-.layer{
+.layer {
   border-top-color: white;
   border-left-color: white;
   border-right-color: white;
 
-  &:hover{
+  &:hover {
     border-color: #c3dafe;
   }
 }
 
-#right-content{
+#right-content {
   height: calc(100vh - 78.2px);
 }
 
@@ -217,17 +266,17 @@
   margin-right: 10px;
   margin-bottom: 10px;
   border-radius: 10px;
-  border: 1px solid rgba(0, 0,0 , 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
-.printable-output{
+.printable-output {
   width: auto;
   background: white;
   transform-origin: bottom right;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
   height: auto;
 
-  .preview-resizer-btn{
+  .preview-resizer-btn {
     transform: scale(2.4);
     top: -20px;
     left: -20px;
@@ -239,5 +288,23 @@
 
   &.-maximized .preview-resizer-btn {
     transform: scale(1.4) !important;
+  }
+}
+
+#global-dropzone {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999999999;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: visibility 175ms, opacity 175ms;
+
+  &.-uploading {
+    visibility: visible;
+    opacity: 1;
   }
 }

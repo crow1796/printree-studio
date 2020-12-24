@@ -237,6 +237,8 @@ export default {
             created_at
             updated_at
             user {
+                _id
+                name
                 email
             }
             products {
@@ -404,6 +406,10 @@ export default {
     query ($searchQuery: PayoutQueryInput) {
         payoutRequests(query: $searchQuery) {
             _id
+            user {
+                _id
+                name
+            }
             recipient {
                 completeName
                 mobileNumber

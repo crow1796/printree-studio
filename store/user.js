@@ -12,9 +12,9 @@ const getters = {
 const actions = {
   async createAccount(context, data) {
     let res = await auth.createUserWithEmailAndPassword(data, this.$axios);
-    if (res.status) {
+      if(!res.status) throw res
       await context.dispatch('signIn', data);
-    }
+    if(!res.status) throw res
     return res;
   },
   async signIn(context, data) {

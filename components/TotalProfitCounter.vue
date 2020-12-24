@@ -17,8 +17,13 @@
 import { mapGetters } from 'vuex'
 
 export default {
+  props: {
+    amount: {
+      type: Number
+    }
+  },
   async mounted(){
-    await this.$store.dispatch('user_dashboard/totalEarningsOfCurrentUser')
+    if(this.amount == undefined) await this.$store.dispatch('user_dashboard/totalEarningsOfCurrentUser')
   },
   computed: {
     ...mapGetters({
