@@ -12,6 +12,7 @@ export default {
     let response = {}
     try {
       let res = await http.post('/signup', formData)
+      if(!res.data.status) throw res
       response = {
         status: true,
         user: this._extractUserdata({
@@ -21,8 +22,9 @@ export default {
       }
     } catch (error) {
       response.status = false
-      response.message = error.message
+      response.message = error.data.err.message
     }
+    if(!response.status) throw response
     return response
   },
   async socialLogin(type){
