@@ -113,7 +113,7 @@ export default {
     AvailableProducts,
     AuthModal,
   },
-  middleware: "authenticated",
+  middleware: ["no_auth"],
   data() {
     return {
       isLoading: true,

@@ -498,5 +498,12 @@ export default {
             fullThumb
         }
     }
+  `,
+  collectionStatus: `
+    query ($id: ID!){
+        collectionStatus(_id: $id){
+            status
+        }
+    }
   `
 };

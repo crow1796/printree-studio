@@ -25,6 +25,17 @@ export const payoutsOfCurrentUser = async (axios, query) => {
   return payoutsOfCurrentUser;
 }
 
+export const collectionStatus = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.collectionStatus,
+    variables: {
+      id
+    }
+  });
+  const collectionStatus = data.data.collectionStatus;
+  return collectionStatus;
+}
+
 export const payoutRequest = async (axios, payout) => {
   const { data } = await axios.post("/gql", {
     query: queries.payoutRequest,

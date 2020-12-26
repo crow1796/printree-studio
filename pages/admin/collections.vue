@@ -132,23 +132,7 @@
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div>
-                    <button
-                      type="button"
-                      class="px-2 py-1 text-xs bg-white hover:bg-gray-200 border rounded mx-1"
-                      title="Delete"
-                      v-tippy="{ arrow: true }"
-                      @click="showDeleteCollectionConfirmation(col)"
-                    >
-                      <font-awesome-icon :icon="['fas', 'trash']" />
-                    </button>
-                    <button
-                      type="button"
-                      class="px-2 py-1 text-xs bg-white hover:bg-gray-200 border rounded mx-1"
-                      title="Share"
-                      v-tippy="{ arrow: true }"
-                    >
-                      <font-awesome-icon :icon="['fas', 'share-alt']" />
-                    </button>
+                    
                   </div>
                 </td>
               </tr>
@@ -199,7 +183,40 @@ export default {
     }),
   },
   methods: {
+    async _validateStatusOf(collection) {
+      const status = await this.$store.dispatch(
+        "user_dashboard/collectionStatus",
+        collection._id
+      );
+
+      if (["approved", "reviewing"].includes(status)) {
+        this.$store.commit("admin/UPDATE_COLLECTION_STATUS", {
+          _id: collection._id,
+          status: status,
+        });
+
+        let message = "";
+        switch (status) {
+          case "approved":
+            message = "The collection is already approved.";
+            break;
+          case "reviewing":
+            message = `Someone is already reviewing this collection.`;
+            break;
+        }
+
+        this.$toast.info(message, {
+          position: "top",
+        });
+        return false
+      }
+
+      return true;
+    },
     async previewCollection(collection) {
+      const statusValidation = await this._validateStatusOf(collection);
+      if(!statusValidation) return;
+      
       this.isLoading = true;
       const collectionData = await this.$store.dispatch(
         "designer/fetchDesignData",

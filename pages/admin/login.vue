@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-grow min-h-screen justify-center mt-32">
-    <AreaLoader v-if="isLoading" fullscreen/>
-    <form @submit.prevent="signIn" class="w-3/12">
+    <AreaLoader v-if="isLoading" fullscreen />
+    <form @submit.prevent="signIn" id="login-form">
       <div class="shadow-xl rounded-lg flex flex-col p-6">
         <div>
           <img src="~/assets/images/logo.png" class="w-16 mx-auto mb-3" />
@@ -49,7 +49,7 @@
         <div
           class="mb-3 bg-red-200 text-red-500 p-3 rounded text-center"
           v-if="isLoginFailed"
-        >Invalid Email or Password. Please try again.</div>
+        >{{ formMessage }}</div>
         <div class="mb-3">
           <button
             class="w-full items-center justify-center focus:outline-none outline-none flex flex-grow border px-3 py-2 font-bold rounded text-white border-white bg-primary hover:bg-primary-lighter"
@@ -62,32 +62,41 @@
 
 <script>
 export default {
-  layout: 'empty',
+  layout: "empty",
   head: {
-    title: 'Admin Login'
+    title: "Admin Login",
   },
-  middleware: 'admin-auth',
+  middleware: "admin-auth",
   data() {
     return {
       isLoginFailed: false,
       formData: {
         email: null,
-        password: null
+        password: null,
       },
-      isLoading: false
-    }
+      isLoading: false,
+      formMessage: "Invalid Email or Password.",
+    };
   },
   methods: {
     async signIn() {
-      this.isLoading = true
-      const res = await this.$store.dispatch('user/signIn', this.formData)
-      this.isLoading = false
-      if (!res.data.status) {
-        this.isLoginFailed = true
-        return
+      this.isLoginFailed = false;
+      if (this.isLoading) return;
+      let validationResponse = await this.$validator.validateAll();
+      if (!validationResponse) return;
+      this.isLoading = true;
+      try {
+        const res = await this.$store.dispatch("user/signIn", this.formData);
+        if (!res.data.status) {
+          this.isLoginFailed = true;
+          return;
+        }
+        this.$router.push("/admin/collections");
+      } catch (e) {
+        this.isLoginFailed = true;
       }
-      this.$router.push('/admin/collections')
-    }
-  }
-}
+      this.isLoading = false;
+    },
+  },
+};
 </script>

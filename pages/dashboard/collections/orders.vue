@@ -10,6 +10,9 @@
         <h2 class="text-2xl mt-4 font-semibold leading-tight">Orders</h2>
       </div>
     </div>
+    <div class="text-center" v-if="!orders.length">
+      You have no order(s).
+    </div>
     <div class="border flex flex-col mb-6" v-for="(order, i) in orders" :key="i">
       <div class="flex border-b p-4 justify-between items-center">
         <div class="flex flex-col">

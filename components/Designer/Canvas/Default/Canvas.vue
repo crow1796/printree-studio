@@ -207,13 +207,13 @@ export default {
     window.addEventListener("dragenter", (e) => {
       if (isFile(e) && !this.$refs.artsModal?.isShown) {
         lastTarget = e.target;
-        this.$refs.globalDropzone.$el.classList.add('-uploading')
+        if(this.$refs.globalDropzone) this.$refs.globalDropzone.$el.classList.add('-uploading')
       }
     });
 
     window.addEventListener("dragleave", (e) => {
       e.preventDefault();
-      if (e.target === this.$refs.globalDropzone.$el) {
+      if (e.target === this.$refs.globalDropzone?.$el) {
         this.$refs.globalDropzone.$el.classList.remove('-uploading')
       }
     });
