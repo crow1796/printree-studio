@@ -51,7 +51,7 @@ export const getUsers = async (axios) => {
       searchQuery: {
         sorting: {
           field: "created_at",
-          order: "ASC"
+          order: "DESC"
         },
         pagination: {
           limit: 15,

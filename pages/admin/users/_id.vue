@@ -13,30 +13,47 @@
           <span class="ml-1">Back</span>
         </button>
         <div class="flex justify-between w-full items-center">
-          <h2 class="text-2xl mt-4 font-semibold leading-tight">User: jw5881jJKKWrt</h2>
+          <h2 class="text-2xl mt-4 font-semibold leading-tight">User: {{user._id}}</h2>
           <TotalProfitCounter />
         </div>
       </div>
     </div>
-    <div class="border rounded p-8 w-full">
+    <div class="border rounded p-8 w-full flex justify-between">
       <div class="flex">
         <div class="mr-16">
-          <div class="font-bold">First Name</div>
-          <div>Joshua</div>
-        </div>
-        <div class="mr-16">
-          <div class="font-bold">Last Name</div>
-          <div>Tundag</div>
+          <div class="font-bold">Name</div>
+          <div>{{ user.name }}</div>
         </div>
         <div class="mr-16">
           <div class="font-bold">Shop Name</div>
-          <div>Penshoppe</div>
+          <div>{{ user.shopName }}</div>
+        </div>
+        <div class="mr-16">
+          <div class="font-bold">Email Address</div>
+          <div>{{ user.email }}</div>
         </div>
         <div>
-          <div class="font-bold">Email Address</div>
-          <div>joshuatundag@gmail.com</div>
+          <div class="font-bold">Status</div>
+          <div>
+            <span
+              class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
+            >
+              <span
+                aria-hidden
+                class="absolute inset-0 opacity-50 rounded-full"
+                :class="{
+                        'bg-green-200':['approved'].includes(user.status),
+                        'bg-blue-200': user.status === 'pending',
+                        'bg-red-200': user.status === 'declined',
+                      }"
+              ></span>
+              <span class="relative uppercase">{{ user.status }}</span>
+            </span>
+          </div>
         </div>
       </div>
+
+      <PTButton color="primary" v-if="user.status === 'pending'" class="text-sm">APPROVE</PTButton>
     </div>
 
     <div class="p-4 rounded border mt-8 box-border">
@@ -180,7 +197,7 @@ export default {
   components: {
     TotalProfitCounter,
   },
-  async mounted(){
+  async mounted() {
     // TODO: add api
   },
   data() {
@@ -193,6 +210,13 @@ export default {
           name: "Sample",
         },
       ],
+      user: {
+        _id: "jw5881jJKKWrt",
+        name: "Joshua Tundag",
+        shopName: "Penshoppe",
+        email: "joshuatundag@gmail.com",
+        status: "pending",
+      },
       payouts: [
         {
           _id: 1,

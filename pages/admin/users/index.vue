@@ -1,6 +1,6 @@
 <template>
   <div class="sm:px-8 relative">
-    <AreaLoader v-if="isLoading"/>
+    <AreaLoader v-if="isLoading" />
     <VueTailwindModal ref="userFormModal" width="30%">
       <form @submit.prevent="submitForm">
         <div class="text-xl font-bold mb-2">{{ formData._id ? 'EDIT' : 'ADD NEW' }} USER</div>
@@ -114,6 +114,9 @@
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Display Name</th>
                 <th
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+                >Status</th>
+                <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
                 >Actions</th>
               </tr>
@@ -125,12 +128,24 @@
                     <span>{{ user._id }}</span>
                   </nuxt-link>
                 </td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
-                >{{user.email}}</td>
-                <td
-                  class="px-5 py-5 border-b border-gray-200 bg-white text-sm"
-                >{{ user.name }}</td>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{user.email}}</td>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.name }}</td>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  <span
+                    class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
+                  >
+                    <span
+                      aria-hidden
+                      class="absolute inset-0 opacity-50 rounded-full"
+                      :class="{
+                        'bg-green-200':['approved'].includes(user.status),
+                        'bg-blue-200': user.status === 'pending',
+                        'bg-red-200': user.status === 'declined',
+                      }"
+                    ></span>
+                    <span class="relative uppercase">{{ user.status }}</span>
+                  </span>
+                </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div>
                     <button
@@ -162,18 +177,18 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import VueTailwindModal from '@/components/VueTailwindModal'
+import { mapGetters } from "vuex";
+import VueTailwindModal from "@/components/VueTailwindModal";
 
 export default {
-  layout: 'admin_dashboard',
+  layout: "admin_dashboard",
   components: {
-    VueTailwindModal
+    VueTailwindModal,
   },
   async mounted() {
     try {
-      await this.$store.dispatch('admin/getUsers')
-      this.isLoading = false
+      await this.$store.dispatch("admin/getUsers");
+      this.isLoading = false;
     } catch (error) {
       console.log(error);
     }
@@ -185,14 +200,14 @@ export default {
         email: null,
         name: null,
         password: null,
-        role: 'customer'
-      }
-    }
+        role: "customer",
+      },
+    };
   },
   computed: {
     ...mapGetters({
-      users: 'admin/users'
-    })
+      users: "admin/users",
+    }),
   },
   methods: {
     addNewUser() {
@@ -200,23 +215,23 @@ export default {
         email: null,
         name: null,
         password: null,
-        role: 'customer'
-      }
-      this.$refs.userFormModal.show()
+        role: "customer",
+      };
+      this.$refs.userFormModal.show();
     },
     async submitForm() {
-      if(this.formData._id){
-        this.isLoading = true
-        this.$refs.userFormModal.hide()
-        await this.$store.dispatch('admin/updateUser', this.formData)
-        this.isLoading = false
-        return
+      if (this.formData._id) {
+        this.isLoading = true;
+        this.$refs.userFormModal.hide();
+        await this.$store.dispatch("admin/updateUser", this.formData);
+        this.isLoading = false;
+        return;
       }
     },
     editUser(user) {
-      this.formData = JSON.parse(JSON.stringify(user))
-      this.$refs.userFormModal.show()
-    }
-  }
-}
+      this.formData = JSON.parse(JSON.stringify(user));
+      this.$refs.userFormModal.show();
+    },
+  },
+};
 </script>
