@@ -13,7 +13,7 @@
 export default {
   name: 'PTButton',
   props: {
-    type: {
+    type: { 
       type: String,
       default: 'button'
     },

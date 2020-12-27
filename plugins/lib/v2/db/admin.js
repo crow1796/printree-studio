@@ -4,65 +4,33 @@ export const getCollections = async (axios, searchQuery) => {
   const { data } = await axios.post("/gql", {
     query: queries.getCollections,
     variables: {
-      searchQuery: {
-        plan: "Sell",
-        status: searchQuery,
-        sorting: {
-          field: "created_at",
-          order: "ASC"
-        },
-        pagination: {
-          limit: 15,
-          page: 0
-        }
-      }
+      searchQuery
     }
   });
 
-  const { collections } = data.data;
-  return collections;
+  return data.data?.collections || [];
 };
 
-export const payoutRequests = async (axios) => {
+export const payoutRequests = async (axios, searchQuery) => {
   const { data } = await axios.post("/gql", {
     query: queries.payoutRequests,
     variables: {
-      searchQuery: {
-        sorting: {
-          field: "created_at",
-          order: "ASC",
-        },
-        pagination: {
-          limit: 15,
-          page: 0,
-        },
-      }
+      searchQuery
     }
   });
 
-  const { payoutRequests } = data.data;
-  return payoutRequests;
+  return data.data?.payoutRequests || [];
 };
 
-export const getUsers = async (axios) => {
+export const getUsers = async (axios, searchQuery) => {
   const { data } = await axios.post("/gql", {
     query: queries.getUsers,
     variables: {
-      searchQuery: {
-        sorting: {
-          field: "created_at",
-          order: "DESC"
-        },
-        pagination: {
-          limit: 15,
-          page: 0
-        }
-      }
+      searchQuery
     }
   });
 
-  const { users } = data.data;
-  return users;
+  return data.data?.users || [];
 }
 
 export const updateCollectionStatus = async (axios, { _id, status }) => {
@@ -88,6 +56,28 @@ export const processPayoutRequest = async (axios, { _id }) => {
   });
   const { processPayoutRequest } = data.data;
   return processPayoutRequest;
+}
+
+export const getUserById = async (axios, { _id }) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.user,
+    variables: {
+      id: _id
+    },
+  });
+  const { user } = data.data;
+  return user;
+}
+
+export const approveAccount = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.approveAccount,
+    variables: {
+      id
+    },
+  });
+  const { approveAccount } = data.data;
+  return approveAccount;
 }
 
 export const declinePayoutRequest = async (axios, { _id }) => {

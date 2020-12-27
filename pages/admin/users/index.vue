@@ -122,6 +122,12 @@
               </tr>
             </thead>
             <tbody>
+              <tr v-if="!users.length">
+                <td
+                  colspan="5"
+                  class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
+                >No user(s).</td>
+              </tr>
               <tr v-for="user in users" :key="user._id">
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <nuxt-link :to="`/admin/users/${user._id}`" class="text-blue-600 hover:underline">
@@ -172,6 +178,8 @@
           </table>
         </div>
       </div>
+
+      <SimplePagination @prev="goTo(prevPage)" @next="goTo(nextPage)" />
     </div>
   </div>
 </template>
@@ -179,19 +187,16 @@
 <script>
 import { mapGetters } from "vuex";
 import VueTailwindModal from "@/components/VueTailwindModal";
+import SimplePagination from "@/components/SimplePagination";
 
 export default {
   layout: "admin_dashboard",
   components: {
     VueTailwindModal,
+    SimplePagination,
   },
-  async mounted() {
-    try {
-      await this.$store.dispatch("admin/getUsers");
-      this.isLoading = false;
-    } catch (error) {
-      console.log(error);
-    }
+  created() {
+    if (!this.$route.query.upage) this.$router.replace("/admin/users/?upage=1");
   },
   data() {
     return {
@@ -202,12 +207,45 @@ export default {
         password: null,
         role: "customer",
       },
+      query: {
+        sorting: {
+          field: "created_at",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 15,
+          page: 0,
+        },
+      },
     };
   },
   computed: {
     ...mapGetters({
       users: "admin/users",
     }),
+    prevPage() {
+      const colPage = parseInt(this.$route.query.upage);
+      return colPage > 1 ? colPage - 1 : 1;
+    },
+    nextPage() {
+      return parseInt(this.$route.query.upage) + 1;
+    },
+  },
+  watch: {
+    "$route.query.upage": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
+    },
   },
   methods: {
     addNewUser() {
@@ -231,6 +269,34 @@ export default {
     editUser(user) {
       this.formData = JSON.parse(JSON.stringify(user));
       this.$refs.userFormModal.show();
+    },
+    goTo(page) {
+      if (page === this.query.pagination.page) return;
+      this.query.pagination.page = page;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: "/admin/users/",
+        query: {
+          upage: this.query.pagination.page,
+        },
+      });
+    },
+    async _loadItems() {
+      this.isLoading = true;
+      try {
+        await this.$store.dispatch("admin/getUsers", {
+          ...this.query,
+          pagination: {
+            ...this.query.pagination,
+            page: this.query.pagination.page - 1,
+          },
+        });
+        this.isLoading = false;
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };

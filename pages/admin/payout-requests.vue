@@ -30,16 +30,17 @@
           <tbody>
             <tr v-if="!payouts.length">
               <td
-                colspan="3"
+                colspan="5"
                 class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-              >You have no payout request(s).</td>
+              >No payout request(s).</td>
             </tr>
             <tr v-for="payout in payouts" :key="payout._id">
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-left">
-                <div
-                  class="text-gray-900 whitespace-no-wrap"
-                >
-                  <nuxt-link :to="`/admin/users/${payout.user._id}`" class="text-blue-600 hover:underline">{{ payout.user.name }}</nuxt-link>
+                <div class="text-gray-900 whitespace-no-wrap">
+                  <nuxt-link
+                    :to="`/admin/users/${payout.user._id}`"
+                    class="text-blue-600 hover:underline"
+                  >{{ payout.user.name }}</nuxt-link>
                 </div>
               </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-left">
@@ -101,6 +102,8 @@
           </tbody>
         </table>
       </div>
+
+      <SimplePagination @prev="goTo(prevPage)" @next="goTo(nextPage)" />
     </div>
   </div>
 </template>
@@ -108,22 +111,59 @@
 <script>
 import moment from "moment";
 import { mapGetters } from "vuex";
+import SimplePagination from "@/components/SimplePagination";
 
 export default {
   layout: "admin_dashboard",
-  async mounted() {
-    await this.$store.dispatch("admin/payoutRequests", {});
-    this.isLoading = false;
+  created() {
+    if (!this.$route.query.prpage)
+      this.$router.replace("/admin/payout-requests/?prpage=1");
+  },
+  components: {
+    SimplePagination,
   },
   data() {
     return {
       isLoading: true,
+      query: {
+        sorting: {
+          field: "created_at",
+          order: "ASC",
+        },
+        pagination: {
+          limit: 15,
+          page: 0,
+        },
+      },
     };
   },
   computed: {
     ...mapGetters({
       payouts: "admin/payouts",
     }),
+    prevPage() {
+      const colPage = parseInt(this.$route.query.prpage);
+      return colPage > 1 ? colPage - 1 : 1;
+    },
+    nextPage() {
+      return parseInt(this.$route.query.prpage) + 1;
+    },
+  },
+  watch: {
+    "$route.query.prpage": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
+    },
   },
   methods: {
     formatTimestamp(timestamp) {
@@ -160,6 +200,34 @@ export default {
           break;
       }
       this.updatePayoutStatusTo(payout, newStatus);
+    },
+    goTo(page) {
+      if (page === this.query.pagination.page) return;
+      this.query.pagination.page = page;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: "/admin/payout-requests/",
+        query: {
+          prpage: this.query.pagination.page,
+        },
+      });
+    },
+    async _loadItems() {
+      this.isLoading = true;
+      try {
+        await this.$store.dispatch("admin/payoutRequests", {
+          ...this.query,
+          pagination: {
+            ...this.query.pagination,
+            page: this.query.pagination.page - 1,
+          },
+        });
+        this.isLoading = false;
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };

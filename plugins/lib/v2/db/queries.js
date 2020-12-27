@@ -269,6 +269,18 @@ export default {
         }
     }
   `,
+    user: `
+    query ($id: ID!){
+        user(_id: $id){
+            _id
+            name
+            shopName
+            email
+            status
+            portfolioLink
+        }
+    }
+  `,
     products: `
     query ($searchQuery: ProductQueryInput) {
         products(query: $searchQuery){
@@ -500,10 +512,22 @@ export default {
         }
     }
   `,
-  collectionStatus: `
+    collectionStatus: `
     query ($id: ID!){
         collectionStatus(_id: $id){
             status
+        }
+    }
+  `,
+  approveAccount: `
+    mutation ($id: ID!){
+        approveAccount(_id: $id){
+            _id
+            name
+            shopName
+            email
+            status
+            portfolioLink
         }
     }
   `

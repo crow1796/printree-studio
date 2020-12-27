@@ -67,17 +67,29 @@ const getters = {
 }
 
 const actions = {
+  async approveAccount(context, _id){
+    const user = await this.$api.admin.approveAccount(_id)
+    return user
+  },
+  async getUserById(context, _id) {
+    const user = await this.$api.admin.getUserById({ _id })
+    return user
+  },
   async generateVariantImages(context, data) {
     const generatedVariantImages = await this.$api.admin.generateVariantImages(data)
     return generatedVariantImages
   },
-  async getUsers(context) {
-    const users = await this.$api.admin.getUsers()
+  async getUsers(context, query) {
+    const users = await this.$api.admin.getUsers(query)
     context.commit('USERS', users)
+  },
+  async getCollectionsAndCommit(context, searchQuery) {
+    const collections = await this.$api.admin.getCollections(searchQuery)
+    context.commit('COLLECTIONS', collections)
   },
   async getCollections(context, searchQuery) {
     const collections = await this.$api.admin.getCollections(searchQuery)
-    context.commit('COLLECTIONS', collections)
+    return collections
   },
   async updateUser(context, data) {
     const res = await this.$axios.patch(`/users/${data.uid}`, data)
