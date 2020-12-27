@@ -10,7 +10,11 @@
                 <nuxt-link to="/">Home</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="/marketplace">Marketplace</nuxt-link>
+                <a
+                  :href="shopifyUrl"
+                  target="_blank"
+                  class="hover:text-primary-lighter mr-4"
+                >Shop</a>
               </li>
             </ul>
           </div>
@@ -30,20 +34,22 @@
           </div>
         </div>
         <div class="sm:w-1/2 sm:mt-0 mt-8 h-auto">
-          <div class="text-red-light mb-2">Newsletter</div>
-          <p
-            class="text-grey-darker leading-normal"
-          >Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi, consectetur.</p>
-          <div class="mt-4 flex">
-            <input
-              type="text"
-              class="p-2 border border-grey-light round text-grey-dark text-sm h-auto"
-              placeholder="Your email address"
-            />
-            <button class="bg-primary text-white rounded-sm h-auto text-xs p-3">Subscribe</button>
+          <div class="flex flex-col items-end">
+            <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
+            <span class="text-xs mt-1 font-bold text-body">&copy; Copyright 2020.</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data() {
+    return {
+      shopifyUrl: process.env.shopifyUrl,
+    };
+  },
+};
+</script>

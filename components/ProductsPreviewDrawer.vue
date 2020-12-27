@@ -209,6 +209,17 @@
                     <div>PHP {{ selectedProductBasePrice }}</div>
                   </div>
                 </div>
+                <div class="pt-4">
+                  <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
+                  <vue-tags-input
+                    v-model="tag"
+                    :max-tags="5"
+                    :tags="selectedProductTags"
+                    @tags-changed="setProductTags"
+                    class="custom-tags-input"
+                    placeholder="Add Tag (Up to 5 tags only)"
+                  />
+                </div>
                 <div>
                   <div class="my-2">
                     <textarea
@@ -364,6 +375,8 @@ export default {
       selectedProduct: null,
       selectedProductVariantKey: null,
       selectedSize: null,
+      tag: "",
+      selectedProductTags: [],
       drawerId: this.makeId(),
       printingOptions: [
         {
@@ -610,6 +623,17 @@ export default {
         this.isCalculating = false;
       }, 2000);
     },
+    setProductTags(newTags) {
+      this.selectedProductTags = newTags;
+
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+        _id: this.selectedProduct._id,
+        props: {
+          path: `meta.tags`,
+          value: _.map(this.selectedProductTags, "text"),
+        },
+      });
+    },
     setProductProfit(e) {
       this.selectedProductProfit = e.target.value
         ? parseFloat(e.target.value)
@@ -691,6 +715,11 @@ export default {
         this.selectedProductBasePrice = _.first(
           to.variants[firstVariantKey].available_sizes
         ).baseCost;
+
+        this.selectedProductTags = _.map(to.meta.tags, (text) => ({
+          text,
+          tiClasses: ["ti-valid"],
+        }));
 
         this.selectedProductProfit =
           to.variants[firstVariantKey].sizes[0].price;

@@ -2,7 +2,7 @@ const webpack = require("webpack");
 
 module.exports = {
   server: {
-    port: process.env.PORT || 3333
+    port: process.env.PORT || 3456
   },
   env: {
     apiUrl: process.env.API_URL,
@@ -43,7 +43,8 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    { src: '~/plugins/vuex-persist', ssr: false },
+    { src: '~/plugins/vuex-persist.js', ssr: false },
+    { src: '~/plugins/vue-tags-input.js', ssr: false },
     "~/plugins/prototypes.js",
     "~/plugins/external-installs.js",
     "~/plugins/api.js",

@@ -12,9 +12,11 @@ const getters = {
 const actions = {
   async createAccount(context, data) {
     let res = await auth.createUserWithEmailAndPassword(data, this.$axios);
-    if (res.status) {
-      await context.dispatch('signIn', data);
-    }
+    if(!res.status) throw res
+    /**
+     * TODO: Hide when removing the user approval flow
+     */
+    // await context.dispatch('signIn', data);
     return res;
   },
   async signIn(context, data) {

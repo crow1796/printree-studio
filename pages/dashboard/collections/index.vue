@@ -237,7 +237,12 @@
                     >
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
-                    <tippy trigger="click" arrow interactive v-if="['approved'].includes(col.status)">
+                    <tippy
+                      trigger="click"
+                      arrow
+                      interactive
+                      v-if="['approved'].includes(col.status)"
+                    >
                       <template v-slot:trigger>
                         <button
                           type="button"
@@ -292,7 +297,7 @@ export default {
     tippy: TippyComponent,
   },
   async mounted() {
-    const collections = await this.$store.dispatch(
+    await this.$store.dispatch(
       "user_dashboard/getUserCollectionsOf",
       this.user.uid
     );
@@ -343,14 +348,49 @@ export default {
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$router.push("/collection/designer");
     },
-    editCollection(collection) {
-      if (['approved', 'reviewing'].includes(collection.status)) return;
+    async _validateStatusOf(collection) {
+      const status = await this.$store.dispatch(
+        "user_dashboard/collectionStatus",
+        collection._id
+      );
+
+      if (["approved", "reviewing"].includes(status)) {
+        this.$store.commit("user_dashboard/UPDATE_COLLECTION_STATUS", {
+          _id: collection._id,
+          newStatus: status,
+        });
+
+        let message = "";
+        switch (status) {
+          case "approved":
+            message = "The collection is already approved.";
+            break;
+          case "reviewing":
+            message = `We are now currently reviewing this collection.`;
+            break;
+        }
+
+        this.$toast.info(message, {
+          position: "top",
+        });
+        return false
+      }
+
+      return true;
+    },
+    async editCollection(collection) {
+      if (!["draft", "pending", "declined"].includes(collection.status)) return;
+      const statusValidation = await this._validateStatusOf(collection);
+      if(!statusValidation) return;
+
       localStorage.removeItem("_stored_ptree");
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
       this.$router.replace("/collection/designer");
     },
-    showDeleteCollectionConfirmation(collection) {
+    async showDeleteCollectionConfirmation(collection) {
+      const statusValidation = await this._validateStatusOf(collection);
+      if(!statusValidation) return;
       this.collectionToDelete = collection;
       this.$refs.deleteConfirmationModal.show();
     },

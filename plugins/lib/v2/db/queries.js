@@ -237,6 +237,8 @@ export default {
             created_at
             updated_at
             user {
+                _id
+                name
                 email
             }
             products {
@@ -256,6 +258,7 @@ export default {
             _id
             name
             email
+            status
             created_at
             updated_at
             roles {
@@ -263,6 +266,18 @@ export default {
                 name
                 displayName
             }
+        }
+    }
+  `,
+    user: `
+    query ($id: ID!){
+        user(_id: $id){
+            _id
+            name
+            shopName
+            email
+            status
+            portfolioLink
         }
     }
   `,
@@ -404,6 +419,10 @@ export default {
     query ($searchQuery: PayoutQueryInput) {
         payoutRequests(query: $searchQuery) {
             _id
+            user {
+                _id
+                name
+            }
             recipient {
                 completeName
                 mobileNumber
@@ -490,6 +509,25 @@ export default {
             isEmpty
             side
             fullThumb
+        }
+    }
+  `,
+    collectionStatus: `
+    query ($id: ID!){
+        collectionStatus(_id: $id){
+            status
+        }
+    }
+  `,
+  approveAccount: `
+    mutation ($id: ID!){
+        approveAccount(_id: $id){
+            _id
+            name
+            shopName
+            email
+            status
+            portfolioLink
         }
     }
   `

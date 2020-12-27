@@ -1,11 +1,22 @@
 <template>
   <div class="flex flex-col items-center w-full p-4">
     <AreaLoader v-if="isLoading" />
-    <div class="top-text flex flex-col items-center">
+    <div class="top-text flex flex-col items-center" v-if="!isSignUpSuccess">
       <h2 class="font-black text-4xl text-primary-lighter mb-4">SIGN IN TO CONTINUE</h2>
     </div>
-    <div class="content w-full flex flex-grow pb-4">
-      <div class="form w-full"> 
+    <div class="content w-full flex flex-grow">
+      <div class="text-center mt-8 mb-6" v-if="isSignUpSuccess">
+        <div class="mb-4">
+          <img src="~/assets/images/welcome.svg" alt="Welcome" class="sm:w-3/5 mx-auto" />
+        </div>
+        <div class="font-bold">Thank you for signing up!</div>
+        <div class="mt-2">
+          We will now review your account.
+          <!-- It usually takes 1-3 working days for your account to be approved.  -->
+          You will receive an email once your account is approved.
+        </div>
+      </div>
+      <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
           <div class="mb-3" v-if="formType == 'sign_up'">
@@ -84,6 +95,61 @@
               v-if="errors.has('pass')"
             >{{ errors.first('pass') }}</span>
           </div>
+          <div class="mb-3" v-if="formType === 'sign_up'">
+            <label for="pass" class="font-bold flex items-center">
+              Link to your Portfolio
+              <span
+                class="pl-1"
+                v-tippy="{arrow: true}"
+                title="This can help you get your application approved faster."
+              >
+                <font-awesome-icon :icon="['fas', 'question-circle']" />
+              </span>
+            </label>
+            <div class="text-xs text-blue-500 mt-1">(Google Drive, Dropbox, personal website, etc.)</div>
+            <div class="mt-2">
+              <input
+                type="url"
+                name="portfolio"
+                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                :class="{ 'border-red-400': errors.has('portfolio'), 'focus:border-gray-600': !errors.has('portfolio') }"
+                placeholder="Portfolio Link"
+                v-model="formData.portfolio"
+                data-vv-as="Portfolio"
+                v-validate="'required|url'"
+              />
+            </div>
+            <span
+              class="text-red-700 text-xs pt-1 font-bold inline-block"
+              v-if="errors.has('portfolio')"
+            >{{ errors.first('portfolio') }}</span>
+          </div>
+          <div class="mb-3" v-if="formType === 'sign_up'">
+            <div class="flex items-center">
+              <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
+                <input
+                  class="absolute opacity-0 left-0 top-0 cursor-pointer"
+                  type="checkbox"
+                  name="terms"
+                  v-model="terms"
+                  v-validate="'required'"
+                />
+                <span class="h-6 w-6 checkmark absolute top-0 left-0 bg-gray-400"></span>
+              </label>
+              <div class="text-sm">
+                I agree to the
+                <strong>Printree Studio</strong>
+                <a href="#" class="text-blue-400">Terms of Service</a> and
+                <a href="#" class="text-blue-400">Privacy Policy</a>.
+                <div>
+                  <span
+                    class="text-red-700 text-xs pt-1 font-bold inline-block"
+                    v-if="errors.has('terms')"
+                  >You must accept the terms and conditions to proceed.</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="mb-3" v-if="formType != 'password_recovery'">
             <a
               href="#"
@@ -93,8 +159,8 @@
           </div>
           <div
             class="mb-3 bg-red-200 text-red-500 p-3 rounded text-center"
-            v-if="isLoginFailed"
-          >Invalid Email or Password. Please try again.</div>
+            v-if="isSubmissionFailed"
+          >{{ formMessage }}</div>
           <div class="mb-3">
             <button
               class="w-full items-center justify-center focus:outline-none outline-none flex flex-grow border px-3 py-2 font-bold rounded text-white border-white bg-primary hover:bg-primary-lighter"
@@ -111,117 +177,134 @@
         </form>
       </div>
     </div>
-    <div class="bot-text flex">
-      <div class="text-center">
-        By using
-        <strong>printree studio</strong> you also agree to our
-        <a href="#" class="text-blue-400">Terms of Service</a> and
-        <a href="#" class="text-blue-400">Privacy Policy</a>.
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
+import confetti from "canvas-confetti";
+
 export default {
   data() {
     return {
-      formType: 'sign_in',
+      formType: "sign_in",
       formData: {
         name: null,
         email: null,
         password: null,
-        shopName: null
+        shopName: null,
+        portfolio: null,
       },
+      terms: false,
       isLoading: false,
-      isLoginFailed: false
-    }
+      isSubmissionFailed: false,
+      formMessage: null,
+      isSignUpSuccess: false,
+    };
   },
   computed: {
     formTitle() {
-      let title = 'SIGN IN WITH EMAIL'
+      let title = "SIGN IN WITH EMAIL";
       switch (this.formType) {
-        case 'password_recovery':
-          title = 'FORGOT PASSWORD?'
-          break
-        case 'sign_up':
-          title = 'CREATE AN ACCOUNT'
-          break
+        case "password_recovery":
+          title = "FORGOT PASSWORD?";
+          break;
+        case "sign_up":
+          title = "CREATE AN ACCOUNT";
+          break;
       }
-      return title
+      return title;
     },
     formButtonText() {
-      let title = 'SIGN IN'
+      let title = "SIGN IN";
       switch (this.formType) {
-        case 'password_recovery':
-          title = 'RESET PASSWORD'
-          break
-        case 'sign_up':
-          title = 'SIGN UP'
-          break
+        case "password_recovery":
+          title = "RESET PASSWORD";
+          break;
+        case "sign_up":
+          title = "SIGN UP";
+          break;
       }
-      return title
-    }
+      return title;
+    },
   },
   methods: {
     toggleForm(type = null) {
-      this.$validator.reset()
-      this.formType = type
+      this.$validator.reset();
+      this.formType = type;
+      this.isSubmissionFailed = false;
       this.$nextTick(() => {
         this.formData = {
           name: null,
           email: null,
-          password: null
-        }
-      })
+          password: null,
+          portfolio: null,
+        };
+      });
     },
     async signInAsAGuest() {
-      this.isLoading = true
-      let response = await this.$store.dispatch('user/signInAsAGuest')
-      this.isLoading = false
-      if (response.status) this.$emit('login-success')
+      this.isLoading = true;
+      let response = await this.$store.dispatch("user/signInAsAGuest");
+      this.isLoading = false;
+      if (response.status) this.$emit("login-success");
     },
     async submitForm() {
-      this.isLoginFailed = false
-      let validationResponse = await this.$validator.validateAll()
-      if (!validationResponse) return
-      this.isLoading = true
-      let action = 'user/signIn'
+      this.isSubmissionFailed = false;
+      let validationResponse = await this.$validator.validateAll();
+      if (!validationResponse) return;
+      this.isLoading = true;
+      let action = "user/signIn";
       switch (this.formType) {
-        case 'password_recovery':
-          action = 'user/sendPasswordRecovery'
-          break
-        case 'sign_up':
-          action = 'user/createAccount'
-          break
+        case "password_recovery":
+          action = "user/sendPasswordRecovery";
+          break;
+        case "sign_up":
+          action = "user/createAccount";
+          break;
       }
-      let res = await this.$store.dispatch(action, this.formData)
-      this.isLoading = false
-      if (!res.status && this.formType == 'sign_in') {
-        this.isLoginFailed = true
-        return
-      }
-      if(this.formType === 'password_recovery'){
-        if(!res.status){
-          this.$toast.error(res.message, {
-            position: 'bottom'
-          })
-          return
+      try {
+        let res = await this.$store.dispatch(action, this.formData);
+
+        if (this.formType === "password_recovery") {
+          if (!res.status) {
+            this.$toast.error(res.message, {
+              position: "bottom",
+            });
+            return;
+          }
+          this.$toast.success(
+            "A reset password email has been sent to your email.",
+            {
+              position: "bottom",
+            }
+          );
+          this.formData = {
+            name: null,
+            email: null,
+            password: null,
+            portfolio: null,
+          };
+          this.formType = "sign_in";
+          this.$validator.reset();
+          return;
         }
-        this.$toast.success('A reset password email has been sent to your email.', {
-          position: 'bottom'
-        })
-        this.formData = {
-          name: null,
-          email: null,
-          password: null
+        if (this.formType !== "sign_up") this.$emit("login-success");
+        else {
+          this.isSignUpSuccess = true;
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
         }
-        this.formType = 'sign_in'
-        this.$validator.reset()
-        return
+      } catch (e) {
+        this.isSubmissionFailed = true;
+        this.formMessage = e.message;
+        if (this.formType == "sign_in") {
+          this.formMessage = "Invalid Email or Password. Please try again.";
+        }
       }
-      this.$emit('login-success')
-    }
-  }
-}
+      this.isLoading = false;
+    },
+  },
+};
 </script>
