@@ -53,7 +53,7 @@
             class="shadow-xl border border-white bg-primary px-10 py-4 text-sm rounded-full font-bold rounded text-white hover:bg-primary-lighter"
             @click="() => !isLoading ? showAvailableProducts() : false"
           >
-            <span>START DESIGNING</span>
+            <span>START DESIGNING NOW</span>
             <span class="ml-2">
               <font-awesome-icon :icon="['fas', 'arrow-right']" />
             </span>
@@ -113,7 +113,6 @@ export default {
     AvailableProducts,
     AuthModal,
   },
-  middleware: "authenticated",
   data() {
     return {
       isLoading: true,

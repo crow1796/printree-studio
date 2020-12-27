@@ -76,16 +76,12 @@
       maxW: {
         type: Number,
         required: true,
-        validator: function (val) {
-          return val > 0
-        }
+        default: -1,
       },
       maxH: {
         type: Number,
         required: true,
-        validator: function (val) {
-          return val > 0
-        }
+        default: -1,
       },
       angle: {
         type: Number,

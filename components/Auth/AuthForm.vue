@@ -1,11 +1,17 @@
 <template>
   <div class="flex flex-col items-center w-full p-4">
     <AreaLoader v-if="isLoading" />
-    <div class="top-text flex flex-col items-center">
+    <div class="top-text flex flex-col items-center" v-if="!isSignUpSuccess">
       <h2 class="font-black text-4xl text-primary-lighter mb-4">SIGN IN TO CONTINUE</h2>
     </div>
     <div class="content w-full flex flex-grow">
-      <div class="form w-full">
+      <div class="text-center mt-8 mb-6" v-if="isSignUpSuccess">
+        <div class="font-bold">Thank you for signing up!</div>
+        <div class="mt-2">
+          We will now review your account. It usually takes 1-3 working days for your account to be approved. You will receive an email once your account is approved.
+        </div>
+      </div>
+      <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
           <div class="mb-3" v-if="formType == 'sign_up'">
@@ -85,6 +91,31 @@
             >{{ errors.first('pass') }}</span>
           </div>
           <div class="mb-3" v-if="formType === 'sign_up'">
+            <label for="pass" class="font-bold flex items-center">
+              Link to your Portfolio
+              <span class="pl-1" v-tippy="{arrow: true}" title="This can help you get your application approved faster.">
+                <font-awesome-icon :icon="['fas', 'question-circle']" />
+              </span>
+            </label>
+            <div class="text-xs text-blue-500 mt-1">(Google Drive, Dropbox, personal website, etc.)</div>
+            <div class="mt-2">
+              <input
+                type="url"
+                name="portfolio"
+                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                :class="{ 'border-red-400': errors.has('portfolio'), 'focus:border-gray-600': !errors.has('portfolio') }"
+                placeholder="Portfolio Link"
+                v-model="formData.portfolio"
+                data-vv-as="Portfolio"
+                v-validate="'required|url'"
+              />
+            </div>
+            <span
+              class="text-red-700 text-xs pt-1 font-bold inline-block"
+              v-if="errors.has('portfolio')"
+            >{{ errors.first('portfolio') }}</span>
+          </div>
+          <div class="mb-3" v-if="formType === 'sign_up'">
             <div class="flex items-center">
               <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
                 <input
@@ -150,11 +181,13 @@ export default {
         email: null,
         password: null,
         shopName: null,
+        portfolio: null
       },
       terms: false,
       isLoading: false,
       isSubmissionFailed: false,
       formMessage: null,
+      isSignUpSuccess: false
     };
   },
   computed: {
@@ -193,6 +226,7 @@ export default {
           name: null,
           email: null,
           password: null,
+          portfolio: null
         };
       });
     },
@@ -236,12 +270,14 @@ export default {
             name: null,
             email: null,
             password: null,
+            portfolio: null
           };
           this.formType = "sign_in";
           this.$validator.reset();
           return;
         }
-        this.$emit("login-success");
+        if(this.formType !== 'sign_up') this.$emit("login-success");
+        else this.isSignUpSuccess = true
       } catch (e) {
         this.isSubmissionFailed = true;
         this.formMessage = e.message;

@@ -14,12 +14,8 @@
             </div>
           </div>
         </div>
-        <div
-          class="modal-body p-4 text-center"
-        >
-          <div>
-            Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?
-          </div>
+        <div class="modal-body p-4 text-center">
+          <div>Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
           <div class="mt-4">
             <textarea
               name="notes"
@@ -136,10 +132,23 @@
                     <div>PHP {{ selectedProductBasePrice }}</div>
                   </div>
                 </div>
+
+                <div class="pt-4">
+                  <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
+                  <div class="flex">
+                    <span
+                      v-for="(tag, i) in selectedProduct.meta.tags"
+                      :key="i"
+                      class="mr-2 px-2 py-1 bg-blue-600 rounded text-white text-xs"
+                    >{{ tag }}</span>
+                  </div>
+                </div>
+
                 <div>
-                  <div class="mt-2" v-if="selectedProduct.meta.description">
+                  <div class="my-2">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-2">Description</div>
                     <div
-                      class="w-full border rounded p-4 outine-none resize-none"
+                      class="w-full border rounded p-4 outine-none resize-none h-40"
                     >{{selectedProduct.meta.description}}</div>
                   </div>
                 </div>
@@ -180,7 +189,10 @@
           class="flex p-4 items-center border-t"
           :class="{'justify-end': meta.status === 'declined', 'justify-between': ['pending', 'reviewing'].includes(meta.status)}"
         >
-          <PTButton @click="confirmAction('decline')" v-if="['pending', 'reviewing'].includes(meta.status)">DECLINE</PTButton>
+          <PTButton
+            @click="confirmAction('decline')"
+            v-if="['pending', 'reviewing'].includes(meta.status)"
+          >DECLINE</PTButton>
           <PTButton
             color="primary"
             v-if="meta.status !== 'approved'"
@@ -193,21 +205,21 @@
 </template>
 
 <script>
-import VueTailwindModal from '@/components/VueTailwindModal'
-import VueTailwindDrawer from '@/components/VueTailwindDrawer'
+import VueTailwindModal from "@/components/VueTailwindModal";
+import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 
 export default {
   props: {
     products: {
-      required: true
+      required: true,
     },
     meta: {
-      required: true
-    }
+      required: true,
+    },
   },
   components: {
     VueTailwindDrawer,
-    VueTailwindModal
+    VueTailwindModal,
   },
   data() {
     return {
@@ -228,96 +240,101 @@ export default {
       estimatedMaxProfit: 0,
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
-      isCalculating: false
-    }
+      isCalculating: false,
+    };
   },
   methods: {
-    async markAsFeatured(){
-      this.isLoading = true
-      const res = await this.$store.dispatch('admin/markAsFeatured', {
-        type: 'product',
+    async markAsFeatured() {
+      this.isLoading = true;
+      const res = await this.$store.dispatch("admin/markAsFeatured", {
+        type: "product",
         obj: this.selectedProduct,
-        is_marked: this.selectedProduct.featured_at ? true : false
-      })
-      this.selectedProduct = res.data
-      this.isLoading = false
-      this.$toast.success(this.selectedProduct.featured_at ? 'Product is now featured!' : 'Product has been unfeatured!', {
-        position: 'top'
-      })
+        is_marked: this.selectedProduct.featured_at ? true : false,
+      });
+      this.selectedProduct = res.data;
+      this.isLoading = false;
+      this.$toast.success(
+        this.selectedProduct.featured_at
+          ? "Product is now featured!"
+          : "Product has been unfeatured!",
+        {
+          position: "top",
+        }
+      );
     },
     switchSides() {
       const sides = _.keys(
         this.selectedProduct.variants[this.selectedProductVariantKey].sides
-      )
-      const sideIndex = sides.indexOf(this.selectedProductSide)
-      const nextSide = sides[sideIndex + 1]
+      );
+      const sideIndex = sides.indexOf(this.selectedProductSide);
+      const nextSide = sides[sideIndex + 1];
       if (nextSide) {
-        this.selectedProductSide = nextSide
-        return
+        this.selectedProductSide = nextSide;
+        return;
       }
-      this.selectedProductSide = _.first(sides)
+      this.selectedProductSide = _.first(sides);
     },
     downloadDesign() {
-      const fileName = `${this.selectedProduct.meta.name}-${this.selectedProduct._id}`
-      const fileType = 'image/svg+xml'
+      const fileName = `${this.selectedProduct.meta.name}-${this.selectedProduct._id}`;
+      const fileType = "image/svg+xml";
       let content = this.selectedProduct.variants[
         this.selectedProductVariantKey
-      ].sides[this.selectedProductSide].design
+      ].sides[this.selectedProductSide].design;
 
-      let a = document.createElement('a')
-      a.target = '_blank';
-      a.download = `(${this.selectedProductSide.toUpperCase()})${fileName}.svg`
-      a.href = content
-      a.style.display = 'none'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      setTimeout(function() {
-        URL.revokeObjectURL(a.href)
-      }, 1500)
+      let a = document.createElement("a");
+      a.target = "_blank";
+      a.download = `(${this.selectedProductSide.toUpperCase()})${fileName}.svg`;
+      a.href = content;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () {
+        URL.revokeObjectURL(a.href);
+      }, 1500);
     },
     async updateCollectionStatus() {
-      this.isLoading = true
-      this.$refs.publishConfirmationModal.hide()
-      let status = 'approved'
-      if(this.confirmationAction === 'decline') status = 'declined'
-      await this.$store.dispatch('admin/updateCollectionStatus', {
+      this.isLoading = true;
+      this.$refs.publishConfirmationModal.hide();
+      let status = "approved";
+      if (this.confirmationAction === "decline") status = "declined";
+      await this.$store.dispatch("admin/updateCollectionStatus", {
         _id: this.meta._id,
-        status
-      })
-      this.isLoading = false
-      this.$toast.success('Collection status has been updated successfully!', {
-        position: 'top'
-      })
+        status,
+      });
+      this.isLoading = false;
+      this.$toast.success("Collection status has been updated successfully!", {
+        position: "top",
+      });
     },
     selectProduct(product) {
-      this.selectedProduct = JSON.parse(JSON.stringify(product))
+      this.selectedProduct = JSON.parse(JSON.stringify(product));
     },
     _placeholderOfFirstVariantOf(product) {
-      const firstKey = _.first(_.keys(product.variants))
+      const firstKey = _.first(_.keys(product.variants));
       return product.variants[firstKey].sides[
         this._firstPrintableAreaOf(product.variants[firstKey].sides)
-      ].with_placeholder
+      ].with_placeholder;
     },
     _firstPrintableAreaOf(variant) {
-      let areas = _.keys(variant)
-      return _.includes(areas, 'front') ? 'front' : _.head(areas)
+      let areas = _.keys(variant);
+      return _.includes(areas, "front") ? "front" : _.head(areas);
     },
     show() {
-      this.$refs.drawer.show()
-      this.calculateProfit()
+      this.$refs.drawer.show();
+      this.calculateProfit();
     },
     hide() {
-      this.$refs.drawer.hide()
+      this.$refs.drawer.hide();
     },
     _calculateEstProfit() {
       let totalProfit = 0;
-      _.map(this.generatedProducts, product => {
-        _.map(product.variants, variant => {
+      _.map(this.generatedProducts, (product) => {
+        _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
               variant.available_sizes,
-              s => s.name === size.name
+              (s) => s.name === size.name
             );
             if (!availableSize) return;
             let baseCost = availableSize.baseCost;
@@ -348,30 +365,32 @@ export default {
       }, 2000);
     },
     confirmAction(action) {
-      this.confirmationAction = action
-      this.$refs.publishConfirmationModal.show()
-    }
+      this.confirmationAction = action;
+      this.$refs.publishConfirmationModal.show();
+    },
   },
   computed: {
     productTotalPrice() {
-      return this.selectedProductBasePrice + this.selectedProductProfit
+      return this.selectedProductBasePrice + this.selectedProductProfit;
     },
     hasPreviousProductOrVariant() {
-      const variationKeys = _.keys(this.selectedProduct.variants)
+      const variationKeys = _.keys(this.selectedProduct.variants);
       const previousVariationKey =
-        variationKeys[variationKeys.indexOf(this.selectedProductVariantKey) - 1]
+        variationKeys[
+          variationKeys.indexOf(this.selectedProductVariantKey) - 1
+        ];
 
       return (
         _.findIndex(this.generatedProducts, { id: this.selectedProduct._id }) >
           0 || previousVariationKey
-      )
-    }
+      );
+    },
   },
   watch: {
     selectedProduct: {
       immediate: true,
       handler(to, from) {
-        if(!to) return;
+        if (!to) return;
         const firstVariantKey = _.first(_.keys(to.variants));
         this.selectedProductSizes = JSON.parse(
           JSON.stringify(to.variants[firstVariantKey].sizes)
@@ -380,16 +399,17 @@ export default {
         this.selectedProductBasePrice = _.first(
           to.variants[firstVariantKey].available_sizes
         ).baseCost;
-        
+
         this.selectedProductSide = this._firstPrintableAreaOf(
           to.variants[this.selectedProductVariantKey].sides
-        )
+        );
 
         this.selectedProductProfit =
           to.variants[firstVariantKey].sizes[0].price;
 
         _.keys(this.selectedProductSizes).map(
-          s => (this.selectedProductSizes[s].price = this.selectedProductProfit)
+          (s) =>
+            (this.selectedProductSizes[s].price = this.selectedProductProfit)
         );
 
         this.selectedProduct.variants[
@@ -397,30 +417,30 @@ export default {
         ].sizes = this.selectedProductSizes;
 
         this._calculateEstProfit();
-      }
+      },
     },
     selectedProductVariantKey: {
       immediate: true,
       handler(to) {
-        if(!this.selectedProduct) return;
+        if (!this.selectedProduct) return;
         this.selectedProductSizes = this.selectedProduct.variants[to].sizes;
 
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
-      }
+      },
     },
     selectedProductProfit: {
       immediate: true,
       handler(to) {
-        if(!this.selectedProduct) return;
+        if (!this.selectedProduct) return;
         const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));
         this.selectedProductSizes = this.selectedProduct.variants[
           firstVariantKey
         ].sizes;
 
         _.keys(this.selectedProductSizes).map(
-          s => (this.selectedProductSizes[s].price = to)
+          (s) => (this.selectedProductSizes[s].price = to)
         );
 
         this.generatedProducts[
@@ -428,10 +448,10 @@ export default {
         ].variants[
           this.selectedProductVariantKey
         ].sizes = this.selectedProductSizes;
-        
+
         this.calculateProfit();
-      }
-    }
-  }
-}
+      },
+    },
+  },
+};
 </script>
