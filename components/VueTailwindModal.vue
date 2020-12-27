@@ -1,6 +1,6 @@
 <template>
   <div
-    class="inset-0 z-70 overflow-hidden bg-smoke-light flex"
+    class="inset-0 z-70 overflow-auto bg-smoke-light flex"
     :class="position"
     v-if="isShown"
     @click="() => backdrop ? hide() : makeBounce()"
@@ -53,12 +53,14 @@ export default {
       }, 300)
     },
     show() {
+      document.body.style.overflow = 'hidden'
       this.isShown = true
       setTimeout(() => {
         this.isContentShown = true
       }, 300)
     },
     hide() {
+      document.body.style.overflow = 'auto'
       this.isContentShown = false
       setTimeout(() => {
         this.isShown = false

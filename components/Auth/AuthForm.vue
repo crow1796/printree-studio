@@ -6,9 +6,14 @@
     </div>
     <div class="content w-full flex flex-grow">
       <div class="text-center mt-8 mb-6" v-if="isSignUpSuccess">
+        <div class="mb-4">
+          <img src="~/assets/images/welcome.svg" alt="Welcome" class="sm:w-3/5 mx-auto" />
+        </div>
         <div class="font-bold">Thank you for signing up!</div>
         <div class="mt-2">
-          We will now review your account. It usually takes 1-3 working days for your account to be approved. You will receive an email once your account is approved.
+          We will now review your account.
+          <!-- It usually takes 1-3 working days for your account to be approved.  -->
+          You will receive an email once your account is approved.
         </div>
       </div>
       <div class="form w-full" v-if="!isSignUpSuccess">
@@ -93,7 +98,11 @@
           <div class="mb-3" v-if="formType === 'sign_up'">
             <label for="pass" class="font-bold flex items-center">
               Link to your Portfolio
-              <span class="pl-1" v-tippy="{arrow: true}" title="This can help you get your application approved faster.">
+              <span
+                class="pl-1"
+                v-tippy="{arrow: true}"
+                title="This can help you get your application approved faster."
+              >
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
               </span>
             </label>
@@ -172,6 +181,8 @@
 </template>
 
 <script>
+import confetti from "canvas-confetti";
+
 export default {
   data() {
     return {
@@ -181,13 +192,13 @@ export default {
         email: null,
         password: null,
         shopName: null,
-        portfolio: null
+        portfolio: null,
       },
       terms: false,
       isLoading: false,
       isSubmissionFailed: false,
       formMessage: null,
-      isSignUpSuccess: false
+      isSignUpSuccess: false,
     };
   },
   computed: {
@@ -226,7 +237,7 @@ export default {
           name: null,
           email: null,
           password: null,
-          portfolio: null
+          portfolio: null,
         };
       });
     },
@@ -270,14 +281,21 @@ export default {
             name: null,
             email: null,
             password: null,
-            portfolio: null
+            portfolio: null,
           };
           this.formType = "sign_in";
           this.$validator.reset();
           return;
         }
-        if(this.formType !== 'sign_up') this.$emit("login-success");
-        else this.isSignUpSuccess = true
+        if (this.formType !== "sign_up") this.$emit("login-success");
+        else {
+          this.isSignUpSuccess = true;
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+        }
       } catch (e) {
         this.isSubmissionFailed = true;
         this.formMessage = e.message;
