@@ -14,7 +14,7 @@
                   :href="shopifyUrl"
                   target="_blank"
                   class="hover:text-primary-lighter mr-4"
-                >Marketplace</a>
+                >Shop</a>
               </li>
             </ul>
           </div>

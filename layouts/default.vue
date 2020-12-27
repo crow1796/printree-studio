@@ -16,7 +16,7 @@
                 :href="shopifyUrl"
                 target="_blank"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Marketplace</a>
+              >Shop</a>
               <nuxt-link
                 :to="dashboardLink"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
@@ -47,7 +47,7 @@
               <nuxt-link
                 to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mb-1"
-              >Marketplace</nuxt-link>
+              >Shop</nuxt-link>
               <div class="flex justify-between items-center border-t-2 pt-2">
                 <a
                   href="#"
