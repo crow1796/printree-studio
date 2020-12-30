@@ -11,6 +11,7 @@ import { mapGetters } from "vuex";
 import CollectionsTable from "@/components/Admin/CollectionsTable";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import SimplePagination from "@/components/SimplePagination";
+import UserTypeCheckerMixin from '@/components/mixins/UserTypeChecker'
 
 export default {
   layout: "admin_dashboard",
@@ -25,6 +26,7 @@ export default {
         "/admin/collections/?colpage=1&status=approved,declined,pending,reviewing"
       );
   },
+  mixins: [UserTypeCheckerMixin],
   data() {
     return {
       isLoading: true,

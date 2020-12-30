@@ -64,7 +64,7 @@
           </div>
         </div>
         <div class="modal-body p-4 text-center">
-          {{ meta.plan === 'Sell' ? 'Are you sure you want to publish these products?' : 'Are you sure you want to proceed? This collection will be added to your cart.' }}
+          {{ meta.plan === 'Sell' ? 'Are you sure you want to publish these products?' : 'Are you sure you want to proceed? You will be redirected to the checkout page.' }}
           <div
             v-if="meta.plan === 'Sell'"
             class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"
@@ -94,7 +94,7 @@
     <div class="flex h-full w-full text-gray-600" v-if="selectedProduct">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4">
-          <!-- <div class="flex w-4/12 uppercase flex-col">
+          <div class="flex w-4/12 uppercase flex-col" v-if="userTypeIs('seller')">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
@@ -114,7 +114,7 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
-          </div>-->
+          </div>
           <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
@@ -176,11 +176,11 @@
                   />
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
-                  <div class="relative flex flex-col">
+                  <div class="relative flex flex-col" v-if="userTypeIs('seller')">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
-                    <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
+                    <div>PHP {{ selectedProductBasePrice }} <span>+</span>&nbsp;</div>
                   </div>
-                  <div class="relative flex flex-col">
+                  <div class="relative flex flex-col" v-if="userTypeIs('seller')">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
@@ -198,18 +198,11 @@
                   >
                     <div
                       class="text-xs uppercase font-bold mb-1"
-                    >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
+                    >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Price' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
                   </div>
-                  <div
-                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded ml-2"
-                    v-if="meta.plan === 'buy'"
-                  >
-                    <div class="text-xs uppercase font-bold mb-1">Pay Only</div>
-                    <div>PHP {{ selectedProductBasePrice }}</div>
-                  </div>
                 </div>
-                <div class="pt-4">
+                <div class="pt-4" v-if="userTypeIs('seller')">
                   <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
                   <vue-tags-input
                     v-model="tag"
@@ -221,7 +214,7 @@
                   />
                 </div>
                 <div>
-                  <div class="my-2">
+                  <div class="my-2" v-if="userTypeIs('seller')">
                     <textarea
                       name="product_description"
                       id="product_description"
@@ -234,7 +227,7 @@
                   </div>
 
                   <div class="bg-gray-200 rounded p-4 shadow mt-8">
-                    <div class="font-bold uppercase">Profit Calculator</div>
+                    <div class="font-bold uppercase">{{ userTypeIs('seller') ? 'Profit Calculator' : 'Quantity' }}</div>
                     <div class="flex flex-wrap">
                       <div
                         class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-4 bg-white"
@@ -260,18 +253,17 @@
                     <div
                       class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
                     >
-                      <div>TOTAL ESTIMATED PROFIT</div>
+                      <div>{{ userTypeIs('seller') ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
                       <div>
                         <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
                         <number
-                          v-if="estimatedMinProfit"
                           animationPaused
                           ref="estMinProfit"
                           :to="estimatedMinProfit"
                           :format="(num) => num.formatMoney('₱ ')"
                           :duration=".4"
                         />
-                        <span class="ml-2">
+                        <span class="ml-2" v-if="userTypeIs('seller')">
                           <span v-tippy="{arrow: true}" title="-7% service fee">
                             <font-awesome-icon
                               v-if="estimatedMinProfit"
@@ -346,6 +338,8 @@ import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
 import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
+import UserTypeCheckerMixin from '@/components/mixins/UserTypeChecker'
+
 const SERVICE_FEE = 0.07;
 
 export default {
@@ -366,6 +360,7 @@ export default {
     VueTailwindToast,
     AutosizeInput,
   },
+  mixins: [UserTypeCheckerMixin],
   data() {
     return {
       selectedProductSide: "front",
@@ -493,7 +488,7 @@ export default {
       this.selectedProduct = JSON.parse(JSON.stringify(product));
     },
     changeCurrentProductPlan({ value }) {
-      let plan = "buy";
+      let plan = "Buy";
       if (value) plan = "Sell";
       this.$store.commit("designer/DESIGN_PLAN", plan);
     },
@@ -586,11 +581,11 @@ export default {
       this.selectProduct(nextProduct);
     },
     setQuantityAndPrice(n, p, v) {
-      if (this.meta.plan == "buy") return;
       this._calculateEstProfit();
     },
     _calculateEstProfit() {
       let totalProfit = 0;
+      let printreeNet = 0;
       _.map(this.generatedProducts, (product) => {
         _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
@@ -604,12 +599,13 @@ export default {
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
             let net = totalWithCustomerPrice - totalForPrintree;
+            printreeNet += totalForPrintree;
             totalProfit += net;
           });
         });
       });
       let minProfit = totalProfit - totalProfit * SERVICE_FEE;
-      this.estimatedMinProfit = minProfit;
+      this.estimatedMinProfit = this.userTypeIs('seller') ? minProfit : printreeNet;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });
