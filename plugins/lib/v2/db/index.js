@@ -2,7 +2,7 @@ import { createDesignFor, getCollection, saveCollection, deleteCollection, updat
 import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, setVariantMainThumbnail } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -45,6 +45,7 @@ export default (axios) => {
       updateAccount: (data) => updateAccount(axios, data),
       removeProductFromCollection: (id) => removeProductFromCollection(axios, id),
       collectionStatus: (id) => collectionStatus(axios, id),
+      setVariantMainThumbnail: (data) => setVariantMainThumbnail(axios, data),
     }
   };
 };

@@ -254,7 +254,7 @@ export default {
   methods: {
     userType(type) {
       let finalType = "sell";
-      if (type === "buyer") finalType = "buyer";
+      if (type === "buyer") finalType = "BUY";
       return finalType;
     },
     changeUserType(type) {

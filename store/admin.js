@@ -1,6 +1,3 @@
-import adminDb from '~/plugins/lib/db/admin'
-import db from '~/plugins/lib/db'
-
 const state = () => ({
   user: null,
   isLoggedIn: false,
@@ -96,11 +93,7 @@ const actions = {
     context.commit('UPDATE_USER', res.data.user)
   },
   async updateCollection(context, { _id, data }) {
-    await db.updateCollection(_id, data)
-    context.commit('UPDATE_COLLECTION_STATUS', {
-      _id,
-      status: data.status
-    })
+    
   },
   async updateCollectionStatus(context, { _id, status }) {
     await this.$api.admin.updateCollectionStatus({ _id, status })
@@ -150,8 +143,7 @@ const actions = {
     return res
   },
   async markAsFeatured(context, data) {
-    const res = await adminDb.markAsFeatured(data)
-    return res
+    
   }
 }
 

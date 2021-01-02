@@ -241,7 +241,7 @@
                       trigger="click"
                       arrow
                       interactive
-                      v-if="['approved'].includes(col.status)"
+                      v-if="['approved'].includes(col.status) && col.plan === 'Sell'"
                     >
                       <template v-slot:trigger>
                         <button
@@ -271,6 +271,14 @@
                         </button>
                       </div>
                     </tippy>
+                    <button
+                      type="button"
+                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
+                      title="Buy Again"
+                      v-tippy="{arrow: true}"
+                    >
+                      <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -373,7 +381,7 @@ export default {
         this.$toast.info(message, {
           position: "top",
         });
-        return false
+        return false;
       }
 
       return true;
@@ -381,7 +389,7 @@ export default {
     async editCollection(collection) {
       if (!["draft", "pending", "declined"].includes(collection.status)) return;
       const statusValidation = await this._validateStatusOf(collection);
-      if(!statusValidation) return;
+      if (!statusValidation) return;
 
       localStorage.removeItem("_stored_ptree");
       this.$storage.setLocalStorage("current_design_id", collection._id);
@@ -390,7 +398,7 @@ export default {
     },
     async showDeleteCollectionConfirmation(collection) {
       const statusValidation = await this._validateStatusOf(collection);
-      if(!statusValidation) return;
+      if (!statusValidation) return;
       this.collectionToDelete = collection;
       this.$refs.deleteConfirmationModal.show();
     },

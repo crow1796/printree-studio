@@ -88,11 +88,11 @@ export const saveCollection = async (axios, collection) => {
     products: _.map(collection.selectedProducts, stringifyContentsOfProduct),
     plan: collection.plan,
   };
-
   const { data } = await axios.post("/gql", {
     query: queries.updateUserCollection,
     variables: {
       collection: tmpCollection,
+      isFinal: collection.isFinal
     },
   });
   const { updateUserCollection } = data.data;

@@ -36,6 +36,15 @@ export const collectionStatus = async (axios, id) => {
   return collectionStatus;
 }
 
+export const setVariantMainThumbnail = async (axios, variables) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.setVariantMainThumbnail,
+    variables
+  });
+  const setVariantMainThumbnail = data.data.setVariantMainThumbnail;
+  return setVariantMainThumbnail;
+}
+
 export const payoutRequest = async (axios, payout) => {
   const { data } = await axios.post("/gql", {
     query: queries.payoutRequest,

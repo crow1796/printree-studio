@@ -31,7 +31,7 @@ export default {
     return {
       isLoading: true,
       query: {
-        plan: "Sell",
+        plan: ["Sell", "Buy"],
         status: ["approved", "declined", "pending", "reviewing"],
         sorting: {
           field: "created_at",

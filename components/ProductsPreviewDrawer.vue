@@ -64,11 +64,10 @@
           </div>
         </div>
         <div class="modal-body p-4 text-center">
-          {{ meta.plan === 'Sell' ? 'Are you sure you want to publish these products?' : 'Are you sure you want to proceed? You will be redirected to the checkout page.' }}
+          {{ meta.plan === 'Sell' ? 'Are you sure you want to publish this collection?' : 'Are you sure you want to proceed?' }}
           <div
-            v-if="meta.plan === 'Sell'"
             class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"
-          >The collection will be reviewed first before publishing it into the store, you will receive an email once it's approved.</div>
+          >The collection will be reviewed first before {{ meta.plan === "Sell" ? "publishing it into the store" : "we start printing it" }}, you will receive an email once it's approved.</div>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
@@ -105,7 +104,7 @@
                 @change="changeCurrentProductPlan"
               />
               <span class="font-bold ml-1">
-                {{generatedProducts.length > 1 ? "THESE" : "THIS"}} PRODUCT
+                THIS COLLECTION
                 <span
                   v-if="generatedProducts.length > 1"
                 >S</span>
@@ -113,7 +112,7 @@
             </div>
             <div
               class="text-xs mt-1"
-            >{{ meta.plan == 'Sell' ? '100% FREE ● NO INVENTORY' : 'BULK DISCOUNTS ● IMMEDIATE FULFILLMENT' }}</div>
+            >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
           </div>
           <div class="flex flex-grow justify-end">
             <div
@@ -176,18 +175,21 @@
                   />
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
-                  <div class="relative flex flex-col" v-if="userTypeIs('seller')">
+                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
-                    <div>PHP {{ selectedProductBasePrice }} <span>+</span>&nbsp;</div>
+                    <div>
+                      PHP {{ selectedProductBasePrice }}
+                      <span>+</span>&nbsp;
+                    </div>
                   </div>
-                  <div class="relative flex flex-col" v-if="userTypeIs('seller')">
+                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
                       <autosize-input
                         input-class="border rounded px-4 py-2 text-center"
                         placeholder="0.00"
-                        @change="setProductProfit"
+                        @change="setQuantityAndProfit"
                         :minWidth="60"
                         :value="selectedProductProfit"
                       />&nbsp;=&nbsp;
@@ -202,7 +204,7 @@
                     <div>PHP {{ productTotalPrice }}</div>
                   </div>
                 </div>
-                <div class="pt-4" v-if="userTypeIs('seller')">
+                <div class="pt-4" v-if="meta.plan ==='Sell'">
                   <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
                   <vue-tags-input
                     v-model="tag"
@@ -214,7 +216,7 @@
                   />
                 </div>
                 <div>
-                  <div class="my-2" v-if="userTypeIs('seller')">
+                  <div class="my-2" v-if="meta.plan ==='Sell'">
                     <textarea
                       name="product_description"
                       id="product_description"
@@ -226,8 +228,10 @@
                     ></textarea>
                   </div>
 
-                  <div class="bg-gray-200 rounded p-4 shadow mt-8">
-                    <div class="font-bold uppercase">{{ userTypeIs('seller') ? 'Profit Calculator' : 'Quantity' }}</div>
+                  <div class="bg-gray-200 rounded p-4 shadow" :class="{'mt-2': meta.plan === 'Sell'}">
+                    <div
+                      class="font-bold uppercase"
+                    >{{ meta.plan ==='Sell' ? 'Profit Calculator' : 'Quantity' }}</div>
                     <div class="flex flex-wrap">
                       <div
                         class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-4 bg-white"
@@ -244,7 +248,7 @@
                               class="ml-1"
                               :min="0"
                               v-model="size.quantity"
-                              @input="calculateProfit(size.name)"
+                              @input="setQuantityAndProfit(size.quantity, 'quantity', size.name)"
                             />
                           </div>
                         </div>
@@ -253,7 +257,7 @@
                     <div
                       class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
                     >
-                      <div>{{ userTypeIs('seller') ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
+                      <div>{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
                       <div>
                         <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
                         <number
@@ -263,7 +267,7 @@
                           :format="(num) => num.formatMoney('₱ ')"
                           :duration=".4"
                         />
-                        <span class="ml-2" v-if="userTypeIs('seller')">
+                        <span class="ml-2" v-if="meta.plan ==='Sell'">
                           <span v-tippy="{arrow: true}" title="-7% service fee">
                             <font-awesome-icon
                               v-if="estimatedMinProfit"
@@ -338,7 +342,7 @@ import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
 import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
-import UserTypeCheckerMixin from '@/components/mixins/UserTypeChecker'
+import UserTypeCheckerMixin from "@/components/mixins/UserTypeChecker";
 
 const SERVICE_FEE = 0.07;
 
@@ -414,6 +418,7 @@ export default {
       );
     },
     productTotalPrice() {
+      if(this.meta.plan === 'Buy') return this.selectedProductBasePrice
       return this.selectedProductBasePrice + this.selectedProductProfit;
     },
     selectedVariantIndex() {
@@ -438,29 +443,15 @@ export default {
       }
       this.selectedProductSide = _.first(sides);
     },
-    makeId(length = 5) {
-      var result = "";
-      var characters =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-      var charactersLength = characters.length;
-      for (var i = 0; i < length; i++) {
-        result += characters.charAt(
-          Math.floor(Math.random() * charactersLength)
-        );
-      }
-      return result;
-    },
     async collectionConfirmed() {
-      if (this.meta.plan === "Sell") {
-        this.isLoading = true;
-        this.$refs.publishConfirmationModal.hide();
-        await this.$store.commit("designer/COLLECTION_STATUS", "pending");
-        await this.$store.dispatch("designer/saveData", {
-          shouldGenerateImages: false,
-        });
-        this.$router.replace("/dashboard/collections");
-        return;
-      }
+      this.isLoading = true;
+      this.$refs.publishConfirmationModal.hide();
+      await this.$store.commit("designer/COLLECTION_STATUS", "pending");
+      await this.$store.dispatch("designer/saveData", {
+        shouldGenerateImages: false,
+        isFinal: true,
+      });
+      this.$router.replace("/dashboard/collections");
     },
     _firstFullThumbnailOf(product) {
       return product.variants[this.selectedProductVariantKey].sides[
@@ -491,6 +482,7 @@ export default {
       let plan = "Buy";
       if (value) plan = "Sell";
       this.$store.commit("designer/DESIGN_PLAN", plan);
+      this.calculateProfit()
     },
     previousProduct() {
       const isValidated = this.validateAndSaveMeta();
@@ -563,10 +555,23 @@ export default {
       const isValidated = this.validateAndSaveMeta();
       if (!isValidated) return;
 
-      const nextProductIndex =
-        _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id }) +
-        1;
+      const currentProductIndex = _.findIndex(this.generatedProducts, {
+        _id: this.selectedProduct._id,
+      });
+
+      const nextProductIndex = currentProductIndex + 1;
       const nextProduct = this.generatedProducts[nextProductIndex];
+
+      const variantKeys = Object.keys(
+        this.generatedProducts[currentProductIndex].variants
+      );
+      const currentVariantKeyIndex = variantKeys.indexOf(
+        this.selectedProductVariantKey
+      );
+      const nextVariantKey = variantKeys[currentVariantKeyIndex + 1];
+
+      if (nextVariantKey)
+        return (this.selectedProductVariantKey = nextVariantKey);
 
       if (!nextProduct) {
         if (
@@ -579,9 +584,6 @@ export default {
       }
 
       this.selectProduct(nextProduct);
-    },
-    setQuantityAndPrice(n, p, v) {
-      this._calculateEstProfit();
     },
     _calculateEstProfit() {
       let totalProfit = 0;
@@ -604,8 +606,10 @@ export default {
           });
         });
       });
-      let minProfit = totalProfit - totalProfit * SERVICE_FEE;
-      this.estimatedMinProfit = this.userTypeIs('seller') ? minProfit : printreeNet;
+      let minProfit = totalProfit - (totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1));
+      this.estimatedMinProfit = this.meta.plan === "Sell"
+        ? minProfit
+        : printreeNet;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });
@@ -630,14 +634,23 @@ export default {
         },
       });
     },
-    setProductProfit(e) {
-      this.selectedProductProfit = e.target.value
-        ? parseFloat(e.target.value)
-        : 0;
+    setQuantityAndProfit(e, type = "profit", name) {
+      if (type === "profit") {
+        this.selectedProductProfit = e.target.value
+          ? parseFloat(e.target.value)
+          : 0;
+      }
 
-      _.keys(this.selectedProductSizes).map(
-        (s) => (this.selectedProductSizes[s].price = this.selectedProductProfit)
-      );
+      _.keys(this.selectedProductSizes).map((s) => {
+        this.selectedProductSizes[s].price = this.selectedProductProfit;
+      });
+
+      if (type === "quantity") {
+        const sizeIndex = _.findIndex(this.selectedProductSizes, {
+          name,
+        });
+        this.selectedProductSizes[sizeIndex].quantity = e;
+      }
 
       const productIndex = _.findIndex(this.selectedProducts, {
         _id: this.selectedProduct._id,
@@ -647,6 +660,7 @@ export default {
           this.selectedProducts[productIndex].variants,
           { _id: vi }
         );
+
         this.$store.commit("designer/PRODUCT_PROPERTIES", {
           _id: this.selectedProduct._id,
           props: {
@@ -654,11 +668,13 @@ export default {
             value: _.map(
               this.selectedProducts[productIndex].variants[variantIndex].sizes,
               (s) => {
+                const currentSize = _.find(this.selectedProductSizes, {
+                  name: s.name,
+                });
                 return {
                   ...s,
-                  price: _.find(this.selectedProductSizes, { name: s.name })
-                    ?.price,
-                  quantity: 0,
+                  price: currentSize?.price,
+                  quantity: this.meta.plan === "Sell" ? 0 : currentSize?.quantity,
                 };
               }
             ),

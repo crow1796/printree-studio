@@ -186,8 +186,8 @@ export default {
 
         let message = "";
         switch (status) {
-          case "approved":
-            message = "The collection is already approved.";
+          case "reviewing":
+            message = "The collection is already under review.";
             break;
         }
 

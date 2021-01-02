@@ -78,6 +78,10 @@ const getters = {
 }
 
 const actions = {
+  async setVariantMainThumbnail(context, data){
+    const variant = await this.$api.userDashboard.setVariantMainThumbnail(data)
+    return variant
+  },
   async getUserCollectionsOf(context, userId) {
     const collections = await this.$api.getUserCollectionsOf(userId)
     context.commit('USER_COLLECTIONS', collections)
