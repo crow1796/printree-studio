@@ -137,6 +137,7 @@ export default {
                             height
                         }
                         objects
+                        isMainThumb
                     }
                 }
             }
@@ -528,6 +529,16 @@ export default {
             email
             status
             portfolioLink
+        }
+    }
+  `,
+  setVariantMainThumbnail: `
+    mutation($_id: ID!, $side: String!) {
+        setVariantMainThumbnail(_id: $_id, side: $side) {
+            _id
+            contents {
+                isMainThumb
+            }
         }
     }
   `

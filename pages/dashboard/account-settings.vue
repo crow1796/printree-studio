@@ -1,11 +1,11 @@
 <template>
   <div class="relative">
     <AreaLoader v-if="isLoading" />
-    <div class="py-4">
+    <div class="py-4 w-6/12 mx-auto">
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">Account Settings</h2>
       </div>
-      <form @submit.prevent="updateAccount" class="w-6/12 mx-auto">
+      <form @submit.prevent="updateAccount">
         <div class="mb-3">
           <label for="name" class="font-bold">Full Name</label>
           <div>

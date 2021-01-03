@@ -25,18 +25,29 @@
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right">
-              <VueTailwindDropdown>
+              <VueTailwindDropdown width="200px">
                 <template v-slot:trigger>
                   <div
                     class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
                   >
-                    <span class="text-sm mr-1">{{ user.shopName }}'s</span>
+                    <span class="text-sm mr-1">{{ user.shopName ? `${user.shopName}'s` : user.name }}</span>
                     <div>
                       <font-awesome-icon :icon="['fas', 'chevron-down']" />
                     </div>
                   </div>
                 </template>
                 <template v-slot:content>
+                  <div class="flex flex-col flex-grow">
+                    <nuxt-link
+                      to="/dashboard/account-settings"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'cog']" />
+                      </span>
+                      <span>Account Settings</span>
+                    </nuxt-link>
+                  </div>
                   <div class="flex flex-col flex-grow">
                     <a
                       href="#"
@@ -71,7 +82,7 @@
                   My Collections
                 </nuxt-link>
               </div>
-              <div class="flex -mb-px mr-8">
+              <div class="flex -mb-px mr-8" v-if="userTypeIs('seller')">
                 <nuxt-link
                   to="/dashboard/payout"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
@@ -82,21 +93,9 @@
                   </span> Payouts
                 </nuxt-link>
               </div>
-              <div class="flex -mb-px">
-                <nuxt-link
-                  to="/dashboard/account-settings"
-                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
-                  active-class="text-primary"
-                >
-                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center">
-                    <font-awesome-icon :icon="['fas', 'cog']" />
-                  </span>
-                  Account Settings
-                </nuxt-link>
-              </div>
             </div>
 
-            <div>
+            <div v-if="userTypeIs('seller')">
               <TotalProfitCounter/>
             </div>
           </div>
@@ -113,11 +112,13 @@
 import TotalProfitCounter from "@/components/TotalProfitCounter";
 import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 import { mapGetters } from 'vuex'
+import UserTypeCheckerMixin from '@/components/mixins/UserTypeChecker'
 
 export default {
   head: {
     title: "Dashboard",
   },
+  mixins: [UserTypeCheckerMixin],
   middleware: ["auth"],
   components: {
     VueTailwindDropdown,
@@ -126,8 +127,7 @@ export default {
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
-      user: "user",
-    }),
+    })
   },
   methods: {
     async signOut() {
