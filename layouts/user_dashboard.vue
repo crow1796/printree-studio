@@ -112,7 +112,7 @@
 import TotalProfitCounter from "@/components/TotalProfitCounter";
 import VueTailwindDropdown from '@/components/VueTailwindDropdown'
 import { mapGetters } from 'vuex'
-import UserTypeCheckerMixin from '@/components/mixins/UserTypeChecker'
+import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
 
 export default {
   head: {

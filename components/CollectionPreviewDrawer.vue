@@ -282,7 +282,7 @@
 import VueTailwindModal from "@/components/VueTailwindModal";
 import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueNumericInput from "@/components/VueNumericInput";
-import UserTypeCheckerMixin from "@/components/mixins/UserTypeChecker";
+import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 
 const SERVICE_FEE = 0.07;
 

@@ -11,7 +11,7 @@ import { mapGetters } from "vuex";
 import CollectionsTable from "@/components/Admin/CollectionsTable";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import SimplePagination from "@/components/SimplePagination";
-import UserTypeCheckerMixin from '@/components/mixins/UserTypeChecker'
+import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
 
 export default {
   layout: "admin_dashboard",
