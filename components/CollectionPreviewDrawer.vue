@@ -328,6 +328,17 @@ export default {
         this.selectedProductSide
       ]?.with_placeholder;
     },
+    _toggleMainThumb() {
+      _.map(this.selectedProduct.variants, (variant, vk) => {
+        _.map(variant.sides, (s, k) => {
+          if (k === this.selectedProductSide) {
+            variant.sides[k].is_main_thumb = !s.is_main_thumb;
+            return;
+          }
+          variant.sides[k].is_main_thumb = false;
+        });
+      });
+    },
     async setAsMainImage() {
       try {
         const res = this.$store.dispatch(
@@ -338,16 +349,7 @@ export default {
           }
         );
 
-        _.map(
-          this.selectedProduct.variants[this.selectedProductVariantKey].sides,
-          (s, k) => {
-            if (k === this.selectedProductSide) {
-              s.is_main_thumb = !s.is_main_thumb;
-              return;
-            }
-            s.is_main_thumb = false;
-          }
-        );
+        this._toggleMainThumb();
 
         this.$toast.success("Saved!", {
           position: "top",
@@ -413,6 +415,9 @@ export default {
       this.$refs.publishConfirmationModal.hide();
       let status = "approved";
       if (this.confirmationAction === "decline") status = "declined";
+
+      await this.setAsMainImage();
+
       await this.$store.dispatch("admin/updateCollectionStatus", {
         _id: this.meta._id,
         status,
@@ -550,13 +555,7 @@ export default {
         );
         this.selectedProductSide = initialSide;
 
-        _.map(to.variants[this.selectedProductVariantKey].sides, (s, k) => {
-          if (k === this.selectedProductSide) {
-            s.is_main_thumb = !s.is_main_thumb;
-            return;
-          }
-          s.is_main_thumb = false;
-        });
+        this._toggleMainThumb();
 
         this._calculateEstProfit();
       },
@@ -570,6 +569,8 @@ export default {
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
+
+        this._toggleMainThumb();
       },
     },
     selectedProductProfit: {

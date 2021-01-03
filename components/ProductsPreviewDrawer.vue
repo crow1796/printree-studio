@@ -105,9 +105,7 @@
               />
               <span class="font-bold ml-1">
                 THIS COLLECTION
-                <span
-                  v-if="generatedProducts.length > 1"
-                >S</span>
+                <span v-if="generatedProducts.length > 1">S</span>
               </span>
             </div>
             <div
@@ -228,7 +226,10 @@
                     ></textarea>
                   </div>
 
-                  <div class="bg-gray-200 rounded p-4 shadow" :class="{'mt-2': meta.plan === 'Sell'}">
+                  <div
+                    class="bg-gray-200 rounded p-4 shadow"
+                    :class="{'mt-2': meta.plan === 'Sell'}"
+                  >
                     <div
                       class="font-bold uppercase"
                     >{{ meta.plan ==='Sell' ? 'Profit Calculator' : 'Quantity' }}</div>
@@ -418,7 +419,7 @@ export default {
       );
     },
     productTotalPrice() {
-      if(this.meta.plan === 'Buy') return this.selectedProductBasePrice
+      if (this.meta.plan === "Buy") return this.selectedProductBasePrice;
       return this.selectedProductBasePrice + this.selectedProductProfit;
     },
     selectedVariantIndex() {
@@ -482,7 +483,7 @@ export default {
       let plan = "Buy";
       if (value) plan = "Sell";
       this.$store.commit("designer/DESIGN_PLAN", plan);
-      this.calculateProfit()
+      this.calculateProfit();
     },
     previousProduct() {
       const isValidated = this.validateAndSaveMeta();
@@ -606,10 +607,11 @@ export default {
           });
         });
       });
-      let minProfit = totalProfit - (totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1));
-      this.estimatedMinProfit = this.meta.plan === "Sell"
-        ? minProfit
-        : printreeNet;
+      let minProfit =
+        totalProfit -
+        totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
+      this.estimatedMinProfit =
+        this.meta.plan === "Sell" ? minProfit : printreeNet;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });
@@ -655,9 +657,16 @@ export default {
       const productIndex = _.findIndex(this.selectedProducts, {
         _id: this.selectedProduct._id,
       });
-      const variantIndex = this.selectedVariantIndex
+      console.log(this.selectedProducts[productIndex].variants)
 
-      this.$store.commit("designer/PRODUCT_PROPERTIES", {
+      _.map(this.selectedProduct.variants, (v, vi) => {
+        const variantIndex = _.findIndex(
+          this.selectedProducts[productIndex].variants,
+          { _id: vi }
+        );
+        if(type === 'quantity' && variantIndex !== this.selectedVariantIndex) return;
+
+        this.$store.commit("designer/PRODUCT_PROPERTIES", {
           _id: this.selectedProduct._id,
           props: {
             path: `variants[${variantIndex}].sizes`,
@@ -671,12 +680,14 @@ export default {
                 return {
                   ...s,
                   price: currentSize?.price,
-                  quantity: this.meta.plan === "Sell" ? 0 : currentSize?.quantity,
+                  quantity:
+                    this.meta.plan === "Sell" ? 0 : currentSize?.quantity,
                 };
               }
             ),
           },
         });
+      });
 
       this.calculateProfit();
     },

@@ -10,7 +10,16 @@
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">All Collections</h2>
         <div class="my-2 flex sm:flex-row flex-col">
-          <div class="relative">
+          <div class="relative flex">
+            <button
+              type="button"
+              class="px-3 py-1 text-xs hover:bg-gray-200 border rounded"
+              title="Reload"
+              v-tippy="{arrow: true}"
+              @click="$emit('reload')"
+            >
+              <font-awesome-icon :icon="['fas', 'sync']" class="text-xs" />
+            </button>
             <select
               class="justify-center items-center mx-2 focus:outline-none outline-none flex flex-shrink border rounded text-gray-600 border-grey-lightest hover:bg-gray-100 appearance-none h-full px-4"
               @change="filter"
