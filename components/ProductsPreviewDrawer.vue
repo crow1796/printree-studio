@@ -655,13 +655,9 @@ export default {
       const productIndex = _.findIndex(this.selectedProducts, {
         _id: this.selectedProduct._id,
       });
-      _.map(this.selectedProduct.variants, (v, vi) => {
-        const variantIndex = _.findIndex(
-          this.selectedProducts[productIndex].variants,
-          { _id: vi }
-        );
+      const variantIndex = this.selectedVariantIndex
 
-        this.$store.commit("designer/PRODUCT_PROPERTIES", {
+      this.$store.commit("designer/PRODUCT_PROPERTIES", {
           _id: this.selectedProduct._id,
           props: {
             path: `variants[${variantIndex}].sizes`,
@@ -671,6 +667,7 @@ export default {
                 const currentSize = _.find(this.selectedProductSizes, {
                   name: s.name,
                 });
+
                 return {
                   ...s,
                   price: currentSize?.price,
@@ -680,7 +677,6 @@ export default {
             ),
           },
         });
-      });
 
       this.calculateProfit();
     },

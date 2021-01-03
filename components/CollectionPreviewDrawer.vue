@@ -42,7 +42,7 @@
         </div>
       </div>
     </VueTailwindModal>
-    <div class="flex flex-grow text-gray-600" :key="drawerId">
+    <div class="flex flex-grow text-gray-600" v-if="selectedProduct">
       <div class="flex flex-col flex-grow">
         <div class="flex flex-grow-0 items-center border-b p-4">
           <div class="flex flex-grow justify-end">
@@ -90,8 +90,9 @@
                     <font-awesome-icon :icon="['fas', 'eye']" />
                   </a>
                   <img
-                    :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
+                    :src="_firstFullThumbnailOf(selectedProduct)"
                     :key="`full_${selectedProduct._id}_${drawerId}`"
+                    :id="`full_${selectedProduct._id}_${drawerId}`"
                     class="w-full"
                   />
                 </div>
@@ -109,12 +110,13 @@
                       <img
                         :src="variant.sides[_firstPrintableAreaOf(variant.sides)]
                             .with_placeholder"
+                        :key="`variant_${variant._id}_${drawerId}`"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 flex-grow ml-4">
+              <div class="flex flex-col mt-5 flex-grow ml-4" :key="`${selectedProduct._id}-meta`">
                 <div class="text-4xl">
                   <span class="font-bold w-full outline-none">{{selectedProduct.meta.name}}</span>
                 </div>
@@ -168,6 +170,7 @@
                     class="bg-gray-200 rounded p-4 shadow"
                     :class="{'mt-2': meta.plan === 'Sell'}"
                     :key="`qands_${drawerId}`"
+                    v-if="meta.plan ==='Buy'"
                   >
                     <div
                       class="font-bold uppercase"
@@ -243,7 +246,11 @@
                       @click="selectProduct(product)"
                     >
                       <div class="px-2 pt-2">
-                        <img :src="_placeholderOfFirstVariantOf(product)" />
+                        <img
+                          :src="_placeholderOfFirstVariantOf(product)"
+                          :key="`${drawerId}_${product._id}`"
+                          :class="`side_thumb_${drawerId}_${product._id}`"
+                        />
                       </div>
                     </div>
                   </div>
@@ -301,9 +308,7 @@ export default {
       drawerId: this.makeId(),
       isLoading: false,
       generatedProducts: JSON.parse(JSON.stringify(this.products)),
-      selectedProduct: this.products.length
-        ? JSON.parse(JSON.stringify(this.products[0]))
-        : null,
+      selectedProduct: null,
       selectedProductVariantKey: this.products.length
         ? _.first(_.keys(JSON.parse(JSON.stringify(this.products[0])).variants))
         : null,
@@ -318,6 +323,11 @@ export default {
     };
   },
   methods: {
+    _firstFullThumbnailOf(product) {
+      return product.variants[this.selectedProductVariantKey].sides[
+        this.selectedProductSide
+      ]?.with_placeholder;
+    },
     async setAsMainImage() {
       try {
         const res = this.$store.dispatch(
@@ -328,28 +338,25 @@ export default {
           }
         );
 
-        _.map(this.selectedProduct.variants[this.selectedProductVariantKey].sides, (s, k) => {
-          if(k === this.selectedProductSide){
-            s.is_main_thumb = !s.is_main_thumb
-            return
+        _.map(
+          this.selectedProduct.variants[this.selectedProductVariantKey].sides,
+          (s, k) => {
+            if (k === this.selectedProductSide) {
+              s.is_main_thumb = !s.is_main_thumb;
+              return;
+            }
+            s.is_main_thumb = false;
           }
-          s.is_main_thumb = false
-        })
+        );
 
-        this.$toast.success(
-          "Saved!",
-          {
-            position: "top",
-          }
-        );
+        this.$toast.success("Saved!", {
+          position: "top",
+        });
       } catch (error) {
-        console.log(error)
-        this.$toast.error(
-          "Unable to set main image. Please try again.",
-          {
-            position: "top",
-          }
-        );
+        console.log(error);
+        this.$toast.error("Unable to set main image. Please try again.", {
+          position: "top",
+        });
       }
     },
     async markAsFeatured() {
@@ -429,6 +436,7 @@ export default {
       return _.includes(areas, "front") ? "front" : _.head(areas);
     },
     show() {
+      this.drawerId = this.makeId();
       this.$refs.drawer.show();
       this.calculateProfit();
     },
@@ -497,6 +505,16 @@ export default {
     },
   },
   watch: {
+    products: {
+      handler(to, from) {
+        this.generatedProducts = [...to];
+        this.selectedProduct = to[0] || null;
+        this.selectedProductVariantKey = this.selectedProduct
+          ? _.first(_.keys(this.selectedProduct.variants))
+          : null;
+      },
+      immediate: true,
+    },
     selectedProduct: {
       immediate: true,
       handler(to, from) {
@@ -531,6 +549,14 @@ export default {
           to.variants[this.selectedProductVariantKey].sides
         );
         this.selectedProductSide = initialSide;
+
+        _.map(to.variants[this.selectedProductVariantKey].sides, (s, k) => {
+          if (k === this.selectedProductSide) {
+            s.is_main_thumb = !s.is_main_thumb;
+            return;
+          }
+          s.is_main_thumb = false;
+        });
 
         this._calculateEstProfit();
       },

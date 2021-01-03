@@ -3,7 +3,6 @@
     <AreaLoader v-if="isLoading" fullscreen />
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
-      v-if="generatedImages.length"
       :products="generatedImages"
       :meta="collectionMeta"
     />
@@ -178,25 +177,6 @@ export default {
         collection._id
       );
 
-      if (["approved"].includes(status)) {
-        this.$store.commit("admin/UPDATE_COLLECTION_STATUS", {
-          _id: collection._id,
-          status: status,
-        });
-
-        let message = "";
-        switch (status) {
-          case "reviewing":
-            message = "The collection is already under review.";
-            break;
-        }
-
-        this.$toast.info(message, {
-          position: "top",
-        });
-        return false;
-      }
-
       return true;
     },
     filter() {
@@ -208,9 +188,6 @@ export default {
       this.$emit("filter", this.filterValues);
     },
     async previewCollection(collection) {
-      const statusValidation = await this._validateStatusOf(collection);
-      if (!statusValidation) return;
-
       this.isLoading = true;
       const collectionData = await this.$store.dispatch(
         "designer/fetchDesignData",

@@ -13,7 +13,7 @@ export default {
       const { roles } = this.user
       return find(roles, { name: type}) ? true : false
     },
-    makeId(length = 5) {
+    makeId(length = 10) {
       var result = "";
       var characters =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
