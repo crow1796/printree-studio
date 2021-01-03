@@ -413,6 +413,9 @@ export default {
       this.$refs.publishConfirmationModal.hide();
       let status = "approved";
       if (this.confirmationAction === "decline") status = "declined";
+
+      await this.setAsMainImage()
+      
       await this.$store.dispatch("admin/updateCollectionStatus", {
         _id: this.meta._id,
         status,
