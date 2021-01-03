@@ -342,7 +342,7 @@ import VueNumericInput from "@/components/VueNumericInput";
 import OptionButtons from "@/components/OptionButtons";
 import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
-import UserTypeCheckerMixin from "@/components/mixins/UserTypeChecker";
+import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 
 const SERVICE_FEE = 0.07;
 
