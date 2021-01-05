@@ -311,7 +311,7 @@ export default {
             return;
           }
           this.$toast.success(
-            "A reset password email has been sent to your email.",
+            "Please check your email to change your password.",
             {
               position: "bottom",
             }
@@ -324,7 +324,8 @@ export default {
             type: "seller",
           };
           this.formType = "sign_in";
-          this.$validator.reset();
+          this.$validator.reset(); 
+          this.$emit("reset-success");
           return;
         }
         if (this.formType !== "sign_up") this.$emit("login-success");

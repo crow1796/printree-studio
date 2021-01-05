@@ -1,5 +1,5 @@
 export default {
-  _extractUserdata(src){
+  _extractUserdata(src) {
     return {
       displayName: src.name,
       email: src.email,
@@ -8,11 +8,11 @@ export default {
       token: src.token
     }
   },
-  async createUserWithEmailAndPassword(formData, http){
+  async createUserWithEmailAndPassword(formData, http) {
     let response = {}
     try {
       let res = await http.post('/signup', formData)
-      if(!res.data.status) throw res
+      if (!res.data.status) throw res
       response = {
         status: true,
         user: this._extractUserdata({
@@ -24,10 +24,10 @@ export default {
       response.status = false
       response.message = error.data.err.message
     }
-    if(!response.status) throw response
+    if (!response.status) throw response
     return response
   },
-  async socialLogin(type){
+  async socialLogin(type) {
     let response = {}
     try {
       let provider = authProviderOf(type)
@@ -42,7 +42,7 @@ export default {
     }
     return response
   },
-  async signInAsAGuest(){
+  async signInAsAGuest() {
     let response = {}
     try {
       let res = await fireAuth.signInAnonymously()
@@ -56,10 +56,10 @@ export default {
     }
     return response
   },
-  async sendPasswordRecoveryEmail(email){
+  async sendPasswordRecoveryEmail(email, http) {
     let response = {}
     try {
-      let res = await fireAuth.sendPasswordResetEmail(email)
+      let res = await http.post('/request-reset-password', { email })
       response = {
         status: true
       }
@@ -69,7 +69,7 @@ export default {
     }
     return response
   },
-  async updateProfile(data){
+  async updateProfile(data) {
     let response = {}
     try {
       await fireAuth.currentUser.updateProfile({
@@ -85,13 +85,11 @@ export default {
     }
     return response
   },
-  async updatePassword(password){
+  async updatePassword(data, http) {
     let response = {}
     try {
-      let res = await fireAuth.currentUser.updatePassword(password)
-      response = {
-        status: true
-      }
+      let res = await http.post('/update-password', data)
+      response = res.data
     } catch (error) {
       response.status = false
       response.message = error.message
