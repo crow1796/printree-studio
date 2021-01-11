@@ -93,7 +93,7 @@
     <div class="flex h-full w-full text-gray-600" v-if="selectedProduct">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4">
-          <div class="flex w-4/12 uppercase flex-col" v-if="userTypeIs('seller')">
+          <!-- TODO: Add when ready <div class="flex w-4/12 uppercase flex-col" v-if="userTypeIs('seller')">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
@@ -111,7 +111,7 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
-          </div>
+          </div> -->
           <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
@@ -657,7 +657,6 @@ export default {
       const productIndex = _.findIndex(this.selectedProducts, {
         _id: this.selectedProduct._id,
       });
-      console.log(this.selectedProducts[productIndex].variants)
 
       _.map(this.selectedProduct.variants, (v, vi) => {
         const variantIndex = _.findIndex(

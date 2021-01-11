@@ -19,7 +19,7 @@
       <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
-          <div v-if="formType === 'sign_up'">
+          <!-- TODO: Add when ready <div v-if="formType === 'sign_up'">
             <label class="font-bold mb-2 block text-center">I want to...</label>
             <div class="flex justify-center mb-4 text-sm">
               <button
@@ -31,7 +31,7 @@
                 @click="changeUserType(type)"
               >{{userType(type)}} PRODUCTS</button>
             </div>
-          </div>
+          </div> -->
 
           <div
             class="mb-3"
@@ -128,7 +128,8 @@
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
               </span>
             </label>
-            <div class="text-xs text-blue-500 mt-1">(Google Drive, Dropbox, personal website, etc.)</div>
+            <div class="text-xs text-blue-500 mt-1">* Google Drive, Dropbox, personal website, etc.</div>
+            <div class="text-xs text-blue-500 mt-1">* Must have at least 3 sample images.</div>
             <div class="mt-2">
               <input
                 type="url"
