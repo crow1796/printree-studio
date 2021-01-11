@@ -420,7 +420,11 @@ export default {
       }));
     },
     currentVariantContent() {
-      return _.find(this.currentVariant.contents, { side: this.currentSide });
+      return (
+        _.find(this.currentVariant.contents, { side: this.currentSide }) ||
+        _.find(this.currentVariant.contents, { side: "front" }) ||
+        _.first(this.currentVariant.contents)
+      );
     },
   },
   methods: {
@@ -535,10 +539,13 @@ export default {
               quantity: 0,
               price: 0,
             })),
-            contents: _.map(product.customizableVariants[0].printableArea, (side) => ({
-              printableArea: side.side,
-              objects: [],
-            })),
+            contents: _.map(
+              product.customizableVariants[0].printableArea,
+              (side) => ({
+                printableArea: side.side,
+                objects: [],
+              })
+            ),
           },
         ],
       }));
@@ -617,6 +624,12 @@ export default {
       handler(to) {
         if (!to || (to && !to.meta)) return;
         this.tmpProductMetadata = JSON.parse(JSON.stringify(to.meta));
+        const firstVariant = _.first(to.variants);
+        const frontOrFirstContent =
+          _.find(firstVariant.contents, { side: "front" }) ||
+          _.first(firstVariant.contents);
+        const side = frontOrFirstContent.side;
+        this.$store.commit("designer/CURRENT_SIDE", side);
       },
     },
     currentProductIndex: {

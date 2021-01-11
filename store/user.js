@@ -26,7 +26,11 @@ const actions = {
     return res;
   },
   async sendPasswordRecovery(context, data) {
-    const res = await auth.sendPasswordRecoveryEmail(data.email);
+    const res = await auth.sendPasswordRecoveryEmail(data.email, this.$axios);
+    return res;
+  },
+  async updatePassword(context, data) {
+    const res = await auth.updatePassword(data, this.$axios);
     return res;
   },
   async signOut(context) {
@@ -44,10 +48,6 @@ const actions = {
     });
     context.commit("USER_NAME", data.name);
     context.commit("USER_EMAIL", data.email);
-    return response;
-  },
-  async updatePassword(context, password) {
-    const response = await auth.updatePassword(password);
     return response;
   },
 };
