@@ -93,11 +93,22 @@
     <div>
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">Users</h2>
-        <button
-          type="button"
-          class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
-          @click="addNewUser"
-        >Add New User</button>
+        <div class="relative flex">
+          <button
+            type="button"
+            class="px-3 py-2 text-xs hover:bg-gray-200 border rounded font-bold outline-none focus:outline-none mr-2"
+            title="Reload"
+            v-tippy="{arrow: true}"
+            @click="_loadItems"
+          >
+            <font-awesome-icon :icon="['fas', 'sync']" class="text-xs" />
+          </button>
+          <button
+            type="button"
+            class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+            @click="addNewUser"
+          >Add New User</button>
+        </div>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
