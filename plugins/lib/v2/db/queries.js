@@ -520,7 +520,7 @@ export default {
         }
     }
   `,
-  approveAccount: `
+    approveAccount: `
     mutation ($id: ID!){
         approveAccount(_id: $id){
             _id
@@ -532,13 +532,20 @@ export default {
         }
     }
   `,
-  setVariantMainThumbnail: `
+    setVariantMainThumbnail: `
     mutation($_id: ID!, $side: String!) {
         setVariantMainThumbnail(_id: $_id, side: $side) {
             _id
             contents {
                 isMainThumb
             }
+        }
+    }
+  `,
+    deleteUserById: `
+    mutation($_id: ID!) {
+        deleteUserById(_id: $_id) {
+            _id
         }
     }
   `

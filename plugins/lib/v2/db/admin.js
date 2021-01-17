@@ -69,6 +69,17 @@ export const getUserById = async (axios, { _id }) => {
   return user;
 }
 
+export const deleteUserById = async (axios, _id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.deleteUserById,
+    variables: {
+      _id
+    },
+  });
+  const { deleteUserById } = data.data;
+  return deleteUserById;
+}
+
 export const approveAccount = async (axios, id) => {
   const { data } = await axios.post("/gql", {
     query: queries.approveAccount,
