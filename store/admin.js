@@ -64,7 +64,7 @@ const getters = {
 }
 
 const actions = {
-  async approveAccount(context, _id){
+  async approveAccount(context, _id) {
     const user = await this.$api.admin.approveAccount(_id)
     return user
   },
@@ -92,8 +92,16 @@ const actions = {
     const res = await this.$axios.patch(`/users/${data.uid}`, data)
     context.commit('UPDATE_USER', res.data.user)
   },
-  async updateCollection(context, { _id, data }) {
-    
+  async deleteUser(context, { _id }) {
+    const res = await this.$api.admin.deleteUserById(_id);
+    return res
+  },
+  removeUserById(context, _id) {
+    const tmpUsers = JSON.parse(
+      JSON.stringify(context.getters.users)
+    )
+    tmpUsers.splice(_.findIndex(tmpUsers, { _id }), 1)
+    context.commit('USERS', tmpUsers)
   },
   async updateCollectionStatus(context, { _id, status }) {
     await this.$api.admin.updateCollectionStatus({ _id, status })
@@ -143,7 +151,7 @@ const actions = {
     return res
   },
   async markAsFeatured(context, data) {
-    
+
   }
 }
 
