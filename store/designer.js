@@ -26,7 +26,9 @@ const state = () => ({
       value: "TEXT",
       bounds: {
         left: 0,
+        x: 0,
         top: 0,
+        y: 0,
         width: scaleUp(80),
         height: scaleUp(20),
         angle: 0,
@@ -58,7 +60,9 @@ const state = () => ({
       value: "",
       bounds: {
         left: 0,
+        x: 0,
         top: 0,
+        y: 0,
         width: scaleUp(40),
         height: scaleUp(40),
         angle: 0,
@@ -82,7 +86,9 @@ const state = () => ({
       value: "",
       bounds: {
         left: 0,
+        x: 0,
         top: 0,
+        y: 0,
         width: scaleUp(40),
         height: scaleUp(40),
         angle: 0,

@@ -75,8 +75,8 @@
                     :enabled="!isHoldingSpace"
                     :aspectRatio="obj.editorData.aspectRatio"
                     :w="obj.bounds.width || 50"
-                    :maxW="obj.bounds.maxWidth"
-                    :maxH="obj.bounds.maxHeight"
+                    :maxW="obj.type === 'svg' ? -1 : obj.bounds.maxWidth"
+                    :maxH="obj.type === 'svg' ? -1 : obj.bounds.maxHeight"
                     :h="obj.bounds.height || 50"
                     :x="obj.bounds.left || 0"
                     :y="obj.bounds.top || 0"
@@ -207,14 +207,15 @@ export default {
     window.addEventListener("dragenter", (e) => {
       if (isFile(e) && !this.$refs.artsModal?.isShown) {
         lastTarget = e.target;
-        if(this.$refs.globalDropzone) this.$refs.globalDropzone.$el.classList.add('-uploading')
+        if (this.$refs.globalDropzone)
+          this.$refs.globalDropzone.$el.classList.add("-uploading");
       }
     });
 
     window.addEventListener("dragleave", (e) => {
       e.preventDefault();
       if (e.target === this.$refs.globalDropzone?.$el) {
-        this.$refs.globalDropzone.$el.classList.remove('-uploading')
+        this.$refs.globalDropzone.$el.classList.remove("-uploading");
       }
     });
 
@@ -372,8 +373,11 @@ export default {
       this.isMoving = true;
     },
     transformStop({ x, y, w, h, angle }, obj) {
+      console.log(w, h)
       this._updateActiveObjectProps("bounds.left", x);
+      this._updateActiveObjectProps("bounds.x", x - w / 2);
       this._updateActiveObjectProps("bounds.top", y);
+      this._updateActiveObjectProps("bounds.y", y - h / 2);
       this._updateActiveObjectProps("bounds.width", w);
       this._updateActiveObjectProps("bounds.height", h);
       this._updateActiveObjectProps("bounds.angle", angle);
@@ -455,7 +459,7 @@ export default {
       this.$store.commit("designer/ADD_ASSET", res.data);
       this.$refs.artsModal.hide();
       this.isGlobalUploading = false;
-      this.$refs.globalDropzone.removeAllFiles()
+      this.$refs.globalDropzone.removeAllFiles();
     },
     async useAsset(asset) {
       const ext = asset.imageKitLocation
@@ -470,12 +474,29 @@ export default {
           resolve(this);
         };
       });
+      if(ext === 'svg') {
+        const container = document.createElement('div')
+        container.style.visibility = 'hidden'
+        container.style.opacity = '0'
+        container.appendChild(imgData)
+        document.body.appendChild(container)
+
+        imgData.width = container.offsetWidth
+        imgData.height = container.offsetHeight
+        
+        document.body.removeChild(container)
+      }
+      
       this.addObject(
         ext === "svg" ? "svg" : "image",
         ext === "svg" ? asset.location : asset.imageKitLocation,
         "",
         {
           bounds: {
+            left: scaleDown(imgData.width) / 2,
+            x: 0,
+            top: scaleDown(imgData.height) / 2,
+            y: 0,
             width: scaleDown(imgData.width),
             height: scaleDown(imgData.height),
             maxWidth: imgData.width,
