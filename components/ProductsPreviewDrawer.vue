@@ -111,7 +111,7 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
-          </div> -->
+          </div>-->
           <div class="flex flex-grow justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
@@ -200,6 +200,9 @@
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Price' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
+                    <div
+                      class="text-xs uppercase font-bold mt-1 text-right"
+                    >VAT Included</div>
                   </div>
                 </div>
                 <div class="pt-4" v-if="meta.plan ==='Sell'">
@@ -419,8 +422,11 @@ export default {
       );
     },
     productTotalPrice() {
-      if (this.meta.plan === "Buy") return this.selectedProductBasePrice;
-      return this.selectedProductBasePrice + this.selectedProductProfit;
+      let total = (this.selectedProductBasePrice)
+
+      if (this.meta.plan === "Sell") total = (this.selectedProductBasePrice + this.selectedProductProfit)
+      
+      return (total + (total * .12)).toFixed(2);
     },
     selectedVariantIndex() {
       const product = {
@@ -597,7 +603,8 @@ export default {
               (s) => s.name === size.name
             );
             if (!availableSize) return;
-            let baseCost = availableSize.baseCost;
+
+            let baseCost = size.calculatedCost;
             let totalForPrintree = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
@@ -663,7 +670,8 @@ export default {
           this.selectedProducts[productIndex].variants,
           { _id: vi }
         );
-        if(type === 'quantity' && variantIndex !== this.selectedVariantIndex) return;
+        if (type === "quantity" && variantIndex !== this.selectedVariantIndex)
+          return;
 
         this.$store.commit("designer/PRODUCT_PROPERTIES", {
           _id: this.selectedProduct._id,
@@ -731,8 +739,8 @@ export default {
         );
         this.selectedProductVariantKey = firstVariantKey;
         this.selectedProductBasePrice = _.first(
-          to.variants[firstVariantKey].available_sizes
-        ).baseCost;
+          this.selectedProductSizes
+        ).calculatedCost;
 
         this.selectedProductTags = _.map(to.meta.tags, (text) => ({
           text,

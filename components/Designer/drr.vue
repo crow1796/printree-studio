@@ -645,7 +645,7 @@
           let newX = stickStartPos.cx + p.x / 2
           let newY = stickStartPos.cy + p.y / 2
           this.isMaxSize = false
-          if(newW >= this.maxW || newH >= this.maxH) this.isMaxSize = true
+          if((this.maxW !== -1 && this.maxH !== -1) && (newW >= this.maxW || newH >= this.maxH)) this.isMaxSize = true
           this.cx = this.isMaxSize ? this.cx : newX
           this.cy = this.isMaxSize ? this.cy : newY
           pn = p.rotate(-phi)
