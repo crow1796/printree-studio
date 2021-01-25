@@ -373,7 +373,6 @@ export default {
       this.isMoving = true;
     },
     transformStop({ x, y, w, h, angle }, obj) {
-      console.log(w, h)
       this._updateActiveObjectProps("bounds.left", x);
       this._updateActiveObjectProps("bounds.x", x - w / 2);
       this._updateActiveObjectProps("bounds.top", y);

@@ -137,6 +137,9 @@
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'sell' ? 'Total Selling Price' : 'Price' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
+                    <div
+                      class="text-xs uppercase font-bold mt-1 text-right"
+                    >VAT Included</div>
                   </div>
                   <div
                     class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded ml-2"
@@ -459,7 +462,7 @@ export default {
               (s) => s.name === size.name
             );
             if (!availableSize) return;
-            let baseCost = availableSize.baseCost;
+            let baseCost = size.calculatedCost;
             let totalForPrintree = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
@@ -494,7 +497,8 @@ export default {
   },
   computed: {
     productTotalPrice() {
-      return this.selectedProductBasePrice + this.selectedProductProfit;
+      let total = (this.selectedProductBasePrice + this.selectedProductProfit)
+      return (total + (total * .12)).toFixed(2);
     },
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);
@@ -530,8 +534,8 @@ export default {
         );
         this.selectedProductVariantKey = firstVariantKey;
         this.selectedProductBasePrice = _.first(
-          to.variants[firstVariantKey].available_sizes
-        ).baseCost;
+          this.selectedProductSizes
+        ).calculatedCost;
 
         this.selectedProductTags = _.map(to.meta.tags, (text) => ({
           text,
