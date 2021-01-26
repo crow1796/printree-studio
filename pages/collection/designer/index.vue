@@ -219,7 +219,6 @@
           :variant="currentProduct.variants[currentVariantIndex]"
           :content="currentVariantContent"
           :resizable="true"
-          :has-outline="true"
           class="designer-preview"
         />
         <Canvas
@@ -229,28 +228,7 @@
           :height="currentVariantContent.bounds.height * 4"
           :backgroundColor="currentProduct.variants[currentVariantIndex].customizableVariant.color"
         >
-          <div class="bottom-actions absolute z-10 flex flex-shrink justify-center">
-            <div class="flex bg-white mt-4 rounded border">
-              <div class="flex p-4">
-                <ToggleSwitch
-                  :options="currentVariantSides"
-                  class="mx-1"
-                  :value="currentSide"
-                  @change="
-                    (option) =>
-                      $store.dispatch('designer/switchSideTo', option.value)
-                  "
-                >
-                  <template v-slot:default="{ option }">
-                    <div class="flex flex-col">
-                      <img :style="{backgroundColor: option.color}" :src="option.label" width="50" />
-                      <div class="text-center mt-1 text-xs">{{ option.value.toUpperCase() }}</div>
-                    </div>
-                  </template>
-                </ToggleSwitch>
-              </div>
-            </div>
-          </div>
+          <BottomActions :items="currentVariantSides" @change="(val) => $store.dispatch('designer/switchSideTo', val)" />
         </Canvas>
       </div>
 
@@ -324,7 +302,6 @@
 <script>
 import VueTailwindModal from "@/components/VueTailwindModal";
 import Select from "@/components/Select";
-import ToggleSwitch from "@/components/ToggleSwitch";
 import ColorRegulator from "~/plugins/color-regulator.js";
 import { mapGetters } from "vuex";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
@@ -333,6 +310,7 @@ import VueTailwindAccordion from "@/components/VueTailwindAccordion";
 import WrappedEditor from "@/components/WrappedEditor";
 import draggable from "vuedraggable";
 import Konva from "@/components/Designer/Canvas/Konva";
+import BottomActions from '@/components/Designer/Canvas/Actions/Bottom'
 import {
   Canvas,
   Output,
@@ -348,7 +326,7 @@ export default {
   layout: "designer",
   components: {
     Select,
-    ToggleSwitch,
+    BottomActions,
     AvailableProducts,
     WrappedEditor,
     VueTailwindDrawer,
