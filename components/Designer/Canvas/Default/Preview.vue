@@ -31,6 +31,8 @@
           <div
             class="printable-area absolute -has-outline"
             id="printable-area"
+            @mouseenter="hasOutline = true"
+            @mouseleave="hasOutline = false"
             :style="{
                     left: `${content.bounds.left}px`,
                     top: `${content.bounds.top}px`,
@@ -78,10 +80,6 @@ export default {
     resizable: {
       default: false,
     },
-    hasOutline: {
-      type: Boolean,
-      default: false,
-    },
     scale: {
       default: 0.3,
     },
@@ -92,6 +90,7 @@ export default {
   data() {
     return {
       isPreviewExpanded: false,
+      hasOutline: false,
     };
   },
   methods: {
