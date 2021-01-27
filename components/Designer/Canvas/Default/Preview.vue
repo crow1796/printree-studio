@@ -28,11 +28,21 @@
             <img draggable="false" class="relative" style="z-index: 2" :src="content.placeholder" />
           </div>
           <div class="printable-area-surface absolute"></div>
+
+          <div
+            class="z-10 absolute -has-outline"
+            @mouseenter="hasOutline = true"
+            @mouseleave="hasOutline = false"
+            :style="{
+                    left: `${content.bounds.left}px`,
+                    top: `${content.bounds.top}px`,
+                    width: `${content.bounds.width}px`,
+                    height: `${content.bounds.height}px`,
+                  }"
+          ></div>
           <div
             class="printable-area absolute -has-outline"
             id="printable-area"
-            @mouseenter="hasOutline = true"
-            @mouseleave="hasOutline = false"
             :style="{
                     left: `${content.bounds.left}px`,
                     top: `${content.bounds.top}px`,

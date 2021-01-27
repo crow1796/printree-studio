@@ -78,6 +78,7 @@ module.exports = {
       },
     ],
     "@nuxtjs/universal-storage",
+    'vue-social-sharing/nuxt'
   ],
   storage: {
     cookie: {

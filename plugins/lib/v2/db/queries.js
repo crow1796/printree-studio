@@ -517,6 +517,7 @@ export default {
     query ($id: ID!){
         collectionStatus(_id: $id){
             status
+            handle
         }
     }
   `,

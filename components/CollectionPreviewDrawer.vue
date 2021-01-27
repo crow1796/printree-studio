@@ -214,7 +214,7 @@
                           :duration=".4"
                         />
                         <span class="ml-2" v-if="meta.plan ==='Sell'">
-                          <span v-tippy="{arrow: true}" title="-7% service fee">
+                          <span v-tippy="{arrow: true}" title="-12% service fee">
                             <font-awesome-icon
                               v-if="estimatedMinProfit"
                               :icon="['fas', 'question-circle']"
@@ -287,7 +287,8 @@ import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueNumericInput from "@/components/VueNumericInput";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 
-const SERVICE_FEE = 0.07;
+const SERVICE_FEE = 0.12;
+const VAT = .12;
 
 export default {
   props: {
@@ -498,7 +499,8 @@ export default {
   computed: {
     productTotalPrice() {
       let total = (this.selectedProductBasePrice + this.selectedProductProfit)
-      return (total + (total * .12)).toFixed(2);
+      
+      return Math.ceil(total + (total * VAT));
     },
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);

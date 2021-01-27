@@ -80,7 +80,9 @@
             </div>
           </div>
         </div>
-        <div class="modal-body p-4 text-center">The collection is already approved. Once you edit this it will undergo again for another review. Do you want to continue?</div>
+        <div
+          class="modal-body p-4 text-center"
+        >The collection is already approved. Once you edit this it will undergo again for another review. Do you want to continue?</div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
             type="button"
@@ -217,7 +219,7 @@
                         </span>
                         <a
                           href="#"
-                          class="text-blue-600 hover:underline"
+                          :class="{ 'text-blue-600 hover:underline': col.status !== 'approved', 'cursor-default': col.status === 'approved' }"
                           @click.prevent="editCollection(col)"
                         >
                           <span>{{ col.name }}</span>
@@ -281,21 +283,39 @@
                         </button>
                       </template>
                       <div class="flex w-full">
-                        <input
-                          class="flex flex-grow pl-4 w-full rounded-l text-black bg-white"
-                          disabled
-                          :value="col.handle"
-                          :ref="`copy-link-${col._id}`"
-                        />
-                        <button
-                          type="button"
-                          class="text-xs w-10 flex items-center justify-center rounded-r bg-white text-black py-2 border-l"
-                          v-tippy="{arrow: true}"
-                          title="Copy Link"
-                          @click="copyCollectionLinkToClipboard(col)"
+                        <ShareNetwork
+                          network="facebook"
+                          :url="col.handle"
+                          :title="col.name"
+                          class="px-3 flex justify-center items-center bg-blue-700 mr-2 rounded"
                         >
-                          <font-awesome-icon :icon="['fas', 'clipboard']" />
-                        </button>
+                          <font-awesome-icon :icon="['fab', 'facebook-square']" />
+                        </ShareNetwork>
+                        <ShareNetwork
+                          network="twitter"
+                          :url="col.handle"
+                          :title="col.name"
+                          class="px-3 flex justify-center items-center bg-blue-400 mr-2 rounded"
+                        >
+                          <font-awesome-icon :icon="['fab', 'twitter']" />
+                        </ShareNetwork>
+                        <div class="flex">
+                          <input
+                            class="flex flex-grow pl-4 w-1/2 rounded-l text-black bg-white"
+                            disabled
+                            :value="col.handle"
+                            :ref="`copy-link-${col._id}`"
+                          />
+                          <button
+                            type="button"
+                            class="text-xs w-10 flex items-center justify-center rounded-r bg-white text-black py-2 border-l"
+                            v-tippy="{arrow: true}"
+                            title="Copy Link"
+                            @click="copyCollectionLinkToClipboard(col)"
+                          >
+                            <font-awesome-icon :icon="['fas', 'clipboard']" />
+                          </button>
+                        </div>
                       </div>
                     </tippy>
                   </div>
@@ -375,8 +395,11 @@ export default {
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$router.push("/collection/designer");
     },
-    async _validateStatusOf(collection, statusToCheck = ["approved", "reviewing"]) {
-      const status = await this.$store.dispatch(
+    async _validateStatusOf(
+      collection,
+      statusToCheck = ["approved", "reviewing"]
+    ) {
+      const { status, handle } = await this.$store.dispatch(
         "user_dashboard/collectionStatus",
         collection._id
       );
@@ -385,50 +408,60 @@ export default {
         this.$store.commit("user_dashboard/UPDATE_COLLECTION_STATUS", {
           _id: collection._id,
           newStatus: status,
+          handle,
+        });
+
+        this.$store.commit("user_dashboard/UPDATE_COLLECTION_HANDLE", {
+          _id: collection._id,
+          handle,
         });
 
         let message = "";
         switch (status) {
           case "approved":
             this.selectedCollection = collection;
-            this.$refs.editConfirmationModal.show()
+            this.$refs.editConfirmationModal.show();
             break;
           case "reviewing":
             message = `Our team is currently reviewing this collection. Please try again later.`;
             break;
         }
 
-        if(message) this.$toast.info(message, {
-          position: "top",
-        });
+        if (message)
+          this.$toast.info(message, {
+            position: "top",
+          });
         return false;
       }
 
       return true;
     },
-    hideEditCollectionConfirmation(){
+    hideEditCollectionConfirmation() {
       this.selectedCollection = null;
       this.$refs.editConfirmationModal.hide();
     },
-    confirmEditCollectionConfirmation(){
+    confirmEditCollectionConfirmation() {
       this.$refs.editConfirmationModal.hide();
-      
-      this._goToCollectionDesigner(this.selectedCollection)
+
+      this._goToCollectionDesigner(this.selectedCollection);
     },
-    _goToCollectionDesigner(collection){
+    _goToCollectionDesigner(collection) {
       localStorage.removeItem("_stored_ptree");
       this.$storage.setLocalStorage("current_design_id", collection._id);
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
       this.$router.replace("/collection/designer");
     },
     async editCollection(collection) {
+      if (collection.status === "approved") return;
       const statusValidation = await this._validateStatusOf(collection);
       if (!statusValidation) return;
 
-      this._goToCollectionDesigner(collection)
+      this._goToCollectionDesigner(collection);
     },
     async showDeleteCollectionConfirmation(collection) {
-      const statusValidation = await this._validateStatusOf(collection, ['reviewing']);
+      const statusValidation = await this._validateStatusOf(collection, [
+        "reviewing",
+      ]);
       if (!statusValidation) return;
       this.selectedCollection = collection;
       this.$refs.deleteConfirmationModal.show();
