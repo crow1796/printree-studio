@@ -1,5 +1,4 @@
 import ColorRegulator from "~/plugins/color-regulator";
-import db from "~/plugins/lib/db/index";
 import { scaleUp } from "~/plugins/scaler";
 
 const generatedId = () => "_" +
@@ -27,7 +26,9 @@ const state = () => ({
       value: "TEXT",
       bounds: {
         left: 0,
+        x: 0,
         top: 0,
+        y: 0,
         width: scaleUp(80),
         height: scaleUp(20),
         angle: 0,
@@ -59,7 +60,9 @@ const state = () => ({
       value: "",
       bounds: {
         left: 0,
+        x: 0,
         top: 0,
+        y: 0,
         width: scaleUp(40),
         height: scaleUp(40),
         angle: 0,
@@ -83,7 +86,9 @@ const state = () => ({
       value: "",
       bounds: {
         left: 0,
+        x: 0,
         top: 0,
+        y: 0,
         width: scaleUp(40),
         height: scaleUp(40),
         angle: 0,
@@ -646,6 +651,7 @@ const actions = {
   async saveData(context, params) {
     const defaultParams = {
       shouldGenerateImages: true,
+      isFinal: false
     };
 
     const newParams = {
@@ -660,7 +666,10 @@ const actions = {
         plan: context.getters.designMeta.plan,
         selectedProducts: context.getters.selectedProducts,
         status: context.getters.designMeta.status,
+        isFinal: newParams.isFinal
       });
+
+      context.commit("SELECTED_PRODUCTS", updatedCollection.products)
 
       const res = newParams.shouldGenerateImages
         ? await this.$axios.post("/create-images", {
@@ -682,11 +691,6 @@ const actions = {
   async updateDesignName(context, name) {
     await this.$api.updateCollectionName({ _id: context.getters.currentDesignId, name });
     context.commit("DESIGN_NAME", name);
-  },
-  async publishCollection(context) {
-    await db.updateCollection(context.getters.currentDesignId, {
-      status: "pending",
-    });
   },
   async deleteCollection(context, collectionId) {
     await this.$api.deleteCollection(collectionId);

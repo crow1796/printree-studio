@@ -10,7 +10,7 @@
           class="text-xs"/>
       </div>
       <div class="flex modal-body">
-        <AuthForm @login-success="loginSuccess"/>
+        <AuthForm @login-success="loginSuccess" @reset-success="$refs.authFormModal.hide()"/>
       </div>
     </div>
   </VueTailwindModal>

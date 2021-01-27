@@ -42,7 +42,7 @@
         </div>
       </div>
     </VueTailwindModal>
-    <div class="flex flex-grow text-gray-600">
+    <div class="flex flex-grow text-gray-600" v-if="selectedProduct">
       <div class="flex flex-col flex-grow">
         <div class="flex flex-grow-0 items-center border-b p-4">
           <div class="flex flex-grow justify-end">
@@ -69,6 +69,17 @@
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
 
+                  <button
+                    type="button"
+                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 ml-10 hover:text-primary hover:border-primary"
+                    :class="{'text-primary border-primary': selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].is_main_thumb}"
+                    @click="setAsMainImage"
+                    title="Set as main image"
+                    v-tippy="{arrow: true}"
+                  >
+                    <font-awesome-icon :icon="['fas', 'image']" />
+                  </button>
+
                   <a
                     :href="`/admin/generate/${selectedProductVariantKey}`"
                     class="absolute top-0 right-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
@@ -79,7 +90,9 @@
                     <font-awesome-icon :icon="['fas', 'eye']" />
                   </a>
                   <img
-                    :src="selectedProduct.variants[selectedProductVariantKey].sides[selectedProductSide].with_placeholder"
+                    :src="_firstFullThumbnailOf(selectedProduct)"
+                    :key="`full_${selectedProduct._id}_${drawerId}`"
+                    :id="`full_${selectedProduct._id}_${drawerId}`"
                     class="w-full"
                   />
                 </div>
@@ -97,21 +110,22 @@
                       <img
                         :src="variant.sides[_firstPrintableAreaOf(variant.sides)]
                             .with_placeholder"
+                        :key="`variant_${variant._id}_${drawerId}`"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 flex-grow ml-4">
+              <div class="flex flex-col mt-5 flex-grow ml-4" :key="`${selectedProduct._id}-meta`">
                 <div class="text-4xl">
                   <span class="font-bold w-full outline-none">{{selectedProduct.meta.name}}</span>
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-center">
-                  <div class="relative flex flex-col">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Base Price</div>
+                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Base Cost</div>
                     <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
                   </div>
-                  <div class="relative flex flex-col">
+                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Profit*</div>
                     <div class="flex">
                       <div>PHP&nbsp;</div>
@@ -121,8 +135,11 @@
                   <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
                     <div
                       class="text-xs uppercase font-bold mb-1"
-                    >{{ meta.plan === 'sell' ? 'Total Selling Price' : 'Sell it for' }}</div>
+                    >{{ meta.plan === 'sell' ? 'Total Selling Price' : 'Price' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
+                    <div
+                      class="text-xs uppercase font-bold mt-1 text-right"
+                    >VAT Included</div>
                   </div>
                   <div
                     class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded ml-2"
@@ -133,7 +150,7 @@
                   </div>
                 </div>
 
-                <div class="pt-4">
+                <div class="pt-4" v-if="meta.plan ==='Sell'">
                   <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
                   <div class="flex">
                     <span
@@ -145,11 +162,67 @@
                 </div>
 
                 <div>
-                  <div class="my-2">
+                  <div class="my-2" v-if="meta.plan ==='Sell'">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-2">Description</div>
                     <div
                       class="w-full border rounded p-4 outine-none resize-none h-40"
                     >{{selectedProduct.meta.description}}</div>
+                  </div>
+
+                  <div
+                    class="bg-gray-200 rounded p-4 shadow"
+                    :class="{'mt-2': meta.plan === 'Sell'}"
+                    :key="`qands_${drawerId}`"
+                    v-if="meta.plan ==='Buy'"
+                  >
+                    <div
+                      class="font-bold uppercase"
+                    >{{ meta.plan ==='Sell' ? 'Profit Calculator' : 'Quantity' }}</div>
+                    <div class="flex flex-wrap">
+                      <div
+                        class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-4 bg-white"
+                        v-for="(size, i) in selectedProduct
+                          .variants[selectedProductVariantKey].sizes"
+                        :key="i"
+                      >
+                        <div class="flex items-center">
+                          <div class="text-center mr-2">{{ size.name }}:</div>
+                          <div>
+                            <VueNumericInput
+                              align="center"
+                              style="width: 90px"
+                              class="ml-1"
+                              :min="0"
+                              disabled
+                              v-model="size.quantity"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
+                    >
+                      <div>{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
+                      <div>
+                        <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
+                        <number
+                          animationPaused
+                          ref="estMinProfit"
+                          :to="estimatedMinProfit"
+                          :format="(num) => num.formatMoney('₱ ')"
+                          :duration=".4"
+                        />
+                        <span class="ml-2" v-if="meta.plan ==='Sell'">
+                          <span v-tippy="{arrow: true}" title="-12% service fee">
+                            <font-awesome-icon
+                              v-if="estimatedMinProfit"
+                              :icon="['fas', 'question-circle']"
+                            />
+                          </span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -176,7 +249,11 @@
                       @click="selectProduct(product)"
                     >
                       <div class="px-2 pt-2">
-                        <img :src="_placeholderOfFirstVariantOf(product)" />
+                        <img
+                          :src="_placeholderOfFirstVariantOf(product)"
+                          :key="`${drawerId}_${product._id}`"
+                          :class="`side_thumb_${drawerId}_${product._id}`"
+                        />
                       </div>
                     </div>
                   </div>
@@ -207,6 +284,11 @@
 <script>
 import VueTailwindModal from "@/components/VueTailwindModal";
 import VueTailwindDrawer from "@/components/VueTailwindDrawer";
+import VueNumericInput from "@/components/VueNumericInput";
+import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
+
+const SERVICE_FEE = 0.12;
+const VAT = .12;
 
 export default {
   props: {
@@ -220,16 +302,17 @@ export default {
   components: {
     VueTailwindDrawer,
     VueTailwindModal,
+    VueNumericInput,
   },
+  mixins: [UserTypeCheckerMixin],
   data() {
     return {
       selectedProductSide: null,
       confirmationAction: null,
+      drawerId: this.makeId(),
       isLoading: false,
       generatedProducts: JSON.parse(JSON.stringify(this.products)),
-      selectedProduct: this.products.length
-        ? JSON.parse(JSON.stringify(this.products[0]))
-        : null,
+      selectedProduct: null,
       selectedProductVariantKey: this.products.length
         ? _.first(_.keys(JSON.parse(JSON.stringify(this.products[0])).variants))
         : null,
@@ -244,6 +327,44 @@ export default {
     };
   },
   methods: {
+    _firstFullThumbnailOf(product) {
+      return product.variants[this.selectedProductVariantKey].sides[
+        this.selectedProductSide
+      ]?.with_placeholder;
+    },
+    _toggleMainThumb() {
+      _.map(this.selectedProduct.variants, (variant, vk) => {
+        _.map(variant.sides, (s, k) => {
+          if (k === this.selectedProductSide) {
+            variant.sides[k].is_main_thumb = !s.is_main_thumb;
+            return;
+          }
+          variant.sides[k].is_main_thumb = false;
+        });
+      });
+    },
+    async setAsMainImage() {
+      try {
+        const res = this.$store.dispatch(
+          "user_dashboard/setVariantMainThumbnail",
+          {
+            _id: this.selectedProductVariantKey,
+            side: this.selectedProductSide,
+          }
+        );
+
+        this._toggleMainThumb();
+
+        this.$toast.success("Saved!", {
+          position: "top",
+        });
+      } catch (error) {
+        console.log(error);
+        this.$toast.error("Unable to set main image. Please try again.", {
+          position: "top",
+        });
+      }
+    },
     async markAsFeatured() {
       this.isLoading = true;
       const res = await this.$store.dispatch("admin/markAsFeatured", {
@@ -298,6 +419,9 @@ export default {
       this.$refs.publishConfirmationModal.hide();
       let status = "approved";
       if (this.confirmationAction === "decline") status = "declined";
+
+      await this.setAsMainImage();
+
       await this.$store.dispatch("admin/updateCollectionStatus", {
         _id: this.meta._id,
         status,
@@ -321,6 +445,7 @@ export default {
       return _.includes(areas, "front") ? "front" : _.head(areas);
     },
     show() {
+      this.drawerId = this.makeId();
       this.$refs.drawer.show();
       this.calculateProfit();
     },
@@ -329,6 +454,7 @@ export default {
     },
     _calculateEstProfit() {
       let totalProfit = 0;
+      let printreeNet = 0;
       _.map(this.generatedProducts, (product) => {
         _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
@@ -337,22 +463,23 @@ export default {
               (s) => s.name === size.name
             );
             if (!availableSize) return;
-            let baseCost = availableSize.baseCost;
+            let baseCost = size.calculatedCost;
             let totalForPrintree = baseCost * size.quantity;
             let totalWithCustomerPrice =
               (baseCost + size.price) * size.quantity;
             let net = totalWithCustomerPrice - totalForPrintree;
+            printreeNet += totalForPrintree;
             totalProfit += net;
           });
         });
       });
-      let minProfit = totalProfit - totalProfit * 0.05;
-      let maxProfit = totalProfit + totalProfit * 0.05;
-      this.estimatedMinProfit = minProfit;
-      this.estimatedMaxProfit = maxProfit;
+      let minProfit =
+        totalProfit -
+        totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
+      this.estimatedMinProfit =
+        this.meta.plan === "Sell" ? minProfit : printreeNet;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
-        if (this.$refs.estMaxProfit) this.$refs.estMaxProfit.play();
       });
     },
     calculateProfit(size) {
@@ -371,7 +498,9 @@ export default {
   },
   computed: {
     productTotalPrice() {
-      return this.selectedProductBasePrice + this.selectedProductProfit;
+      let total = (this.selectedProductBasePrice + this.selectedProductProfit)
+      
+      return Math.ceil(total + (total * VAT));
     },
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);
@@ -387,6 +516,16 @@ export default {
     },
   },
   watch: {
+    products: {
+      handler(to, from) {
+        this.generatedProducts = [...to];
+        this.selectedProduct = to[0] || null;
+        this.selectedProductVariantKey = this.selectedProduct
+          ? _.first(_.keys(this.selectedProduct.variants))
+          : null;
+      },
+      immediate: true,
+    },
     selectedProduct: {
       immediate: true,
       handler(to, from) {
@@ -397,12 +536,13 @@ export default {
         );
         this.selectedProductVariantKey = firstVariantKey;
         this.selectedProductBasePrice = _.first(
-          to.variants[firstVariantKey].available_sizes
-        ).baseCost;
+          this.selectedProductSizes
+        ).calculatedCost;
 
-        this.selectedProductSide = this._firstPrintableAreaOf(
-          to.variants[this.selectedProductVariantKey].sides
-        );
+        this.selectedProductTags = _.map(to.meta.tags, (text) => ({
+          text,
+          tiClasses: ["ti-valid"],
+        }));
 
         this.selectedProductProfit =
           to.variants[firstVariantKey].sizes[0].price;
@@ -416,6 +556,13 @@ export default {
           this.selectedProductVariantKey
         ].sizes = this.selectedProductSizes;
 
+        const initialSide = this._firstPrintableAreaOf(
+          to.variants[this.selectedProductVariantKey].sides
+        );
+        this.selectedProductSide = initialSide;
+
+        this._toggleMainThumb();
+
         this._calculateEstProfit();
       },
     },
@@ -428,6 +575,8 @@ export default {
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
+
+        this._toggleMainThumb();
       },
     },
     selectedProductProfit: {

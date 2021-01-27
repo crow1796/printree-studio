@@ -137,6 +137,7 @@ export default {
                             height
                         }
                         objects
+                        isMainThumb
                     }
                 }
             }
@@ -516,10 +517,11 @@ export default {
     query ($id: ID!){
         collectionStatus(_id: $id){
             status
+            handle
         }
     }
   `,
-  approveAccount: `
+    approveAccount: `
     mutation ($id: ID!){
         approveAccount(_id: $id){
             _id
@@ -528,6 +530,23 @@ export default {
             email
             status
             portfolioLink
+        }
+    }
+  `,
+    setVariantMainThumbnail: `
+    mutation($_id: ID!, $side: String!) {
+        setVariantMainThumbnail(_id: $_id, side: $side) {
+            _id
+            contents {
+                isMainThumb
+            }
+        }
+    }
+  `,
+    deleteUserById: `
+    mutation($_id: ID!) {
+        deleteUserById(_id: $_id) {
+            _id
         }
     }
   `

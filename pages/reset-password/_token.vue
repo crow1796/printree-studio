@@ -1,47 +1,11 @@
 <template>
-  <div class="relative">
+  <div class="relative py-48">
     <AreaLoader v-if="isLoading" />
     <div class="py-4 w-6/12 mx-auto">
       <div class="my-2 flex sm:flex-row justify-between items-center">
-        <h2 class="text-2xl font-semibold leading-tight">Account Settings</h2>
+        <h2 class="text-2xl font-semibold leading-tight">Change Password</h2>
       </div>
-      <form @submit.prevent="updateAccount">
-        <div class="mb-3">
-          <label for="name" class="font-bold">Full Name</label>
-          <div>
-            <input
-              type="text"
-              name="name"
-              class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-              :class="{ 'border-red-400': errors.has('name'), 'focus:border-gray-600': !errors.has('name') }"
-              placeholder="Your Name"
-              v-model="formData.name"
-            />
-          </div>
-          <span
-            class="text-red-700 text-xs pt-1 font-bold inline-block"
-            v-if="errors.has('name')"
-          >{{ errors.first('name') }}</span>
-        </div>
-        <div class="mb-3">
-          <label for="email" class="font-bold">Email Address</label>
-          <div>
-            <input
-              type="text"
-              name="email"
-              class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-              :class="{ 'border-red-400': errors.has('email'), 'focus:border-gray-600': !errors.has('email') }"
-              placeholder="Your Email Address"
-              v-model="formData.email"
-              data-vv-as="Email Address"
-              v-validate="'required|email'"
-            />
-          </div>
-          <span
-            class="text-red-700 text-xs pt-1 font-bold inline-block"
-            v-if="errors.has('email')"
-          >{{ errors.first('email') }}</span>
-        </div>
+      <form @submit.prevent="updatePassword">
         <div class="mb-3">
           <label for="password" class="font-bold">New Password</label>
           <div>
@@ -54,7 +18,7 @@
               placeholder="Your Password"
               v-model="formData.password"
               data-vv-as="Password"
-              v-validate="'min:6|confirmed:confirmPasswordRef'"
+              v-validate="'required|min:6|confirmed:confirmPasswordRef'"
             />
           </div>
           <span
@@ -85,7 +49,7 @@
         <div class="flex justify-end">
           <button
             class="items-center justify-center focus:outline-none outline-none flex border px-6 py-2 font-bold rounded text-white border-white bg-primary hover:bg-primary-lighter"
-          >UPDATE</button>
+          >CHANGE PASSWORD</button>
         </div>
       </form>
     </div>
@@ -93,33 +57,19 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 export default {
-  layout: 'user_dashboard',
-  async mounted() {
-    this.formData.name = this.user.name
-    this.formData.email = this.user.email
-    this.isLoading = false
-  },
-  data() {
+  data(){
     return {
-      isLoading: true,
+      isLoading: false,
       formData: {
-        name: null,
-        email: null,
         password: null,
-        passwordConfirmation: null
+        passwordConfirmation: null,
+        token: this.$route.params.token
       }
     }
   },
-  computed: {
-    ...mapGetters({
-      user: 'user'
-    })
-  },
   methods: {
-    async updateAccount(){
+    async updatePassword(){
       let res = await this.$validator.validateAll()
       if (this.isLoading) return
       if(!res){
@@ -127,23 +77,20 @@ export default {
         return
       }
       this.isLoading = true
-      const response = await this.$store.dispatch('user/updateAccount', this.formData)
-      let passwordResponse = null
 
-      if(!response){
+      res = await this.$store.dispatch('user/updatePassword', this.formData);
+      if (!res.status) {
+        this.$toast.error(res.message, {
+          position: "top",
+        });
         this.isLoading = false
-        this.$toast.error('Updating the profile failed! Please try again.', {
-          position: 'bottom'
-        })
-        return
+        return;
       }
-      this.formData.password = null
-      this.formData.passwordConfirmation = null
-      this.$toast.success('Profile updated successfully!', {
-        position: 'top'
-      })
-      this.isLoading = false
+
+      this.$toast.success('Password changed successfully! You can now log in.', { position: 'top'})
+
+      this.$router.replace('/')
     }
   }
-}
+};
 </script>

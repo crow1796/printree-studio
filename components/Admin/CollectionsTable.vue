@@ -3,7 +3,6 @@
     <AreaLoader v-if="isLoading" fullscreen />
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
-      v-if="generatedImages.length"
       :products="generatedImages"
       :meta="collectionMeta"
     />
@@ -11,7 +10,16 @@
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">All Collections</h2>
         <div class="my-2 flex sm:flex-row flex-col">
-          <div class="relative">
+          <div class="relative flex">
+            <button
+              type="button"
+              class="px-3 py-1 text-xs hover:bg-gray-200 border rounded"
+              title="Reload"
+              v-tippy="{arrow: true}"
+              @click="$emit('reload')"
+            >
+              <font-awesome-icon :icon="['fas', 'sync']" class="text-xs" />
+            </button>
             <select
               class="justify-center items-center mx-2 focus:outline-none outline-none flex flex-shrink border rounded text-gray-600 border-grey-lightest hover:bg-gray-100 appearance-none h-full px-4"
               @change="filter"
@@ -118,9 +126,9 @@
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
                   <div class="text-gray-900 whitespace-no-wrap">
                     <nuxt-link
-                      :to="`/admin/users/${col.user._id}`"
+                      :to="`/admin/users/${col.user ? col.user._id : ''}`"
                       class="text-blue-600 hover:underline"
-                    >{{ col.user.name }}</nuxt-link>
+                    >{{ col.user ? col.user.shopName || col.user.name : '' }}</nuxt-link>
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
@@ -178,25 +186,6 @@ export default {
         collection._id
       );
 
-      if (["approved"].includes(status)) {
-        this.$store.commit("admin/UPDATE_COLLECTION_STATUS", {
-          _id: collection._id,
-          status: status,
-        });
-
-        let message = "";
-        switch (status) {
-          case "approved":
-            message = "The collection is already approved.";
-            break;
-        }
-
-        this.$toast.info(message, {
-          position: "top",
-        });
-        return false;
-      }
-
       return true;
     },
     filter() {
@@ -208,9 +197,6 @@ export default {
       this.$emit("filter", this.filterValues);
     },
     async previewCollection(collection) {
-      const statusValidation = await this._validateStatusOf(collection);
-      if (!statusValidation) return;
-
       this.isLoading = true;
       const collectionData = await this.$store.dispatch(
         "designer/fetchDesignData",

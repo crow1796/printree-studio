@@ -198,7 +198,7 @@
         </button>
       </div>
     </div>
-    <!-- 
+    
     <div class="flex bg-white mt-4 rounded border justify-center">
       <div class="flex flex-col py-1">
         <button
@@ -220,7 +220,7 @@
           <font-awesome-icon :icon="['fas', 'search-minus']" class="text-xs" />
         </button>
       </div>
-    </div> -->
+    </div>
 
     <div class="flex bg-white mt-4 rounded border justify-center">
       <div class="flex flex-col py-1">

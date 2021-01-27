@@ -1,7 +1,7 @@
 <template>
   <div class="sm:px-8 relative">
     <AreaLoader v-if="isLoading" fullscreen />
-    <CollectionsTable :collections="collections" @filter="filterCollection" />
+    <CollectionsTable :collections="collections" @filter="filterCollection" @reload="_loadItems"/>
     <SimplePagination @prev="goTo(prevPage)" @next="goTo(nextPage)"/>
   </div>
 </template>
@@ -11,6 +11,7 @@ import { mapGetters } from "vuex";
 import CollectionsTable from "@/components/Admin/CollectionsTable";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import SimplePagination from "@/components/SimplePagination";
+import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
 
 export default {
   layout: "admin_dashboard",
@@ -25,11 +26,12 @@ export default {
         "/admin/collections/?colpage=1&status=approved,declined,pending,reviewing"
       );
   },
+  mixins: [UserTypeCheckerMixin],
   data() {
     return {
       isLoading: true,
       query: {
-        plan: "Sell",
+        plan: ["Sell", "Buy"],
         status: ["approved", "declined", "pending", "reviewing"],
         sorting: {
           field: "created_at",

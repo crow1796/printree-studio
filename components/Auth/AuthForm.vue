@@ -19,7 +19,25 @@
       <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
-          <div class="mb-3" v-if="formType == 'sign_up'">
+          <!-- TODO: Add when ready <div v-if="formType === 'sign_up'">
+            <label class="font-bold mb-2 block text-center">I want to...</label>
+            <div class="flex justify-center mb-4 text-sm">
+              <button
+                type="button"
+                class="rounded border flex items-center p-3 flex-col w-6/12 cursor-pointer mx-2 hover:border-gray-600 uppercase font-bold"
+                v-for="(type, i) in userTypes"
+                :key="i"
+                :class="{'bg-primary text-white': formData.type === type}"
+                @click="changeUserType(type)"
+              >{{userType(type)}} PRODUCTS</button>
+            </div>
+          </div> -->
+
+          <div
+            class="mb-3"
+            v-if="formType == 'sign_up' && formData.type === 'seller'"
+            key="shop_name"
+          >
             <label for="shop_name" class="font-bold">Shop Name</label>
             <div class="mt-2">
               <input
@@ -38,7 +56,7 @@
               v-if="errors.has('shop_name')"
             >{{ errors.first('shop_name') }}</span>
           </div>
-          <div class="mb-3" v-if="formType == 'sign_up'">
+          <div class="mb-3" v-if="formType == 'sign_up'" key="name">
             <label for="name" class="font-bold">Name</label>
             <div class="mt-2">
               <input
@@ -57,7 +75,7 @@
               v-if="errors.has('name')"
             >{{ errors.first('name') }}</span>
           </div>
-          <div class="mb-3">
+          <div class="mb-3" key="email">
             <label for="email" class="font-bold">Email</label>
             <div class="mt-2">
               <input
@@ -76,7 +94,7 @@
               v-if="errors.has('email')"
             >{{ errors.first('email') }}</span>
           </div>
-          <div class="mb-3" v-if="formType != 'password_recovery'">
+          <div class="mb-3" v-if="formType != 'password_recovery'" key="password">
             <label for="pass" class="font-bold">Password</label>
             <div class="mt-2">
               <input
@@ -95,7 +113,11 @@
               v-if="errors.has('pass')"
             >{{ errors.first('pass') }}</span>
           </div>
-          <div class="mb-3" v-if="formType === 'sign_up'">
+          <div
+            class="mb-3"
+            v-if="formType === 'sign_up' && formData.type === 'seller'"
+            key="portfolio"
+          >
             <label for="pass" class="font-bold flex items-center">
               Link to your Portfolio
               <span
@@ -106,7 +128,8 @@
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
               </span>
             </label>
-            <div class="text-xs text-blue-500 mt-1">(Google Drive, Dropbox, personal website, etc.)</div>
+            <div class="text-xs text-blue-500 mt-1">* Google Drive, Dropbox, personal website, etc.</div>
+            <div class="text-xs text-blue-500 mt-1">* Must have at least 3 sample images.</div>
             <div class="mt-2">
               <input
                 type="url"
@@ -124,7 +147,7 @@
               v-if="errors.has('portfolio')"
             >{{ errors.first('portfolio') }}</span>
           </div>
-          <div class="mb-3" v-if="formType === 'sign_up'">
+          <div class="mb-3" v-if="formType === 'sign_up'" key="terms">
             <div class="flex items-center">
               <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
                 <input
@@ -193,12 +216,14 @@ export default {
         password: null,
         shopName: null,
         portfolio: null,
+        type: "seller",
       },
       terms: false,
       isLoading: false,
       isSubmissionFailed: false,
       formMessage: null,
       isSignUpSuccess: false,
+      userTypes: ["seller", "buyer"],
     };
   },
   computed: {
@@ -228,6 +253,14 @@ export default {
     },
   },
   methods: {
+    userType(type) {
+      let finalType = "sell";
+      if (type === "buyer") finalType = "BUY";
+      return finalType;
+    },
+    changeUserType(type) {
+      this.formData.type = type;
+    },
     toggleForm(type = null) {
       this.$validator.reset();
       this.formType = type;
@@ -238,6 +271,7 @@ export default {
           email: null,
           password: null,
           portfolio: null,
+          type: "seller",
         };
       });
     },
@@ -246,6 +280,11 @@ export default {
       let response = await this.$store.dispatch("user/signInAsAGuest");
       this.isLoading = false;
       if (response.status) this.$emit("login-success");
+    },
+    async signIn(){
+      let res = await this.$store.dispatch("user/signIn", this.formData);
+
+      this.$emit("login-success");
     },
     async submitForm() {
       this.isSubmissionFailed = false;
@@ -263,6 +302,7 @@ export default {
       }
       try {
         let res = await this.$store.dispatch(action, this.formData);
+        let tmpFormData = {...this.formData};
 
         if (this.formType === "password_recovery") {
           if (!res.status) {
@@ -272,7 +312,7 @@ export default {
             return;
           }
           this.$toast.success(
-            "A reset password email has been sent to your email.",
+            "Please check your email to change your password.",
             {
               position: "bottom",
             }
@@ -282,19 +322,26 @@ export default {
             email: null,
             password: null,
             portfolio: null,
+            type: "seller",
           };
           this.formType = "sign_in";
-          this.$validator.reset();
+          this.$validator.reset(); 
+          this.$emit("reset-success");
           return;
         }
         if (this.formType !== "sign_up") this.$emit("login-success");
         else {
-          this.isSignUpSuccess = true;
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 },
-          });
+          if (tmpFormData.type === "seller") {
+            this.isSignUpSuccess = true;
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 },
+            });
+          } else{
+            await this.signIn()
+            return 
+          }
         }
       } catch (e) {
         this.isSubmissionFailed = true;

@@ -1,6 +1,3 @@
-import adminDb from '~/plugins/lib/db/admin'
-import db from '~/plugins/lib/db'
-
 const state = () => ({
   user: null,
   isLoggedIn: false,
@@ -67,7 +64,7 @@ const getters = {
 }
 
 const actions = {
-  async approveAccount(context, _id){
+  async approveAccount(context, _id) {
     const user = await this.$api.admin.approveAccount(_id)
     return user
   },
@@ -95,12 +92,16 @@ const actions = {
     const res = await this.$axios.patch(`/users/${data.uid}`, data)
     context.commit('UPDATE_USER', res.data.user)
   },
-  async updateCollection(context, { _id, data }) {
-    await db.updateCollection(_id, data)
-    context.commit('UPDATE_COLLECTION_STATUS', {
-      _id,
-      status: data.status
-    })
+  async deleteUser(context, { _id }) {
+    const res = await this.$api.admin.deleteUserById(_id);
+    return res
+  },
+  removeUserById(context, _id) {
+    const tmpUsers = JSON.parse(
+      JSON.stringify(context.getters.users)
+    )
+    tmpUsers.splice(_.findIndex(tmpUsers, { _id }), 1)
+    context.commit('USERS', tmpUsers)
   },
   async updateCollectionStatus(context, { _id, status }) {
     await this.$api.admin.updateCollectionStatus({ _id, status })
@@ -150,8 +151,7 @@ const actions = {
     return res
   },
   async markAsFeatured(context, data) {
-    const res = await adminDb.markAsFeatured(data)
-    return res
+
   }
 }
 

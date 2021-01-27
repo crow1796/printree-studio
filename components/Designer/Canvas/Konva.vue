@@ -19,10 +19,10 @@ export default {
       isCanvasMounted: false,
       stageCursor: 'initial',
       innerCanvasConfig: {
-        x: (1000 / 2) - 400, //TODO: This must be served by a server / props
-        y: (1000 / 2) - 500, //TODO: This must be served by a server / props
-        width: 800, //TODO: This must be served by a server / props
-        height: 1000, //TODO: This must be served by a server / props
+        x: (1000 / 2) - 400,
+        y: (1000 / 2) - 500,
+        width: 800,
+        height: 1000,
         fill: 'white',
         stroke: '#f1f1f1'
       },

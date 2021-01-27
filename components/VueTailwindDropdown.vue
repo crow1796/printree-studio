@@ -4,7 +4,8 @@
       <slot name="trigger" />
     </div>
     <div
-      class="absolute bg-white shadow-xl rounded border w-full"
+      class="absolute bg-white shadow-xl rounded border right-0"
+      :style="{width}"
       v-show="isOpen"
       v-click-outside="hide"
     >
@@ -17,6 +18,11 @@
 import ClickOutside from 'vue-click-outside'
 
 export default {
+  props: {
+    width: {
+      default: '100%'
+    }
+  },
   directives: {
     ClickOutside
   },

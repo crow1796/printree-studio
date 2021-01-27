@@ -1,6 +1,36 @@
 <template>
   <div class="sm:px-8 relative">
-    <AreaLoader v-if="isLoading" />
+    <AreaLoader v-if="isLoading" fullscreen />
+
+    <VueTailwindModal
+      ref="deleteConfirmationModal"
+      width="30%"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase justify-center flex-grow">
+              <strong>Confirmation</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body p-4 text-center">Are you sure you want to delete this user?</div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="hideDeleteConfirmation"
+          >No</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="deleteUser"
+          >Yes</button>
+        </div>
+      </div>
+    </VueTailwindModal>
     <VueTailwindModal ref="userFormModal" width="30%">
       <form @submit.prevent="submitForm">
         <div class="text-xl font-bold mb-2">{{ formData._id ? 'EDIT' : 'ADD NEW' }} USER</div>
@@ -93,11 +123,22 @@
     <div>
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">Users</h2>
-        <button
-          type="button"
-          class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
-          @click="addNewUser"
-        >Add New User</button>
+        <div class="relative flex">
+          <button
+            type="button"
+            class="px-3 py-2 text-xs hover:bg-gray-200 border rounded font-bold outline-none focus:outline-none mr-2"
+            title="Reload"
+            v-tippy="{arrow: true}"
+            @click="_loadItems"
+          >
+            <font-awesome-icon :icon="['fas', 'sync']" class="text-xs" />
+          </button>
+          <button
+            type="button"
+            class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+            @click="addNewUser"
+          >Add New User</button>
+        </div>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -168,6 +209,7 @@
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Delete"
                       v-tippy="{arrow: true}"
+                      @click="showDeleteConfirmationModal(user)"
                     >
                       <font-awesome-icon :icon="['fas', 'trash']" />
                     </button>
@@ -217,6 +259,7 @@ export default {
           page: 0,
         },
       },
+      selectedUser: null,
     };
   },
   computed: {
@@ -248,6 +291,29 @@ export default {
     },
   },
   methods: {
+    async showDeleteConfirmationModal(user) {
+      this.selectedUser = user;
+      this.$refs.deleteConfirmationModal.show();
+    },
+    hideDeleteConfirmation() {
+      this.selectedUser = null;
+      this.$refs.deleteConfirmationModal.hide();
+    },
+    async deleteUser() {
+      this.isLoading = true;
+      this.$refs.deleteConfirmationModal.hide();
+      await this.$store.dispatch("admin/deleteUser", {
+        _id: this.selectedUser._id,
+      });
+      this.$store.dispatch(
+        "admin/removeUserById",
+        this.selectedUser._id
+      );
+      this.$toast.success("User has been deleted.", {
+        position: "top",
+      });
+      this.isLoading = false;
+    },
     addNewUser() {
       this.formData = {
         email: null,

@@ -284,6 +284,10 @@
 
   &.-maximized {
     transform: scale(0.9) !important;
+
+    @media(max-width: 1280px){
+      transform: scale(0.7) !important;
+    }
   }
 
   &.-maximized .preview-resizer-btn {
