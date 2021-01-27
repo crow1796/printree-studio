@@ -257,7 +257,7 @@ export default {
           this.zoomTo(0.1);
           break;
         case "zoom_out":
-          this.zoomTo(0.1);
+          this.zoomTo(-0.1);
           break;
       }
     },
@@ -830,7 +830,10 @@ export default {
       this._registerCanvasKeyEvents();
     },
     zoomTo(scale) {
-      if (scale == "reset") return this.panzoomController.zoomAbs(0, 0, 1);
+      if (scale == "reset") {
+        this.canvasScale = 1;
+        return
+      }
       this.canvasScale += scale;
     },
     pause() {

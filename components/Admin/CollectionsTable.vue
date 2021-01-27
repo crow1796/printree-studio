@@ -128,7 +128,7 @@
                     <nuxt-link
                       :to="`/admin/users/${col.user ? col.user._id : ''}`"
                       class="text-blue-600 hover:underline"
-                    >{{ col.user ? col.user.name : '' }}</nuxt-link>
+                    >{{ col.user ? col.user.shopName || col.user.name : '' }}</nuxt-link>
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
