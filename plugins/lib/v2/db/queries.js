@@ -334,6 +334,13 @@ export default {
                 variant {
                     _id
                     fullThumb
+                    contents {
+                        isMainThumb
+                        fullThumb
+                        printableArea {
+                            side
+                        }
+                    }
                     sizes {
                         name
                         shopId
