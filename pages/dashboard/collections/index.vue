@@ -219,7 +219,7 @@
                         </span>
                         <a
                           href="#"
-                          :class="{ 'text-blue-600 hover:underline': col.status !== 'approved', 'cursor-default': col.status === 'approved' }"
+                          class="text-blue-600 hover:underline"
                           @click.prevent="editCollection(col)"
                         >
                           <span>{{ col.name }}</span>
@@ -452,7 +452,6 @@ export default {
       this.$router.replace("/collection/designer");
     },
     async editCollection(collection) {
-      if (collection.status === "approved") return;
       const statusValidation = await this._validateStatusOf(collection);
       if (!statusValidation) return;
 

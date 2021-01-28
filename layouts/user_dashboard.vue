@@ -129,6 +129,9 @@ export default {
       isLoggedIn: "isLoggedIn",
     })
   },
+  mounted(){
+    document.body.style.overflow = 'auto'
+  },
   methods: {
     async signOut() {
       await this.$router.replace("/");
