@@ -10,9 +10,7 @@
         <h2 class="text-2xl mt-4 font-semibold leading-tight">Orders</h2>
       </div>
     </div>
-    <div class="text-center" v-if="!orders.length">
-      You have no order(s).
-    </div>
+    <div class="text-center" v-if="!orders.length">You have no order(s).</div>
     <div class="border flex flex-col mb-6" v-for="(order, i) in orders" :key="i">
       <div class="flex border-b p-4 justify-between items-center">
         <div class="flex flex-col">
@@ -59,7 +57,7 @@
         >
           <div class="w-2/12 flex">
             <div class="w-24">
-              <progressive-img class="relative mx-auto" :src="product.variant.fullThumb" />
+              <progressive-img class="relative mx-auto" :src="_firstFullThumbnailOf(product)" />
             </div>
           </div>
           <div class="flex flex-col w-4/12 justify-center">
@@ -102,11 +100,12 @@
 import moment from "moment";
 import { mapGetters } from "vuex";
 
+const VAT = 0.12
+
 export default {
   layout: "user_dashboard",
   async mounted() {
     await this.$store.dispatch("user_dashboard/ordersOfCurrentUser");
-    // await this.$store.dispatch('user_dashboard/getTotalProfitOf', this.user)
     this.isLoading = false;
   },
   data() {
@@ -123,7 +122,8 @@ export default {
   methods: {
     _profitFrom(product) {
       const size = _.find(product.variant.sizes, { shopId: product.shopId });
-      return (size?.price || 0) * product.quantity;
+      const price = (size?.price || 0)
+      return (price - (price * VAT)) * product.quantity;
     },
     _sizeNameOfProduct(product) {
       const size = _.find(product.variant.sizes, { shopId: product.shopId });
@@ -132,6 +132,15 @@ export default {
     formatTimestamp(timestamp) {
       if (!timestamp) return;
       return moment(timestamp).format("MMMM Do YYYY, h:mm:ss a");
+    },
+    _firstFullThumbnailOf(product) {
+      let mainContent = _.find(product.variant.contents, (c) => c.isMainThumb);
+      if(!mainContent) {
+        const front = _.find(product.variant.contents, (c) => c.printableArea?.side === 'front')
+        mainContent = front || _.first(product.variant.contents)
+      }
+      
+      return mainContent?.fullThumb;
     },
   },
 };

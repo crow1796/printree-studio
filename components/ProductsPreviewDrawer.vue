@@ -549,7 +549,7 @@ export default {
 
       if (!this.selectedProductProfit && this.meta.plan === "Sell") {
         isDirty = true;
-        this.productErrors.push("How much would your profit be?");
+        this.productErrors.push("How much is your desired profit?");
       }
 
       if (isDirty) {
