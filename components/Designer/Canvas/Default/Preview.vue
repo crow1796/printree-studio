@@ -1,8 +1,8 @@
 <template>
   <div
-    class="flex flex-grow w-full h-full justify-center printable-output p-2"
+    class="flex flex-grow justify-center printable-output p-2"
     :style="{transform: `scale(${scale})`}"
-    :class="{ '-maximized': resizable && isPreviewExpanded }"
+    :class="{ '-maximized': resizable && isPreviewExpanded, 'w-full h-full': fullSize }"
     ref="preview-container"
   >
     <button
@@ -18,11 +18,15 @@
         :rotation="90"
       />
     </button>
-    <div class="outline-none select-none relative w-full h-full text-center overflow-hidden">
-      <div class="inline-block outline-none relative w-full h-full">
-        <div class="relative w-full h-full">
+    <div
+      class="outline-none select-none relative text-center overflow-hidden"
+      :class="{'w-full h-full': fullSize}"
+    >
+      <div class="inline-block outline-none relative" :class="{'w-full h-full': fullSize}">
+        <div class="relative" :class="{'w-full h-full': fullSize}">
           <div
-            class="inline-block relative w-full h-full"
+            class="inline-block relative"
+            :class="{'w-full h-full': fullSize}"
             :style="{ 'background-color': variant.customizableVariant.color }"
           >
             <img draggable="false" class="relative" style="z-index: 2" :src="content.placeholder" />
@@ -92,6 +96,9 @@ export default {
     },
     scale: {
       default: 0.3,
+    },
+    fullSize: {
+      default: true,
     },
   },
   components: {

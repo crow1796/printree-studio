@@ -124,11 +124,11 @@
         <div class="flex flex-grow">
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
-              <div class="large-thumbnail w-6/12 flex flex-col">
-                <div class="flex relative justify-center items-center">
+              <div class="large-thumbnail w-6/12 flex flex-col relative">
+                <div class="flex justify-center items-center">
                   <button
                     type="button"
-                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
+                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary z-10"
                     @click="switchSides"
                     title="Rotate"
                     v-tippy="{arrow: true}"
@@ -136,11 +136,14 @@
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
 
-                  <img
-                    :src="`${_firstFullThumbnailOf(selectedProduct)}`"
-                    :key="`full_${selectedProduct._id}_${drawerId}`"
-                    :id="`full_${selectedProduct._id}_${drawerId}`"
-                  />
+                    <Preview
+                      :key="`full_${selectedProduct._id}_${drawerId}`"
+                      :id="`full_${selectedProduct._id}_${drawerId}`"
+                      :scale="1"
+                      :variant="selectedProduct.variants[this.selectedProductVariantKey]"
+                      :content="_firstFullThumbnailOf(selectedProduct)"
+                      :fullSize="false"
+                    />
                 </div>
                 <div class="variants flex">
                   <div
@@ -200,9 +203,7 @@
                       class="text-xs uppercase font-bold mb-1"
                     >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Price' }}</div>
                     <div>PHP {{ productTotalPrice }}</div>
-                    <div
-                      class="text-xs uppercase font-bold mt-1 text-right"
-                    >VAT Included</div>
+                    <div class="text-xs uppercase font-bold mt-1 text-right">VAT Included</div>
                   </div>
                 </div>
                 <div class="pt-4" v-if="meta.plan ==='Sell'">
@@ -347,9 +348,10 @@ import OptionButtons from "@/components/OptionButtons";
 import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
+import { Preview } from "@/components/Designer/Canvas/Default/index.js";
 
 const SERVICE_FEE = 0.12;
-const VAT = .12;
+const VAT = 0.12;
 
 export default {
   props: {
@@ -368,6 +370,7 @@ export default {
     VueTailwindModal,
     VueTailwindToast,
     AutosizeInput,
+    Preview,
   },
   mixins: [UserTypeCheckerMixin],
   data() {
@@ -423,11 +426,12 @@ export default {
       );
     },
     productTotalPrice() {
-      let total = (this.selectedProductBasePrice)
+      let total = this.selectedProductBasePrice;
 
-      if (this.meta.plan === "Sell") total = (this.selectedProductBasePrice + this.selectedProductProfit)
-      
-      return Math.ceil(total + (total * VAT));
+      if (this.meta.plan === "Sell")
+        total = this.selectedProductBasePrice + this.selectedProductProfit;
+
+      return Math.ceil(total + total * VAT);
     },
     selectedVariantIndex() {
       const product = {
@@ -464,7 +468,7 @@ export default {
     _firstFullThumbnailOf(product) {
       return product.variants[this.selectedProductVariantKey].sides[
         this.selectedProductSide
-      ]?.with_placeholder;
+      ]?.content;
     },
     _placeholderOfFirstVariantOf(product) {
       const firstKey = _.first(_.keys(product.variants));

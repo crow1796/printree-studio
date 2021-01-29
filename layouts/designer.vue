@@ -216,7 +216,10 @@ export default {
       if (!this.isLoggedIn) return this.$refs.authModal.show();
       this.loadingText = "Generating Images...";
       this.isLoading = true;
-      const generatedImages = await this.$store.dispatch("designer/saveData");
+      const generatedImages = await this.$store.dispatch("designer/saveData", {
+        shouldGenerateImages: true,
+        extractDesign: false
+      });
       this.isLoading = false;
       this.generatedImages = generatedImages;
       this.loadingText = "";

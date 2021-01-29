@@ -82,7 +82,7 @@ const getters = {
 }
 
 const actions = {
-  async setVariantMainThumbnail(context, data){
+  async setVariantMainThumbnail(context, data) {
     const variant = await this.$api.userDashboard.setVariantMainThumbnail(data)
     return variant
   },
@@ -146,6 +146,10 @@ const actions = {
       context.commit('INCR_TOTAL_PROFIT_BY', payout.amount)
     }
     return payout
+  },
+  async variantData(context, { _id }) {
+    const variant = await this.$api.userDashboard.variantData(_id)
+    return variant
   }
 }
 

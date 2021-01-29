@@ -651,7 +651,8 @@ const actions = {
   async saveData(context, params) {
     const defaultParams = {
       shouldGenerateImages: true,
-      isFinal: false
+      isFinal: false,
+      extractDesign: true
     };
 
     const newParams = {
@@ -674,6 +675,7 @@ const actions = {
       const res = newParams.shouldGenerateImages
         ? await this.$axios.post("/create-images", {
           products: updatedCollection.products,
+          extractDesign: newParams.extractDesign
         })
         : [];
       generatedImages = newParams.shouldGenerateImages ? (res.data || res) : res;

@@ -556,5 +556,35 @@ export default {
             _id
         }
     }
+  `,
+  variantData: `
+    query ($id: ID!){
+        variantData(_id: $id){
+            _id
+            sizes {
+                name
+                quantity
+                shopId
+            }
+            customizableVariant {
+                color
+            }
+            contents {
+                _id
+                side
+                placeholder
+                bounds {
+                    left
+                    top
+                    width
+                    height
+                }
+                objects
+                isMainThumb
+                fullThumb
+                imageId
+            }
+        }
+    }
   `
 };
