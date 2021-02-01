@@ -145,8 +145,8 @@ export default {
     }
   `,
     updateUserCollection: `
-    mutation ($collection: UpdateCollectionInput){
-        updateUserCollection(collection: $collection){
+    mutation ($collection: UpdateCollectionInput, $isFinal: Boolean){
+        updateUserCollection(collection: $collection, isFinal: $isFinal){
             _id
             name
             plan
@@ -554,6 +554,36 @@ export default {
     mutation($_id: ID!) {
         deleteUserById(_id: $_id) {
             _id
+        }
+    }
+  `,
+  variantData: `
+    query ($id: ID!){
+        variantData(_id: $id){
+            _id
+            sizes {
+                name
+                quantity
+                shopId
+            }
+            customizableVariant {
+                color
+            }
+            contents {
+                _id
+                side
+                placeholder
+                bounds {
+                    left
+                    top
+                    width
+                    height
+                }
+                objects
+                isMainThumb
+                fullThumb
+                imageId
+            }
         }
     }
   `

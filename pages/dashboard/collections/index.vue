@@ -452,8 +452,12 @@ export default {
       this.$router.replace("/collection/designer");
     },
     async editCollection(collection) {
+      this.isLoading = true
       const statusValidation = await this._validateStatusOf(collection);
-      if (!statusValidation) return;
+      if (!statusValidation) {
+        this.isLoading = false
+        return;
+      }
 
       this._goToCollectionDesigner(collection);
     },

@@ -33,13 +33,14 @@ export const getUsers = async (axios, searchQuery) => {
   return data.data?.users || [];
 }
 
-export const updateCollectionStatus = async (axios, { _id, status }) => {
+export const updateCollectionStatus = async (axios, { _id, status, notes }) => {
   const { data } = await axios.post("/gql", {
     query: queries.updateCollectionStatus,
     variables: {
       collection: {
         _id,
-        status
+        status,
+        notes
       }
     },
   });
@@ -91,7 +92,7 @@ export const approveAccount = async (axios, id) => {
   return approveAccount;
 }
 
-export const declinePayoutRequest = async (axios, { _id }) => {
+export const declinePayoutRequest = async (axios, { _id, notes }) => {
   const { data } = await axios.post("/gql", {
     query: queries.declinePayoutRequest,
     variables: {

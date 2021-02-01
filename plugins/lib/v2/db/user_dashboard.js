@@ -100,3 +100,14 @@ export const removeProductFromCollection = async (axios, id) => {
   const removeProductFromCollection = data.data.removeProductFromCollection;
   return removeProductFromCollection;
 }
+
+export const variantData = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.variantData,
+    variables: {
+      id,
+    }
+  });
+  const variantData = data.data.variantData;
+  return variantData;
+}
