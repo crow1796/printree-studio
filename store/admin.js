@@ -103,8 +103,8 @@ const actions = {
     tmpUsers.splice(_.findIndex(tmpUsers, { _id }), 1)
     context.commit('USERS', tmpUsers)
   },
-  async updateCollectionStatus(context, { _id, status }) {
-    await this.$api.admin.updateCollectionStatus({ _id, status })
+  async updateCollectionStatus(context, { _id, status, notes }) {
+    await this.$api.admin.updateCollectionStatus({ _id, status, notes })
     context.commit('UPDATE_COLLECTION_STATUS', {
       _id,
       status

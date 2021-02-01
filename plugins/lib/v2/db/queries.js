@@ -145,8 +145,8 @@ export default {
     }
   `,
     updateUserCollection: `
-    mutation ($collection: UpdateCollectionInput){
-        updateUserCollection(collection: $collection){
+    mutation ($collection: UpdateCollectionInput, $isFinal: Boolean){
+        updateUserCollection(collection: $collection, isFinal: $isFinal){
             _id
             name
             plan

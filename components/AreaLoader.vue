@@ -15,7 +15,8 @@ export default {
       type: Boolean
     },
     text: {
-      type: String
+      type: String,
+      default: "Loading..."
     }
   }
 }

@@ -85,14 +85,18 @@
       </div>
     </VueTailwindModal>
     <VueTailwindToast placement="top-center" ref="productValidationToast">
-      <div class="font-bold">Oops! Please fill up the required fields first:</div>
+      <div class="font-bold">Oops! Please fill up the required fields:</div>
       <ul class="text-sm list-disc">
         <li v-for="(error, i) in productErrors" :key="i">{{ error }}</li>
       </ul>
     </VueTailwindToast>
-    <div class="flex h-full w-full text-gray-600" v-if="selectedProduct">
+    <VueTailwindToast placement="top-center" ref="nextProductToast">
+      <div class="font-bold">Please wait...</div>
+      <div class="text-sm">We're still generating your product(s), please bear with us.</div>
+    </VueTailwindToast>
+    <div class="flex h-full w-full text-gray-600">
       <div class="flex flex-col w-full h-full">
-        <div class="flex flex-grow-0 items-center border-b p-4">
+        <div class="flex flex-grow-0 items-center border-b p-4 justify-between">
           <!-- TODO: Add when ready <div class="flex w-4/12 uppercase flex-col" v-if="userTypeIs('seller')">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
@@ -112,10 +116,12 @@
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
           </div>-->
-          <div class="flex flex-grow justify-end">
+          <div class="flex h-8 items-center font-bold">Set Collection Details</div>
+          <div class="flex justify-end">
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
               @click="hide"
+              v-if="!isGenerating"
             >
               <font-awesome-icon :icon="['fas', 'times']" class="text-xs" />
             </div>
@@ -124,28 +130,37 @@
         <div class="flex flex-grow">
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
-              <div class="large-thumbnail w-6/12 flex flex-col relative">
-                <div class="flex justify-center items-center">
+              <div class="large-thumbnail w-6/12 flex flex-col">
+                <div class="flex relative justify-center items-center">
                   <button
                     type="button"
-                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary z-10"
+                    class="absolute top-0 left-0 border rounded flex justify-center items-center w-8 h-8 hover:text-primary hover:border-primary"
                     @click="switchSides"
                     title="Rotate"
                     v-tippy="{arrow: true}"
+                    v-if="selectedProduct"
                   >
                     <font-awesome-icon :icon="['fas', 'sync-alt']" />
                   </button>
 
-                    <Preview
-                      :key="`full_${selectedProduct._id}_${drawerId}`"
-                      :id="`full_${selectedProduct._id}_${drawerId}`"
-                      :scale="1"
-                      :variant="selectedProduct.variants[this.selectedProductVariantKey]"
-                      :content="_firstFullThumbnailOf(selectedProduct)"
-                      :fullSize="false"
-                    />
+                  <ContentLoader
+                    :width="476"
+                    :height="500"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="25" rx="0" ry="0" width="476" height="475" />
+                  </ContentLoader>
+                  <img
+                    :src="`${_firstFullThumbnailOf(selectedProduct)}`"
+                    :key="`full_${selectedProduct._id}_${drawerId}`"
+                    :id="`full_${selectedProduct._id}_${drawerId}`"
+                    v-if="selectedProduct"
+                  />
                 </div>
-                <div class="variants flex">
+                <div class="variants flex" v-if="selectedProduct">
                   <div
                     class="flex w-1/5 cursor-pointer border border-transparent hover:border-gray-500 p-1 rounded mr-1"
                     v-for="(variant, vid) in selectedProduct.variants"
@@ -165,25 +180,37 @@
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 w-full ml-4" :key="`${selectedProduct._id}-meta`">
+              <div class="flex flex-col mt-5 w-full ml-4">
                 <div class="text-4xl">
                   <input
+                    v-if="selectedProduct"
                     type="text"
                     class="font-bold w-full outline-none border rounded px-4 py-2"
                     placeholder="What's the name of this product?*"
                     v-model="selectedProduct.meta.name"
                     @keyup="updateProductMeta"
                   />
+
+                  <ContentLoader
+                    :width="476"
+                    :height="50"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="0" rx="0" ry="0" width="476" height="50" />
+                  </ContentLoader>
                 </div>
                 <div class="text-3xl leading-none py-4 flex items-start">
-                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
+                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell' && selectedProduct">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
                     <div>
                       PHP {{ selectedProductBasePrice }}
                       <span>+</span>&nbsp;
                     </div>
                   </div>
-                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
+                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell' && selectedProduct">
                     <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
@@ -198,6 +225,7 @@
                   </div>
                   <div
                     class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center"
+                    v-if="selectedProduct"
                   >
                     <div
                       class="text-xs uppercase font-bold mb-1"
@@ -205,17 +233,41 @@
                     <div>PHP {{ productTotalPrice }}</div>
                     <div class="text-xs uppercase font-bold mt-1 text-right">VAT Included</div>
                   </div>
+                  <ContentLoader
+                    :width="476"
+                    :height="56"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="149" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="296" y="0" rx="0" ry="0" width="128" height="56" />
+                  </ContentLoader>
                 </div>
                 <div class="pt-4" v-if="meta.plan ==='Sell'">
-                  <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
-                  <vue-tags-input
-                    v-model="tag"
-                    :max-tags="5"
-                    :tags="selectedProductTags"
-                    @tags-changed="setProductTags"
-                    class="custom-tags-input"
-                    placeholder="Add Tag (Up to 5 tags only)"
-                  />
+                  <div v-if="selectedProduct">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-2">Tags</div>
+                    <vue-tags-input
+                      v-model="tag"
+                      :max-tags="5"
+                      :tags="selectedProductTags"
+                      @tags-changed="setProductTags"
+                      class="custom-tags-input"
+                      placeholder="Add Tag (Up to 5 tags only)"
+                    />
+                  </div>
+                  <ContentLoader
+                    :width="476"
+                    :height="16"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="0" rx="5" ry="5" width="476" height="16" />
+                  </ContentLoader>
                 </div>
                 <div>
                   <div class="my-2" v-if="meta.plan ==='Sell'">
@@ -227,12 +279,34 @@
                       class="w-full border rounded p-4 outine-none resize-none"
                       placeholder="Describe this product (optional)"
                       v-model="selectedProduct.meta.description"
+                      v-if="selectedProduct"
                     ></textarea>
+                    <ContentLoader
+                      :width="476"
+                      :height="100"
+                      :speed="2"
+                      primaryColor="#f3f3f3"
+                      secondaryColor="#ecebeb"
+                      v-if="!selectedProduct"
+                    >
+                      <rect x="0" y="0" rx="5" ry="5" width="476" height="100" />
+                    </ContentLoader>
                   </div>
 
+                  <ContentLoader
+                    :width="476"
+                    :height="70"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="0" rx="5" ry="5" width="476" height="70" />
+                  </ContentLoader>
                   <div
                     class="bg-gray-200 rounded p-4 shadow"
                     :class="{'mt-2': meta.plan === 'Sell'}"
+                    v-if="selectedProduct"
                   >
                     <div
                       class="font-bold uppercase"
@@ -308,17 +382,40 @@
               <div class="overflow-auto h-full">
                 <div class="flex p-4 flex-wrap">
                   <div
+                    class="flex w-6/12 p-1" v-if="!selectedProduct">
+                    <ContentLoader
+                      :width="175"
+                      :height="195"
+                      :speed="2"
+                      primaryColor="#f3f3f3"
+                      secondaryColor="#ecebeb"
+                    >
+                      <rect x="0" y="0" rx="0" ry="0" width="175" height="195" />
+                    </ContentLoader>
+                  </div>
+                  <div
                     class="flex w-6/12 p-1"
                     v-for="product in generatedProducts"
-                    :key="product._id"
+                    :key="product ? product._id : makeId()"
                   >
+                    <ContentLoader
+                      :width="175"
+                      :height="195"
+                      :speed="2"
+                      primaryColor="#f3f3f3"
+                      secondaryColor="#ecebeb"
+                      v-if="!product"
+                    >
+                      <rect x="0" y="0" rx="0" ry="0" width="175" height="195" />
+                    </ContentLoader>
                     <div
-                      class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500"
+                      class="flex flex-col border-2 rounded w-full cursor-pointer hover:border-primary"
                       :class="{
-                        'border-gray-500 shadow-xl':
+                        'border-primary':
                           selectedProduct._id === product._id
                       }"
                       @click="validateAndSelectProduct(product)"
+                      v-if="product"
                     >
                       <div class="px-2 pt-2">
                         <img
@@ -348,7 +445,7 @@ import OptionButtons from "@/components/OptionButtons";
 import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
-import { Preview } from "@/components/Designer/Canvas/Default/index.js";
+import { ContentLoader } from "vue-content-loader";
 
 const SERVICE_FEE = 0.12;
 const VAT = 0.12;
@@ -370,7 +467,7 @@ export default {
     VueTailwindModal,
     VueTailwindToast,
     AutosizeInput,
-    Preview,
+    ContentLoader,
   },
   mixins: [UserTypeCheckerMixin],
   data() {
@@ -414,6 +511,7 @@ export default {
       currentDesignName: "designer/currentDesignName",
     }),
     hasPreviousProductOrVariant() {
+      if (!this.selectedProduct) return;
       const variationKeys = _.keys(this.selectedProduct.variants);
       const previousVariationKey =
         variationKeys[
@@ -426,6 +524,7 @@ export default {
       );
     },
     productTotalPrice() {
+      if (!this.selectedProduct) return;
       let total = this.selectedProductBasePrice;
 
       if (this.meta.plan === "Sell")
@@ -434,12 +533,19 @@ export default {
       return Math.ceil(total + total * VAT);
     },
     selectedVariantIndex() {
+      if (!this.selectedProduct) return -1;
       const product = {
         ..._.find(this.selectedProducts, { _id: this.selectedProduct._id }),
       };
       return _.findIndex(product.variants, {
         _id: this.selectedProductVariantKey,
       });
+    },
+    isGenerating() {
+      return (
+        this.generatedProducts.filter((e) => e).length !==
+        this.generatedProducts.length
+      );
     },
   },
   methods: {
@@ -468,7 +574,7 @@ export default {
     _firstFullThumbnailOf(product) {
       return product.variants[this.selectedProductVariantKey].sides[
         this.selectedProductSide
-      ]?.content;
+      ]?.with_placeholder;
     },
     _placeholderOfFirstVariantOf(product) {
       const firstKey = _.first(_.keys(product.variants));
@@ -564,6 +670,10 @@ export default {
       return true;
     },
     nextProduct() {
+      if (!this.selectedProduct) {
+        this.$refs.nextProductToast.show();
+        return;
+      }
       const isValidated = this.validateAndSaveMeta();
       if (!isValidated) return;
 
@@ -586,6 +696,10 @@ export default {
         return (this.selectedProductVariantKey = nextVariantKey);
 
       if (!nextProduct) {
+        if (this.isGenerating) {
+          this.$refs.nextProductToast.show();
+          return;
+        }
         if (
           this.currentDesignName === "Untitled Collection" ||
           !this.currentDesignName
@@ -601,6 +715,7 @@ export default {
       let totalProfit = 0;
       let printreeNet = 0;
       _.map(this.generatedProducts, (product) => {
+        if (!product) return;
         _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
@@ -726,8 +841,9 @@ export default {
   watch: {
     products: {
       handler(to, from) {
+        if (!to[0]) return;
         this.generatedProducts = [...to];
-        this.selectedProduct = to[0] || null;
+        this.selectedProduct = this.selectedProduct || to[0];
         this.selectedProductVariantKey = this.selectedProduct
           ? _.first(_.keys(this.selectedProduct.variants))
           : null;

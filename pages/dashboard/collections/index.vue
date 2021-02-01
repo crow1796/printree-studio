@@ -452,6 +452,7 @@ export default {
       this.$router.replace("/collection/designer");
     },
     async editCollection(collection) {
+      this.isLoading = true
       const statusValidation = await this._validateStatusOf(collection);
       if (!statusValidation) return;
 
