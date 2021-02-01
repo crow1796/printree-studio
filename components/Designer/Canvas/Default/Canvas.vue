@@ -60,6 +60,7 @@
             />
 
             <LeftActions @action-clicked="leftActionClicked" />
+
           </DesignerActions>
 
           <div class="z-1 inline-block product-section outline-none relative w-auto h-auto">
