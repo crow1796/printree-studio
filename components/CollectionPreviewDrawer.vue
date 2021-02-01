@@ -24,6 +24,7 @@
               rows="5"
               class="w-full border rounded p-4 outine-none resize-none"
               placeholder="Notes to the designer"
+              v-model="notes"
             ></textarea>
           </div>
         </div>
@@ -324,6 +325,7 @@ export default {
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
       isCalculating: false,
+      notes: null
     };
   },
   methods: {
@@ -425,6 +427,7 @@ export default {
       await this.$store.dispatch("admin/updateCollectionStatus", {
         _id: this.meta._id,
         status,
+        notes: this.notes
       });
       this.isLoading = false;
       this.$toast.success("Collection status has been updated successfully!", {

@@ -651,7 +651,7 @@ const actions = {
   async saveData(context, params) {
     const defaultParams = {
       shouldGenerateImages: true,
-      isFinal: false
+      isFinal: false,
     };
 
     const newParams = {

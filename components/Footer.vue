@@ -25,7 +25,7 @@
                 <nuxt-link to="/faqs">FAQs</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
-                <nuxt-link to="/terms-of-service">Terms of Service</nuxt-link>
+                <nuxt-link to="/terms-and-conditions">Terms & Conditions</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
                 <nuxt-link to="/privacy-policy">Privacy Policy</nuxt-link>
@@ -36,7 +36,7 @@
         <div class="sm:w-1/2 sm:mt-0 mt-8 h-auto">
           <div class="flex flex-col items-end">
             <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
-            <span class="text-xs mt-1 font-bold text-body">&copy; Copyright 2020.</span>
+            <span class="text-xs mt-1 font-bold text-body">&copy; Copyright {{year}}.</span>
           </div>
         </div>
       </div>
@@ -49,6 +49,7 @@ export default {
   data() {
     return {
       shopifyUrl: process.env.shopifyUrl,
+      year: (new Date()).getFullYear()
     };
   },
 };

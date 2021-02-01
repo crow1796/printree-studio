@@ -166,7 +166,7 @@ export default {
     async saveChanges() {
       this.$refs.saveConfirmationModal.hide();
       this.isLoading = true;
-      const generatedImages = await this.$store.dispatch("designer/saveData", {
+      await this.$store.dispatch("designer/saveData", {
         shouldGenerateImages: false,
       });
       this.isLoading = false;
@@ -214,14 +214,29 @@ export default {
       }
 
       if (!this.isLoggedIn) return this.$refs.authModal.show();
-      this.loadingText = "Generating Images...";
+      this.loadingText = "Saving Data...";
+
       this.isLoading = true;
-      const generatedImages = await this.$store.dispatch("designer/saveData");
+      await this.$store.dispatch("designer/saveData", {
+        shouldGenerateImages: false,
+      });
+
       this.isLoading = false;
-      this.generatedImages = generatedImages;
       this.loadingText = "";
+      this.generatedImages = _.map(this.selectedProducts, () => null);
       this.$refs.productsPreviewDrawer.show();
       this.$forceUpdate();
+
+      await this.selectedProducts.reduce(async (promise, product, i) => {
+        await promise;
+
+        const res = await this.$axios.post("/create-images", {
+          products: [product],
+        });
+
+        this.$set(this.generatedImages, i, _.first(res.data))
+        // this.generatedImages = _.uniqBy([...this.generatedImages, ...res.data], '_id');
+      }, Promise.resolve());
     },
   },
 };

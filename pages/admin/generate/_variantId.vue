@@ -41,8 +41,7 @@
 </template>
 
 <script>
-import AreaLoader from "@/components/AreaLoader";
-import { saveSvgAsPng, svgAsPngUri } from "save-svg-as-png";
+import { svgAsPngUri } from "save-svg-as-png";
 
 export default {
   layout: "admin_dashboard",
