@@ -167,7 +167,7 @@
                     :class="{
                       'border-gray-500 shadow-xl': selectedProductVariantKey === vid
                     }"
-                    :key="variant._id"
+                    :key="`${variant._id}_${drawerId}`"
                     @click="() => (selectedProductVariantKey = vid)"
                   >
                     <div class="flex flex-col w-full">
