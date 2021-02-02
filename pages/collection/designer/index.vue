@@ -397,7 +397,6 @@ export default {
   methods: {
     _variantIndexOf(variant) {
       const selectedProduct = this.selectedProducts[this.currentProductIndex];
-      console.log(selectedProduct.variants, variant._id);
       return _.findIndex(
         selectedProduct.variants,
         (v) => v.customizableVariant._id === variant._id

@@ -221,11 +221,7 @@ export default {
         shouldGenerateImages: false,
       });
 
-      this.isLoading = false;
-      this.loadingText = "";
       this.generatedImages = _.map(this.selectedProducts, () => null);
-      this.$refs.productsPreviewDrawer.show();
-      this.$forceUpdate();
 
       await this.selectedProducts.reduce(async (promise, product, i) => {
         await promise;
@@ -235,7 +231,12 @@ export default {
         });
 
         this.$set(this.generatedImages, i, _.first(res.data))
-        // this.generatedImages = _.uniqBy([...this.generatedImages, ...res.data], '_id');
+
+        if(i === 0) {
+          this.loadingText = "";
+          this.isLoading = false;
+          this.$refs.productsPreviewDrawer.show();
+        }
       }, Promise.resolve());
     },
   },
