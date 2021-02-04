@@ -4,6 +4,9 @@
   "description": "Printree Studio",
   "author": "Joshua Tundag",
   "private": true,
+  "engines": {
+    "node": "12.x"
+  },
   "scripts": {
     "test": "jest",
     "dev": "./node_modules/.bin/cross-env API_URL=http://localhost:4000/api NODE_ENV=development SHOPIFY_URL=https://shop.printreestudio.com/ nodemon server/index.js --watch server",
