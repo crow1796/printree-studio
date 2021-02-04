@@ -95,8 +95,24 @@
               </div>
             </div>
 
-            <div v-if="userTypeIs('seller')">
-              <TotalProfitCounter/>
+            <div v-if="userTypeIs('seller')" class="flex items-center">
+              <div>
+                <TotalProfitCounter/>
+              </div>
+              <div class="flex -mb-px ml-8" v-if="userTypeIs('seller')">
+                <a
+                  :href="`${shopifyUrl}collections/vendors?q=${user.shopName}`"
+                  target="_blank"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
+                    <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                  </span> My Shop <span class="h-6 w-6 fill-current ml-2 flex items-center justify-center" flex items-center justify-center>
+                    <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -123,6 +139,11 @@ export default {
   components: {
     VueTailwindDropdown,
     TotalProfitCounter
+  },
+  data(){
+    return {
+      shopifyUrl: process.env.shopifyUrl
+    }
   },
   computed: {
     ...mapGetters({
