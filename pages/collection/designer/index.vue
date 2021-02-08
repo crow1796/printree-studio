@@ -115,81 +115,10 @@
                   <div class="flex-grow flex flex-col pt-2">
                     <div class="font-bold text-gray-600">{{ product.meta.name }}</div>
                     <div class="flex">
-                      <tippy trigger="click" arrow interactive>
-                        <template v-slot:trigger>
-                          <div
-                            class="rounded-full p-1 border border-white m-1 bg-white border-gray-300 hover:border-gray-400 hover:text-gray-700"
-                            v-if="
-                            product.customizableProduct.customizableVariants
-                              .length > 1
-                          "
-                          >
-                            <div
-                              class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 bg-white"
-                            >
-                              <font-awesome-icon
-                                :icon="['fas', 'plus']"
-                                class="text-xs"
-                                :style="{ fontSize: '.6em' }"
-                              />
-                            </div>
-                          </div>
-                        </template>
-                        <div class="w-64">
-                          <div class="flex flex-col w-full">
-                            <div
-                              class="font-bold text-white p-2 border-b border-gray-700"
-                            >Choose a color</div>
-                            <div class="flex p-2 flex-wrap">
-                              <div
-                                class="rounded-full border border-white w-5 h-5 flex justify-center items-center hover:border-gray-300 border-gray-300 mx-1"
-                                v-for="(variant,
-                                  variantIndex) in currentProduct
-                                    .customizableProduct.customizableVariants"
-                                :key="variantIndex"
-                                :class="{
-                                    'border-gray-300 bg-white': _colorIsInVariantsOf(
-                                      currentProduct,
-                                      variant.color
-                                    ),
-                                  }"
-                                @click="addVariant(variant)"
-                              >
-                                <div
-                                  class="w-full h-full rounded-full flex items-center justify-center"
-                                  :style="{
-                                      'background-color': variant.color,
-                                    }"
-                                >
-                                  <font-awesome-icon
-                                    :icon="['fas', 'check']"
-                                    :style="{
-                                        color: getCorrectColor(variant.color),
-                                        fontSize: '.4em',
-                                      }"
-                                    v-if="
-                                        _colorIsInVariantsOf(
-                                          currentProduct,
-                                          variant.color
-                                        )
-                                      "
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </tippy>
                       <div
                         class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
                         v-for="(variant, variantIndex) in product.variants"
                         :key="variantIndex"
-                        @click.stop="selectVariant(variantIndex, index)"
-                        :class="{
-                          'border-gray-300 bg-white':
-                            index == currentProductIndex &&
-                            variantIndex == currentVariantIndex,
-                        }"
                       >
                         <div
                           class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
@@ -213,6 +142,60 @@
             style="animation-duration: .3s;"
           >{{ autoSavingText }}</div>
         </transition>
+        <RightActions>
+          <div
+            class="w-8 h-8 rounded-full cursor-pointer mx-2 my-1 border border-gray-300 flex justify-center items-center relative"
+            v-for="(variant, variantIndex) in currentProduct.customizableProduct.customizableVariants"
+            :key="variantIndex"
+            :class="{
+                      'border-gray-300 bg-white': _colorIsInVariantsOf(
+                        currentProduct,
+                        variant.color
+                      ),
+                    }"
+            @click="() => _colorIsInVariantsOf(
+                      currentProduct,
+                      variant.color
+                    ) ? selectVariant(_variantIndexOf(variant), currentProductIndex) : addVariant(variant)"
+            :style="{
+                    'background-color': variant.color,
+                  }"
+          >
+            <div
+              class="absolute rounded-full bg-white border border-gray-400 flex justify-center text-red-700 items-center w-4 h-4 remove-variant-btn"
+              v-if="_colorIsInVariantsOf(
+                      currentProduct,
+                      variant.color
+                    )
+                  "
+              @click.stop="addVariant(variant)"
+            >
+              <font-awesome-icon :icon="['fas', 'times']" class="text-xs text-red" />
+            </div>
+            <font-awesome-icon
+              :icon="['fas', 'check']"
+              :style="{
+                        color: getCorrectColor(variant.color),
+                        fontSize: '.8em',
+                      }"
+              v-if="currentVariantIndex === _variantIndexOf(variant)
+                  "
+            />
+            <font-awesome-icon
+              :icon="['fas', 'plus']"
+              :style="{
+                        color: getCorrectColor(variant.color),
+                        fontSize: '.8em',
+                      }"
+              v-if="!_colorIsInVariantsOf(
+                      selectedProducts[currentProductIndex],
+                      variant.color
+                    )
+                  "
+            />
+          </div>
+        </RightActions>
+
         <Preview
           :key="`preview-${currentProduct._id}-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           :scale="0.4"
@@ -221,6 +204,7 @@
           :resizable="true"
           class="designer-preview"
         />
+
         <Canvas
           :key="`canvas-${currentProduct._id}-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           v-model="currentVariantContent.objects"
@@ -228,7 +212,10 @@
           :height="currentVariantContent.bounds.height * 4"
           :backgroundColor="currentProduct.variants[currentVariantIndex].customizableVariant.color"
         >
-          <BottomActions :items="currentVariantSides" @change="(val) => $store.dispatch('designer/switchSideTo', val)" />
+          <BottomActions
+            :items="currentVariantSides"
+            @change="(val) => $store.dispatch('designer/switchSideTo', val)"
+          />
         </Canvas>
       </div>
 
@@ -310,12 +297,13 @@ import VueTailwindAccordion from "@/components/VueTailwindAccordion";
 import WrappedEditor from "@/components/WrappedEditor";
 import draggable from "vuedraggable";
 import Konva from "@/components/Designer/Canvas/Konva";
-import BottomActions from '@/components/Designer/Canvas/Actions/Bottom'
+import BottomActions from "@/components/Designer/Canvas/Actions/Bottom";
 import {
   Canvas,
   Output,
   Preview,
 } from "@/components/Designer/Canvas/Default/index.js";
+import RightActions from "@/components/Designer/Canvas/Actions/Right";
 
 let WebFontLoader = null;
 if (process.client) {
@@ -337,6 +325,7 @@ export default {
     Output,
     Preview,
     VueTailwindModal,
+    RightActions,
   },
   async mounted() {
     WebFontLoader.load({
@@ -406,6 +395,13 @@ export default {
     },
   },
   methods: {
+    _variantIndexOf(variant) {
+      const selectedProduct = this.selectedProducts[this.currentProductIndex];
+      return _.findIndex(
+        selectedProduct.variants,
+        (v) => v.customizableVariant._id === variant._id
+      );
+    },
     hideDeleteCollectionConfirmation() {
       this.productToDeleteIndex = -1;
       this.$refs.productDeletionModal.hide();
