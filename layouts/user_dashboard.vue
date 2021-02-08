@@ -101,7 +101,7 @@
               </div>
               <div class="flex -mb-px ml-8" v-if="userTypeIs('seller')">
                 <a
-                  :href="`${shopifyUrl}collections/vendors?q=${user.shopName}`"
+                  :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
                   target="_blank"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
@@ -160,6 +160,9 @@ export default {
         this.$store.dispatch("user/signOut");
       })
     },
+    _encodeUri(uri){
+      return encodeURI(uri)
+    }
   },
 };
 </script>
