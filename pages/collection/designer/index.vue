@@ -79,18 +79,6 @@
             <span class="font-bold">ADD MORE PRODUCTS</span>
           </div>
           <div class="flex flex-wrap flex mt-4 overflow-auto px-4 pb-4">
-            <div class="p-1 w-6/12">
-              <div
-                class="px-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
-                style="height: 176.8px"
-                @click="showAvailableProducts"
-              >
-                <div class="flex flex-col items-center justify-center">
-                  <font-awesome-icon :icon="['fas', 'plus-circle']" class="text-5xl" />
-                  <span class="font-bold mt-2 block">ADD PRODUCTS</span>
-                </div>
-              </div>
-            </div>
             <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
               <div
                 class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded relative"
