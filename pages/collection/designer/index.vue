@@ -72,7 +72,7 @@
       <div class="flex w-1/4 border-r flex-grow flex-col">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
-            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
+            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-primary-lighter select-none w-auto justify-center items-center flex rounded border-dashed bg-primary text-white"
             @click="showAvailableProducts"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
