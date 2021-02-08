@@ -161,7 +161,7 @@ export default {
       })
     },
     _encodeUri(uri){
-      return encodeURI(uri)
+      return encodeURIComponent(uri)
     }
   },
 };
