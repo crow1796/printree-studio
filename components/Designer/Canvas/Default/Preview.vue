@@ -45,7 +45,7 @@
                   }"
           ></div>
           <div
-            class="printable-area absolute -has-outline"
+            class="printable-area absolute -has-outline z-10"
             id="printable-area"
             :style="{
                     left: `${content.bounds.left}px`,
