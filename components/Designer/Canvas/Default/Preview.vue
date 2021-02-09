@@ -34,7 +34,7 @@
           <div class="printable-area-surface absolute"></div>
 
           <div
-            class="z-10 absolute -has-outline"
+            class="z-11 absolute -has-outline"
             @mouseenter="hasOutline = true"
             @mouseleave="hasOutline = false"
             :style="{
