@@ -112,6 +112,7 @@
                         :style="{ fontFamily: obj.style.fontFamily }"
                         @input="changeText"
                         @blur="deactivateContentOf(obj, $event)"
+                        @keydown.enter.prevent="deactivateContentOf(obj, $event)"
                       >{{ obj.value || '' }}</pre>
                     </div>
                     <div
