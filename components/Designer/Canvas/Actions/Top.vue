@@ -24,7 +24,7 @@
                 :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }"
               >
                 <div
-                  class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
+                  class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-400"
                   :style="{ 'background-color': color.code }"
                 >
                   <font-awesome-icon

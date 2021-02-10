@@ -31,7 +31,7 @@
                 @click="changeUserType(type)"
               >{{userType(type)}} PRODUCTS</button>
             </div>
-          </div> -->
+          </div>-->
 
           <div
             class="mb-3"
@@ -115,7 +115,7 @@
           </div>
           <div
             class="mb-3"
-            v-if="formType === 'sign_up' && formData.type === 'seller'"
+            v-if="formType === 'sign_up' && (formData.type === 'seller' && !formData.inviteCode)"
             key="portfolio"
           >
             <label for="pass" class="font-bold flex items-center">
@@ -207,6 +207,16 @@
 import confetti from "canvas-confetti";
 
 export default {
+  created() {
+    const inviteCode =
+      this.$route.query.invite || this.$storage.getCookie("invite");
+    if (process.client) {
+      if (inviteCode) {
+        this.$storage.setCookie("invite", inviteCode);
+        this.formData.inviteCode = inviteCode;
+      }
+    }
+  },
   data() {
     return {
       formType: "sign_in",
@@ -217,6 +227,7 @@ export default {
         shopName: null,
         portfolio: null,
         type: "seller",
+        inviteCode: this.$storage.getCookie("invite"),
       },
       terms: false,
       isLoading: false,
@@ -272,6 +283,7 @@ export default {
           password: null,
           portfolio: null,
           type: "seller",
+          inviteCode: this.formData.inviteCode,
         };
       });
     },
@@ -281,7 +293,7 @@ export default {
       this.isLoading = false;
       if (response.status) this.$emit("login-success");
     },
-    async signIn(){
+    async signIn() {
       let res = await this.$store.dispatch("user/signIn", this.formData);
 
       this.$emit("login-success");
@@ -302,7 +314,7 @@ export default {
       }
       try {
         let res = await this.$store.dispatch(action, this.formData);
-        let tmpFormData = {...this.formData};
+        let tmpFormData = { ...this.formData };
 
         if (this.formType === "password_recovery") {
           if (!res.status) {
@@ -323,24 +335,30 @@ export default {
             password: null,
             portfolio: null,
             type: "seller",
+            inviteCode: null,
           };
           this.formType = "sign_in";
-          this.$validator.reset(); 
+          this.$validator.reset();
           this.$emit("reset-success");
           return;
         }
         if (this.formType !== "sign_up") this.$emit("login-success");
         else {
           if (tmpFormData.type === "seller") {
+            if (res.isInvited) {
+              this.$storage.removeCookie("invite");
+              await this.signIn();
+              return;
+            }
             this.isSignUpSuccess = true;
             confetti({
               particleCount: 100,
               spread: 70,
               origin: { y: 0.6 },
             });
-          } else{
-            await this.signIn()
-            return 
+          } else {
+            await this.signIn();
+            return;
           }
         }
       } catch (e) {

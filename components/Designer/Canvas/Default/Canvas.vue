@@ -60,7 +60,6 @@
             />
 
             <LeftActions @action-clicked="leftActionClicked" />
-
           </DesignerActions>
 
           <div class="z-1 inline-block product-section outline-none relative w-auto h-auto">
@@ -109,10 +108,13 @@
                       <pre
                         class="w-auto h-auto outline-none focus:outline-none"
                         :ref="`textContainer_${obj.id}`"
+                        :id="`textContainer_${obj.id}`"
                         :style="{ fontFamily: obj.style.fontFamily }"
                         @input="changeText"
                         @blur="deactivateContentOf(obj, $event)"
-                        @keydown.enter.prevent="deactivateContentOf(obj, $event)"
+                        @keydown.enter.prevent.stop="deactivateContentOf(obj, $event)"
+                        @keypress.enter.prevent.stop="deactivateContentOf(obj, $event)"
+                        @keyup.enter.prevent.stop="deactivateContentOf(obj, $event)"
                       >{{ obj.value || '' }}</pre>
                     </div>
                     <div
@@ -290,8 +292,9 @@ export default {
     },
     _registerCanvasKeyEvents() {
       document.addEventListener("keydown", (evt) => {
+        if (this._objectIsEditing()) return;
         // Left
-        if (evt.which == 37 && this.activeObject) {
+        if (evt.code == "ArrowLeft" && this.activeObject) {
           this._updateActiveObjectProps(
             "bounds.left",
             this.activeObject.bounds.left - 1
@@ -300,7 +303,7 @@ export default {
           return;
         }
         // Up
-        if (evt.which == 38 && this.activeObject) {
+        if (evt.code == "ArrowUp" && this.activeObject) {
           this._updateActiveObjectProps(
             "bounds.top",
             this.activeObject.bounds.top - 1
@@ -309,7 +312,7 @@ export default {
           return;
         }
         // Right
-        if (evt.which == 39 && this.activeObject) {
+        if (evt.code == "ArrowRight" && this.activeObject) {
           this._updateActiveObjectProps(
             "bounds.left",
             this.activeObject.bounds.left + 1
@@ -318,7 +321,7 @@ export default {
           return;
         }
         // Down
-        if (evt.which == 40 && this.activeObject) {
+        if (evt.code == "ArrowDown" && this.activeObject) {
           this._updateActiveObjectProps(
             "bounds.top",
             this.activeObject.bounds.top + 1
@@ -329,7 +332,13 @@ export default {
       });
 
       document.addEventListener("keyup", (evt) => {
-        if (_.includes([37, 38, 39, 40], evt.which) && this.activeObject) {
+        if (
+          _.includes(
+            ["ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown"],
+            evt.code
+          ) &&
+          this.activeObject
+        ) {
           clearTimeout(this.arrowKeysTimeout);
           this.arrowKeysTimeout = setTimeout(() => {
             this.$nextTick(() => {
@@ -339,12 +348,21 @@ export default {
           return;
         }
 
-        if (evt.which == 46) {
+        if (evt.code == "Delete") {
           if (!this.activeObject) return;
+          if (this._objectIsEditing()) return;
           this.removeObject(this.activeObject);
           return;
         }
       });
+    },
+    _objectIsEditing() {
+      if (this.activeObject?.type === "text") {
+        const field = this.$refs[`textContainer_${this.activeObject.id}`][0];
+
+        if (field?.contentEditable === "true") return true;
+      }
+      return false;
     },
     activated(obj) {
       this.activeObject = obj;
@@ -475,19 +493,19 @@ export default {
           resolve(this);
         };
       });
-      if(ext === 'svg') {
-        const container = document.createElement('div')
-        container.style.visibility = 'hidden'
-        container.style.opacity = '0'
-        container.appendChild(imgData)
-        document.body.appendChild(container)
+      if (ext === "svg") {
+        const container = document.createElement("div");
+        container.style.visibility = "hidden";
+        container.style.opacity = "0";
+        container.appendChild(imgData);
+        document.body.appendChild(container);
 
-        imgData.width = container.offsetWidth
-        imgData.height = container.offsetHeight
-        
-        document.body.removeChild(container)
+        imgData.width = container.offsetWidth;
+        imgData.height = container.offsetHeight;
+
+        document.body.removeChild(container);
       }
-      
+
       this.addObject(
         ext === "svg" ? "svg" : "image",
         ext === "svg" ? asset.location : asset.imageKitLocation,
@@ -543,9 +561,10 @@ export default {
       if (type == "text") {
         let el = document.createElement("div");
         el.innerHTML = value;
-        el.style.position = "absolute";
         el.style.visibility = "hidden";
-        el.style.display = "block";
+        el.style.opacity = "0";
+        el.style.display = "inline-block";
+        el.style.fontFamily = newObject.style.fontFamily;
         el.style.fontSize = `${newObject.style.fontSize}px`;
         document.body.appendChild(el);
         newObject.bounds.width = el.offsetWidth;
@@ -573,9 +592,11 @@ export default {
       this.$store.dispatch("designer/copyPropsToAllVariantsFrom", newObject);
     },
     async removeObject(obj) {
-      let index = await this.$store.dispatch("designer/removeObject", obj);
+      const index = _.findIndex(this.objects, { id: obj.id });
+      console.log(obj.id, [...objects])
       this.objects.splice(index, 1);
-      this.activeObject = null;
+      await this.$store.dispatch("designer/removeObject", obj);
+      this.deactivateContentOf(obj);
     },
     toggleFontWeight(fontWeight) {
       this._updateActiveObjectProps("style.fontWeight", fontWeight);
@@ -610,6 +631,9 @@ export default {
           this.activeObject
         );
       });
+    },
+    hasTextDecoration(decoration) {
+      return _.includes(this.activeObject.style.textDecoration, decoration);
     },
     toggleTextDecoration(decoration) {
       let newDecoration = this.activeObject.style.textDecoration;
@@ -757,7 +781,7 @@ export default {
       });
 
       this.canvasSection.addEventListener("keypress", (evt) => {
-        if (evt.which == 32) {
+        if (evt.code == "Space") {
           this.isHoldingSpace = true;
           this.stageCursor = "grab";
           return;
@@ -774,22 +798,25 @@ export default {
       });
 
       this.canvasSection.addEventListener("keydown", (evt) => {
-        if (evt.ctrlKey && (evt.which == 107 || evt.which == 187)) {
+        if (evt.ctrlKey && (evt.code == "Equal" || evt.code == "NumpadAdd")) {
           evt.preventDefault();
           this.zoomTo(0.1);
           return;
         }
-        if (evt.ctrlKey && (evt.which == 109 || evt.which == 189)) {
+        if (
+          evt.ctrlKey &&
+          (evt.code == "Minus" || evt.code == "NumpadSubtract")
+        ) {
           evt.preventDefault();
           this.zoomTo(-0.1);
           return;
         }
-        if (evt.ctrlKey && (evt.which == 48 || evt.which == 96)) {
+        if (evt.ctrlKey && (evt.code == "Digit0" || evt.code == "Numpad0")) {
           evt.preventDefault();
           this.zoomTo("reset");
           return;
         }
-        if (evt.ctrlKey && evt.which == 66) {
+        if (evt.ctrlKey && evt.code == "KeyB") {
           evt.preventDefault();
           if (this.activeObject.type != "text") return;
           this.toggleFontWeight(
@@ -797,7 +824,7 @@ export default {
           );
           return;
         }
-        if (evt.ctrlKey && evt.which == 73) {
+        if (evt.ctrlKey && evt.code == "KeyI") {
           evt.preventDefault();
           if (this.activeObject.type != "text") return;
           this.toggleFontStyle(
@@ -805,13 +832,13 @@ export default {
           );
           return;
         }
-        if (evt.ctrlKey && evt.which == 85) {
+        if (evt.ctrlKey && evt.code == "KeyU") {
           evt.preventDefault();
           if (this.activeObject.type != "text") return;
           this.toggleTextDecoration("underline");
           return;
         }
-        if (evt.ctrlKey && evt.which == 75) {
+        if (evt.ctrlKey && evt.code == "KeyL") {
           evt.preventDefault();
           if (this.activeObject.type != "text") return;
           this.toggleTextDecoration("line-through");
@@ -820,7 +847,7 @@ export default {
       });
 
       this.canvasSection.addEventListener("keyup", (evt) => {
-        if (evt.which == 32) {
+        if (evt.code == "Space") {
           this.isHoldingSpace = false;
           this.stageCursor = "initial";
           this.isPanning = false;
@@ -834,7 +861,7 @@ export default {
     zoomTo(scale) {
       if (scale == "reset") {
         this.canvasScale = 1;
-        return
+        return;
       }
       this.canvasScale += scale;
     },
@@ -851,16 +878,14 @@ export default {
       this.activated(obj);
       if (obj.type == "text") {
         this.$refs[`textContainer_${obj.id}`][0].contentEditable = true;
-        this.$refs[`textContainer_${obj.id}`][0].innerText = "";
         this.$refs[`textContainer_${obj.id}`][0].innerText = obj.value;
         this.$refs[`textContainer_${obj.id}`][0].focus();
       }
     },
     async deactivateContentOf(obj, e) {
-      if (obj.type == "text") {
-        this.$refs[`textContainer_${obj.id}`][0].contentEditable = false;
-        this.$refs[`obj_${obj.id}_drr`][0].$emit("content-inactive");
-      }
+      this.$refs[`textContainer_${obj.id}`][0].blur();
+      this.$refs[`obj_${obj.id}_drr`][0].$emit("content-inactive");
+      this.$refs[`obj_${obj.id}_drr`][0].$emit("deselect");
     },
   },
   watch: {
