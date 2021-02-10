@@ -7,7 +7,11 @@
           <div class="flex items-center justify-between py-4">
             <div class="flex flex-grow">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
+                <img
+                  src="~/assets/images/logo-nav.png"
+                  alt="Printree Studio"
+                  class="w-28 object-fit"
+                />
               </nuxt-link>
             </div>
 
@@ -23,7 +27,7 @@
                 v-if="isLoggedIn && user"
               >
                 <span>
-                  <span>{{ user.shopName ? `${user.shopName}'s` : user.email  }}</span>
+                  <span>{{ user.shopName ? `${user.shopName}'s` : user.email }}</span>
                   <span class="ml-3">
                     <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </span>
@@ -81,6 +85,10 @@ export default {
   components: {
     Footer,
     AuthModal,
+  },
+  created() {
+    const inviteCode = this.$route.query.invite;
+    if (inviteCode) this.$storage.setCookie("invite", inviteCode);
   },
   data() {
     return {
