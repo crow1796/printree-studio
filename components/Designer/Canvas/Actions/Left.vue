@@ -4,7 +4,7 @@
   >
     <div class="flex bg-white mb-4 rounded border">
       <div class="flex flex-col py-1">
-        <!-- <button
+        <button
           type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           @click="$emit('action-clicked', { action: 'add_text' })"
@@ -23,7 +23,7 @@
               fill="#718096"
             />
           </svg>
-        </button> -->
+        </button>
         <button
           type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"

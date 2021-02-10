@@ -840,10 +840,10 @@ export default {
   },
   watch: {
     products: {
-      handler(to, from) {
+      handler(to) {
         if (!to[0]) return;
         this.generatedProducts = [...to];
-        this.selectedProduct = this.selectedProduct || to[0];
+        this.selectedProduct = to[0];
         this.selectedProductVariantKey = this.selectedProduct
           ? _.first(_.keys(this.selectedProduct.variants))
           : null;
