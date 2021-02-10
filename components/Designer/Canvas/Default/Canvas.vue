@@ -592,11 +592,9 @@ export default {
       this.$store.dispatch("designer/copyPropsToAllVariantsFrom", newObject);
     },
     async removeObject(obj) {
-      const index = _.findIndex(this.objects, { id: obj.id });
-      console.log(obj.id, [...objects])
+      let index = await this.$store.dispatch("designer/removeObject", obj);
       this.objects.splice(index, 1);
-      await this.$store.dispatch("designer/removeObject", obj);
-      this.deactivateContentOf(obj);
+      this.activeObject = null;
     },
     toggleFontWeight(fontWeight) {
       this._updateActiveObjectProps("style.fontWeight", fontWeight);
@@ -883,9 +881,10 @@ export default {
       }
     },
     async deactivateContentOf(obj, e) {
-      this.$refs[`textContainer_${obj.id}`][0].blur();
-      this.$refs[`obj_${obj.id}_drr`][0].$emit("content-inactive");
-      this.$refs[`obj_${obj.id}_drr`][0].$emit("deselect");
+      if (obj.type == "text") {
+        this.$refs[`textContainer_${obj.id}`][0].contentEditable = false;
+        this.$refs[`obj_${obj.id}_drr`][0].$emit("content-inactive");
+      }
     },
   },
   watch: {
