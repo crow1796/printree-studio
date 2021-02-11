@@ -13,7 +13,9 @@
               <div>
                 <strong>Select Products</strong>
               </div>
-              <div class="text-xs normal-case">Each collection can only have a maximum of 10 products.</div>
+              <div
+                class="text-xs normal-case"
+              >Each collection can only have a maximum of 10 products.</div>
             </div>
             <div class="flex text-right">
               <div
@@ -351,6 +353,7 @@ export default {
       "user_dashboard/getUserCollectionsOf",
       this.user.uid
     );
+    this.$store.commit("designer/SELECTED_PRODUCTS", []);
     this.isLoading = false;
   },
   data() {
