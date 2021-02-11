@@ -9,8 +9,9 @@
       <div class="flex flex-col flex-grow">
         <div class="modal-heading border-b flex-grow p-4">
           <div class="flex justify-between flex-grow items-center">
-            <div class="flex uppercase">
-              <strong>Select Products</strong>
+            <div class="flex uppercase flex-col">
+              <div><strong>Select Products</strong></div>
+              <div class="text-xs normal-case">Each collection can only have a maximum of 10 products.</div>
             </div>
             <div class="flex text-right">
               <div

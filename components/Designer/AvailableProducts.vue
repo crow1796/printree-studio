@@ -87,6 +87,7 @@ export default {
   computed: {
     ...mapGetters({
       availableProducts: "designer/availableProducts",
+      selectedProducts: "designer/selectedProducts",
     }),
     availableCategories() {
       let categories = _.map(this.availableProducts, "category");
@@ -98,11 +99,16 @@ export default {
   methods: {
     toggleProduct(product) {
       if (this._hasBeenSelected(product)) {
-        if (this.tmpProducts.length == 1) return;
         let index = _.findIndex(this.tmpProducts, { _id: product._id });
         this.tmpProducts.splice(index, 1);
         this.$emit("input", this.tmpProducts);
         return;
+      }
+      if(this.tmpProducts.length + this.selectedProducts.length >= 10) {
+        this.$toast.error("Each collection can only have a maximum of 10 products.", {
+            position: "top",
+          });
+        return
       }
       product = JSON.parse(JSON.stringify(product));
       this.tmpProducts.push(product);

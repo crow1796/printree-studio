@@ -7,8 +7,13 @@
         <div class="flex flex-col flex-grow">
           <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
-              <div class="flex uppercase">
-                <strong>Select Products</strong>
+              <div class="flex uppercase flex-col">
+                <div>
+                  <strong>Select Products</strong>
+                </div>
+                <div
+                  class="text-xs normal-case"
+                >Each collection can only have a maximum of 10 products.</div>
               </div>
               <div class="flex text-right">
                 <div
@@ -72,8 +77,9 @@
       <div class="flex w-1/4 border-r flex-grow flex-col">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
-            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-primary-lighter select-none w-auto justify-center items-center flex rounded border-dashed bg-primary text-white"
+            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 select-none w-auto justify-center items-center flex rounded border-dashed cursor-pointer hover:bg-primary-lighter bg-primary text-white"
             @click="showAvailableProducts"
+            v-if="selectedProducts.length < 10"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
             <span class="font-bold">ADD MORE PRODUCTS</span>
@@ -486,6 +492,11 @@ export default {
     },
     async manageProducts() {
       this.isAvailableProductsLoading = true;
+      if (!this.tmpProducts.length) {
+        this.isAvailableProductsLoading = false;
+        this.$refs.availableProductsModal.hide();
+        return;
+      }
       const tmpProducts = _.map(this.tmpProducts, (product) => ({
         customizableProduct: product,
         meta: {
@@ -527,6 +538,7 @@ export default {
       this.$refs.availableProductsModal.hide();
     },
     showAvailableProducts() {
+      if (this.selectedProducts.length >= 10) return;
       this.$refs.availableProductsModal.show();
     },
     hideAvailableProducts() {

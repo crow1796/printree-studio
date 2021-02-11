@@ -9,8 +9,11 @@
       <div class="flex flex-col h-full">
         <div class="modal-heading border-b w-full p-4">
           <div class="flex justify-between w-full items-center">
-            <div class="flex uppercase">
-              <strong>Select Products</strong>
+            <div class="flex uppercase flex-col">
+              <div>
+                <strong>Select Products</strong>
+              </div>
+              <div class="text-xs normal-case">Each collection can only have a maximum of 10 products.</div>
             </div>
             <div class="flex text-right">
               <div
@@ -452,10 +455,10 @@ export default {
       this.$router.replace("/collection/designer");
     },
     async editCollection(collection) {
-      this.isLoading = true
+      this.isLoading = true;
       const statusValidation = await this._validateStatusOf(collection);
       if (!statusValidation) {
-        this.isLoading = false
+        this.isLoading = false;
         return;
       }
 
