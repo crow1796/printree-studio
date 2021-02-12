@@ -66,8 +66,8 @@
         <div class="modal-body p-4 text-center">
           {{ meta.plan === 'Sell' ? 'Are you sure you want to publish this collection?' : 'Are you sure you want to proceed?' }}
           <div
-            class="text-xs text-text-600 bg-gray-300 p-2 mt-2 text-center"
-          >The collection will be reviewed first before {{ meta.plan === "Sell" ? "publishing it into the store" : "we start printing it" }}, you will receive an email once it's approved.</div>
+            class="text-text-600 bg-red-800 p-2 mt-2 text-center text-white rounded"
+          >The collection will be reviewed first before {{ meta.plan === "Sell" ? "publishing it into the store" : "we start the printing process" }}, you will receive an email for the payment process once it's approved.</div>
         </div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
@@ -97,7 +97,7 @@
     <div class="flex h-full w-full text-gray-600">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4 justify-between">
-          <!-- TODO: Add when ready <div class="flex w-4/12 uppercase flex-col" v-if="userTypeIs('seller')">
+          <div class="flex w-2/6 uppercase flex-col" v-if="userTypeIs('seller')">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
@@ -115,9 +115,15 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
-          </div>-->
-          <div class="flex h-8 items-center font-bold">Set Collection Details</div>
-          <div class="flex justify-end">
+          </div>
+          <div
+            class="flex h-8 items-center font-bold"
+            :class="{ 'w-3/6': meta.plan === 'Buy', 'w-2/6 justify-center': meta.plan === 'Sell' }"
+          >Set Collection Details</div>
+          <div
+            class="flex justify-end"
+            :class="{ 'w-3/6': meta.plan === 'Buy', 'w-2/6': meta.plan === 'Sell' }"
+          >
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
               @click="hide"
@@ -127,7 +133,7 @@
             </div>
           </div>
         </div>
-        <div class="flex flex-grow">
+        <div class="flex flex-grow pb-16">
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
               <div class="large-thumbnail w-6/12 flex flex-col">
@@ -182,8 +188,13 @@
               </div>
               <div class="flex flex-col mt-5 w-full ml-4">
                 <div class="text-4xl">
+                  <span
+                    v-if="meta.plan === 'Buy' && selectedProduct"
+                    class="font-bold w-full outline-none"
+                  >{{selectedProduct.meta.name}}</span>
+
                   <input
-                    v-if="selectedProduct"
+                    v-if="selectedProduct && meta.plan === 'Sell'"
                     type="text"
                     class="font-bold w-full outline-none border rounded px-4 py-2"
                     placeholder="What's the name of this product?*"
@@ -202,16 +213,12 @@
                     <rect x="0" y="0" rx="0" ry="0" width="476" height="50" />
                   </ContentLoader>
                 </div>
-                <div class="text-3xl leading-none py-4 flex items-start">
-                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell' && selectedProduct">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-4">Base Cost</div>
-                    <div>
-                      PHP {{ selectedProductBasePrice }}
-                      <span>+</span>&nbsp;
-                    </div>
-                  </div>
-                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell' && selectedProduct">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Your Desired Profit*</div>
+                <div
+                  class="text-3xl leading-none py-4 flex items-start"
+                  v-if="meta.plan ==='Sell' && selectedProduct"
+                >
+                  <div class="relative flex flex-col">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Profit per item*</div>
                     <div class="flex items-center">
                       <div>PHP&nbsp;</div>
                       <autosize-input
@@ -220,19 +227,63 @@
                         @change="setQuantityAndProfit"
                         :minWidth="60"
                         :value="selectedProductProfit"
-                      />&nbsp;=&nbsp;
+                      />
                     </div>
                   </div>
-                  <div
-                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded h-full justify-center"
-                    v-if="selectedProduct"
+                  <ContentLoader
+                    :width="476"
+                    :height="56"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
                   >
-                    <div
-                      class="text-xs uppercase font-bold mb-1"
-                    >{{ meta.plan === 'Sell' ? 'Total Selling Price' : 'Price' }}</div>
-                    <div>PHP {{ productTotalPrice }}</div>
-                    <div class="text-xs uppercase font-bold mt-1 text-right">VAT Included</div>
-                  </div>
+                    <rect x="0" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="149" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="296" y="0" rx="0" ry="0" width="128" height="56" />
+                  </ContentLoader>
+                </div>
+                <div :class="{'my-4': meta.plan === 'Buy'}">
+                  <table v-if="selectedProduct" class="table-fixed w-full border">
+                    <thead class="justify-between">
+                      <tr class="bg-gray-300">
+                        <th class="w-2/12 text-center py-4 border-r border-white">
+                          <span>Size</span>
+                        </th>
+                        <th class="w-5/12 text-center py-4 border-r border-white">
+                          <span>Base Cost</span>
+                        </th>
+                        <th class="w-5/12 text-center py-4">
+                          <span>Total Selling Price</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        class="bg-white"
+                        :key="i"
+                        v-for="(size, i) in selectedProduct
+                          .variants[selectedProductVariantKey].sizes"
+                      >
+                        <td class="text-center py-4 border-r">
+                          <span class="text-center font-semibold">{{size.name}}</span>
+                        </td>
+                        <td class="text-center py-4 border-r">
+                          <span>PHP {{size.calculatedCost}}</span>
+                        </td>
+                        <td class="text-right p-4 font-bold">
+                          <div class="text-primary">
+                            <number
+                              :to="(_totalPriceFor(size) || 0)"
+                              :format="(num) => num.formatMoney('₱ ')"
+                              :duration=".4"
+                            />
+                          </div>
+                          <div class="text-xs font-normal">VAT Included</div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                   <ContentLoader
                     :width="476"
                     :height="56"
@@ -322,6 +373,7 @@
                           <div class="text-center mr-2">{{ size.name }}:</div>
                           <div>
                             <VueNumericInput
+                              :key="`${selectedProductVariantKey}_${size.name}`"
                               align="center"
                               style="width: 90px"
                               class="ml-1"
@@ -333,45 +385,45 @@
                         </div>
                       </div>
                     </div>
-                    <div
-                      class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
-                    >
-                      <div>{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
-                      <div>
-                        <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
-                        <number
-                          animationPaused
-                          ref="estMinProfit"
-                          :to="estimatedMinProfit"
-                          :format="(num) => num.formatMoney('₱ ')"
-                          :duration=".4"
-                        />
-                        <span class="ml-2" v-if="meta.plan ==='Sell'">
-                          <span v-tippy="{arrow: true}" title="-12% service fee">
-                            <font-awesome-icon
-                              v-if="estimatedMinProfit"
-                              :icon="['fas', 'question-circle']"
-                            />
-                          </span>
-                        </span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="flex justify-end p-4 border-t">
-              <button
-                type="button"
-                class="px-8 py-2 font-bold rounded outline-none focus:outline-none border hover:border-gray-600 hover:text-gray-700 mr-4"
-                @click="previousProduct"
-                v-if="hasPreviousProductOrVariant"
-              >Previous</button>
-              <button
-                type="button"
-                class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
-                @click="nextProduct"
-              >NEXT</button>
+            <div class="flex justify-between p-4 border-t fixed bottom-0 w-full bg-white">
+              <div class="font-bold text-xl" data-cy="total">
+                <div>{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
+                <div>
+                  <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
+                  <number
+                    animationPaused
+                    ref="estMinProfit"
+                    :to="estimatedMinProfit"
+                    :format="(num) => num.formatMoney('₱ ')"
+                    :duration=".4"
+                  />
+                  <span class="ml-2" v-if="meta.plan ==='Sell'">
+                    <span v-tippy="{arrow: true}" title="-12% service fee">
+                      <font-awesome-icon
+                        v-if="estimatedMinProfit"
+                        :icon="['fas', 'question-circle']"
+                      />
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <div class="flex">
+                <button
+                  type="button"
+                  class="px-8 py-2 font-bold rounded outline-none focus:outline-none border hover:border-gray-600 hover:text-gray-700 mr-4"
+                  @click="previousProduct"
+                  v-if="hasPreviousProductOrVariant"
+                >Previous</button>
+                <button
+                  type="button"
+                  class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+                  @click="nextProduct"
+                >NEXT</button>
+              </div>
             </div>
           </div>
           <div class="flex border-l w-3/12">
@@ -381,8 +433,7 @@
               </div>
               <div class="overflow-auto h-full">
                 <div class="flex p-4 flex-wrap">
-                  <div
-                    class="flex w-6/12 p-1" v-if="!selectedProduct">
+                  <div class="flex w-6/12 p-1" v-if="!selectedProduct">
                     <ContentLoader
                       :width="175"
                       :height="195"
@@ -549,6 +600,16 @@ export default {
     },
   },
   methods: {
+    _totalPriceFor(size) {
+      let preTotal = size.calculatedCost;
+
+      if (this.meta.plan === "Sell")
+        preTotal = this.selectedProductProfit + size.calculatedCost;
+
+      const total = preTotal + preTotal * VAT;
+
+      return this.meta.plan === "Sell" ? Math.ceil(total) : total;
+    },
     switchSides() {
       const sides = _.keys(
         this.selectedProduct.variants[this.selectedProductVariantKey].sides
@@ -662,6 +723,19 @@ export default {
         this.productErrors.push("How much is your desired profit?");
       }
 
+      const selectedVariantQuantity = _.sum(
+        _.map(
+          this.selectedProduct.variants[this.selectedProductVariantKey].sizes,
+          (s) => s.quantity
+        )
+      );
+      if (!selectedVariantQuantity && this.meta.plan === "Buy") {
+        isDirty = true;
+        this.productErrors.push(
+          "Please set at least 1 quantity for each product."
+        );
+      }
+
       if (isDirty) {
         this.$refs.productValidationToast.show();
         return false;
@@ -723,7 +797,6 @@ export default {
               (s) => s.name === size.name
             );
             if (!availableSize) return;
-
             let baseCost = size.calculatedCost;
             let totalForPrintree = baseCost * size.quantity;
             let totalWithCustomerPrice =
@@ -738,7 +811,7 @@ export default {
         totalProfit -
         totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
       this.estimatedMinProfit =
-        this.meta.plan === "Sell" ? minProfit : printreeNet;
+        this.meta.plan === "Sell" ? minProfit : printreeNet + printreeNet * VAT;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });
@@ -840,7 +913,7 @@ export default {
   },
   watch: {
     products: {
-      handler(to) {
+      handler(to, from) {
         if (!to[0]) return;
         this.generatedProducts = [...to];
         this.selectedProduct = to[0];

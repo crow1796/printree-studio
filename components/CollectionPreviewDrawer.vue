@@ -480,7 +480,7 @@ export default {
         totalProfit -
         totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
       this.estimatedMinProfit =
-        this.meta.plan === "Sell" ? minProfit : printreeNet;
+        this.meta.plan === "Sell" ? minProfit : printreeNet + printreeNet * VAT;
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });

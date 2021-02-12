@@ -19,7 +19,7 @@
       <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
-          <!-- TODO: Add when ready <div v-if="formType === 'sign_up'">
+          <div v-if="formType === 'sign_up'">
             <label class="font-bold mb-2 block text-center">I want to...</label>
             <div class="flex justify-center mb-4 text-sm">
               <button
@@ -31,7 +31,7 @@
                 @click="changeUserType(type)"
               >{{userType(type)}} PRODUCTS</button>
             </div>
-          </div>-->
+          </div>
 
           <div
             class="mb-3"
@@ -115,37 +115,35 @@
           </div>
           <div
             class="mb-3"
-            v-if="formType === 'sign_up' && (formData.type === 'seller' && !formData.inviteCode)"
-            key="portfolio"
+            v-if="formType === 'sign_up' && formData.type === 'seller'"
+            key="inviteCode"
           >
-            <label for="pass" class="font-bold flex items-center">
-              Link to your Portfolio
+            <label for="inviteCode" class="font-bold flex items-center">
+              Invitation Code
               <span
                 class="pl-1"
                 v-tippy="{arrow: true}"
-                title="This can help you get your application approved faster."
+                title="If you're interested to sell your designs or create your own merch. Send us an email at: contact@printreestudio.com"
               >
                 <font-awesome-icon :icon="['fas', 'question-circle']" />
               </span>
             </label>
-            <div class="text-xs text-blue-500 mt-1">* Google Drive, Dropbox, personal website, etc.</div>
-            <div class="text-xs text-blue-500 mt-1">* Must have at least 3 sample images.</div>
             <div class="mt-2">
               <input
-                type="url"
-                name="portfolio"
+                type="text"
+                name="inviteCode"
                 class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                :class="{ 'border-red-400': errors.has('portfolio'), 'focus:border-gray-600': !errors.has('portfolio') }"
-                placeholder="Portfolio Link"
-                v-model="formData.portfolio"
-                data-vv-as="Portfolio"
-                v-validate="'required|url'"
+                :class="{ 'border-red-400': errors.has('inviteCode'), 'focus:border-gray-600': !errors.has('inviteCode') }"
+                placeholder="Invitation Code"
+                v-model="formData.inviteCode"
+                data-vv-as="Invitation Code"
+                v-validate="'required'"
               />
             </div>
             <span
               class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('portfolio')"
-            >{{ errors.first('portfolio') }}</span>
+              v-if="errors.has('inviteCode')"
+            >{{ errors.first('inviteCode') }}</span>
           </div>
           <div class="mb-3" v-if="formType === 'sign_up'" key="terms">
             <div class="flex items-center">
@@ -225,9 +223,8 @@ export default {
         email: null,
         password: null,
         shopName: null,
-        portfolio: null,
         type: "seller",
-        inviteCode: this.$storage.getCookie("invite"),
+        inviteCode: this.$storage.getCookie("invite") || null,
       },
       terms: false,
       isLoading: false,
@@ -281,7 +278,6 @@ export default {
           name: null,
           email: null,
           password: null,
-          portfolio: null,
           type: "seller",
           inviteCode: this.formData.inviteCode,
         };
@@ -333,7 +329,6 @@ export default {
             name: null,
             email: null,
             password: null,
-            portfolio: null,
             type: "seller",
             inviteCode: null,
           };
