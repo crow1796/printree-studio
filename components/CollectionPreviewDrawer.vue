@@ -273,7 +273,7 @@
           >DECLINE</PTButton>
           <PTButton
             color="primary"
-            v-if="meta.status !== 'approved'"
+            v-if="['pending', 'declined', 'reviewing'].includes(meta.status)"
             @click="confirmAction('approval')"
           >PUBLISH</PTButton>
         </div>
@@ -421,6 +421,7 @@ export default {
       this.$refs.publishConfirmationModal.hide();
       let status = "approved";
       if (this.confirmationAction === "decline") status = "declined";
+      if (this.confirmationAction === "approval" && this.meta.plan === "Buy") status = "to pay";
 
       await this.setAsMainImage();
 
@@ -501,9 +502,12 @@ export default {
   },
   computed: {
     productTotalPrice() {
-      let total = (this.selectedProductBasePrice + this.selectedProductProfit)
+      let total = this.selectedProductBasePrice;
+
+      if (this.meta.plan === "Sell")
+        total = this.selectedProductBasePrice + this.selectedProductProfit;
       
-      return Math.ceil(total + (total * VAT));
+      return this.meta.plan === "Sell" ? Math.ceil(total + (total * VAT)) : total;
     },
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);

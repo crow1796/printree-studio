@@ -241,6 +241,7 @@ export default {
                 _id
                 name
                 email
+                shopName
             }
             products {
                 _id
@@ -262,6 +263,7 @@ export default {
             status
             created_at
             updated_at
+            shopName
             roles {
                 _id
                 name

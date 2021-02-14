@@ -86,6 +86,7 @@
             <div class="flex flex-col items-end">
               <div>{{ (product.price * product.quantity).formatMoney('₱ ') }}</div>
               <div
+                v-if="_profitFrom(product)"
                 class="text-xs font-bold text-primary"
               >My Profit: {{ (_profitFrom(product)).formatMoney('₱ ') }}</div>
             </div>
