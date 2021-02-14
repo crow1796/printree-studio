@@ -560,6 +560,18 @@ export default {
       }
       let newVariant = await this.$store.dispatch("designer/addVariant", {
         ..._.omit(this.currentVariant, "_id"),
+        sizes: _.map(variant.sizes, (s) => {
+          const existingSize = _.find(this.currentVariant.sizes, {
+            name: s.name,
+          });
+          if (!existingSize)
+            return {
+              name: s.name,
+              price: 0,
+              quantity: 0,
+            };
+          return existingSize;
+        }),
         customizableVariant: variant,
       });
       this.currentProduct.variants.push({ ...newVariant });
