@@ -200,8 +200,13 @@
                   class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
                 >You have no collection(s).</td>
               </tr>
-              <tr v-for="col in userCollections" :key="col.id">
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <tr
+                v-for="col in userCollections"
+                :key="col.id"
+                :class="{
+                'bg-red-100': col.status === 'declined'}"
+              >
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center">
                     <div class="ml-3">
                       <p class="text-gray-900 whitespace-no-wrap">
@@ -230,7 +235,7 @@
                           <span>{{ col.name }}</span>
                         </a>
                         <a
-                          v-if="!['approved', 'reviewing'].includes(col.status)"
+                          v-if="!['approved', 'reviewing', 'to pay', 'printing process'].includes(col.status)"
                           href="#"
                           class="text-xs ml-1 hover:text-gray-800 text-gray-700"
                           @click.prevent="showCollectionRenameModal(col)"
@@ -243,7 +248,7 @@
                     </div>
                   </div>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
                   >
@@ -251,18 +256,18 @@
                       aria-hidden
                       class="absolute inset-0 opacity-50 rounded-full"
                       :class="{
-                        'bg-green-200':['approved'].includes(col.status),
+                        'bg-green-200':['approved', 'completed'].includes(col.status),
                         'bg-blue-200': col.status === 'pending',
-                        'bg-red-200': col.status === 'draft',
+                        'bg-red-300': ['draft', 'declined'].includes(col.status),
                       }"
                     ></span>
                     <span class="relative uppercase">{{ col.status }}</span>
                   </span>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center justify-center">
                     <button
-                      v-if="!['reviewing'].includes(col.status)"
+                      v-if="!['reviewing'].includes(col.status) && col.plan === 'Sell'"
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Delete"
@@ -403,7 +408,7 @@ export default {
     },
     async _validateStatusOf(
       collection,
-      statusToCheck = ["approved", "reviewing"]
+      statusToCheck = ["approved", "reviewing", "to pay", "printing process"]
     ) {
       const { status, handle } = await this.$store.dispatch(
         "user_dashboard/collectionStatus",
@@ -430,6 +435,12 @@ export default {
             break;
           case "reviewing":
             message = `Our team is currently reviewing this collection. Please try again later.`;
+            break;
+          case "to pay":
+            message = "Cannot edit collection. Please check your email for the payment process."
+            break;
+          case "printing process":
+            message = "Cannot edit collection. We are now working on your order. You will receive an email/SMS when it's ready for delivery."
             break;
         }
 

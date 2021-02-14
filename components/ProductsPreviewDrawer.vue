@@ -118,11 +118,11 @@
           </div>
           <div
             class="flex h-8 items-center font-bold"
-            :class="{ 'w-3/6': meta.plan === 'Buy', 'w-2/6 justify-center': meta.plan === 'Sell' }"
+            :class="{ 'w-3/6': userTypeIs('buyer'), 'w-2/6 justify-center': userTypeIs('seller') }"
           >Set Collection Details</div>
           <div
             class="flex justify-end"
-            :class="{ 'w-3/6': meta.plan === 'Buy', 'w-2/6': meta.plan === 'Sell' }"
+            :class="{ 'w-3/6': userTypeIs('buyer'), 'w-2/6': userTypeIs('seller') }"
           >
             <div
               class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
@@ -253,6 +253,9 @@
                         <th class="w-5/12 text-center py-4 border-r border-white">
                           <span>Base Cost</span>
                         </th>
+                        <th class="w-5/12 text-center py-4 border-r border-white">
+                          <span>{{ meta.plan === "Buy" ? "Quantity" : "If I sell..." }}</span>
+                        </th>
                         <th class="w-5/12 text-center py-4">
                           <span>Total Selling Price</span>
                         </th>
@@ -271,6 +274,17 @@
                         <td class="text-center py-4 border-r">
                           <span>PHP {{size.calculatedCost}}</span>
                         </td>
+                        <td class="text-center py-4 border-r">
+                          <VueNumericInput
+                            :key="`${selectedProductVariantKey}_${size.name}`"
+                            align="center"
+                            style="width: 90px"
+                            class="ml-1"
+                            :min="0"
+                            v-model="size.quantity"
+                            @input="setQuantityAndProfit(size.quantity, 'quantity', size.name)"
+                          />
+                        </td>
                         <td class="text-right p-4 font-bold">
                           <div class="text-primary">
                             <number
@@ -281,6 +295,37 @@
                           </div>
                           <div class="text-xs font-normal">VAT Included</div>
                         </td>
+                      </tr>
+                      <tr class="bg-primary border border-top text-white">
+                        <td
+                          colspan="3"
+                          class="p-4 font-bold text-right"
+                        >{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</td>
+                        <td colspan="4" class="text-right p-4 font-bold border border-left">
+                          <div>
+                            <font-awesome-icon
+                              v-if="isCalculating"
+                              :icon="['fas', 'spinner']"
+                              spin
+                            />
+                            <number
+                              animationPaused
+                              ref="estMinProfit"
+                              :to="estimatedMinProfit"
+                              :format="(num) => num.formatMoney('₱ ')"
+                              :duration=".4"
+                            />
+                            <span class="ml-2" v-if="meta.plan ==='Sell'">
+                              <span v-tippy="{arrow: true}" title="-12% service fee">
+                                <font-awesome-icon
+                                  v-if="estimatedMinProfit"
+                                  :icon="['fas', 'question-circle']"
+                                />
+                              </span>
+                            </span>
+                          </div>
+                        </td>
+                        <td></td>
                       </tr>
                     </tbody>
                   </table>
@@ -343,74 +388,10 @@
                       <rect x="0" y="0" rx="5" ry="5" width="476" height="100" />
                     </ContentLoader>
                   </div>
-
-                  <ContentLoader
-                    :width="476"
-                    :height="70"
-                    :speed="2"
-                    primaryColor="#f3f3f3"
-                    secondaryColor="#ecebeb"
-                    v-if="!selectedProduct"
-                  >
-                    <rect x="0" y="0" rx="5" ry="5" width="476" height="70" />
-                  </ContentLoader>
-                  <div
-                    class="bg-gray-200 rounded p-4 shadow"
-                    :class="{'mt-2': meta.plan === 'Sell'}"
-                    v-if="selectedProduct"
-                  >
-                    <div
-                      class="font-bold uppercase"
-                    >{{ meta.plan ==='Sell' ? 'Profit Calculator' : 'Quantity' }}</div>
-                    <div class="flex flex-wrap">
-                      <div
-                        class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-4 bg-white"
-                        v-for="(size, i) in selectedProduct
-                          .variants[selectedProductVariantKey].sizes"
-                        :key="i"
-                      >
-                        <div class="flex items-center">
-                          <div class="text-center mr-2">{{ size.name }}:</div>
-                          <div>
-                            <VueNumericInput
-                              :key="`${selectedProductVariantKey}_${size.name}`"
-                              align="center"
-                              style="width: 90px"
-                              class="ml-1"
-                              :min="0"
-                              v-model="size.quantity"
-                              @input="setQuantityAndProfit(size.quantity, 'quantity', size.name)"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
-            <div class="flex justify-between p-4 border-t fixed bottom-0 w-full bg-white">
-              <div class="font-bold text-xl" data-cy="total">
-                <div>{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
-                <div>
-                  <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
-                  <number
-                    animationPaused
-                    ref="estMinProfit"
-                    :to="estimatedMinProfit"
-                    :format="(num) => num.formatMoney('₱ ')"
-                    :duration=".4"
-                  />
-                  <span class="ml-2" v-if="meta.plan ==='Sell'">
-                    <span v-tippy="{arrow: true}" title="-12% service fee">
-                      <font-awesome-icon
-                        v-if="estimatedMinProfit"
-                        :icon="['fas', 'question-circle']"
-                      />
-                    </span>
-                  </span>
-                </div>
-              </div>
+            <div class="flex justify-end p-4 border-t fixed bottom-0 w-full bg-white">
               <div class="flex">
                 <button
                   type="button"
@@ -581,7 +562,7 @@ export default {
       if (this.meta.plan === "Sell")
         total = this.selectedProductBasePrice + this.selectedProductProfit;
 
-      return Math.ceil(total + total * VAT);
+      return this.meta.plan === "Sell" ? Math.ceil(total + total * VAT) : total;
     },
     selectedVariantIndex() {
       if (!this.selectedProduct) return -1;

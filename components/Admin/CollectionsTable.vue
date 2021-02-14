@@ -30,6 +30,8 @@
               <option value="declined">Declined</option>
               <option value="pending">Pending</option>
               <option value="reviewing">Reviewing</option>
+              <option value="to pay">To Pay</option>
+              <option value="printing process">Printing Process</option>
             </select>
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-700"
@@ -71,6 +73,9 @@
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Designer</th>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+                >Shop Name</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
                 >Status</th>
@@ -128,7 +133,15 @@
                     <nuxt-link
                       :to="`/admin/users/${col.user ? col.user._id : ''}`"
                       class="text-blue-600 hover:underline"
-                    >{{ col.user ? col.user.shopName || col.user.name : '' }}</nuxt-link>
+                    >{{ col.user ? col.user.name : '' }}</nuxt-link>
+                  </div>
+                </td>
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
+                  <div class="text-gray-900 whitespace-no-wrap">
+                    <nuxt-link
+                      :to="`/admin/users/${col.user ? col.user._id : ''}`"
+                      class="text-blue-600 hover:underline"
+                    >{{ col.user ? col.user.shopName : '' }}</nuxt-link>
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
@@ -192,7 +205,7 @@ export default {
       this.filterValues = [];
       this.filterValues.push(this.defaultValue);
       if (this.filterValues[0] === "all")
-        this.filterValues = ["approved", "declined", "pending", "reviewing"];
+        this.filterValues = ["approved", "declined", "pending", "reviewing", "to pay", "printing process"];
 
       this.$emit("filter", this.filterValues);
     },
