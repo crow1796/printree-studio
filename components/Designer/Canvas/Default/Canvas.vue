@@ -229,6 +229,7 @@ export default {
 
     window.addEventListener("drop", (e) => {
       e.preventDefault();
+      if (!this.$refs.globalDropzone) return;
       this.$refs.globalDropzone.$el.style.visibility = "hidden";
       this.$refs.globalDropzone.$el.style.opacity = 0;
     });

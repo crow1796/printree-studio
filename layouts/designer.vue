@@ -67,7 +67,13 @@
         <div class="flex w-1/3 items-center justify-end">
           <a href="#" @click.stop="goToDashboard" class="text-blue-400">Go to Dashboard</a>
           <div class="w-4"></div>
-          <PTButton color="primary" @click="nextStep">NEXT</PTButton>
+          <PTButton
+            color="primary"
+            @click="nextStep"
+            v-intro="'Finally, click on this button when you\'re done designing all of your products. And that\'s it!'"
+            v-intro-step="6"
+            v-intro-disable-interaction="true"
+          >NEXT</PTButton>
         </div>
       </div>
       <div class="flex flex-grow" id="right-content">
@@ -230,9 +236,9 @@ export default {
           products: [product],
         });
 
-        this.$set(this.generatedImages, i, _.first(res.data))
+        this.$set(this.generatedImages, i, _.first(res.data));
 
-        if(i === 0) {
+        if (i === 0) {
           this.loadingText = "";
           this.isLoading = false;
           this.$refs.productsPreviewDrawer.show();

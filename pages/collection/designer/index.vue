@@ -1,5 +1,9 @@
 <template>
-  <div class="flex h-full w-full">
+  <div
+    class="flex h-full w-full"
+    v-intro="'Welcome to the studio, this is where you can add designs to the products that you\'ve selected...'"
+    v-intro-disable-interaction="true"
+  >
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="flex flex-grow w-full relative" v-else>
       <VueTailwindDrawer ref="availableProductsModal" width="70%">
@@ -80,6 +84,9 @@
             class="mx-4 mt-4 px-4 h-24 flex-shrink-0 select-none w-auto justify-center items-center flex rounded border-dashed cursor-pointer hover:bg-primary-lighter bg-primary text-white"
             @click="showAvailableProducts"
             v-if="selectedProducts.length < 10"
+            v-intro="'And if you want to add more products, just click on this button... (Note: You can add the same products multiple times)'"
+            v-intro-step="5"
+            v-intro-disable-interaction="true"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
             <span class="font-bold">ADD MORE PRODUCTS</span>
@@ -200,6 +207,9 @@
         />
 
         <Canvas
+          v-intro="'This is the canvas, this is where you can resize and position your designs...'"
+          v-intro-step="2"
+          v-intro-disable-interaction="true"
           :key="`canvas-${currentProduct._id}-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
@@ -322,6 +332,13 @@ export default {
     RightActions,
   },
   async mounted() {
+    if (!this.$storage.getLocalStorage("designer_tour")) {
+      const intro = this.$intro();
+      intro.start();
+      intro.onexit(() => {
+        this.$storage.setLocalStorage("designer_tour", "1");
+      });
+    }
     WebFontLoader.load({
       google: {
         families: _.map(this.webfonts, "value"),

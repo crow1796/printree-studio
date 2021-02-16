@@ -48,6 +48,7 @@ module.exports = {
     "~/plugins/prototypes.js",
     "~/plugins/external-installs.js",
     "~/plugins/api.js",
+    { src: '~plugins/vue-introjs.js', ssr: false  },
   ],
   /*
    ** Nuxt.js modules
@@ -143,6 +144,7 @@ module.exports = {
       new webpack.ProvidePlugin({
         $: "jquery",
         _: "lodash",
+        introJs: ['intro.js'],
       }),
     ],
   },
