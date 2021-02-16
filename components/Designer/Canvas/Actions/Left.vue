@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="left-actions absolute z-10 flex flex-shrink justify-center flex-col"
-  >
+  <div class="left-actions absolute z-10 flex flex-shrink justify-center flex-col">
     <div class="flex bg-white mb-4 rounded border">
       <div class="flex flex-col py-1">
         <!-- <button
@@ -23,13 +21,16 @@
               fill="#718096"
             />
           </svg>
-        </button> -->
+        </button>-->
         <button
           type="button"
           class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           @click="$emit('action-clicked', { action: 'add_art' })"
-          title="Add an Asset"
+          title="Add an Art"
           v-tippy="{ arrow: true }"
+          v-intro="'To add your designs/assets, just click on this button...'"
+          v-intro-step="3"
+          v-intro-disable-interaction="true"
         >
           <font-awesome-icon :icon="['fas', 'image']" />
         </button>
@@ -198,7 +199,7 @@
         </button>
       </div>
     </div>
-    
+
     <div class="flex bg-white mt-4 rounded border justify-center">
       <div class="flex flex-col py-1">
         <button
@@ -231,15 +232,10 @@
             title="Tips"
             v-tippy="{ arrow: true }"
           >
-            <font-awesome-icon
-              :icon="['fas', 'question-circle']"
-              class="text-xs"
-            />
+            <font-awesome-icon :icon="['fas', 'question-circle']" class="text-xs" />
           </button>
           <template slot="popover">
-            <div
-              class="bg-gray-900 text-xs text-white rounded border p-4 text-left"
-            >
+            <div class="bg-gray-900 text-xs text-white rounded border p-4 text-left">
               <div class="font-bold mb-2">Tips:</div>
               <ul class="tips-list list-disc ml-4">
                 <li>Hold space + drag to start panning</li>

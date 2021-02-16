@@ -1,9 +1,6 @@
 <template>
-  <div class="flex flex-col items-center w-full p-4">
+  <div class="flex flex-col items-center w-full pl-4 pb-4 pt-8">
     <AreaLoader v-if="isLoading" />
-    <div class="top-text flex flex-col items-center" v-if="!isSignUpSuccess">
-      <h2 class="font-black text-4xl text-primary-lighter mb-4">SIGN IN TO CONTINUE</h2>
-    </div>
     <div class="content w-full flex flex-grow">
       <div class="text-center mt-8 mb-6" v-if="isSignUpSuccess">
         <div class="mb-4">
@@ -18,13 +15,13 @@
       </div>
       <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
-          <div class="text-lg font-black text-gray-700 mb-4">{{ formTitle }}</div>
+          <div class="text-3xl text-primary font-black text-gray-700 mb-4">{{ formTitle }}</div>
           <div v-if="formType === 'sign_up'">
-            <label class="font-bold mb-2 block text-center">I want to...</label>
-            <div class="flex justify-center mb-4 text-sm">
+            <label class="font-bold mb-2 block">I want to...</label>
+            <div class="flex mb-4 text-sm">
               <button
                 type="button"
-                class="rounded border flex items-center p-3 flex-col w-6/12 cursor-pointer mx-2 hover:border-gray-600 uppercase font-bold"
+                class="rounded border flex items-center p-3 flex-col w-6/12 cursor-pointer hover:border-gray-600 mr-4 uppercase font-bold flex-grow"
                 v-for="(type, i) in userTypes"
                 :key="i"
                 :class="{'bg-primary text-white': formData.type === type}"
@@ -33,150 +30,152 @@
             </div>
           </div>
 
-          <div
-            class="mb-3"
-            v-if="formType == 'sign_up' && formData.type === 'seller'"
-            key="shop_name"
-          >
-            <label for="shop_name" class="font-bold">Shop Name</label>
-            <div class="mt-2">
-              <input
-                name="shop_name"
-                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                type="text"
-                :class="{ 'border-red-400': errors.has('shop_name'), 'focus:border-gray-600': !errors.has('shop_name') }"
-                placeholder="Name of your shop"
-                v-model="formData.shopName"
-                data-vv-as="Shop Name"
-                v-validate="'required'"
-              />
-            </div>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('shop_name')"
-            >{{ errors.first('shop_name') }}</span>
-          </div>
-          <div class="mb-3" v-if="formType == 'sign_up'" key="name">
-            <label for="name" class="font-bold">Name</label>
-            <div class="mt-2">
-              <input
-                name="name"
-                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                type="text"
-                :class="{ 'border-red-400': errors.has('name'), 'focus:border-gray-600': !errors.has('name') }"
-                placeholder="Your name"
-                v-model="formData.name"
-                data-vv-as="Name"
-                v-validate="'required'"
-              />
-            </div>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('name')"
-            >{{ errors.first('name') }}</span>
-          </div>
-          <div class="mb-3" key="email">
-            <label for="email" class="font-bold">Email</label>
-            <div class="mt-2">
-              <input
-                name="email"
-                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                type="text"
-                :class="{ 'border-red-400': errors.has('email'), 'focus:border-gray-600': !errors.has('email') }"
-                placeholder="email@example.com"
-                v-model="formData.email"
-                data-vv-as="Email"
-                v-validate="'required|email'"
-              />
-            </div>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('email')"
-            >{{ errors.first('email') }}</span>
-          </div>
-          <div class="mb-3" v-if="formType != 'password_recovery'" key="password">
-            <label for="pass" class="font-bold">Password</label>
-            <div class="mt-2">
-              <input
-                type="password"
-                name="pass"
-                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                :class="{ 'border-red-400': errors.has('pass'), 'focus:border-gray-600': !errors.has('pass') }"
-                placeholder="Password"
-                v-model="formData.password"
-                data-vv-as="Password"
-                v-validate="'required|min:6'"
-              />
-            </div>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('pass')"
-            >{{ errors.first('pass') }}</span>
-          </div>
-          <div
-            class="mb-3"
-            v-if="formType === 'sign_up' && formData.type === 'seller'"
-            key="inviteCode"
-          >
-            <label for="inviteCode" class="font-bold flex items-center">
-              Invitation Code
-              <span
-                class="pl-1"
-                v-tippy="{arrow: true}"
-                title="If you're interested to sell your designs or create your own merch. Send us an email at: contact@printreestudio.com"
-              >
-                <font-awesome-icon :icon="['fas', 'question-circle']" />
-              </span>
-            </label>
-            <div class="mt-2">
-              <input
-                type="text"
-                name="inviteCode"
-                class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                :class="{ 'border-red-400': errors.has('inviteCode'), 'focus:border-gray-600': !errors.has('inviteCode') }"
-                placeholder="Invitation Code"
-                v-model="formData.inviteCode"
-                data-vv-as="Invitation Code"
-                v-validate="'required'"
-              />
-            </div>
-            <span
-              class="text-red-700 text-xs pt-1 font-bold inline-block"
-              v-if="errors.has('inviteCode')"
-            >{{ errors.first('inviteCode') }}</span>
-          </div>
-          <div class="mb-3" v-if="formType === 'sign_up'" key="terms">
-            <div class="flex items-center">
-              <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
+          <div class="flex flex-wrap">
+            <div
+              class="mb-3 flex-grow mr-3"
+              v-if="formType == 'sign_up' && formData.type === 'seller'"
+              key="shop_name"
+            >
+              <label for="shop_name" class="font-bold">Shop Name</label>
+              <div class="mt-2">
                 <input
-                  class="absolute opacity-0 left-0 top-0 cursor-pointer"
-                  type="checkbox"
-                  name="terms"
-                  v-model="terms"
+                  name="shop_name"
+                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                  type="text"
+                  :class="{ 'border-red-400': errors.has('shop_name'), 'focus:border-gray-600': !errors.has('shop_name') }"
+                  placeholder="Name of your shop"
+                  v-model="formData.shopName"
+                  data-vv-as="Shop Name"
                   v-validate="'required'"
                 />
-                <span class="h-6 w-6 checkmark absolute top-0 left-0 bg-gray-400"></span>
+              </div>
+              <span
+                class="text-red-700 text-xs pt-1 font-bold inline-block"
+                v-if="errors.has('shop_name')"
+              >{{ errors.first('shop_name') }}</span>
+            </div>
+            <div class="mb-3 flex-grow mr-3" v-if="formType == 'sign_up'" key="name">
+              <label for="name" class="font-bold">Name</label>
+              <div class="mt-2">
+                <input
+                  name="name"
+                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                  type="text"
+                  :class="{ 'border-red-400': errors.has('name'), 'focus:border-gray-600': !errors.has('name') }"
+                  placeholder="Your name"
+                  v-model="formData.name"
+                  data-vv-as="Name"
+                  v-validate="'required'"
+                />
+              </div>
+              <span
+                class="text-red-700 text-xs pt-1 font-bold inline-block"
+                v-if="errors.has('name')"
+              >{{ errors.first('name') }}</span>
+            </div>
+            <div class="mb-3 w-full mr-3" key="email">
+              <label for="email" class="font-bold">Email</label>
+              <div class="mt-2">
+                <input
+                  name="email"
+                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                  type="text"
+                  :class="{ 'border-red-400': errors.has('email'), 'focus:border-gray-600': !errors.has('email') }"
+                  placeholder="email@example.com"
+                  v-model="formData.email"
+                  data-vv-as="Email"
+                  v-validate="'required|email'"
+                />
+              </div>
+              <span
+                class="text-red-700 text-xs pt-1 font-bold inline-block"
+                v-if="errors.has('email')"
+              >{{ errors.first('email') }}</span>
+            </div>
+            <div class="mb-3 w-full mr-3" v-if="formType != 'password_recovery'" key="password">
+              <label for="pass" class="font-bold">Password</label>
+              <div class="mt-2">
+                <input
+                  type="password"
+                  name="pass"
+                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                  :class="{ 'border-red-400': errors.has('pass'), 'focus:border-gray-600': !errors.has('pass') }"
+                  placeholder="Password"
+                  v-model="formData.password"
+                  data-vv-as="Password"
+                  v-validate="'required|min:6'"
+                />
+              </div>
+              <span
+                class="text-red-700 text-xs pt-1 font-bold inline-block"
+                v-if="errors.has('pass')"
+              >{{ errors.first('pass') }}</span>
+            </div>
+            <div
+              class="mb-3 w-full mr-4"
+              v-if="formType === 'sign_up' && formData.type === 'seller'"
+              key="inviteCode"
+            >
+              <label for="inviteCode" class="font-bold flex items-center">
+                Invitation Code
+                <span
+                  class="pl-1"
+                  v-tippy="{arrow: true}"
+                  title="If you're interested to sell your designs or create your own merch. Send us an email at: contact@printreestudio.com"
+                >
+                  <font-awesome-icon :icon="['fas', 'question-circle']" />
+                </span>
               </label>
-              <div class="text-sm">
-                I agree to the
-                <strong>Printree Studio</strong>
-                <a href="#" class="text-blue-400">Terms of Service</a> and
-                <a href="#" class="text-blue-400">Privacy Policy</a>.
-                <div>
-                  <span
-                    class="text-red-700 text-xs pt-1 font-bold inline-block"
-                    v-if="errors.has('terms')"
-                  >You must accept the terms and conditions to proceed.</span>
+              <div class="mt-2">
+                <input
+                  type="text"
+                  name="inviteCode"
+                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                  :class="{ 'border-red-400': errors.has('inviteCode'), 'focus:border-gray-600': !errors.has('inviteCode') }"
+                  placeholder="Invitation Code"
+                  v-model="formData.inviteCode"
+                  data-vv-as="Invitation Code"
+                  v-validate="'required'"
+                />
+              </div>
+              <span
+                class="text-red-700 text-xs pt-1 font-bold inline-block"
+                v-if="errors.has('inviteCode')"
+              >{{ errors.first('inviteCode') }}</span>
+            </div>
+            <div class="mb-3 flex-grow mr-3" v-if="formType === 'sign_up'" key="terms">
+              <div class="flex items-center">
+                <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
+                  <input
+                    class="absolute opacity-0 left-0 top-0 cursor-pointer"
+                    type="checkbox"
+                    name="terms"
+                    v-model="terms"
+                    v-validate="'required'"
+                  />
+                  <span class="h-6 w-6 checkmark absolute top-0 left-0 bg-gray-400"></span>
+                </label>
+                <div class="text-sm">
+                  I agree to the
+                  <strong>Printree Studio</strong>
+                  <a href="#" class="text-blue-400">Terms of Service</a> and
+                  <a href="#" class="text-blue-400">Privacy Policy</a>.
+                  <div>
+                    <span
+                      class="text-red-700 text-xs pt-1 font-bold inline-block"
+                      v-if="errors.has('terms')"
+                    >You must accept the terms and conditions to proceed.</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="mb-3" v-if="formType != 'password_recovery'">
-            <a
-              href="#"
-              class="text-blue-400 font-bold"
-              @click.prevent="toggleForm('password_recovery')"
-            >Forgot Password?</a>
+            <div class="mb-3 flex-grow mr-3" v-if="formType != 'password_recovery'">
+              <a
+                href="#"
+                class="text-blue-400 font-bold"
+                @click.prevent="toggleForm('password_recovery')"
+              >Forgot Password?</a>
+            </div>
           </div>
           <div
             class="mb-3 bg-red-200 text-red-500 p-3 rounded text-center"
@@ -215,15 +214,25 @@ export default {
       }
     }
   },
+  props: {
+    type: {
+      type: String,
+      default: "seller",
+    },
+    form: {
+      type: String,
+      default: "sign_in"
+    }
+  },
   data() {
     return {
-      formType: "sign_in",
+      formType: this.form,
       formData: {
         name: null,
         email: null,
         password: null,
         shopName: null,
-        type: "seller",
+        type: this.type,
         inviteCode: this.$storage.getCookie("invite") || null,
       },
       terms: false,

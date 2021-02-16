@@ -14,8 +14,8 @@
                 <strong>Select Products</strong>
               </div>
               <div
-                class="text-xs normal-case"
-              >Each collection can only have a maximum of 10 products.</div>
+                class="text-xs normal-case text-red-500"
+              >Each {{ userTypeIs('buyer') ? 'order' : 'collection' }} can only have a maximum of 10 products.</div>
             </div>
             <div class="flex text-right">
               <div
@@ -37,9 +37,9 @@
           >{{ tmpSelectedProducts.length || "No" }} Products Selected</a>
           <button
             type="button"
-            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            class="shadow-xl border border-white bg-primary px-8 py-6 font-bold rounded text-white hover:bg-primary-lighter"
             @click="createNewDesign"
-          >CONTINUE</button>
+          >START DESIGNING <font-awesome-icon :icon="['fas', 'arrow-right']" /></button>
         </div>
       </div>
     </VueTailwindModal>
@@ -175,7 +175,7 @@
           type="button"
           class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
           @click="showAvailableProducts"
-        >Create New Collection</button>
+        >Create new collection</button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -345,6 +345,7 @@ import { TippyComponent } from "vue-tippy";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import first from "lodash/first";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
+import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
 
 export default {
   layout: "user_dashboard",
@@ -353,6 +354,7 @@ export default {
     AvailableProducts,
     tippy: TippyComponent,
   },
+  mixins: [UserTypeCheckerMixin],
   async mounted() {
     await this.$store.dispatch(
       "user_dashboard/getUserCollectionsOf",
