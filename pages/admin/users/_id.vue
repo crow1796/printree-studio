@@ -55,7 +55,7 @@
         </button>
         <div class="flex justify-between w-full items-center">
           <h2 class="text-2xl mt-4 font-semibold leading-tight">User: {{user._id}}</h2>
-          <TotalProfitCounter />
+          <TotalProfitCounter :amount="totalEarnings"/>
         </div>
       </div>
     </div>
@@ -196,10 +196,13 @@ export default {
       this.collectionsQuery
     );
 
+    this.totalEarnings = await this.$store.dispatch('admin/totalEarningsOfUser', id)
+
     this.isLoading = false;
   },
   data() {
     return {
+      totalEarnings: 0,
       confirmationAction: null,
       isLoading: true,
       collections: [],

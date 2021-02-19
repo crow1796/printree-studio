@@ -110,6 +110,10 @@ const actions = {
       status
     })
   },
+  async totalEarningsOfUser(context, id) {
+    const total = await this.$api.admin.totalEarningsOfUser(id)
+    return total
+  },
   async getOrders(context, query) {
     const res = await this.$axios.get('/orders')
     context.commit('ORDERS', res.data.orders)

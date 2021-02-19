@@ -124,3 +124,14 @@ export const generateVariantImages = async (axios, { _id }) => {
   const { generateVariantImages } = data.data;
   return generateVariantImages;
 }
+
+export const totalEarningsOfUser = async (axios, _id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.totalEarningsOfUser,
+    variables: {
+      id: _id
+    },
+  });
+  const { totalEarningsOfUser } = data.data;
+  return totalEarningsOfUser;
+}

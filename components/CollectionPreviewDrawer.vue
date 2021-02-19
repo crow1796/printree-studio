@@ -273,7 +273,7 @@
           >DECLINE</PTButton>
           <PTButton
             color="primary"
-            v-if="['pending', 'declined', 'reviewing'].includes(meta.status)"
+            v-if="['pending', 'declined', 'reviewing', 'approved'].includes(meta.status)"
             @click="confirmAction('approval')"
           >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }}</PTButton>
         </div>

@@ -588,5 +588,10 @@ export default {
             }
         }
     }
+  `,
+  totalEarningsOfUser: `
+    query ($id: ID!){
+        totalEarningsOfUser(_id: $id)
+    }
   `
 };

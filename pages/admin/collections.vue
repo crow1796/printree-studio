@@ -1,7 +1,7 @@
 <template>
   <div class="sm:px-8 relative">
     <AreaLoader v-if="isLoading" fullscreen />
-    <CollectionsTable :collections="collections" @filter="filterCollection" @reload="_loadItems"/>
+  <CollectionsTable :collections="collections" @filter="filterCollection" @reload="_loadItems"/>
     <SimplePagination @prev="goTo(prevPage)" @next="goTo(nextPage)"/>
   </div>
 </template>
