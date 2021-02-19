@@ -5,7 +5,7 @@
     >
       <number
         ref="profit"
-        :to="totalProfit"
+        :to="amount || totalProfit"
         :format="(num) => num.formatMoney('₱ ')"
         :duration=".4"
       />
