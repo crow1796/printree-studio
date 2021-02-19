@@ -275,7 +275,7 @@
             color="primary"
             v-if="['pending', 'declined', 'reviewing'].includes(meta.status)"
             @click="confirmAction('approval')"
-          >PUBLISH</PTButton>
+          >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }}</PTButton>
         </div>
       </div>
     </div>
