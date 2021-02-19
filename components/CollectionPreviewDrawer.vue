@@ -117,7 +117,7 @@
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 flex-grow ml-4" :key="`${selectedProduct._id}-meta`">
+              <div class="flex flex-col mt-5 flex-grow ml-4 w-6/12" :key="`${selectedProduct._id}-meta`">
                 <div class="text-4xl">
                   <span class="font-bold w-full outline-none">{{selectedProduct.meta.name}}</span>
                 </div>

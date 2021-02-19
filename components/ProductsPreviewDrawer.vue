@@ -186,7 +186,7 @@
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 w-full ml-4">
+              <div class="flex flex-col mt-5 w-full ml-4 w-6/12">
                 <div class="text-4xl">
                   <span
                     v-if="meta.plan === 'Buy' && selectedProduct"
