@@ -6,7 +6,7 @@
   >
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="flex flex-grow w-full relative" v-else>
-      <VueTailwindDrawer ref="availableProductsModal" width="70%">
+      <VueTailwindDrawer ref="availableProductsModal" width="70%" :closeOnBackdropClicked="false">
         <AreaLoader v-if="isAvailableProductsLoading" />
         <div class="flex flex-col flex-grow">
           <div class="modal-heading border-b w-full p-4 text-gray-600">
@@ -78,7 +78,7 @@
         </div>
       </VueTailwindModal>
 
-      <div class="flex w-1/4 border-r flex-grow flex-col">
+      <div class="flex w-1/4 border-r flex-grow flex-col" v-if="!isSingle">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
             class="mx-4 mt-4 px-4 h-24 flex-shrink-0 select-none w-auto justify-center items-center flex rounded border-dashed cursor-pointer hover:bg-primary-lighter bg-primary text-white"
@@ -351,6 +351,7 @@ export default {
   },
   data() {
     return {
+      isSingle: this.$flags.flagIs("single", "on"),
       isProductDeleteLoading: false,
       autoSavingTimeout: null,
       autoSaving: false,

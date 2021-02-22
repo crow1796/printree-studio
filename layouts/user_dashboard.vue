@@ -152,6 +152,7 @@ export default {
   },
   mounted(){
     document.body.style.overflow = 'auto'
+    this.$flags.set('single', 'off')
   },
   methods: {
     async signOut() {

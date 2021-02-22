@@ -1,5 +1,6 @@
 <template>
   <div class="sm:w-11/12 mx-auto">
+    <NoMobileModal ref="noMobileModal" />
     <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="availableProductsModal"
@@ -10,8 +11,12 @@
         <div class="modal-heading border-b flex-grow p-4">
           <div class="flex justify-between flex-grow items-center">
             <div class="flex uppercase flex-col">
-              <div><strong>Select Products</strong></div>
-              <div class="text-xs normal-case">Each collection can only have a maximum of 10 products.</div>
+              <div>
+                <strong>Select Products</strong>
+              </div>
+              <div
+                class="text-xs normal-case"
+              >Each collection can only have a maximum of 10 products.</div>
             </div>
             <div class="flex text-right">
               <div
@@ -39,7 +44,7 @@
         </div>
       </div>
     </VueTailwindModal>
-    <AuthModal ref="authModal" @login-success="createNewDesign" :type="type" :form="form"/>
+    <AuthModal ref="authModal" @login-success="handleLoginSuccess" :type="type" :form="form" />
     <div class="hero flex relative w-full">
       <div
         class="flex z-20 relative sm:mt-32 mt-8 sm:w-6/12 w-full flex-col sm:pl-4 flex-grow sm:flex-grow-0"
@@ -76,16 +81,24 @@
         <span class="text-primary">PRINTREE STUDIO</span> WORKS?
       </div>
       <div class="flex sm:flex-row flex-col justify-center items-start">
-        <div class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow">
+        <div
+          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+        >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/sign_in.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
           <div class="text-center font-bold text-xl">Join us</div>
-          <div
-            class="text-center text-gray-600 mt-4"
-          >You can create an account if you don't have one or login. If you want to sell products, send us an email at: <a class="text-primary" href="mailto:contact@printreestudio.com">contact@printreestudio.com</a></div>
+          <div class="text-center text-gray-600 mt-4">
+            You can create an account if you don't have one or login. If you want to sell products, send us an email at:
+            <a
+              class="text-primary"
+              href="mailto:contact@printreestudio.com"
+            >contact@printreestudio.com</a>
+          </div>
         </div>
-        <div class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow">
+        <div
+          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+        >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/design.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
@@ -94,19 +107,27 @@
             class="text-center text-gray-600 mt-4"
           >You choose from variety of products and add your designs on them.</div>
         </div>
-        <div class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow">
+        <div
+          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+        >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/shopping.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
           <div class="text-center font-bold text-xl">Sell</div>
-          <div class="text-center text-gray-600 mt-4">Share it to your friends/community and start earning.</div>
+          <div
+            class="text-center text-gray-600 mt-4"
+          >Share it to your friends/community and start earning.</div>
         </div>
-        <div class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow">
+        <div
+          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+        >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/delivery.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
           </div>
           <div class="text-center font-bold text-xl">We print and deliver</div>
-          <div class="text-center text-gray-600 mt-4">You don't have to worry about printing, shipping, inventory and other stuff, we'll handle everything for you.</div>
+          <div
+            class="text-center text-gray-600 mt-4"
+          >You don't have to worry about printing, shipping, inventory and other stuff, we'll handle everything for you.</div>
         </div>
       </div>
     </div>
@@ -118,12 +139,15 @@ import VueTailwindModal from "@/components/VueTailwindModal";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
 import AuthModal from "@/components/Auth/AuthModal";
 import { mapGetters } from "vuex";
+import NoMobileModal from "@/components/NoMobileModal";
+import { isMobile } from "@/helpers";
 
 export default {
   components: {
     VueTailwindModal,
     AvailableProducts,
     AuthModal,
+    NoMobileModal,
   },
   data() {
     return {
@@ -141,6 +165,7 @@ export default {
     }),
   },
   async mounted() {
+    this.$flags.set('single', 'off')
     if (this.$storage.getLocalStorage("current_design_id") && this.isLoggedIn) {
       const design = await this.$store.dispatch(
         "designer/fetchDesignDataAndCommit",
@@ -151,10 +176,14 @@ export default {
   },
   methods: {
     async showAvailableProducts(type) {
+      if (isMobile()) {
+        this.$refs.noMobileModal.show();
+        return;
+      }
       if (!this.isLoggedIn) {
-        this.type = type
+        this.type = type;
         this.$refs.authModal.show();
-        return
+        return;
       }
       if (this.$storage.getLocalStorage("current_design_id")) {
         this.isLoading = true;
@@ -167,6 +196,15 @@ export default {
       }
       this.isLoading = false;
       this.$refs.availableProductsModal.show();
+    },
+    handleLoginSuccess() {
+      if (this.$flags.flagIs("flow", 2)) {
+        this.$refs.authModal.hide();
+        this.isLoading = false;
+        this.showAvailableProducts();
+        return;
+      }
+      this.createNewDesign();
     },
     async createNewDesign() {
       if (!this.isLoggedIn) {

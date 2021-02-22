@@ -1,5 +1,6 @@
 <template>
   <div class="flex flex-grow flex-col">
+    <NoMobileModal ref="noMobileModal" />
     <AuthModal ref="authModal" @login-success="$router.replace('/dashboard')" />
     <div class="flex flex-grow bg-transparent z-10">
       <div class="flex flex-grow">
@@ -36,7 +37,7 @@
               <a
                 href="#"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                @click.prevent="$refs.authModal.show()"
+                @click.prevent="showAuthModal"
                 v-else
               >Get Started</a>
             </div>
@@ -56,7 +57,7 @@
                 <a
                   href="#"
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-                  @click.prevent="$refs.authModal.show()"
+                  @click.prevent="showAuthModal"
                 >Get Started</a>
               </div>
             </div>
@@ -77,6 +78,8 @@
 import { mapGetters } from "vuex";
 import AuthModal from "@/components/Auth/AuthModal";
 import Footer from "@/components/Footer";
+import NoMobileModal from "@/components/NoMobileModal";
+import { isMobile } from "@/helpers";
 
 export default {
   head: {
@@ -85,6 +88,7 @@ export default {
   components: {
     Footer,
     AuthModal,
+    NoMobileModal
   },
   created() {
     const inviteCode = this.$route.query.invite;
@@ -108,6 +112,13 @@ export default {
     },
   },
   methods: {
+    showAuthModal(){
+      if (isMobile()) {
+        this.$refs.noMobileModal.show();
+        return;
+      }
+      this.$refs.authModal.show()
+    },
     async signOut() {
       this.$router.replace("/");
       await this.$store.dispatch("user/signOut");

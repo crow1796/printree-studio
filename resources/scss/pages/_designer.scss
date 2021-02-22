@@ -80,8 +80,7 @@
 
 .bottom-actions {
   width: auto;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 10px;
   bottom: 20px;
 }
 
@@ -101,8 +100,8 @@
 }
 
 .top-actions {
-  left: 50%;
-  transform: translateX(-50%);
+  left: 70px;
+  top: 10px;
 }
 
 .svg-object > svg {
