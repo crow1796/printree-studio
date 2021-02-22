@@ -23,7 +23,7 @@
 
   const _ = require('lodash');
 
-  const stickSize = 8;
+  const stickSize = 18;
   const roStickSize = 20;
   const styleMapping = {
     y: {
@@ -731,7 +731,7 @@
     position: absolute;
     font-size: 1px;
     background: #ffffff;
-    border: 1px solid #6c6c6c;
+    border: 5px solid #6c6c6c;
     box-shadow: 0 0 2px #bbb;
   }
 

@@ -210,6 +210,16 @@
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div>
+                    <a
+                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
+                      title="Open Store"
+                      target="_blank"
+                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+                      v-tippy="{arrow: true}"
+                      v-if="_isSeller(user)"
+                    >
+                      <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    </a>
                     <button
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
@@ -243,6 +253,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import find from "lodash/find";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import SimplePagination from "@/components/SimplePagination";
 
@@ -257,7 +268,7 @@ export default {
   },
   data() {
     return {
-      isLoading: true,
+      shopifyUrl: process.env.shopifyUrl,
       formData: {
         email: null,
         name: null,
@@ -375,6 +386,13 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
+    _isSeller(user) {
+      const { roles } = user;
+      return find(roles, { name: "seller" }) ? true : false;
     },
   },
 };

@@ -772,8 +772,9 @@ export default {
           },
         }
       );
-      this.moveTo(-(this.width / 2), 0);
-      this.panzoomController.pause();
+      this.moveTo(-(this.width / 3), 0);
+      this.zoomTo(-0.4);
+      this.panzoomController.pause ();
 
       this.canvasSection.addEventListener("dblclick", (evt) => {
         this.panzoomController.pause();

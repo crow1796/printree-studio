@@ -250,14 +250,14 @@
                         <th class="w-2/12 text-center py-4 border-r border-white">
                           <span>Size</span>
                         </th>
-                        <th class="w-5/12 text-center py-4 border-r border-white">
+                        <th class="w-5/12 text-center py-4 border-r border-white" v-if="meta.plan === 'Sell'">
                           <span>Base Cost</span>
                         </th>
                         <th class="w-5/12 text-center py-4 border-r border-white">
                           <span>{{ meta.plan === "Buy" ? "Quantity" : "If I sell..." }}</span>
                         </th>
                         <th class="w-5/12 text-center py-4">
-                          <span>Total Selling Price</span>
+                          <span>Total price per item</span>
                         </th>
                       </tr>
                     </thead>
@@ -271,7 +271,7 @@
                         <td class="text-center py-4 border-r">
                           <span class="text-center font-semibold">{{size.name}}</span>
                         </td>
-                        <td class="text-center py-4 border-r">
+                        <td class="text-center py-4 border-r" v-if="meta.plan === 'Sell'">
                           <span>PHP {{size.calculatedCost}}</span>
                         </td>
                         <td class="text-center py-4 border-r">
@@ -298,7 +298,7 @@
                       </tr>
                       <tr class="bg-primary border border-top text-white">
                         <td
-                          colspan="3"
+                          :colspan="meta.plan ==='Sell' ? 3 : 2"
                           class="p-4 font-bold text-right"
                         >{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</td>
                         <td colspan="4" class="text-right p-4 font-bold border border-left">

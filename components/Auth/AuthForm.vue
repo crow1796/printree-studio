@@ -16,7 +16,7 @@
       <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-3xl text-primary font-black text-gray-700 mb-4">{{ formTitle }}</div>
-          <div v-if="formType === 'sign_up'">
+          <div v-if="formType === 'sign_up' && !isSingle">
             <label class="font-bold mb-2 block">I want to...</label>
             <div class="flex mb-4 text-sm">
               <button
@@ -111,38 +111,6 @@
                 v-if="errors.has('pass')"
               >{{ errors.first('pass') }}</span>
             </div>
-            <div
-              class="mb-3 w-full mr-4"
-              v-if="formType === 'sign_up' && formData.type === 'seller'"
-              key="inviteCode"
-            >
-              <label for="inviteCode" class="font-bold flex items-center">
-                Invitation Code
-                <span
-                  class="pl-1"
-                  v-tippy="{arrow: true}"
-                  title="If you're interested to sell your designs or create your own merch. Send us an email at: contact@printreestudio.com"
-                >
-                  <font-awesome-icon :icon="['fas', 'question-circle']" />
-                </span>
-              </label>
-              <div class="mt-2">
-                <input
-                  type="text"
-                  name="inviteCode"
-                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                  :class="{ 'border-red-400': errors.has('inviteCode'), 'focus:border-gray-600': !errors.has('inviteCode') }"
-                  placeholder="Invitation Code"
-                  v-model="formData.inviteCode"
-                  data-vv-as="Invitation Code"
-                  v-validate="'required'"
-                />
-              </div>
-              <span
-                class="text-red-700 text-xs pt-1 font-bold inline-block"
-                v-if="errors.has('inviteCode')"
-              >{{ errors.first('inviteCode') }}</span>
-            </div>
             <div class="mb-3 flex-grow mr-3" v-if="formType === 'sign_up'" key="terms">
               <div class="flex items-center">
                 <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
@@ -183,6 +151,7 @@
           >{{ formMessage }}</div>
           <div class="mb-3">
             <button
+              type="submit"
               class="w-full items-center justify-center focus:outline-none outline-none flex flex-grow border px-3 py-2 font-bold rounded text-white border-white bg-primary hover:bg-primary-lighter"
             >{{ formButtonText }}</button>
           </div>
@@ -221,12 +190,13 @@ export default {
     },
     form: {
       type: String,
-      default: "sign_in"
-    }
+      default: "sign_in",
+    },
   },
   data() {
     return {
       formType: this.form,
+      isSingle: this.$flags.flagIs("single", "on"),
       formData: {
         name: null,
         email: null,
@@ -287,7 +257,7 @@ export default {
           name: null,
           email: null,
           password: null,
-          type: "seller",
+          type: this.formData.type || "seller",
           inviteCode: this.formData.inviteCode,
         };
       });
@@ -299,7 +269,7 @@ export default {
       if (response.status) this.$emit("login-success");
     },
     async signIn() {
-      let res = await this.$store.dispatch("user/signIn", this.formData);
+      await this.$store.dispatch("user/signIn", this.formData);
 
       this.$emit("login-success");
     },

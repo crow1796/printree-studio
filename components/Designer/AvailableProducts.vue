@@ -6,7 +6,7 @@
         <template v-for="category in categories" :slot="category.name">
           <div class="flex flex-wrap w-full" :key="category.name">
             <div
-              class="flex w-1/3 p-1"
+              class="flex sm:w-1/3 w-full p-1"
               v-for="product in _productsOf(category.name)"
               :key="product._id"
               @click="toggleProduct(product)"
@@ -82,6 +82,7 @@ export default {
       categories: [],
       tmpProducts: [],
       isLoading: false,
+      isSingle: this.$flags.flagIs("single", "on"),
     };
   },
   computed: {
@@ -104,11 +105,23 @@ export default {
         this.$emit("input", this.tmpProducts);
         return;
       }
-      if(this.tmpProducts.length + this.selectedProducts.length >= 10) {
-        this.$toast.error("Each collection can only have a maximum of 10 products.", {
+      if (this.isSingle && this.tmpProducts.length) {
+        this.$toast.error(
+          "You can only select 1 product.",
+          {
             position: "top",
-          });
+          }
+        );
         return
+      }
+      if (this.tmpProducts.length + this.selectedProducts.length >= 10) {
+        this.$toast.error(
+          "Each collection can only have a maximum of 10 products.",
+          {
+            position: "top",
+          }
+        );
+        return;
       }
       product = JSON.parse(JSON.stringify(product));
       this.tmpProducts.push(product);
@@ -134,12 +147,12 @@ export default {
       return _.find(this.tmpProducts, { _id: product._id });
     },
     _productsOf(category) {
-      if(category === 'all') return this.availableProducts
+      if (category === "all") return this.availableProducts;
 
       return _.filter(
-          this.availableProducts,
-          (prod) => prod.category._id === category
-        );
+        this.availableProducts,
+        (prod) => prod.category._id === category
+      );
     },
   },
 };

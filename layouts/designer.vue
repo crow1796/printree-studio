@@ -1,6 +1,6 @@
 <template>
   <client-only>
-    <div class="flex-grow flex flex-col text-sm">
+    <div class="flex-grow flex flex-col text-sm h-full">
       <AreaLoader v-if="isLoading" fullscreen :text="loadingText" />
       <VueTailwindModal
         ref="saveConfirmationModal"
@@ -65,7 +65,12 @@
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <a href="#" @click.stop="goToDashboard" class="text-blue-400">Go to Dashboard</a>
+          <a
+            href="#"
+            @click.stop="goToDashboard"
+            class="text-blue-400"
+            v-if="!isSingle"
+          >Go to Dashboard</a>
           <div class="w-4"></div>
           <PTButton
             color="primary"
@@ -159,6 +164,7 @@ export default {
       isLoading: true,
       isEditingDesignName: false,
       generatedImages: [],
+      isSingle: this.$flags?.get("single") === "on",
     };
   },
   methods: {

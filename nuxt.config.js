@@ -2,7 +2,7 @@ const webpack = require("webpack");
 
 module.exports = {
   server: {
-    port: process.env.PORT || 3456
+    port: process.env.PORT || 4123
   },
   env: {
     apiUrl: process.env.API_URL,
@@ -49,6 +49,7 @@ module.exports = {
     "~/plugins/external-installs.js",
     "~/plugins/api.js",
     { src: '~plugins/vue-introjs.js', ssr: false  },
+    { src: '~plugins/flags.js', ssr: false  },
   ],
   /*
    ** Nuxt.js modules
@@ -79,8 +80,12 @@ module.exports = {
       },
     ],
     "@nuxtjs/universal-storage",
-    'vue-social-sharing/nuxt'
+    'vue-social-sharing/nuxt',
+    '@nuxtjs/google-analytics'
   ],
+  googleAnalytics: {
+    id: 'G-95953L4HX1'
+  },
   storage: {
     cookie: {
       prefix: "printreestudio:",
@@ -107,6 +112,7 @@ module.exports = {
     redirect: {
       login: '/',
       callback: '/',
+      home: false
     },
     strategies: {
       local: {
