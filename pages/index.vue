@@ -165,7 +165,12 @@ export default {
     }),
   },
   async mounted() {
-    this.$flags.set('single', 'off')
+    this.$ga.page({
+      page: "/",
+      title: "Home page",
+      location: window.location.href,
+    });
+    this.$flags.set("single", "off");
     if (this.$storage.getLocalStorage("current_design_id") && this.isLoggedIn) {
       const design = await this.$store.dispatch(
         "designer/fetchDesignDataAndCommit",
