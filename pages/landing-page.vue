@@ -1,6 +1,6 @@
 <template>
   <div class="mx-auto lp-container">
-    <NoMobileModal ref="noMobileModal"/>
+    <NoMobileModal ref="noMobileModal" />
     <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="availableProductsModal"
@@ -55,7 +55,7 @@
             <button
               type="button"
               class="shadow-xl bg-primary px-8 py-6 font-bold rounded text-white hover:bg-primary-lighter"
-              @click="showAvailableProducts"
+              @click="handleStartClicked"
             >
               START DESIGNING
               <font-awesome-icon class="text-lg" :icon="['fas', 'arrow-circle-right']" />
@@ -73,7 +73,7 @@ import AvailableProducts from "@/components/Designer/AvailableProducts";
 import AuthModal from "@/components/Auth/AuthModal";
 import NoMobileModal from "@/components/NoMobileModal";
 import { mapGetters } from "vuex";
-import { isMobile } from '@/helpers'
+import { isMobile } from "@/helpers";
 
 export default {
   layout: "empty",
@@ -87,7 +87,14 @@ export default {
     VueTailwindModal,
     AvailableProducts,
     AuthModal,
-    NoMobileModal
+    NoMobileModal,
+  },
+  mounted() {
+    this.$ga.page({
+      page: "/landing-page",
+      title: "Landing page",
+      location: window.location.href,
+    });
   },
   data() {
     return {
@@ -104,10 +111,19 @@ export default {
     }),
   },
   methods: {
+    handleStartClicked() {
+      this.$ga.event({
+        eventCategory: "landing-page",
+        eventAction: "click",
+        eventLabel: "Start Designing",
+        eventValue: 1,
+      });
+      this.showAvailableProducts()
+    },
     async showAvailableProducts() {
-      if(isMobile()) {
-        this.$refs.noMobileModal.show()
-        return
+      if (isMobile()) {
+        this.$refs.noMobileModal.show();
+        return;
       }
       if (!this.isLoggedIn) {
         this.$refs.authModal.show();
@@ -117,7 +133,7 @@ export default {
       this.$refs.availableProductsModal.show();
     },
     handleLoginSuccess() {
-      if (this.$flags.flagIs('flow', 2)) {
+      if (this.$flags.flagIs("flow", 2)) {
         this.$refs.authModal.hide();
         this.isLoading = false;
         this.showAvailableProducts();
@@ -140,7 +156,8 @@ export default {
         this.tmpSelectedProducts = [];
         this.$storage.setLocalStorage("current_design_id", design._id);
         this.$router.push("/collection/designer");
-        return;``
+        return;
+        ``;
       }
     },
   },

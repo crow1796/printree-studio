@@ -9,7 +9,7 @@
       <font-awesome-icon :icon="['fas', 'arrow-left']" />
       <span class="ml-1">Back</span>
     </button>
-    <AreaLoader v-if="isLoading" />
+    <AreaLoader v-if="isLoading" fullscreen/>
     <VueTailwindModal
       ref="publishConfirmationModal"
       width="30%"
@@ -666,7 +666,6 @@ export default {
         if (!this.selectedProduct) return;
         this.selectedProductSizes = this.selectedProduct.variants[to].sizes;
 
-        console.log(this.generatedProducts);
         this.generatedProducts[
           _.findIndex(this.generatedProducts, { _id: this.selectedProduct._id })
         ].variants[to].sizes = this.selectedProductSizes;
