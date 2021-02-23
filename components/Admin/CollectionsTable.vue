@@ -117,13 +117,12 @@
                           ></span>
                           <span class="relative uppercase">{{ col.plan }}</span>
                         </span>
-                        <a
-                          href="#"
+                        <nuxt-link
+                          :to="`/admin/collections/${col._id}`"
                           class="text-blue-600 hover:underline"
-                          @click.prevent="previewCollection(col)"
                         >
                           <span>{{ col.name }}</span>
-                        </a>
+                        </nuxt-link>
                       </p>
                     </div>
                   </div>
@@ -137,11 +136,17 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
-                  <div class="text-gray-900 whitespace-no-wrap">
-                    <nuxt-link
-                      :to="`/admin/users/${col.user ? col.user._id : ''}`"
-                      class="text-blue-600 hover:underline"
-                    >{{ col.user ? col.user.shopName : '' }}</nuxt-link>
+                  <div class="text-gray-900 whitespace-no-wrap" v-if="col.user">
+                    <a
+                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(col.user.shopName)}`"
+                      target="_blank"
+                      class="text-blue-500 hover:text-blue-700"
+                      title="Open store in new tab"
+                      v-tippy="{arrow: true}"
+                    >
+                      <span>{{ col.user.shopName }}</span>
+                      <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                    </a>
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
@@ -159,7 +164,17 @@
                   </span>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <div></div>
+                  <div>
+                    <a
+                      :href="col.handle"
+                      target="_blank"
+                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
+                      title="Open in new tab"
+                      v-tippy="{arrow: true}"
+                    >
+                      <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                    </a>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -185,6 +200,7 @@ export default {
   },
   data() {
     return {
+      shopifyUrl: process.env.shopifyUrl,
       isLoading: false,
       generatedImages: [],
       defaultValue: "all",
@@ -201,38 +217,23 @@ export default {
 
       return true;
     },
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
     filter() {
       this.filterValues = [];
       this.filterValues.push(this.defaultValue);
       if (this.filterValues[0] === "all")
-        this.filterValues = ["approved", "declined", "pending", "reviewing", "to pay", "printing process"];
+        this.filterValues = [
+          "approved",
+          "declined",
+          "pending",
+          "reviewing",
+          "to pay",
+          "printing process",
+        ];
 
       this.$emit("filter", this.filterValues);
-    },
-    async previewCollection(collection) {
-      this.isLoading = true;
-      const collectionData = await this.$store.dispatch(
-        "designer/fetchDesignData",
-        collection._id
-      );
-      const res = await this.$store.dispatch(
-        "designer/generatePreview",
-        collectionData
-      );
-
-      if (collection.status === "pending")
-        await this.$store.dispatch("admin/updateCollectionStatus", {
-          _id: collection._id,
-          status: "reviewing",
-        });
-
-      this.isLoading = false;
-      this.generatedImages = res.data;
-      this.collectionMeta = collection;
-      this.$nextTick(() => {
-        if (this.$refs.collectionPreviewDrawer)
-          this.$refs.collectionPreviewDrawer.show();
-      });
     },
   },
   watch: {
