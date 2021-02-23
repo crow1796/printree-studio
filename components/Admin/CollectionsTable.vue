@@ -136,7 +136,7 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
-                  <div class="text-gray-900 whitespace-no-wrap" v-if="col.user">
+                  <div class="text-gray-900 whitespace-no-wrap" v-if="col.user && col.user.shopName">
                     <a
                       :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(col.user.shopName)}`"
                       target="_blank"
