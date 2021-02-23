@@ -55,7 +55,7 @@
         </button>
         <div class="flex justify-between w-full items-center">
           <h2 class="text-2xl mt-4 font-semibold leading-tight">User: {{user._id}}</h2>
-          <TotalProfitCounter :amount="totalEarnings"/>
+          <TotalProfitCounter :amount="totalEarnings" />
         </div>
       </div>
     </div>
@@ -67,7 +67,18 @@
         </div>
         <div class="mr-16">
           <div class="font-bold">Shop Name</div>
-          <div>{{ user.shopName }}</div>
+          <div>
+            <a
+              :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+              target="_blank"
+              class="text-blue-500 hover:text-blue-700"
+              title="Open store in new tab"
+              v-tippy="{arrow: true}"
+            >
+              <span>{{ user.shopName }}</span>
+              <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+            </a>
+          </div>
         </div>
         <div class="mr-16">
           <div class="font-bold">Email Address</div>
@@ -196,12 +207,16 @@ export default {
       this.collectionsQuery
     );
 
-    this.totalEarnings = await this.$store.dispatch('admin/totalEarningsOfUser', id)
+    this.totalEarnings = await this.$store.dispatch(
+      "admin/totalEarningsOfUser",
+      id
+    );
 
     this.isLoading = false;
   },
   data() {
     return {
+      shopifyUrl: process.env.shopifyUrl,
       totalEarnings: 0,
       confirmationAction: null,
       isLoading: true,
@@ -227,18 +242,24 @@ export default {
     goBack() {
       this.$router.back();
     },
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
     formatTimestamp(timestamp) {
       return moment(timestamp).format("MMMM Do YYYY, h:mm:ss a");
     },
     showApprovalConfirmationModal(res) {
-      this.confirmationAction = res
+      this.confirmationAction = res;
       this.$refs.approveConfirmationModal.show();
     },
     async approveUser() {
-      this.isLoading = true
-      this.user = await this.$store.dispatch('admin/approveAccount', this.user._id)
+      this.isLoading = true;
+      this.user = await this.$store.dispatch(
+        "admin/approveAccount",
+        this.user._id
+      );
       this.$refs.approveConfirmationModal.hide();
-      this.isLoading = false
+      this.isLoading = false;
     },
   },
 };
