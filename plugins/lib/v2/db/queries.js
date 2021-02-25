@@ -91,6 +91,7 @@ export default {
         collection(_id: $id){
             _id
             name
+            handle
             plan
             status
             products {

@@ -1,15 +1,26 @@
 <template>
   <div>
-    <button
-      type="button"
-      href="#"
-      @click.prevent="goBack"
-      class="text-xs text-blue-500 hover:text-blue-700"
-    >
-      <font-awesome-icon :icon="['fas', 'arrow-left']" />
-      <span class="ml-1">Back</span>
-    </button>
-    <AreaLoader v-if="isLoading" fullscreen/>
+    <div class="flex justify-between">
+      <button
+        type="button"
+        href="#"
+        @click.prevent="goBack"
+        class="text-xs text-blue-500 hover:text-blue-700"
+      >
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        <span class="ml-1">Back</span>
+      </button>
+      <a
+        v-if="meta.handle"
+        :href="meta.handle"
+        target="_blank"
+        class="text-xs text-blue-500 hover:text-blue-700"
+      >
+        <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+        <span class="ml-1">Open in Store</span>
+      </a>
+    </div>
+    <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="publishConfirmationModal"
       width="30%"
@@ -171,7 +182,10 @@
                         >
                           <span>Base Cost</span>
                         </th>
-                        <th class="w-5/12 text-center py-4 border-r border-white" v-if="meta.plan === 'Buy'">
+                        <th
+                          class="w-5/12 text-center py-4 border-r border-white"
+                          v-if="meta.plan === 'Buy'"
+                        >
                           <span>Quantity</span>
                         </th>
                         <th class="w-5/12 text-center py-4">
@@ -192,7 +206,10 @@
                         <td class="text-center py-4 border-r" v-if="meta.plan === 'Sell'">
                           <span>PHP {{size.calculatedCost}}</span>
                         </td>
-                        <td class="text-center py-4 border-r" v-if="meta.plan === 'Buy'">{{size.quantity}}</td>
+                        <td
+                          class="text-center py-4 border-r"
+                          v-if="meta.plan === 'Buy'"
+                        >{{size.quantity}}</td>
                         <td class="text-right p-4 font-bold">
                           <div class="text-primary">
                             <number
@@ -204,7 +221,10 @@
                           <div class="text-xs font-normal">VAT Included</div>
                         </td>
                       </tr>
-                      <tr class="bg-primary border border-top text-white" v-if="meta.plan === 'Buy'">
+                      <tr
+                        class="bg-primary border border-top text-white"
+                        v-if="meta.plan === 'Buy'"
+                      >
                         <td
                           :colspan="meta.plan ==='Sell' ? 3 : 2"
                           class="p-4 font-bold text-right"
@@ -279,7 +299,7 @@
                 <strong>OTHER PRODUCTS</strong>
               </div>
               <div class="overflow-auto h-full">
-                <div class="flex p-4 flex-wrap">
+                <div class="flex p-4 flex-wrap pr-0">
                   <div
                     class="flex w-6/12 p-1"
                     v-for="product in generatedProducts"
@@ -296,7 +316,7 @@
                       <rect x="0" y="0" rx="0" ry="0" width="175" height="195" />
                     </ContentLoader>
                     <div
-                      class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500"
+                      class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500 relative"
                       :class="{
                         'border-gray-500 shadow-xl':
                           selectedProduct._id === product._id
@@ -305,6 +325,13 @@
                       v-if="product"
                     >
                       <div class="px-2 pt-2">
+                        <div class="absolute right-0 top-0">
+                          <CustomCheckbox
+                            @change="(e) => toggleProductToApprove(product._id, e)"
+                            :true-value="product._id"
+                            :checked="productsToApprove.includes(product._id)"
+                          />
+                        </div>
                         <img
                           :src="_placeholderOfFirstVariantOf(product)"
                           :key="`${drawerId}_${product._id}`"
@@ -330,7 +357,7 @@
             color="primary"
             v-if="['pending', 'declined', 'reviewing', 'approved'].includes(meta.status)"
             @click="confirmAction('approval')"
-          >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }}</PTButton>
+          >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }} ({{ productsToApprove.length }})</PTButton>
         </div>
       </div>
     </div>
@@ -342,6 +369,7 @@ import VueTailwindModal from "@/components/VueTailwindModal";
 import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueNumericInput from "@/components/VueNumericInput";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
+import CustomCheckbox from "@/components/CustomCheckbox";
 import { ContentLoader } from "vue-content-loader";
 
 const SERVICE_FEE = 0.12;
@@ -354,6 +382,7 @@ export default {
     VueTailwindModal,
     VueNumericInput,
     ContentLoader,
+    CustomCheckbox,
   },
   mixins: [UserTypeCheckerMixin],
   async mounted() {
@@ -374,7 +403,7 @@ export default {
         products: [product],
       });
 
-      this.$set(this.generatedProducts, i, _.first(res.data))
+      this.$set(this.generatedProducts, i, _.first(res.data));
 
       if (i === 0) {
         this.loadingText = "";
@@ -390,6 +419,7 @@ export default {
         );
       }
 
+      this.productsToApprove.push(res.data[0]._id);
       this.calculateProfit();
     }, Promise.resolve());
 
@@ -401,6 +431,7 @@ export default {
   },
   data() {
     return {
+      productsToApprove: [],
       meta: {},
       selectedProductSide: null,
       confirmationAction: null,
@@ -421,6 +452,15 @@ export default {
     };
   },
   methods: {
+    toggleProductToApprove(prod) {
+      if (this.productsToApprove.includes(prod)) {
+        const index = this.productsToApprove.indexOf(prod);
+        this.productsToApprove.splice(index, 1);
+        return;
+      }
+
+      this.productsToApprove.push(prod);
+    },
     _totalPriceFor(size) {
       let preTotal = size.calculatedCost;
 
@@ -531,11 +571,17 @@ export default {
 
       await this.setAsMainImage();
 
-      await this.$store.dispatch("admin/updateCollectionStatus", {
-        _id: this.meta._id,
-        status,
-        notes: this.notes,
-      });
+      try {
+        await this.$store.dispatch("admin/updateCollectionStatus", {
+          _id: this.meta._id,
+          status,
+          notes: this.notes,
+          products: this.productsToApprove,
+        });
+        this.meta.status = status;
+      } catch (error) {
+        console.log(error);
+      }
       this.isLoading = false;
       this.$toast.success("Collection status has been updated successfully!", {
         position: "top",
