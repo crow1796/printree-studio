@@ -536,6 +536,7 @@ export default {
         status,
         notes: this.notes,
       });
+      this.meta.status = status
       this.isLoading = false;
       this.$toast.success("Collection status has been updated successfully!", {
         position: "top",
