@@ -1,13 +1,13 @@
 <template>
   <div class="top-actions absolute z-10 flex">
     <div
-      class="flex bg-white ml-2 mt-2 py-2 px-1 rounded border items-center"
+      class="flex bg-white py-1 px-2 rounded border items-center flex-col"
       v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')"
     >
       <v-popover class="flex">
         <button
           type="button"
-          class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
+          class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-6 h-6 font-bold rounded-full text-gray-600 border-grey-lightest hover:border-gray-400 text-xs"
           :style="{ backgroundColor: activeObject.style.color }"
           title="Color"
           v-if="activeObjectCanBeColored"
@@ -24,7 +24,7 @@
                 :class="{ 'border-gray-400': activeObject && activeObject.style.color == color.code, 'border-white': !activeObject || activeObject.style.color != color.code }"
               >
                 <div
-                  class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-200"
+                  class="justify-center items-center flex rounded-full cursor-pointer w-8 h-8 border border-gray-400"
                   :style="{ 'background-color': color.code }"
                 >
                   <font-awesome-icon
@@ -53,7 +53,7 @@
         </div>
         <button
           type="button"
-          class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+          class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
           @click="$emit('action-clicked', {action: 'toggle_font_weight', args: activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold'})"
           title="Bold (Ctrl + B)"
@@ -63,7 +63,7 @@
         </button>
         <button
           type="button"
-          class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+          class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
           @click="$emit('action-clicked', {action: 'toggle_font_style', args: activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic'})"
           title="Italic (Ctrl + I)"
@@ -73,7 +73,7 @@
         </button>
         <button
           type="button"
-          class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+          class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
           @click="$emit('action-clicked', {action: 'toggle_text_decoration', args: 'underline'})"
           title="Underline (Ctrl + U)"
@@ -83,7 +83,7 @@
         </button>
         <button
           type="button"
-          class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+          class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
           :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
           @click="$emit('action-clicked', {action: 'toggle_text_decoration', args: 'line-through'})"
           title="Strikethrough (Ctrl + K)"
@@ -101,11 +101,16 @@
         />
       </div>
     </div>
-    <div class="flex bg-white ml-2 mt-2 py-2 px-1 rounded border" v-if="activeObject">
+    <div
+      class="flex bg-white rounded border"
+      :class="{'flex-col px-2 py-1': !isSingle, 'flex-row px-1 py-2': isSingle}"
+      v-if="activeObject"
+    >
       <button
         type="button"
-        class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        class="justify-center items-center focus:outline-none outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
         title="Align Left"
+        :class="{'mx-1': isSingle, 'my-1': !isSingle}"
         @click="emitLeft(activeObject.bounds.width / 2, 0)"
         v-tippy="{ arrow: true }"
       >
@@ -139,7 +144,8 @@
       </button>
       <button
         type="button"
-        class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        class="justify-center items-center focus:outline-none outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        :class="{'mx-1': isSingle, 'my-1': !isSingle}"
         title="Align Horizontal Center"
         @click="emitLeft((width / 2), (width / 2) - (activeObject.bounds.width / 2))"
         v-tippy="{ arrow: true }"
@@ -166,7 +172,8 @@
       </button>
       <button
         type="button"
-        class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        class="justify-center items-center focus:outline-none outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        :class="{'mx-1': isSingle, 'my-1': !isSingle}"
         title="Align Right"
         @click="emitLeft(((width) - (activeObject.bounds.width / 2)), width - activeObject.bounds.width)"
         v-tippy="{ arrow: true }"
@@ -195,9 +202,11 @@
           />
         </svg>
       </button>
+      <hr class="my-2" />
       <button
         type="button"
-        class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        class="justify-center items-center focus:outline-none outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        :class="{'mx-1': isSingle, 'my-1': !isSingle}"
         title="Align Top"
         @click="emitTop(activeObject.bounds.height / 2, 0)"
         v-tippy="{ arrow: true }"
@@ -224,7 +233,8 @@
       </button>
       <button
         type="button"
-        class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        class="justify-center items-center focus:outline-none outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        :class="{'mx-1': isSingle, 'my-1': !isSingle}"
         title="Align Vertical Center"
         @click="emitTop((height / 2), (height / 2) - (activeObject.bounds.height / 2))"
         v-tippy="{ arrow: true }"
@@ -267,7 +277,8 @@
       </button>
       <button
         type="button"
-        class="justify-center items-center focus:outline-none mx-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        class="justify-center items-center focus:outline-none outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
+        :class="{'mx-1': isSingle, 'my-1': !isSingle}"
         title="Align Bottom"
         @click="emitTop((height) - (activeObject.bounds.height / 2), height - activeObject.bounds.height)"
         v-tippy="{ arrow: true }"
@@ -318,6 +329,11 @@ export default {
   components: {
     vSelect,
     VueNumericInput,
+  },
+  data() {
+    return {
+      isSingle: this.$flags.flagIs("single", "on"),
+    };
   },
   computed: {
     ...mapGetters({

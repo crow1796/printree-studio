@@ -23,6 +23,7 @@ const actions = {
     let res = await this.$auth.loginWith('local', {
       data,
     })
+    if(!res.status) throw res
     return res;
   },
   async sendPasswordRecovery(context, data) {

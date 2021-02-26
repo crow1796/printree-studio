@@ -153,7 +153,10 @@
                 >Email</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >Display Name</th>
+                >Name</th>
+                <th
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+                >Shop Name</th>
                 <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Status</th>
@@ -171,12 +174,24 @@
               </tr>
               <tr v-for="user in users" :key="user._id">
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                  <div class="flex flex-wrap">
+                    <span
+                      class="rounded-full text-xs text-white px-2 mr-1"
+                      :class="{
+                        'bg-primary': role.name !== 'buyer',
+                        'bg-blue-400': role.name === 'buyer',
+                      }"
+                      v-for="(role, i) in user.roles"
+                      :key="role ? `${user._id}_role_${role._id}` : `${user._id}_role_${i}`"
+                    >{{ role ? role.displayName : '' }}</span>
+                  </div>
                   <nuxt-link :to="`/admin/users/${user._id}`" class="text-blue-600 hover:underline">
                     <span>{{ user._id }}</span>
                   </nuxt-link>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{user.email}}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.name }}</td>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.shopName }}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
@@ -195,6 +210,16 @@
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
                   <div>
+                    <a
+                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
+                      title="Open Store"
+                      target="_blank"
+                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+                      v-tippy="{arrow: true}"
+                      v-if="_isSeller(user)"
+                    >
+                      <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    </a>
                     <button
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
@@ -228,6 +253,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import find from "lodash/find";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import SimplePagination from "@/components/SimplePagination";
 
@@ -243,6 +269,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      shopifyUrl: process.env.shopifyUrl,
       formData: {
         email: null,
         name: null,
@@ -305,10 +332,7 @@ export default {
       await this.$store.dispatch("admin/deleteUser", {
         _id: this.selectedUser._id,
       });
-      this.$store.dispatch(
-        "admin/removeUserById",
-        this.selectedUser._id
-      );
+      this.$store.dispatch("admin/removeUserById", this.selectedUser._id);
       this.$toast.success("User has been deleted.", {
         position: "top",
       });
@@ -363,6 +387,13 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
+    _isSeller(user) {
+      const { roles } = user;
+      return find(roles, { name: "seller" }) ? true : false;
     },
   },
 };

@@ -91,10 +91,19 @@ export default {
         collection(_id: $id){
             _id
             name
+            handle
+            shopId
+            handle
             plan
             status
+            user {
+                _id
+                name
+                shopName
+            }
             products {
                 _id
+                shopId
                 meta {
                     name
                     description
@@ -125,6 +134,7 @@ export default {
                         name
                         quantity
                         price
+                        shopId
                     }
                     contents {
                         _id
@@ -241,6 +251,7 @@ export default {
                 _id
                 name
                 email
+                shopName
             }
             products {
                 _id
@@ -262,6 +273,7 @@ export default {
             status
             created_at
             updated_at
+            shopName
             roles {
                 _id
                 name
@@ -585,6 +597,11 @@ export default {
                 imageId
             }
         }
+    }
+  `,
+  totalEarningsOfUser: `
+    query ($id: ID!){
+        totalEarningsOfUser(_id: $id)
     }
   `
 };

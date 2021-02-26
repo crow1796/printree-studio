@@ -55,7 +55,7 @@
         </button>
         <div class="flex justify-between w-full items-center">
           <h2 class="text-2xl mt-4 font-semibold leading-tight">User: {{user._id}}</h2>
-          <TotalProfitCounter />
+          <TotalProfitCounter :amount="totalEarnings" />
         </div>
       </div>
     </div>
@@ -65,15 +65,26 @@
           <div class="font-bold">Name</div>
           <div>{{ user.name }}</div>
         </div>
-        <div class="mr-16">
+        <div class="mr-16" v-if="user.shopName">
           <div class="font-bold">Shop Name</div>
-          <div>{{ user.shopName }}</div>
+          <div>
+            <a
+              :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+              target="_blank"
+              class="text-blue-500 hover:text-blue-700"
+              title="Open store in new tab"
+              v-tippy="{arrow: true}"
+            >
+              <span>{{ user.shopName }}</span>
+              <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+            </a>
+          </div>
         </div>
         <div class="mr-16">
           <div class="font-bold">Email Address</div>
           <div>{{ user.email }}</div>
         </div>
-        <div class="mr-16">
+        <div class="mr-16" v-if="user.portfolioLink">
           <div class="font-bold">Portfolio</div>
           <a
             :href="user.portfolioLink"
@@ -112,7 +123,11 @@
 
     <div class="p-4 rounded border mt-8 box-border">
       <div class="mt-4">
-        <CollectionsTable :collections="collections" />
+        <CollectionsTable
+          :collections="collections"
+          @filter="filterCollection"
+          @reload="_loadItems"
+        />
       </div>
     </div>
     <div class="p-4 rounded border mt-8 box-border">
@@ -187,29 +202,40 @@ export default {
     CollectionsTable,
     VueTailwindModal,
   },
+  created() {
+    if (!this.$route.query.colpage)
+      this.$router.replace(
+        `/admin/users/${this.$route.params.id}/?colpage=1&status=approved,declined,pending,reviewing`
+      );
+  },
   async mounted() {
     const { id } = this.$route.params;
 
     this.user = await this.$store.dispatch("admin/getUserById", id);
-    this.collections = await this.$store.dispatch(
-      "admin/getCollections",
-      this.collectionsQuery
+
+    await this._loadItems();
+
+    this.totalEarnings = await this.$store.dispatch(
+      "admin/totalEarningsOfUser",
+      id
     );
 
     this.isLoading = false;
   },
   data() {
     return {
+      shopifyUrl: process.env.shopifyUrl,
+      totalEarnings: 0,
       confirmationAction: null,
       isLoading: true,
       collections: [],
-      collectionsQuery: {
+      query: {
         userId: this.$route.params.id,
-        plan: "Sell",
-        status: ["approved", "declined", "pending", "reviewing"],
+        plan: ["Buy", "Sell"],
+        status: ["draft", "approved", "declined", "pending", "reviewing", "to pay", "printing process", "completed"],
         sorting: {
           field: "created_at",
-          order: "ASC",
+          order: "DESC",
         },
         pagination: {
           limit: 15,
@@ -224,18 +250,76 @@ export default {
     goBack() {
       this.$router.back();
     },
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
     formatTimestamp(timestamp) {
       return moment(timestamp).format("MMMM Do YYYY, h:mm:ss a");
     },
     showApprovalConfirmationModal(res) {
-      this.confirmationAction = res
+      this.confirmationAction = res;
       this.$refs.approveConfirmationModal.show();
     },
     async approveUser() {
-      this.isLoading = true
-      this.user = await this.$store.dispatch('admin/approveAccount', this.user._id)
+      this.isLoading = true;
+      this.user = await this.$store.dispatch(
+        "admin/approveAccount",
+        this.user._id
+      );
       this.$refs.approveConfirmationModal.hide();
-      this.isLoading = false
+      this.isLoading = false;
+    },
+    async _loadItems() {
+      this.isLoading = true;
+      try {
+        this.collections = await this.$store.dispatch("admin/getCollections", {
+          ...this.query,
+          pagination: {
+            ...this.query.pagination,
+            page: this.query.pagination.page - 1,
+          },
+        });
+        this.isLoading = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async filterCollection(v) {
+      this.query.status = v;
+      this.query.pagination.page = 1;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: `/admin/users/${this.$route.params.id}`,
+        query: {
+          colpage: this.query.pagination.page,
+          status: this.query.status.join(","),
+        },
+      });
+    },
+  },
+  watch: {
+    "$route.query.colpage": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    "$route.query.status": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.status = to.split(",");
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
     },
   },
 };

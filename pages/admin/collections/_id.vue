@@ -1,5 +1,25 @@
 <template>
-  <VueTailwindDrawer ref="drawer" class="text-sm" width="100%">
+  <div>
+    <div class="flex justify-between">
+      <button
+        type="button"
+        href="#"
+        @click.prevent="goBack"
+        class="text-xs text-blue-500 hover:text-blue-700"
+      >
+        <font-awesome-icon :icon="['fas', 'arrow-left']" />
+        <span class="ml-1">Back</span>
+      </button>
+      <a
+        v-if="meta.handle"
+        :href="meta.handle"
+        target="_blank"
+        class="text-xs text-blue-500 hover:text-blue-700"
+      >
+        <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+        <span class="ml-1">Open in Store</span>
+      </a>
+    </div>
     <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="publishConfirmationModal"
@@ -15,8 +35,11 @@
           </div>
         </div>
         <div class="modal-body p-4 text-center">
-          <div>Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
-          <div class="mt-4">
+          <div v-if="confirmationAction !== 'review'">Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
+          <div v-if="confirmationAction === 'review'">
+            Are you sure you want to start reviewing this collection?
+          </div>
+          <div class="mt-4" v-if="confirmationAction !== 'review'">
             <textarea
               name="notes"
               id="notes"
@@ -43,18 +66,25 @@
         </div>
       </div>
     </VueTailwindModal>
-    <div class="flex flex-grow text-gray-600" v-if="selectedProduct">
+    <div v-if="meta.name" class="mt-4 flex justify-between items-center">
+      <span class="font-bold text-body text-xl">
+        <span class="block">{{ meta.name }}</span>
+        <span class="text-xs">
+          Shop ID:
+          <a
+            :href="meta.handle"
+            target="_blank"
+            class="text-blue-500 hover:text-blue-700 font-bold"
+          >{{ meta.shopId }}</a>
+        </span>
+      </span>
+      <nuxt-link
+        :to="`/admin/users/${meta.user._id}`"
+        class="text-blue-500 hover:text-blue-700 font-bold text-xl"
+      >{{ meta.user.shopName || meta.user.name }}</nuxt-link>
+    </div>
+    <div class="flex flex-grow text-gray-600 pb-10" v-if="selectedProduct">
       <div class="flex flex-col flex-grow">
-        <div class="flex flex-grow-0 items-center border-b p-4">
-          <div class="flex flex-grow justify-end">
-            <div
-              class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
-              @click="hide"
-            >
-              <font-awesome-icon :icon="['fas', 'times']" class="text-xs" />
-            </div>
-          </div>
-        </div>
         <div class="flex flex-grow">
           <div class="flex flex-col overflow-auto w-9/12">
             <div class="flex flex-grow p-4">
@@ -117,38 +147,158 @@
                   </div>
                 </div>
               </div>
-              <div class="flex flex-col mt-5 flex-grow ml-4 w-6/12" :key="`${selectedProduct._id}-meta`">
+              <div
+                class="flex flex-col mt-5 flex-grow ml-4 w-6/12"
+                :key="`${selectedProduct._id}-meta`"
+              >
                 <div class="text-4xl">
+                  <div class="text-xs font-bold">Product shop ID: {{selectedProduct.shopId}}</div>
                   <span class="font-bold w-full outline-none">{{selectedProduct.meta.name}}</span>
+
+                  <ContentLoader
+                    :width="476"
+                    :height="50"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="0" rx="0" ry="0" width="476" height="50" />
+                  </ContentLoader>
                 </div>
-                <div class="text-3xl leading-none py-4 flex items-center">
-                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Base Cost</div>
-                    <div>PHP {{ selectedProductBasePrice }} +&nbsp;</div>
-                  </div>
-                  <div class="relative flex flex-col" v-if="meta.plan ==='Sell'">
-                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Profit*</div>
-                    <div class="flex">
+                <div
+                  class="text-3xl leading-none py-4 flex items-start"
+                  v-if="meta.plan ==='Sell' && selectedProduct"
+                >
+                  <div class="relative flex flex-col">
+                    <div class="text-xs text-gray-600 uppercase font-bold mb-1">Profit per item*</div>
+                    <div class="flex items-center">
                       <div>PHP&nbsp;</div>
-                      <div>{{ selectedProductProfit }}</div>&nbsp;=&nbsp;
+                      {{ selectedProductProfit }}
                     </div>
                   </div>
-                  <div class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded">
-                    <div
-                      class="text-xs uppercase font-bold mb-1"
-                    >{{ meta.plan === 'sell' ? 'Total Selling Price' : 'Price' }}</div>
-                    <div>PHP {{ productTotalPrice }}</div>
-                    <div
-                      class="text-xs uppercase font-bold mt-1 text-right"
-                    >VAT Included</div>
-                  </div>
-                  <div
-                    class="text-white bg-primary flex flex-col font-bold px-4 py-2 rounded ml-2"
-                    v-if="meta.plan === 'buy'"
+                  <ContentLoader
+                    :width="476"
+                    :height="56"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
                   >
-                    <div class="text-xs uppercase font-bold mb-1">Pay Only</div>
-                    <div>PHP {{ selectedProductBasePrice }}</div>
-                  </div>
+                    <rect x="0" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="149" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="296" y="0" rx="0" ry="0" width="128" height="56" />
+                  </ContentLoader>
+                </div>
+                <div :class="{'my-4': meta.plan === 'Buy'}">
+                  <table v-if="selectedProduct" class="table-auto w-full border">
+                    <thead class="justify-between">
+                      <tr class="bg-gray-300">
+                        <th
+                          class="w-2/12 text-center py-4 border-r border-white"
+                          v-if="selectedProduct.shopId"
+                        >
+                          <span>Variant shop ID</span>
+                        </th>
+                        <th class="w-2/12 text-center py-4 border-r border-white">
+                          <span>Size</span>
+                        </th>
+                        <th
+                          class="w-5/12 text-center py-4 border-r border-white"
+                          v-if="meta.plan === 'Sell'"
+                        >
+                          <span>Base Cost</span>
+                        </th>
+                        <th
+                          class="w-5/12 text-center py-4 border-r border-white"
+                          v-if="meta.plan === 'Buy'"
+                        >
+                          <span>Quantity</span>
+                        </th>
+                        <th class="w-5/12 text-center py-4">
+                          <span>Total price per item</span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        class="bg-white"
+                        :key="i"
+                        v-for="(size, i) in selectedProduct
+                          .variants[selectedProductVariantKey].sizes"
+                      >
+                        <td class="text-center p-4 border-r" v-if="selectedProduct.shopId">
+                          <span>{{size.shopId}}</span>
+                        </td>
+                        <td class="text-center py-4 border-r">
+                          <span class="text-center font-semibold">{{size.name}}</span>
+                        </td>
+                        <td class="text-center py-4 border-r" v-if="meta.plan === 'Sell'">
+                          <span>PHP {{size.calculatedCost}}</span>
+                        </td>
+                        <td
+                          class="text-center py-4 border-r"
+                          v-if="meta.plan === 'Buy'"
+                        >{{size.quantity}}</td>
+                        <td class="text-right p-4 font-bold">
+                          <div class="text-primary">
+                            <number
+                              :to="(_totalPriceFor(size) || 0)"
+                              :format="(num) => num.formatMoney('₱ ')"
+                              :duration=".4"
+                            />
+                          </div>
+                          <div class="text-xs font-normal">VAT Included</div>
+                        </td>
+                      </tr>
+                      <tr
+                        class="bg-primary border border-top text-white"
+                        v-if="meta.plan === 'Buy'"
+                      >
+                        <td
+                          :colspan="meta.plan ==='Sell' ? 3 : 2"
+                          class="p-4 font-bold text-right"
+                        >{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</td>
+                        <td colspan="4" class="text-right p-4 font-bold border border-left">
+                          <div>
+                            <font-awesome-icon
+                              v-if="isCalculating"
+                              :icon="['fas', 'spinner']"
+                              spin
+                            />
+                            <number
+                              animationPaused
+                              ref="estMinProfit"
+                              :to="estimatedMinProfit"
+                              :format="(num) => num.formatMoney('₱ ')"
+                              :duration=".4"
+                            />
+                            <span class="ml-2" v-if="meta.plan ==='Sell'">
+                              <span v-tippy="{arrow: true}" title="-12% service fee">
+                                <font-awesome-icon
+                                  v-if="estimatedMinProfit"
+                                  :icon="['fas', 'question-circle']"
+                                />
+                              </span>
+                            </span>
+                          </div>
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <ContentLoader
+                    :width="476"
+                    :height="56"
+                    :speed="2"
+                    primaryColor="#f3f3f3"
+                    secondaryColor="#ecebeb"
+                    v-if="!selectedProduct"
+                  >
+                    <rect x="0" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="149" y="0" rx="0" ry="0" width="128" height="56" />
+                    <rect x="296" y="0" rx="0" ry="0" width="128" height="56" />
+                  </ContentLoader>
                 </div>
 
                 <div class="pt-4" v-if="meta.plan ==='Sell'">
@@ -169,62 +319,6 @@
                       class="w-full border rounded p-4 outine-none resize-none h-40"
                     >{{selectedProduct.meta.description}}</div>
                   </div>
-
-                  <div
-                    class="bg-gray-200 rounded p-4 shadow"
-                    :class="{'mt-2': meta.plan === 'Sell'}"
-                    :key="`qands_${drawerId}`"
-                    v-if="meta.plan ==='Buy'"
-                  >
-                    <div
-                      class="font-bold uppercase"
-                    >{{ meta.plan ==='Sell' ? 'Profit Calculator' : 'Quantity' }}</div>
-                    <div class="flex flex-wrap">
-                      <div
-                        class="px-4 py-2 border mr-2 hover:border-gray-600 rounded font-bold mt-4 bg-white"
-                        v-for="(size, i) in selectedProduct
-                          .variants[selectedProductVariantKey].sizes"
-                        :key="i"
-                      >
-                        <div class="flex items-center">
-                          <div class="text-center mr-2">{{ size.name }}:</div>
-                          <div>
-                            <VueNumericInput
-                              align="center"
-                              style="width: 90px"
-                              class="ml-1"
-                              :min="0"
-                              disabled
-                              v-model="size.quantity"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      class="flex justify-between mt-4 font-bold bg-gray-700 rounded text-white p-4"
-                    >
-                      <div>{{ meta.plan ==='Sell' ? 'TOTAL ESTIMATED PROFIT' : 'TOTAL' }}</div>
-                      <div>
-                        <font-awesome-icon v-if="isCalculating" :icon="['fas', 'spinner']" spin />
-                        <number
-                          animationPaused
-                          ref="estMinProfit"
-                          :to="estimatedMinProfit"
-                          :format="(num) => num.formatMoney('₱ ')"
-                          :duration=".4"
-                        />
-                        <span class="ml-2" v-if="meta.plan ==='Sell'">
-                          <span v-tippy="{arrow: true}" title="-12% service fee">
-                            <font-awesome-icon
-                              v-if="estimatedMinProfit"
-                              :icon="['fas', 'question-circle']"
-                            />
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -235,21 +329,39 @@
                 <strong>OTHER PRODUCTS</strong>
               </div>
               <div class="overflow-auto h-full">
-                <div class="flex p-4 flex-wrap">
+                <div class="flex p-4 flex-wrap pr-0">
                   <div
                     class="flex w-6/12 p-1"
                     v-for="product in generatedProducts"
-                    :key="product._id"
+                    :key="product ? product._id : makeId()"
                   >
+                    <ContentLoader
+                      :width="175"
+                      :height="195"
+                      :speed="2"
+                      primaryColor="#f3f3f3"
+                      secondaryColor="#ecebeb"
+                      v-if="!product"
+                    >
+                      <rect x="0" y="0" rx="0" ry="0" width="175" height="195" />
+                    </ContentLoader>
                     <div
-                      class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500"
+                      class="flex flex-col border rounded w-full cursor-pointer hover:border-gray-500 relative"
                       :class="{
                         'border-gray-500 shadow-xl':
                           selectedProduct._id === product._id
                       }"
                       @click="selectProduct(product)"
+                      v-if="product"
                     >
                       <div class="px-2 pt-2">
+                        <div class="absolute right-0 top-0">
+                          <CustomCheckbox
+                            @change="(e) => toggleProductToApprove(product._id, e)"
+                            :true-value="product._id"
+                            :checked="productsToApprove.includes(product._id)"
+                          />
+                        </div>
                         <img
                           :src="_placeholderOfFirstVariantOf(product)"
                           :key="`${drawerId}_${product._id}`"
@@ -264,22 +376,29 @@
           </div>
         </div>
         <div
-          class="flex p-4 items-center border-t"
-          :class="{'justify-end': meta.status === 'declined', 'justify-between': ['pending', 'reviewing'].includes(meta.status)}"
+          class="flex p-4 items-center border-t fixed bottom-0 w-full bg-white left-0"
+          :class="{'justify-end': ['declined', 'approved'].includes(meta.status), 'justify-between': ['pending', 'reviewing'].includes(meta.status)}"
         >
           <PTButton
             @click="confirmAction('decline')"
             v-if="['pending', 'reviewing'].includes(meta.status)"
           >DECLINE</PTButton>
-          <PTButton
-            color="primary"
-            v-if="['pending', 'declined', 'reviewing', 'approved'].includes(meta.status)"
-            @click="confirmAction('approval')"
-          >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }}</PTButton>
+          <div>
+            <PTButton
+              color="primary"
+              @click="confirmAction('review')"
+              v-if="['pending'].includes(meta.status)"
+            >START REVIEW</PTButton>
+            <PTButton
+              color="primary"
+              v-if="['declined', 'reviewing', 'approved'].includes(meta.status)"
+              @click="confirmAction('approval')"
+            >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }} ({{ productsToApprove.length }})</PTButton>
+          </div>
         </div>
       </div>
     </div>
-  </VueTailwindDrawer>
+  </div>
 </template>
 
 <script>
@@ -287,36 +406,71 @@ import VueTailwindModal from "@/components/VueTailwindModal";
 import VueTailwindDrawer from "@/components/VueTailwindDrawer";
 import VueNumericInput from "@/components/VueNumericInput";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
+import CustomCheckbox from "@/components/CustomCheckbox";
+import { ContentLoader } from "vue-content-loader";
 
 const SERVICE_FEE = 0.12;
-const VAT = .12;
+const VAT = 0.12;
 
 export default {
-  props: {
-    products: {
-      required: true,
-    },
-    meta: {
-      required: true,
-    },
-  },
+  layout: "admin_dashboard",
   components: {
     VueTailwindDrawer,
     VueTailwindModal,
     VueNumericInput,
+    ContentLoader,
+    CustomCheckbox,
   },
   mixins: [UserTypeCheckerMixin],
+  async mounted() {
+    const { id } = this.$route.params;
+    this.isLoading = true;
+    const collectionData = await this.$store.dispatch(
+      "designer/fetchDesignData",
+      id
+    );
+
+    this.generatedProducts = _.map(collectionData.products, () => null);
+
+    _.map(collectionData.products, () => null);
+    await collectionData.products.reduce(async (promise, product, i) => {
+      await promise;
+
+      const res = await this.$axios.post("/create-images", {
+        products: [product],
+      });
+
+      this.$set(this.generatedProducts, i, _.first(res.data));
+
+      if (i === 0) {
+        this.loadingText = "";
+        this.isLoading = false;
+
+        this.selectedProductVariantKey = _.first(
+          _.keys(JSON.parse(JSON.stringify(res.data[0])).variants)
+        );
+        this.meta = _.omit(collectionData, ["products"]);
+        this.selectedProduct = res.data[0] || null;
+        this.selectedProductVariantKey = _.first(
+          _.keys(this.selectedProduct.variants)
+        );
+      }
+
+      this.productsToApprove.push(res.data[0]._id);
+      this.calculateProfit();
+    }, Promise.resolve());
+  },
   data() {
     return {
+      productsToApprove: [],
+      meta: {},
       selectedProductSide: null,
       confirmationAction: null,
       drawerId: this.makeId(),
       isLoading: false,
-      generatedProducts: JSON.parse(JSON.stringify(this.products)),
+      generatedProducts: [],
       selectedProduct: null,
-      selectedProductVariantKey: this.products.length
-        ? _.first(_.keys(JSON.parse(JSON.stringify(this.products[0])).variants))
-        : null,
+      selectedProductVariantKey: null,
       selectedSize: null,
       selectedProductProfit: 0,
       selectedProductSizes: [],
@@ -325,10 +479,32 @@ export default {
       selectedProductBasePrice: 0,
       calculatorTimeout: null,
       isCalculating: false,
-      notes: null
+      notes: null,
     };
   },
   methods: {
+    toggleProductToApprove(prod) {
+      if (this.productsToApprove.includes(prod)) {
+        const index = this.productsToApprove.indexOf(prod);
+        this.productsToApprove.splice(index, 1);
+        return;
+      }
+
+      this.productsToApprove.push(prod);
+    },
+    _totalPriceFor(size) {
+      let preTotal = size.calculatedCost;
+
+      if (this.meta.plan === "Sell")
+        preTotal = this.selectedProductProfit + size.calculatedCost;
+
+      const total = preTotal + preTotal * VAT;
+
+      return this.meta.plan === "Sell" ? Math.ceil(total) : total;
+    },
+    goBack() {
+      this.$router.back();
+    },
     _firstFullThumbnailOf(product) {
       return product.variants[this.selectedProductVariantKey].sides[
         this.selectedProductSide
@@ -421,15 +597,23 @@ export default {
       this.$refs.publishConfirmationModal.hide();
       let status = "approved";
       if (this.confirmationAction === "decline") status = "declined";
-      if (this.confirmationAction === "approval" && this.meta.plan === "Buy") status = "to pay";
+      if (this.confirmationAction === "approval" && this.meta.plan === "Buy")
+        status = "to pay";
+      if (this.confirmationAction === "review") status = "reviewing";
 
       await this.setAsMainImage();
 
-      await this.$store.dispatch("admin/updateCollectionStatus", {
-        _id: this.meta._id,
-        status,
-        notes: this.notes
-      });
+      try {
+        await this.$store.dispatch("admin/updateCollectionStatus", {
+          _id: this.meta._id,
+          status,
+          notes: this.notes,
+          products: this.productsToApprove,
+        });
+        this.meta.status = status;
+      } catch (error) {
+        console.log(error);
+      }
       this.isLoading = false;
       this.$toast.success("Collection status has been updated successfully!", {
         position: "top",
@@ -448,18 +632,11 @@ export default {
       let areas = _.keys(variant);
       return _.includes(areas, "front") ? "front" : _.head(areas);
     },
-    show() {
-      this.drawerId = this.makeId();
-      this.$refs.drawer.show();
-      this.calculateProfit();
-    },
-    hide() {
-      this.$refs.drawer.hide();
-    },
     _calculateEstProfit() {
       let totalProfit = 0;
       let printreeNet = 0;
       _.map(this.generatedProducts, (product) => {
+        if (!product) return;
         _.map(product.variants, (variant) => {
           _.map(variant.sizes, (size, k) => {
             let availableSize = _.find(
@@ -506,8 +683,8 @@ export default {
 
       if (this.meta.plan === "Sell")
         total = this.selectedProductBasePrice + this.selectedProductProfit;
-      
-      return this.meta.plan === "Sell" ? Math.ceil(total + (total * VAT)) : total;
+
+      return this.meta.plan === "Sell" ? Math.ceil(total + total * VAT) : total;
     },
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);
@@ -523,18 +700,7 @@ export default {
     },
   },
   watch: {
-    products: {
-      handler(to, from) {
-        this.generatedProducts = [...to];
-        this.selectedProduct = to[0] || null;
-        this.selectedProductVariantKey = this.selectedProduct
-          ? _.first(_.keys(this.selectedProduct.variants))
-          : null;
-      },
-      immediate: true,
-    },
     selectedProduct: {
-      immediate: true,
       handler(to, from) {
         if (!to) return;
         const firstVariantKey = _.first(_.keys(to.variants));
@@ -574,7 +740,6 @@ export default {
       },
     },
     selectedProductVariantKey: {
-      immediate: true,
       handler(to) {
         if (!this.selectedProduct) return;
         this.selectedProductSizes = this.selectedProduct.variants[to].sizes;
@@ -587,7 +752,6 @@ export default {
       },
     },
     selectedProductProfit: {
-      immediate: true,
       handler(to) {
         if (!this.selectedProduct) return;
         const firstVariantKey = _.first(_.keys(this.selectedProduct.variants));

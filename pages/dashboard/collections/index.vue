@@ -9,8 +9,13 @@
       <div class="flex flex-col h-full">
         <div class="modal-heading border-b w-full p-4">
           <div class="flex justify-between w-full items-center">
-            <div class="flex uppercase">
-              <strong>Select Products</strong>
+            <div class="flex uppercase flex-col">
+              <div>
+                <strong>Select Products</strong>
+              </div>
+              <div
+                class="text-xs normal-case text-red-500"
+              >Each {{ userTypeIs('buyer') ? 'order' : 'collection' }} can only have a maximum of 10 products.</div>
             </div>
             <div class="flex text-right">
               <div
@@ -32,9 +37,9 @@
           >{{ tmpSelectedProducts.length || "No" }} Products Selected</a>
           <button
             type="button"
-            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            class="shadow-xl border border-white bg-primary px-8 py-6 font-bold rounded text-white hover:bg-primary-lighter"
             @click="createNewDesign"
-          >CONTINUE</button>
+          >START DESIGNING <font-awesome-icon :icon="['fas', 'arrow-right']" /></button>
         </div>
       </div>
     </VueTailwindModal>
@@ -170,7 +175,7 @@
           type="button"
           class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
           @click="showAvailableProducts"
-        >Create New Collection</button>
+        >Create new collection</button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
         <div class="inline-block min-w-full border-l border-r overflow-hidden">
@@ -195,8 +200,13 @@
                   class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
                 >You have no collection(s).</td>
               </tr>
-              <tr v-for="col in userCollections" :key="col.id">
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+              <tr
+                v-for="col in userCollections"
+                :key="col.id"
+                :class="{
+                'bg-red-100': col.status === 'declined'}"
+              >
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center">
                     <div class="ml-3">
                       <p class="text-gray-900 whitespace-no-wrap">
@@ -225,7 +235,7 @@
                           <span>{{ col.name }}</span>
                         </a>
                         <a
-                          v-if="!['approved', 'reviewing'].includes(col.status)"
+                          v-if="!['approved', 'reviewing', 'to pay', 'printing process'].includes(col.status)"
                           href="#"
                           class="text-xs ml-1 hover:text-gray-800 text-gray-700"
                           @click.prevent="showCollectionRenameModal(col)"
@@ -238,7 +248,7 @@
                     </div>
                   </div>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
                   >
@@ -246,18 +256,18 @@
                       aria-hidden
                       class="absolute inset-0 opacity-50 rounded-full"
                       :class="{
-                        'bg-green-200':['approved'].includes(col.status),
+                        'bg-green-200':['approved', 'completed'].includes(col.status),
                         'bg-blue-200': col.status === 'pending',
-                        'bg-red-200': col.status === 'draft',
+                        'bg-red-300': ['draft', 'declined'].includes(col.status),
                       }"
                     ></span>
                     <span class="relative uppercase">{{ col.status }}</span>
                   </span>
                 </td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
                   <div class="flex items-center justify-center">
                     <button
-                      v-if="!['reviewing'].includes(col.status)"
+                      v-if="!['reviewing'].includes(col.status) && col.plan === 'Sell'"
                       type="button"
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Delete"
@@ -335,6 +345,7 @@ import { TippyComponent } from "vue-tippy";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import first from "lodash/first";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
+import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
 
 export default {
   layout: "user_dashboard",
@@ -343,11 +354,13 @@ export default {
     AvailableProducts,
     tippy: TippyComponent,
   },
+  mixins: [UserTypeCheckerMixin],
   async mounted() {
     await this.$store.dispatch(
       "user_dashboard/getUserCollectionsOf",
       this.user.uid
     );
+    this.$store.commit("designer/SELECTED_PRODUCTS", []);
     this.isLoading = false;
   },
   data() {
@@ -397,7 +410,7 @@ export default {
     },
     async _validateStatusOf(
       collection,
-      statusToCheck = ["approved", "reviewing"]
+      statusToCheck = ["approved", "reviewing", "to pay", "printing process"]
     ) {
       const { status, handle } = await this.$store.dispatch(
         "user_dashboard/collectionStatus",
@@ -424,6 +437,12 @@ export default {
             break;
           case "reviewing":
             message = `Our team is currently reviewing this collection. Please try again later.`;
+            break;
+          case "to pay":
+            message = "Cannot edit collection. Please check your email for the payment process."
+            break;
+          case "printing process":
+            message = "Cannot edit collection. We are now working on your order. You will receive an email/SMS when it's ready for delivery."
             break;
         }
 
@@ -452,10 +471,10 @@ export default {
       this.$router.replace("/collection/designer");
     },
     async editCollection(collection) {
-      this.isLoading = true
+      this.isLoading = true;
       const statusValidation = await this._validateStatusOf(collection);
       if (!statusValidation) {
-        this.isLoading = false
+        this.isLoading = false;
         return;
       }
 

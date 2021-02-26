@@ -104,11 +104,10 @@
                   :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
                   target="_blank"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
-                  active-class="text-primary"
                 >
                   <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
                     <font-awesome-icon :icon="['fas', 'shopping-cart']" />
-                  </span> My Shop <span class="h-6 w-6 fill-current ml-2 flex items-center justify-center" flex items-center justify-center>
+                  </span> My Store <span class="h-6 w-6 fill-current ml-2 flex items-center justify-center" flex items-center justify-center>
                     <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                   </span>
                 </a>
@@ -152,6 +151,7 @@ export default {
   },
   mounted(){
     document.body.style.overflow = 'auto'
+    this.$flags.set('single', 'off')
   },
   methods: {
     async signOut() {

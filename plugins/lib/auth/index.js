@@ -13,13 +13,7 @@ export default {
     try {
       let res = await http.post('/signup', formData)
       if (!res.data.status) throw res
-      response = {
-        status: true,
-        user: this._extractUserdata({
-          ...res.data.user,
-          token: res.data.token
-        })
-      }
+      response = res?.data
     } catch (error) {
       response.status = false
       response.message = error.data.err.message

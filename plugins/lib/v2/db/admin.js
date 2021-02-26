@@ -33,14 +33,15 @@ export const getUsers = async (axios, searchQuery) => {
   return data.data?.users || [];
 }
 
-export const updateCollectionStatus = async (axios, { _id, status, notes }) => {
+export const updateCollectionStatus = async (axios, { _id, status, notes, products }) => {
   const { data } = await axios.post("/gql", {
     query: queries.updateCollectionStatus,
     variables: {
       collection: {
         _id,
         status,
-        notes
+        notes,
+        products
       }
     },
   });
@@ -123,4 +124,15 @@ export const generateVariantImages = async (axios, { _id }) => {
   });
   const { generateVariantImages } = data.data;
   return generateVariantImages;
+}
+
+export const totalEarningsOfUser = async (axios, _id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.totalEarningsOfUser,
+    variables: {
+      id: _id
+    },
+  });
+  const { totalEarningsOfUser } = data.data;
+  return totalEarningsOfUser;
 }

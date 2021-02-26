@@ -1,14 +1,23 @@
 <template>
-  <div class="flex h-full w-full">
+  <div
+    class="flex h-full w-full"
+    v-intro="'Welcome to the studio, this is where you can add designs to the products that you\'ve selected...'"
+    v-intro-disable-interaction="true"
+  >
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="flex flex-grow w-full relative" v-else>
-      <VueTailwindDrawer ref="availableProductsModal" width="70%">
+      <VueTailwindDrawer ref="availableProductsModal" width="70%" :closeOnBackdropClicked="false">
         <AreaLoader v-if="isAvailableProductsLoading" />
         <div class="flex flex-col flex-grow">
           <div class="modal-heading border-b w-full p-4 text-gray-600">
             <div class="flex justify-between w-full items-center">
-              <div class="flex uppercase">
-                <strong>Select Products</strong>
+              <div class="flex uppercase flex-col">
+                <div>
+                  <strong>Select Products</strong>
+                </div>
+                <div
+                  class="text-xs normal-case"
+                >Each collection can only have a maximum of 10 products.</div>
               </div>
               <div class="flex text-right">
                 <div
@@ -69,28 +78,20 @@
         </div>
       </VueTailwindModal>
 
-      <div class="flex w-1/4 border-r flex-grow flex-col">
+      <div class="flex w-1/4 border-r flex-grow flex-col" v-if="!isSingle">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
-            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
+            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 select-none w-auto justify-center items-center flex rounded border-dashed cursor-pointer hover:bg-primary-lighter bg-primary text-white"
             @click="showAvailableProducts"
+            v-if="selectedProducts.length < 10"
+            v-intro="'And if you want to add more products, just click on this button... (Note: You can add the same products multiple times)'"
+            v-intro-step="5"
+            v-intro-disable-interaction="true"
           >
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
             <span class="font-bold">ADD MORE PRODUCTS</span>
           </div>
           <div class="flex flex-wrap flex mt-4 overflow-auto px-4 pb-4">
-            <div class="p-1 w-6/12">
-              <div
-                class="px-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded border-dashed"
-                style="height: 176.8px"
-                @click="showAvailableProducts"
-              >
-                <div class="flex flex-col items-center justify-center">
-                  <font-awesome-icon :icon="['fas', 'plus-circle']" class="text-5xl" />
-                  <span class="font-bold mt-2 block">ADD PRODUCTS</span>
-                </div>
-              </div>
-            </div>
             <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
               <div
                 class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded relative"
@@ -142,7 +143,7 @@
             style="animation-duration: .3s;"
           >{{ autoSavingText }}</div>
         </transition>
-        <RightActions>
+        <RightActions :isExpandable="currentProduct.customizableProduct.customizableVariants.length > 2">
           <div
             class="w-8 h-8 rounded-full cursor-pointer mx-2 my-1 border border-gray-300 flex justify-center items-center relative"
             v-for="(variant, variantIndex) in currentProduct.customizableProduct.customizableVariants"
@@ -206,6 +207,9 @@
         />
 
         <Canvas
+          v-intro="'This is the canvas, this is where you can resize and position your designs...'"
+          v-intro-step="2"
+          v-intro-disable-interaction="true"
           :key="`canvas-${currentProduct._id}-${currentProductIndex}-${currentVariantIndex}-${currentSide}`"
           v-model="currentVariantContent.objects"
           :width="currentVariantContent.bounds.width * 4"
@@ -328,6 +332,13 @@ export default {
     RightActions,
   },
   async mounted() {
+    if (!this.$storage.getLocalStorage("designer_tour")) {
+      const intro = this.$intro();
+      intro.start();
+      intro.onexit(() => {
+        this.$storage.setLocalStorage("designer_tour", "1");
+      });
+    }
     WebFontLoader.load({
       google: {
         families: _.map(this.webfonts, "value"),
@@ -340,6 +351,7 @@ export default {
   },
   data() {
     return {
+      isSingle: this.$flags.flagIs("single", "on"),
       isProductDeleteLoading: false,
       autoSavingTimeout: null,
       autoSaving: false,
@@ -498,6 +510,11 @@ export default {
     },
     async manageProducts() {
       this.isAvailableProductsLoading = true;
+      if (!this.tmpProducts.length) {
+        this.isAvailableProductsLoading = false;
+        this.$refs.availableProductsModal.hide();
+        return;
+      }
       const tmpProducts = _.map(this.tmpProducts, (product) => ({
         customizableProduct: product,
         meta: {
@@ -539,6 +556,7 @@ export default {
       this.$refs.availableProductsModal.hide();
     },
     showAvailableProducts() {
+      if (this.selectedProducts.length >= 10) return;
       this.$refs.availableProductsModal.show();
     },
     hideAvailableProducts() {
@@ -560,6 +578,18 @@ export default {
       }
       let newVariant = await this.$store.dispatch("designer/addVariant", {
         ..._.omit(this.currentVariant, "_id"),
+        sizes: _.map(variant.sizes, (s) => {
+          const existingSize = _.find(this.currentVariant.sizes, {
+            name: s.name,
+          });
+          if (!existingSize)
+            return {
+              name: s.name,
+              price: 0,
+              quantity: 0,
+            };
+          return existingSize;
+        }),
         customizableVariant: variant,
       });
       this.currentProduct.variants.push({ ...newVariant });

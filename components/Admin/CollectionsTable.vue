@@ -1,6 +1,5 @@
 <template>
   <div>
-    <AreaLoader v-if="isLoading" fullscreen />
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
       :products="generatedImages"
@@ -30,6 +29,10 @@
               <option value="declined">Declined</option>
               <option value="pending">Pending</option>
               <option value="reviewing">Reviewing</option>
+              <option value="to pay">To Pay</option>
+              <option value="printing process">Printing Process</option>
+              <option value="completed">Completed</option>
+              <option value="draft">Draft</option>
             </select>
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-700"
@@ -72,6 +75,9 @@
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
                 >Designer</th>
                 <th
+                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
+                >Shop Name</th>
+                <th
                   class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
                 >Status</th>
                 <th
@@ -112,13 +118,12 @@
                           ></span>
                           <span class="relative uppercase">{{ col.plan }}</span>
                         </span>
-                        <a
-                          href="#"
+                        <nuxt-link
+                          :to="`/admin/collections/${col._id}`"
                           class="text-blue-600 hover:underline"
-                          @click.prevent="previewCollection(col)"
                         >
                           <span>{{ col.name }}</span>
-                        </a>
+                        </nuxt-link>
                       </p>
                     </div>
                   </div>
@@ -128,7 +133,21 @@
                     <nuxt-link
                       :to="`/admin/users/${col.user ? col.user._id : ''}`"
                       class="text-blue-600 hover:underline"
-                    >{{ col.user ? col.user.shopName || col.user.name : '' }}</nuxt-link>
+                    >{{ col.user ? col.user.name : '' }}</nuxt-link>
+                  </div>
+                </td>
+                <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
+                  <div class="text-gray-900 whitespace-no-wrap" v-if="col.user && col.user.shopName">
+                    <a
+                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(col.user.shopName)}`"
+                      target="_blank"
+                      class="text-blue-500 hover:text-blue-700"
+                      title="Open store in new tab"
+                      v-tippy="{arrow: true}"
+                    >
+                      <span>{{ col.user.shopName }}</span>
+                      <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                    </a>
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
@@ -137,7 +156,7 @@
                       aria-hidden
                       class="absolute inset-0 rounded-full"
                       :class="{
-                      'bg-green-200': col.status === 'approved',
+                      'bg-green-200': ['approved', 'completed'].includes(col.status),
                       'bg-red-300': col.status === 'declined',
                       'bg-blue-200': col.status === 'pending',
                     }"
@@ -146,7 +165,17 @@
                   </span>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <div></div>
+                  <div>
+                    <a
+                      :href="col.handle"
+                      target="_blank"
+                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
+                      title="Open in new tab"
+                      v-tippy="{arrow: true}"
+                    >
+                      <font-awesome-icon :icon="['fas', 'external-link-alt']" />
+                    </a>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -172,7 +201,7 @@ export default {
   },
   data() {
     return {
-      isLoading: false,
+      shopifyUrl: process.env.shopifyUrl,
       generatedImages: [],
       defaultValue: "all",
       filterValues: [],
@@ -188,38 +217,24 @@ export default {
 
       return true;
     },
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
     filter() {
       this.filterValues = [];
       this.filterValues.push(this.defaultValue);
       if (this.filterValues[0] === "all")
-        this.filterValues = ["approved", "declined", "pending", "reviewing"];
+        this.filterValues = [
+          "approved",
+          "declined",
+          "pending",
+          "reviewing",
+          "to pay",
+          "printing process",
+          "completed",
+        ];
 
       this.$emit("filter", this.filterValues);
-    },
-    async previewCollection(collection) {
-      this.isLoading = true;
-      const collectionData = await this.$store.dispatch(
-        "designer/fetchDesignData",
-        collection._id
-      );
-      const res = await this.$store.dispatch(
-        "designer/generatePreview",
-        collectionData
-      );
-
-      if (collection.status === "pending")
-        await this.$store.dispatch("admin/updateCollectionStatus", {
-          _id: collection._id,
-          status: "reviewing",
-        });
-
-      this.isLoading = false;
-      this.generatedImages = res.data;
-      this.collectionMeta = collection;
-      this.$nextTick(() => {
-        if (this.$refs.collectionPreviewDrawer)
-          this.$refs.collectionPreviewDrawer.show();
-      });
     },
   },
   watch: {

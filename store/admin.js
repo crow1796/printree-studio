@@ -103,12 +103,12 @@ const actions = {
     tmpUsers.splice(_.findIndex(tmpUsers, { _id }), 1)
     context.commit('USERS', tmpUsers)
   },
-  async updateCollectionStatus(context, { _id, status, notes }) {
-    await this.$api.admin.updateCollectionStatus({ _id, status, notes })
-    context.commit('UPDATE_COLLECTION_STATUS', {
-      _id,
-      status
-    })
+  async updateCollectionStatus(context, { _id, status, notes, products }) {
+    await this.$api.admin.updateCollectionStatus({ _id, status, notes, products })
+  },
+  async totalEarningsOfUser(context, id) {
+    const total = await this.$api.admin.totalEarningsOfUser(id)
+    return total
   },
   async getOrders(context, query) {
     const res = await this.$axios.get('/orders')

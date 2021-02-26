@@ -1,5 +1,5 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, setVariantMainThumbnail, variantData } from './user_dashboard';
@@ -31,6 +31,7 @@ export default (axios) => {
       getUserById: (data) => getUserById(axios, data),
       approveAccount: (id) => approveAccount(axios, id),
       deleteUserById: (id) => deleteUserById(axios, id),
+      totalEarningsOfUser: (id) => totalEarningsOfUser(axios, id),
     },
     // marketplace
     marketplace: {

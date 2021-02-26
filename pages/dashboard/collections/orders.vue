@@ -86,6 +86,7 @@
             <div class="flex flex-col items-end">
               <div>{{ (product.price * product.quantity).formatMoney('₱ ') }}</div>
               <div
+                v-if="_profitFrom(product)"
                 class="text-xs font-bold text-primary"
               >My Profit: {{ (_profitFrom(product)).formatMoney('₱ ') }}</div>
             </div>
@@ -122,7 +123,7 @@ export default {
   methods: {
     _profitFrom(product) {
       const size = _.find(product.variant.sizes, { shopId: product.shopId });
-      const price = (size?.price || 0)
+      const price = (size?.approvedPrice || size?.price || 0)
       return (price - (price * VAT)) * product.quantity;
     },
     _sizeNameOfProduct(product) {
