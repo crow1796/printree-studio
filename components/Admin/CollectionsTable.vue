@@ -1,6 +1,5 @@
 <template>
   <div>
-    <AreaLoader v-if="isLoading" fullscreen />
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
       :products="generatedImages"
@@ -32,6 +31,8 @@
               <option value="reviewing">Reviewing</option>
               <option value="to pay">To Pay</option>
               <option value="printing process">Printing Process</option>
+              <option value="completed">Completed</option>
+              <option value="draft">Draft</option>
             </select>
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-700"
@@ -155,7 +156,7 @@
                       aria-hidden
                       class="absolute inset-0 rounded-full"
                       :class="{
-                      'bg-green-200': col.status === 'approved',
+                      'bg-green-200': ['approved', 'completed'].includes(col.status),
                       'bg-red-300': col.status === 'declined',
                       'bg-blue-200': col.status === 'pending',
                     }"
@@ -201,7 +202,6 @@ export default {
   data() {
     return {
       shopifyUrl: process.env.shopifyUrl,
-      isLoading: false,
       generatedImages: [],
       defaultValue: "all",
       filterValues: [],
@@ -231,6 +231,7 @@ export default {
           "reviewing",
           "to pay",
           "printing process",
+          "completed",
         ];
 
       this.$emit("filter", this.filterValues);

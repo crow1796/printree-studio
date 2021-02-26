@@ -35,7 +35,7 @@ export default {
         status: ["approved", "declined", "pending", "reviewing"],
         sorting: {
           field: "created_at",
-          order: "ASC",
+          order: "DESC",
         },
         pagination: {
           limit: 15,
