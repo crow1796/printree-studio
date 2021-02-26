@@ -250,7 +250,10 @@
                         <th class="w-2/12 text-center py-4 border-r border-white">
                           <span>Size</span>
                         </th>
-                        <th class="w-5/12 text-center py-4 border-r border-white" v-if="meta.plan === 'Sell'">
+                        <th
+                          class="w-5/12 text-center py-4 border-r border-white"
+                          v-if="meta.plan === 'Sell'"
+                        >
                           <span>Base Cost</span>
                         </th>
                         <th class="w-5/12 text-center py-4 border-r border-white">
@@ -504,6 +507,7 @@ export default {
   mixins: [UserTypeCheckerMixin],
   data() {
     return {
+      isSingle: this.$flags.flagIs("single", "on"),
       selectedProductSide: "front",
       isLoading: false,
       productErrors: [],
@@ -756,8 +760,9 @@ export default {
           return;
         }
         if (
-          this.currentDesignName === "Untitled Collection" ||
-          !this.currentDesignName
+          (this.currentDesignName === "Untitled Collection" ||
+            !this.currentDesignName) &&
+          !this.isSingle
         )
           return this.showCollectionRenameModal();
         this.$refs.publishConfirmationModal.show();
