@@ -65,7 +65,7 @@
           <div class="font-bold">Name</div>
           <div>{{ user.name }}</div>
         </div>
-        <div class="mr-16">
+        <div class="mr-16" v-if="user.shopName">
           <div class="font-bold">Shop Name</div>
           <div>
             <a
@@ -84,7 +84,7 @@
           <div class="font-bold">Email Address</div>
           <div>{{ user.email }}</div>
         </div>
-        <div class="mr-16">
+        <div class="mr-16" v-if="user.portfolioLink">
           <div class="font-bold">Portfolio</div>
           <a
             :href="user.portfolioLink"
@@ -123,7 +123,11 @@
 
     <div class="p-4 rounded border mt-8 box-border">
       <div class="mt-4">
-        <CollectionsTable :collections="collections" />
+        <CollectionsTable
+          :collections="collections"
+          @filter="filterCollection"
+          @reload="_loadItems"
+        />
       </div>
     </div>
     <div class="p-4 rounded border mt-8 box-border">
@@ -198,14 +202,18 @@ export default {
     CollectionsTable,
     VueTailwindModal,
   },
+  created() {
+    if (!this.$route.query.colpage)
+      this.$router.replace(
+        `/admin/users/${this.$route.params.id}/?colpage=1&status=approved,declined,pending,reviewing`
+      );
+  },
   async mounted() {
     const { id } = this.$route.params;
 
     this.user = await this.$store.dispatch("admin/getUserById", id);
-    this.collections = await this.$store.dispatch(
-      "admin/getCollections",
-      this.collectionsQuery
-    );
+
+    await this._loadItems();
 
     this.totalEarnings = await this.$store.dispatch(
       "admin/totalEarningsOfUser",
@@ -221,13 +229,13 @@ export default {
       confirmationAction: null,
       isLoading: true,
       collections: [],
-      collectionsQuery: {
+      query: {
         userId: this.$route.params.id,
-        plan: "Sell",
-        status: ["approved", "declined", "pending", "reviewing"],
+        plan: ["Buy", "Sell"],
+        status: ["draft", "approved", "declined", "pending", "reviewing", "to pay", "printing process", "completed"],
         sorting: {
           field: "created_at",
-          order: "ASC",
+          order: "DESC",
         },
         pagination: {
           limit: 15,
@@ -260,6 +268,58 @@ export default {
       );
       this.$refs.approveConfirmationModal.hide();
       this.isLoading = false;
+    },
+    async _loadItems() {
+      this.isLoading = true;
+      try {
+        this.collections = await this.$store.dispatch("admin/getCollections", {
+          ...this.query,
+          pagination: {
+            ...this.query.pagination,
+            page: this.query.pagination.page - 1,
+          },
+        });
+        this.isLoading = false;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async filterCollection(v) {
+      this.query.status = v;
+      this.query.pagination.page = 1;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: `/admin/users/${this.$route.params.id}`,
+        query: {
+          colpage: this.query.pagination.page,
+          status: this.query.status.join(","),
+        },
+      });
+    },
+  },
+  watch: {
+    "$route.query.colpage": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    "$route.query.status": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.status = to.split(",");
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
     },
   },
 };

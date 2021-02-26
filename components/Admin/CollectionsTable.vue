@@ -1,6 +1,5 @@
 <template>
   <div>
-    <AreaLoader v-if="isLoading" fullscreen />
     <CollectionPreviewDrawer
       ref="collectionPreviewDrawer"
       :products="generatedImages"
@@ -33,6 +32,7 @@
               <option value="to pay">To Pay</option>
               <option value="printing process">Printing Process</option>
               <option value="completed">Completed</option>
+              <option value="draft">Draft</option>
             </select>
             <div
               class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-700"
@@ -202,7 +202,6 @@ export default {
   data() {
     return {
       shopifyUrl: process.env.shopifyUrl,
-      isLoading: false,
       generatedImages: [],
       defaultValue: "all",
       filterValues: [],

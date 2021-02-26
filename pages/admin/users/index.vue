@@ -1,6 +1,6 @@
 <template>
   <div class="sm:px-8 relative">
-    <!-- <AreaLoader v-if="isLoading" fullscreen /> -->
+    <AreaLoader v-if="isLoading" fullscreen />
 
     <VueTailwindModal
       ref="deleteConfirmationModal"
@@ -268,6 +268,7 @@ export default {
   },
   data() {
     return {
+      isLoading: true,
       shopifyUrl: process.env.shopifyUrl,
       formData: {
         email: null,

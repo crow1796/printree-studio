@@ -92,10 +92,18 @@ export default {
             _id
             name
             handle
+            shopId
+            handle
             plan
             status
+            user {
+                _id
+                name
+                shopName
+            }
             products {
                 _id
+                shopId
                 meta {
                     name
                     description
@@ -126,6 +134,7 @@ export default {
                         name
                         quantity
                         price
+                        shopId
                     }
                     contents {
                         _id

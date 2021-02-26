@@ -35,8 +35,11 @@
           </div>
         </div>
         <div class="modal-body p-4 text-center">
-          <div>Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
-          <div class="mt-4">
+          <div v-if="confirmationAction !== 'review'">Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
+          <div v-if="confirmationAction === 'review'">
+            Are you sure you want to start reviewing this collection?
+          </div>
+          <div class="mt-4" v-if="confirmationAction !== 'review'">
             <textarea
               name="notes"
               id="notes"
@@ -63,6 +66,23 @@
         </div>
       </div>
     </VueTailwindModal>
+    <div v-if="meta.name" class="mt-4 flex justify-between items-center">
+      <span class="font-bold text-body text-xl">
+        <span class="block">{{ meta.name }}</span>
+        <span class="text-xs">
+          Shop ID:
+          <a
+            :href="meta.handle"
+            target="_blank"
+            class="text-blue-500 hover:text-blue-700 font-bold"
+          >{{ meta.shopId }}</a>
+        </span>
+      </span>
+      <nuxt-link
+        :to="`/admin/users/${meta.user._id}`"
+        class="text-blue-500 hover:text-blue-700 font-bold text-xl"
+      >{{ meta.user.shopName || meta.user.name }}</nuxt-link>
+    </div>
     <div class="flex flex-grow text-gray-600 pb-10" v-if="selectedProduct">
       <div class="flex flex-col flex-grow">
         <div class="flex flex-grow">
@@ -132,6 +152,7 @@
                 :key="`${selectedProduct._id}-meta`"
               >
                 <div class="text-4xl">
+                  <div class="text-xs font-bold">Product shop ID: {{selectedProduct.shopId}}</div>
                   <span class="font-bold w-full outline-none">{{selectedProduct.meta.name}}</span>
 
                   <ContentLoader
@@ -170,9 +191,15 @@
                   </ContentLoader>
                 </div>
                 <div :class="{'my-4': meta.plan === 'Buy'}">
-                  <table v-if="selectedProduct" class="table-fixed w-full border">
+                  <table v-if="selectedProduct" class="table-auto w-full border">
                     <thead class="justify-between">
                       <tr class="bg-gray-300">
+                        <th
+                          class="w-2/12 text-center py-4 border-r border-white"
+                          v-if="selectedProduct.shopId"
+                        >
+                          <span>Variant shop ID</span>
+                        </th>
                         <th class="w-2/12 text-center py-4 border-r border-white">
                           <span>Size</span>
                         </th>
@@ -200,6 +227,9 @@
                         v-for="(size, i) in selectedProduct
                           .variants[selectedProductVariantKey].sizes"
                       >
+                        <td class="text-center p-4 border-r" v-if="selectedProduct.shopId">
+                          <span>{{size.shopId}}</span>
+                        </td>
                         <td class="text-center py-4 border-r">
                           <span class="text-center font-semibold">{{size.name}}</span>
                         </td>
@@ -353,11 +383,18 @@
             @click="confirmAction('decline')"
             v-if="['pending', 'reviewing'].includes(meta.status)"
           >DECLINE</PTButton>
-          <PTButton
-            color="primary"
-            v-if="['pending', 'declined', 'reviewing', 'approved'].includes(meta.status)"
-            @click="confirmAction('approval')"
-          >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }} ({{ productsToApprove.length }})</PTButton>
+          <div>
+            <PTButton
+              color="primary"
+              @click="confirmAction('review')"
+              v-if="['pending'].includes(meta.status)"
+            >START REVIEW</PTButton>
+            <PTButton
+              color="primary"
+              v-if="['declined', 'reviewing', 'approved'].includes(meta.status)"
+              @click="confirmAction('approval')"
+            >{{ meta.status === 'approved' ? 'UPDATE' : "PUBLISH" }} ({{ productsToApprove.length }})</PTButton>
+          </div>
         </div>
       </div>
     </div>
@@ -422,12 +459,6 @@ export default {
       this.productsToApprove.push(res.data[0]._id);
       this.calculateProfit();
     }, Promise.resolve());
-
-    if (collectionData.status === "pending")
-      await this.$store.dispatch("admin/updateCollectionStatus", {
-        _id: id,
-        status: "reviewing",
-      });
   },
   data() {
     return {
@@ -568,6 +599,7 @@ export default {
       if (this.confirmationAction === "decline") status = "declined";
       if (this.confirmationAction === "approval" && this.meta.plan === "Buy")
         status = "to pay";
+      if (this.confirmationAction === "review") status = "reviewing";
 
       await this.setAsMainImage();
 
