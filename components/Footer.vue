@@ -10,11 +10,10 @@
                 <nuxt-link to="/">Home</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
-                <a
-                  :href="shopifyUrl"
-                  target="_blank"
-                  class="hover:text-primary-lighter mr-4"
-                >Shop</a>
+                <a :href="shopifyUrl" target="_blank" class="hover:text-primary-lighter mr-4">Shop</a>
+              </li>
+              <li class="hover:text-primary text-grey-darker">
+                <nuxt-link to="/pricing" class="hover:text-primary-lighter mr-4">Plans</nuxt-link>
               </li>
             </ul>
           </div>
@@ -49,7 +48,7 @@ export default {
   data() {
     return {
       shopifyUrl: process.env.shopifyUrl,
-      year: (new Date()).getFullYear()
+      year: new Date().getFullYear(),
     };
   },
 };

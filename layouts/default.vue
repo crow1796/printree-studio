@@ -17,6 +17,12 @@
             </div>
 
             <div class="flex flex-grow hidden sm:flex sm:items-center justify-end">
+              <nuxt-link
+                to="/pricing"
+                class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
+              >
+                <span>Plans</span>
+              </nuxt-link>
               <a
                 :href="shopifyUrl"
                 target="_blank"
@@ -88,7 +94,7 @@ export default {
   components: {
     Footer,
     AuthModal,
-    NoMobileModal
+    NoMobileModal,
   },
   created() {
     const inviteCode = this.$route.query.invite;
@@ -112,12 +118,12 @@ export default {
     },
   },
   methods: {
-    showAuthModal(){
+    showAuthModal() {
       if (isMobile()) {
         this.$refs.noMobileModal.show();
         return;
       }
-      this.$refs.authModal.show()
+      this.$refs.authModal.show();
     },
     async signOut() {
       this.$router.replace("/");
