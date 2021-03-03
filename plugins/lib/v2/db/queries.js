@@ -303,10 +303,18 @@ export default {
                 description
                 tags
             }
+            status
             created_at
             parent_collection {
                 _id
                 name
+                plan
+                handle
+            }
+            variants {
+                contents {
+                    fullThumb
+                }
             }
         }
     }

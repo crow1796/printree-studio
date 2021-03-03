@@ -2,7 +2,7 @@ import { createDesignFor, getCollection, saveCollection, deleteCollection, updat
 import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell } from './marketplace';
-import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, setVariantMainThumbnail, variantData } from './user_dashboard';
+import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
 export default (axios) => {
@@ -38,6 +38,7 @@ export default (axios) => {
       getProductsToSell: (query) => getProductsToSell(axios, query),
     },
     userDashboard: {
+      getUserProductsOf: (query) => getUserProductsOf(axios, query),
       ordersOfCurrentUser: (query) => ordersOfCurrentUser(axios, query),
       totalEarningsOfCurrentUser: () => totalEarningsOfCurrentUser(axios),
       payoutsOfCurrentUser: (query) => payoutsOfCurrentUser(axios, query),

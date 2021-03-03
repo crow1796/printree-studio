@@ -1,5 +1,6 @@
 const state = () => ({
   userCollections: [],
+  userProducts: [],
   userPurchases: [],
   payouts: [],
   totalProfit: 0,
@@ -14,6 +15,9 @@ const mutations = {
   },
   USER_COLLECTIONS(state, userCollections) {
     state.userCollections = userCollections
+  },
+  USER_PRODUCTS(state, userProducts) {
+    state.userProducts = userProducts
   },
   USER_PURCHASES(state, purchases) {
     state.userPurchases = purchases
@@ -67,6 +71,9 @@ const getters = {
   userCollections(state) {
     return state.userCollections
   },
+  userProducts(state) {
+    return state.userProducts
+  },
   userPurchases(state) {
     return state.userPurchases
   },
@@ -90,6 +97,11 @@ const actions = {
     const collections = await this.$api.getUserCollectionsOf(userId)
     context.commit('USER_COLLECTIONS', collections)
     return collections
+  },
+  async getUserProductsOf(context, query) {
+    const products = await this.$api.userDashboard.getUserProductsOf(query)
+    context.commit('USER_PRODUCTS', products)
+    return products
   },
   async collectionStatus(context, collectionId) {
     const collection = await this.$api.userDashboard.collectionStatus(collectionId)

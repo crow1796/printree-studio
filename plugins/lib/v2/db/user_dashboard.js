@@ -111,3 +111,14 @@ export const variantData = async (axios, id) => {
   const variantData = data.data.variantData;
   return variantData;
 }
+
+export const getUserProductsOf = async (axios, searchQuery) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.products,
+    variables: {
+      searchQuery,
+    }
+  });
+  const products = data.data.products;
+  return products;
+}
