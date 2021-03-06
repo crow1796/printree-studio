@@ -97,7 +97,7 @@
     <div class="flex h-full w-full text-gray-600">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4 justify-between">
-          <div class="flex w-2/6 uppercase flex-col" v-if="userTypeIs('seller')">
+          <!-- TODO: Uncomment if ready <div class="flex w-2/6 uppercase flex-col" v-if="userTypeIs('seller')">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
@@ -115,10 +115,10 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
-          </div>
+          </div> -->
           <div
             class="flex h-8 items-center font-bold"
-            :class="{ 'w-3/6': userTypeIs('buyer'), 'w-2/6 justify-center': userTypeIs('seller') }"
+            :class="{ 'w-3/6': userTypeIs('buyer'), 'w-2/6 justify-start': userTypeIs('seller') }"
           >Set Collection Details</div>
           <div
             class="flex justify-end"

@@ -16,7 +16,7 @@
       <div class="form w-full" v-if="!isSignUpSuccess">
         <form @submit.prevent="submitForm">
           <div class="text-3xl text-primary font-black text-gray-700 mb-4">{{ formTitle }}</div>
-          <div v-if="formType === 'sign_up' && !isSingle">
+          <!-- TODO: Uncomment if ready <div v-if="formType === 'sign_up' && !isSingle">
             <label class="font-bold mb-2 block">I want to...</label>
             <div class="flex mb-4 text-sm">
               <button
@@ -28,7 +28,7 @@
                 @click="changeUserType(type)"
               >{{userType(type)}} PRODUCTS</button>
             </div>
-          </div>
+          </div> -->
 
           <div class="flex flex-wrap">
             <div
