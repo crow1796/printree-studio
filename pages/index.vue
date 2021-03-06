@@ -61,13 +61,13 @@
           >
             <span>Sell my designs</span>
           </button>
-          <button
+          <!-- TODO: Uncomment if ready <button
             type="button"
             class="shadow-xl border bg-white border px-10 py-4 text-sm rounded-full font-bold rounded hover:bg-gray-100 sm:mb-0 mb-4 sm:w-auto w-full"
             @click="() => !isLoading ? showAvailableProducts('buyer') : false"
           >
             <span>Customize & Buy</span>
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="flex sm:flex hidden sm:w-6/12">

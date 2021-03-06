@@ -31,9 +31,28 @@
                     <div class="flex py-1 items-center">
                       <font-awesome-icon :icon="['far', 'circle']" />
                       <div class="pl-2 cursor-help">
-                        <span
-                          class="border-b border-dashed hover:border-gray-500"
-                        >{{ product.customizableVariants.length }} Variants</span>
+                        <tippy arrow>
+                          <template v-slot:trigger>
+                            <span
+                              class="border-b border-dashed hover:border-gray-500"
+                            >{{ product.customizableVariants.length }} Variants</span>
+                          </template>
+
+                          <div class="flex">
+                            <div
+                              class="w-5 h-5 rounded-full cursor-pointer mx-1 my-1 border border-gray-300 flex justify-center items-center relative"
+                              v-for="(variant, variantIndex) in product.customizableVariants"
+                              :key="variantIndex"
+                              :style="{ 'background-color': variant.color, }"
+                            />
+                          </div>
+                        </tippy>
+                      </div>
+                    </div>
+                    <div class="flex py-1 items-center" v-if="product.fabricDescription">
+                      <font-awesome-icon :icon="['fas', 'tag']" />
+                      <div class="pl-2">
+                        <span>{{ product.fabricDescription }}</span>
                       </div>
                     </div>
                   </div>
@@ -106,13 +125,10 @@ export default {
         return;
       }
       if (this.isSingle && this.tmpProducts.length) {
-        this.$toast.error(
-          "You can only select 1 product.",
-          {
-            position: "top",
-          }
-        );
-        return
+        this.$toast.error("You can only select 1 product.", {
+          position: "top",
+        });
+        return;
       }
       if (this.tmpProducts.length + this.selectedProducts.length >= 10) {
         this.$toast.error(
