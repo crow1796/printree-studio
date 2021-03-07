@@ -90,7 +90,7 @@
         </div>
         <div
           class="modal-body p-4 text-center"
-        >The collection is already approved. Once you edit this it will undergo again for another review. Do you want to continue?</div>
+        >This item is already approved. Once you edit this it will undergo again for another review. Do you want to continue?</div>
         <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
           <button
             type="button"
@@ -236,7 +236,7 @@
                         <a
                           href="#"
                           class="text-blue-600 hover:underline"
-                          @click.prevent="editCollection(prod.parent_collection, prod)"
+                          @click.prevent="editCollection(prod)"
                         >
                           <span>{{ prod.meta.name }}</span>
                         </a>
@@ -264,7 +264,7 @@
                   <a
                     href="#"
                     class="text-blue-600 hover:underline"
-                    @click.prevent="editCollection(prod.parent_collection)"
+                    @click.prevent="editCollection(prod, 'collection')"
                   >
                     <span class="relative">{{ prod.parent_collection.name }}</span>
                   </a>
@@ -436,42 +436,53 @@ export default {
       this.$router.push("/collection/designer");
     },
     async _validateStatusOf(
-      collection,
+      product,
       statusToCheck = ["approved", "reviewing", "to pay", "printing process"]
     ) {
+      let type = 'product'
+      if(!product.parent_collection) type = 'collection'
+      
+      const statusCheckAction =
+        type === "collection"
+          ? "user_dashboard/collectionStatus"
+          : "user_dashboard/productStatus";
+      const statusCheckCommit =
+        type === "collection"
+          ? "user_dashboard/UPDATE_COLLECTION_STATUS"
+          : "user_dashboard/UPDATE_PRODUCT_STATUS";
+
       const { status, handle } = await this.$store.dispatch(
-        "user_dashboard/collectionStatus",
-        collection._id
+        statusCheckAction,
+        product._id
       );
 
       if (statusToCheck.includes(status)) {
-        this.$store.commit("user_dashboard/UPDATE_COLLECTION_STATUS", {
-          _id: collection._id,
+        this.$store.commit(statusCheckCommit, {
+          _id: product._id,
           newStatus: status,
-          handle,
-        });
-
-        this.$store.commit("user_dashboard/UPDATE_COLLECTION_HANDLE", {
-          _id: collection._id,
-          handle,
+          ...(type === "collection"
+            ? {
+                handle,
+              }
+            : {}),
         });
 
         let message = "";
         switch (status) {
           case "approved":
-            this.selectedProduct = collection;
+            this.selectedProduct = product;
             this.$refs.editConfirmationModal.show();
             break;
           case "reviewing":
-            message = `Our team is currently reviewing this collection. Please try again later.`;
+            message = `Our team is currently reviewing this item. Please try again later.`;
             break;
           case "to pay":
             message =
-              "Cannot edit collection. Please check your email for the payment process.";
+              "Cannot edit item. Please check your email for the payment process.";
             break;
           case "printing process":
             message =
-              "Cannot edit collection. We are now working on your order. You will receive an email/SMS when it's ready for delivery.";
+              "Cannot edit item. We are now working on your order. You will receive an email/SMS when it's ready for delivery.";
             break;
         }
 
@@ -493,21 +504,28 @@ export default {
 
       this._goToCollectionDesigner(this.selectedProduct);
     },
-    _goToCollectionDesigner(collection) {
+    _goToCollectionDesigner(product, type) {
       localStorage.removeItem("_stored_ptree");
-      this.$storage.setLocalStorage("current_design_id", collection._id);
+      this.$storage.setLocalStorage(
+        "current_design_id",
+        product.parent_collection._id
+      );
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
-      this.$router.replace("/collection/designer");
+      
+      let route = `/collection/designer`;
+      if (type === 'product')
+        route = `/collection/designer/?single=on&prod=${product._id}`;
+      this.$router.replace(route);
     },
-    async editCollection(collection, prod) {
+    async editCollection(prod, type = 'product') {
       this.isLoading = true;
-      const statusValidation = await this._validateStatusOf(collection);
+      const statusValidation = await this._validateStatusOf(prod);
       if (!statusValidation) {
         this.isLoading = false;
         return;
       }
 
-      this._goToCollectionDesigner(collection);
+      this._goToCollectionDesigner(prod, type);
     },
     async showDeleteCollectionConfirmation(product) {
       const statusValidation = await this._validateStatusOf(product, [

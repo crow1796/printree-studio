@@ -72,6 +72,18 @@
             <div class="flex">
               <div class="flex -mb-px mr-8">
                 <nuxt-link
+                  to="/dashboard/products"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center">
+                    <font-awesome-icon :icon="['fas', 'tag']" />
+                  </span>
+                  My Products
+                </nuxt-link>
+              </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
                   to="/dashboard/collections"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
@@ -80,18 +92,6 @@
                     <font-awesome-icon :icon="['fas', 'boxes']" />
                   </span>
                   My Collections
-                </nuxt-link>
-              </div>
-              <div class="flex -mb-px mr-8">
-                <nuxt-link
-                  to="/dashboard/products"
-                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
-                  active-class="text-primary"
-                >
-                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center">
-                    <font-awesome-icon :icon="['fas', 'boxes']" />
-                  </span>
-                  My Products
                 </nuxt-link>
               </div>
               <div class="flex -mb-px mr-8" v-if="userTypeIs('seller')">

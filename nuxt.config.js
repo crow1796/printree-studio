@@ -27,6 +27,9 @@ module.exports = {
     ],
     link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
   },
+  router: {
+    middleware: 'flag-registrar'
+  },
   /*
    ** Customize the progress-bar color
    */
@@ -48,8 +51,8 @@ module.exports = {
     "~/plugins/prototypes.js",
     "~/plugins/external-installs.js",
     "~/plugins/api.js",
-    { src: '~plugins/vue-introjs.js', ssr: false  },
-    { src: '~plugins/flags.js', ssr: false  },
+    { src: '~plugins/vue-introjs.js', ssr: false },
+    { src: '~plugins/flags.js', ssr: false },
   ],
   /*
    ** Nuxt.js modules

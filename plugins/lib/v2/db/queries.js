@@ -548,6 +548,14 @@ export default {
         }
     }
   `,
+    productStatus: `
+    query ($id: ID!){
+        productStatus(_id: $id){
+            status
+            handle
+        }
+    }
+  `,
     approveAccount: `
     mutation ($id: ID!){
         approveAccount(_id: $id){

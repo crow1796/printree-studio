@@ -61,6 +61,10 @@ const mutations = {
     const index = _.findIndex(state.userCollections, { _id })
     state.userCollections[index].status = newStatus
   },
+  UPDATE_PRODUCT_STATUS(state, { _id, newStatus }) {
+    const index = _.findIndex(state.userProducts, { _id })
+    state.userProducts[index].status = newStatus
+  },
   UPDATE_COLLECTION_HANDLE(state, { _id, handle }) {
     const index = _.findIndex(state.userCollections, { _id })
     state.userCollections[index].handle = handle
@@ -106,6 +110,10 @@ const actions = {
   async collectionStatus(context, collectionId) {
     const collection = await this.$api.userDashboard.collectionStatus(collectionId)
     return collection
+  },
+  async productStatus(context, productId) {
+    const product = await this.$api.userDashboard.productStatus(productId)
+    return product
   },
   async updateCollectionName(context, { _id, newName }) {
     await this.$api.updateCollectionName({ _id, name: newName });
