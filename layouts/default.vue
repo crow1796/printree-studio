@@ -24,7 +24,7 @@
               >Shop</a>
               <nuxt-link
                 :to="dashboardLink"
-                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 v-if="isLoggedIn && user"
               >
                 <span>
@@ -36,7 +36,7 @@
               </nuxt-link>
               <a
                 href="#"
-                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 @click.prevent="showAuthModal"
                 v-else
               >Get Started</a>

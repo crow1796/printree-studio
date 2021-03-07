@@ -56,14 +56,14 @@
         <div class="flex sm:mt-5 mt-2 sm:justify-start justify-center flex-wrap">
           <button
             type="button"
-            class="shadow-xl border border-white bg-primary px-10 py-4 text-sm rounded-full font-bold rounded text-white hover:bg-primary-lighter sm:mr-4 sm:mb-0 mb-4 sm:w-auto w-full"
+            class="border border-white bg-primary px-10 py-4 text-sm rounded font-bold rounded text-white hover:bg-primary-lighter sm:mr-4 sm:mb-0 mb-4 sm:w-auto w-full"
             @click="() => !isLoading ? showAvailableProducts('seller') : false"
           >
             <span>Sell my designs</span>
           </button>
           <button
             type="button"
-            class="shadow-xl border bg-white border px-10 py-4 text-sm rounded-full font-bold rounded hover:bg-gray-100 sm:mb-0 mb-4 sm:w-auto w-full"
+            class="border bg-white border px-10 py-4 text-sm rounded font-bold rounded hover:bg-gray-100 sm:mb-0 mb-4 sm:w-auto w-full"
             @click="() => !isLoading ? showAvailableProducts('buyer') : false"
           >
             <span>Customize & Buy</span>

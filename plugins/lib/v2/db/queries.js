@@ -312,8 +312,18 @@ export default {
                 handle
             }
             variants {
+                sizes {
+                    name
+                    quantity
+                    calculatedCost
+                    price
+                    approvedPrice
+                    approvedBaseCost
+                    shopId
+                }
                 contents {
                     fullThumb
+                    isMainThumb
                 }
             }
         }

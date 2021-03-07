@@ -1,20 +1,10 @@
 import queries from "./queries";
 
-export const getProductsToSell = async (axios, query) => {
+export const getProductsToSell = async (axios, searchQuery) => {
   const { data } = await axios.post("/gql", {
     query: queries.products,
     variables: {
-      searchQuery: {
-        plan: "Sell",
-        sorting: {
-          field: "created_at",
-          order: "ASC"
-        },
-        pagination: {
-          limit: 15,
-          page: 0
-        }
-      }
+      searchQuery
     },
   });
   const { products } = data.data;

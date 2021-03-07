@@ -106,13 +106,16 @@
     <!-- Display Container (not part of component) END -->
     <!-- Listing START-->
     <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">
-      <AreaLoader v-if="isFeaturedProductLoading"/>
+      <AreaLoader v-if="isFeaturedProductLoading" />
       <div class="flex justify-between lg:px-8 font-bold mb-4">
         <div class="font-black">Featured Products</div>
         <div>
-          <nuxt-link class="text-primary hover:text-primary-lighter flex items-center" to="/marketplace/products">
+          <nuxt-link
+            class="text-primary hover:text-primary-lighter flex items-center"
+            to="/marketplace/products"
+          >
             <span class="mr-2">See all Products</span>
-            <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+            <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </nuxt-link>
         </div>
       </div>
@@ -123,26 +126,39 @@
 </template>
 
 <script>
-import ProductsGrid from '@/components/ProductsGrid'
+import ProductsGrid from "@/components/ProductsGrid";
 
 export default {
-  layout: 'marketplace',
+  layout: "marketplace",
   components: {
-    ProductsGrid
+    ProductsGrid,
   },
-  async mounted(){
-    this.isFeaturedProductLoading = true
-    const res = await this.$store.dispatch('marketplace/getProductsToSell', { is_featured: true })
-    if(res.status){
-      this.featuredProducts = res.data
-    }
-    this.isFeaturedProductLoading = false
+  async mounted() {
+    this.isFeaturedProductLoading = true;
+    const res = await this.$store.dispatch(
+      "marketplace/getProductsToSell",
+      this.query
+    );
+    this.featuredProducts = res;
+    this.isFeaturedProductLoading = false;
   },
-  data(){
+  data() {
     return {
       isFeaturedProductLoading: true,
-      featuredProducts: []
-    }
-  }
-}
+      featuredProducts: [],
+      query: {
+        plan: ["Sell"],
+        status: ["approved"],
+        sorting: {
+          field: "created_at",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 8,
+          page: 0,
+        },
+      },
+    };
+  },
+};
 </script>

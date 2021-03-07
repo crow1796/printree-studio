@@ -36,6 +36,7 @@ if (process.client) {
   const ToggleButton = require('vue-js-toggle-button').default
   const VueNumber = require('vue-number-animation').default
   const SocialSharing = require('vue-social-sharing')
+  const StarRating = require('vue-star-rating')
 
   Vue.component('vue-dropzone', vue2Dropzone)
   Vue.component('drr', drr)
@@ -46,4 +47,5 @@ if (process.client) {
   Vue.use(VueKonva)
   Vue.use(VueProgressiveImage)
   Vue.use(SocialSharing)
+  Vue.component('star-rating', StarRating)
 }
