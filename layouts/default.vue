@@ -17,11 +17,10 @@
             </div>
 
             <div class="flex flex-grow hidden sm:flex sm:items-center justify-end">
-              <a
-                :href="shopifyUrl"
-                target="_blank"
+              <nuxt-link
+                to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Shop</a>
+              >Marketplace</nuxt-link>
               <nuxt-link
                 :to="dashboardLink"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"
@@ -52,7 +51,7 @@
               <nuxt-link
                 to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mb-1"
-              >Shop</nuxt-link>
+              >Marketplace</nuxt-link>
               <div class="flex justify-between items-center border-t-2 pt-2">
                 <a
                   href="#"

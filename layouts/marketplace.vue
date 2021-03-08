@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-grow text-gray-800">
-    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" />
+    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type"/>
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -8,7 +8,11 @@
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
-                  <img src="~/assets/images/logo.png" alt="Printree Studio" class="w-24" />
+                  <img
+                    src="~/assets/images/logo-nav.png"
+                    alt="Printree Studio"
+                    class="w-28 object-fit"
+                  />
                 </nuxt-link>
               </div>
 
@@ -56,11 +60,11 @@
               </div>
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
-              <nuxt-link
-                to="/marketplace/products"
-                class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Products</nuxt-link>
-                
+                <nuxt-link
+                  to="/marketplace/products"
+                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
+                >Products</nuxt-link>
+
                 <nuxt-link
                   to="/dashboard"
                   class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
@@ -117,39 +121,40 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AuthModal from '@/components/Auth/AuthModal'
-import Footer from '@/components/Footer'
-import VueTailwindDropdown from '@/components/VueTailwindDropdown'
+import { mapGetters } from "vuex";
+import AuthModal from "@/components/Auth/AuthModal";
+import Footer from "@/components/Footer";
+import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 
 export default {
   head: {
-    title: 'Printree Studio'
+    title: "Printree Studio",
   },
   components: {
     AuthModal,
     Footer,
-    VueTailwindDropdown
+    VueTailwindDropdown,
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user'
-    })
+      isLoggedIn: "isLoggedIn",
+      user: "user",
+    }),
   },
-  data(){
+  data() {
     return {
-      categories: []
-    }
+      categories: [],
+      type: "customer"
+    };
   },
   methods: {
-    openCart(){
-      if(!this.isLoggedIn){
-        this.$refs.authModal.show()
-        return
+    openCart() {
+      if (!this.isLoggedIn) {
+        this.$refs.authModal.show();
+        return;
       }
-      this.$router.replace('/marketplace/cart')
-    }
-  }
-}
+      this.$router.replace("/marketplace/cart");
+    },
+  },
+};
 </script>

@@ -150,7 +150,7 @@ export default {
         plan: ["Sell"],
         status: ["approved"],
         sorting: {
-          field: "created_at",
+          field: "featuredAt",
           order: "DESC",
         },
         pagination: {
