@@ -44,7 +44,7 @@ export default {
           order: "DESC",
         },
         pagination: {
-          limit: 16,
+          limit: 15,
           page: 0,
         },
       },

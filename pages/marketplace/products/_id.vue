@@ -1,8 +1,8 @@
 <template>
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
     <AreaLoader v-if="isLoading" class="my-2" />
-    <div v-if="product">
-      <div class="flex justify-between items-center">
+    <div v-if="product" :key="product._id">
+      <div class="flex justify-between items-center mb-12">
         <div>
           <BreadCrumbs
             home-link="/marketplace"
@@ -10,34 +10,13 @@
           title: 'Products',
           link: '/marketplace/products'
           }, {
-            title: product.collectionName,
-            link: `/marketplace/collections/${product.collectionId}`
+            title: product.parent_collection.name,
+            link: `/marketplace/collections/${product.parent_collection._id}`
           }, {
-          title: product.name,
+          title: product.meta.name,
           active: true
         }]"
           />
-        </div>
-        <div class="flex items-center">
-          <div class="mr-2 font-bold">
-            Share this product on
-          </div>
-          <social-sharing :url="currentUrl" inline-template>
-            <div>
-              <network network="facebook">
-                <font-awesome-icon
-                  :icon="['fab', 'facebook-f']"
-                  class="cursor-pointer hover:text-primary mx-1"
-                />
-              </network>
-              <network network="twitter">
-                <font-awesome-icon
-                  :icon="['fab', 'twitter']"
-                  class="cursor-pointer hover:text-primary mx-1"
-                />
-              </network>
-            </div>
-          </social-sharing>
         </div>
       </div>
       <div class="flex lg:flex-row sm:flex-col">
@@ -64,40 +43,39 @@
             <div class="text-xs mb-2">
               <span
                 class="bg-primary-lighter rounded px-2 py-1 text-white"
-              >{{ product.collectionName }}</span>
+              >{{ product.parent_collection.name }}</span>
             </div>
-            <h1 class="text-3xl font-bold leading-none">{{ product.name }}</h1>
-            <h2 class="text-xl">{{ product.price.formatMoney('₱ ') }}</h2>
-            <div class="mt-3" v-if="product.description">{{ product.description }}</div>
+            <h1 class="text-3xl font-bold leading-none">{{ product.meta.name }}</h1>
+            <h2 class="text-xl">{{ selectedVariantSizePrice.formatMoney('₱ ') }}</h2>
             <div class="font-bold mt-3">COLOR</div>
             <div class="mt-2 flex">
               <div
                 class="w-10 h-10 rounded flex justify-center items-center cursor-pointer border hover:shadow mr-1"
                 v-for="variant in product.variants"
                 :key="variant.id"
-                :style="{backgroundColor: variant.color}"
+                :style="{backgroundColor: variant.customizableVariant.color}"
                 @click="selectVariant(variant)"
               >
                 <font-awesome-icon
-                  :style="{color: getContrastOf(variant.color)}"
+                  :style="{color: getContrastOf(variant.customizableVariant.color)}"
                   :icon="['fas', 'check']"
-                  v-if="selectedVariant.id === variant.id"
+                  v-if="selectedVariant._id === variant._id"
                 />
               </div>
             </div>
             <div class="font-bold mt-3">SIZE</div>
             <div class="mt-2 flex">
               <div
-                class="w-10 h-10 rounded flex justify-center items-center font-bold text-xs mr-1 border"
+                class="w-10 h-10 rounded flex justify-center items-center font-bold text-xs mr-1 border cursor-pointer hover:border-primary hover:text-primary"
                 v-for="(size, i) in selectedVariant.sizes"
-                :class="{'opacity-50': !size.quantity, 'cursor-pointer hover:border-primary hover:text-primary': size.quantity, 'text-primary border-primary': i === selectedSize}"
+                :class="{'text-primary border-primary': selectedSize === size.name}"
                 :key="i"
-                @click="() => size.quantity ? selectedSize = i : false"
-              >{{i}}</div>
+                @click="() => selectedSize = size.name"
+              >{{size.name}}</div>
             </div>
-            <div
+            <!-- <div
               class="text-xs text-red-600 font-bold mt-2"
-            >Only {{ selectedVariant.sizes[selectedSize].quantity }} stock(s) left!</div>
+            >Only {{ selectedVariant.sizes[selectedSize].quantity }} stock(s) left!</div>-->
             <div class="font-bold mt-3">QUANTITY</div>
             <div class="mt-2 flex">
               <VueNumericInput
@@ -105,13 +83,12 @@
                 style="width: 90px; height: 40px;"
                 :min="1"
                 v-model="quantity"
-                :max="selectedVariant.sizes[selectedSize].quantity"
               />
             </div>
             <div class="mt-3">
               <button
                 type="button"
-                class="border border-white bg-primary px-8 py-4 font-bold rounded text-white hover:bg-primary-lighter w-full"
+                class="border border-white bg-primary px-8 py-4 font-bold rounded text-white hover:bg-primary-lighter w-full sm:w-7/12"
                 @click="addToCart"
               >
                 <span v-if="!isAddingToCart">ADD TO CART</span>
@@ -119,59 +96,90 @@
                   <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin" />
                 </span>
               </button>
+              <button
+                type="button"
+                class="border border mt-2 bg-white px-8 py-4 font-bold rounded text-body hover:bg-gray-200 w-full sm:w-7/12"
+                @click="addToCart"
+              >
+                <span v-if="!isAddingToCart">BUY NOW</span>
+                <span v-if="isAddingToCart">
+                  <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin" />
+                </span>
+              </button>
+            </div>
+            <div>
+              <div class="my-10" v-if="product.meta.description">{{ product.meta.description }}</div>
+              <div v-html="product.customizableProduct.preDescription"></div>
+            </div>
+            <div class="flex items-center mt-8">
+              <div class="mr-2 font-bold">Share this product on</div>
+              <ShareNetwork
+                network="facebook"
+                :url="currentUrl"
+                title="Hey guys! Check out this product"
+                class="cursor-pointer hover:text-primary mx-2"
+              >
+                <font-awesome-icon :icon="['fab', 'facebook-f']" />
+              </ShareNetwork>
+              <ShareNetwork
+                network="twitter"
+                :url="currentUrl"
+                title="Hey guys! Check out this product"
+                class="cursor-pointer hover:text-primary mx-2"
+              >
+                <font-awesome-icon :icon="['fab', 'twitter']" />
+              </ShareNetwork>
             </div>
           </div>
         </div>
       </div>
-      <!-- Other collection products START-->
       <div class="flex flex-col lg:pt-16 sm:pt-6">
         <div class="flex lg:px-8 font-bold">
-          <div class="w-full lg:text-left sm:text-center">OTHER PRODUCTS IN THIS COLLECTION</div>
+          <div class="w-full lg:text-left sm:text-center">YOU MAY ALSO LIKE</div>
         </div>
         <ProductsGrid :products="otherCollectionProducts" />
       </div>
-      <!-- Other collection products END -->
     </div>
   </div>
 </template>
 
 <script>
-import VueNumericInput from '@/components/VueNumericInput'
-import ProductsGrid from '@/components/ProductsGrid'
-import ZoomOnHover from '@/components/ZoomOnHover/index'
-import VueTailwindModal from '@/components/VueTailwindModal'
-import BreadCrumbs from '@/components/BreadCrumbs'
-import ColorRegulator from '~/plugins/color-regulator'
-import { mapGetters } from 'vuex'
+import VueNumericInput from "@/components/VueNumericInput";
+import ProductsGrid from "@/components/ProductsGrid";
+import ZoomOnHover from "@/components/ZoomOnHover/index";
+import VueTailwindModal from "@/components/VueTailwindModal";
+import BreadCrumbs from "@/components/BreadCrumbs";
+import ColorRegulator from "~/plugins/color-regulator";
+import { mapGetters } from "vuex";
+import { priceWithVatCeil } from '@/plugins/price-calculator'
 
 export default {
-  layout: 'marketplace',
+  layout: "marketplace",
   components: {
     ProductsGrid,
     VueNumericInput,
     ZoomOnHover,
     VueTailwindModal,
-    BreadCrumbs
+    BreadCrumbs,
   },
   async mounted() {
-    this.product = await this.$store.dispatch(
-      'marketplace/getProductFromCollection',
-      {
-        collection: this.$route.params.collectionId,
-        product: this.$route.params.id
-      }
-    )
-    this.selectedVariant = _.first(this.product.variants)
-    this.selectedSize = _.first(
-      _.filter(
-        _.keys(this.selectedVariant.sizes),
-        k => this.selectedVariant.sizes[k].quantity
-      )
-    )
-    this.thumbnails = _.map(this.product.variants, 'thumbnails')
-    this.sides = _.keys(this.selectedVariant.thumbnails)
-    this.selectedSide = this.frontOrFirst
-    this.isLoading = false
+    const res = await this.$store.dispatch(
+      "marketplace/getProductsToSell",
+      this.query
+    );
+    if (!res.length) return;
+    this.product = _.first(res);
+    this.selectedVariant = _.first(this.product.variants);
+    this.selectedSize = _.first(this.selectedVariant.sizes).name;
+    this._setDisplayMeta();
+
+    this.otherQuery.collectionId = this.product.parent_collection._id;
+    this.otherCollectionProducts = await this.$store.dispatch(
+      "marketplace/getProductsToSell",
+      this.otherQuery
+    );
+
+    this.isLoading = false;
   },
   data() {
     return {
@@ -185,58 +193,88 @@ export default {
       selectedSide: null,
       otherCollectionProducts: [],
       quantity: 1,
-      selectedColor: '#ffffff',
-      isAddingToCart: false
-    }
+      selectedColor: "#ffffff",
+      isAddingToCart: false,
+      query: {
+        plan: ["Sell"],
+        status: ["approved"],
+        id: this.$route.params.id,
+      },
+      otherQuery: {
+        plan: ["Sell"],
+        status: ["approved"],
+        collectionId: null,
+        id: this.$route.params.id,
+        pagination: {
+          limit: 5,
+          page: 0,
+        },
+      },
+    };
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user'
+      isLoggedIn: "isLoggedIn",
+      user: "user",
     }),
     currentUrl() {
-      return window.location.href
+      return window.location.href;
     },
     frontOrFirst() {
-      return _.includes(this.sides, 'front') ? 'front' : this.sides[0]
-    }
+      return _.includes(this.sides, "front") ? "front" : this.sides[0];
+    },
+    selectedVariantSizePrice() {
+      const size = _.find(this.selectedVariant.sizes, { name: this.selectedSize })
+      const preTotal = size.price + size.calculatedCost
+      return priceWithVatCeil(preTotal);
+    },
   },
   methods: {
+    _setDisplayMeta() {
+      let tmpThumbnails = [];
+      this.sides = _.map(this.selectedVariant.contents, "printableArea.side");
+
+      _.map(this.product.variants, (variant, i) => {
+        if (!tmpThumbnails[i]) tmpThumbnails.push({});
+        _.map(this.selectedVariant.contents, (content) => {
+          tmpThumbnails[i][content.printableArea.side] = content.fullThumb;
+        });
+      });
+
+      this.selectedSide = this.frontOrFirst;
+      this.thumbnails = tmpThumbnails;
+    },
     async addToCart() {
       if (!this.isLoggedIn) {
-        document.getElementById('get-started-btn').click()
-        return
+        document.getElementById("get-started-btn").click();
+        return;
       }
-      if (this.isAddingToCart) return
-      this.isAddingToCart = true
+      if (this.isAddingToCart) return;
+      this.isAddingToCart = true;
       const item = {
         variant: this.selectedVariant,
         quantity: this.quantity,
-        size: this.selectedSize
-      }
-      await this.$store.dispatch('marketplace/addToCartOf', {
+        size: this.selectedSize,
+      };
+      await this.$store.dispatch("marketplace/addToCartOf", {
         item,
-        user: this.user
-      })
+        user: this.user,
+      });
       this.$toast.success(
-        'This item has been added to your cart successfully.',
+        "This item has been added to your cart successfully.",
         {
-          position: 'bottom'
+          position: "bottom",
         }
-      )
-      this.isAddingToCart = false
+      );
+      this.isAddingToCart = false;
     },
     getContrastOf(color) {
-      return ColorRegulator.getContrastOf(color)
+      return ColorRegulator.getContrastOf(color);
     },
     selectVariant(variant) {
-      this.selectedVariant = variant
-      this.sides = _.keys(variant.thumbnails)
-      this.selectedSize = _.first(
-        _.filter(_.keys(variant.sizes), k => variant.sizes[k].quantity)
-      )
-      this.selectedSide = this.frontOrFirst
-    }
-  }
-}
+      this.selectedVariant = variant;
+      this._setDisplayMeta();
+    },
+  },
+};
 </script>

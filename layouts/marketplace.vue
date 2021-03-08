@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-grow text-gray-800">
-    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type"/>
+    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -65,25 +65,50 @@
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
                 >Products</nuxt-link>
 
-                <nuxt-link
-                  to="/dashboard"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                  v-if="isLoggedIn"
-                >
-                  <span>
-                    <span>{{ user.email }}</span>
-                    <span class="ml-3">
-                      <font-awesome-icon :icon="['fas', 'arrow-right']" />
-                    </span>
-                  </span>
-                </nuxt-link>
+                <VueTailwindDropdown width="200px" v-if="isLoggedIn">
+                  <template v-slot:trigger>
+                    <div
+                      class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
+                    >
+                      <span class="mr-1 font-bold">{{ user.name }}</span>
+                      <div>
+                        <font-awesome-icon :icon="['fas', 'chevron-down']" />
+                      </div>
+                    </div>
+                  </template>
+                  <template v-slot:content>
+                    <div class="flex flex-col flex-grow">
+                      <nuxt-link
+                        to="/marketplace/profile"
+                        class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      >
+                        <span class="mr-2">
+                          <font-awesome-icon :icon="['fas', 'cog']" />
+                        </span>
+                        <span>Profile</span>
+                      </nuxt-link>
+                    </div>
+                    <div class="flex flex-col flex-grow">
+                      <a
+                        href="#"
+                        class="flex items-center hover:bg-gray-200 px-4 py-2"
+                        @click.prevent="signOut"
+                      >
+                        <span class="mr-2">
+                          <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                        </span>
+                        <span>Logout</span>
+                      </a>
+                    </div>
+                  </template>
+                </VueTailwindDropdown>
                 <a
                   href="#"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  class="text-gray-800 text-sm font-semibold border px-4 py-2 hover:text-primary-lighter hover:border-primary-lighter bg-white"
                   id="get-started-btn"
                   @click.prevent="$refs.authModal.show()"
                   v-else
-                >Get Started</a>
+                >Sign In</a>
               </div>
 
               <div class="sm:hidden cursor-pointer">
@@ -144,7 +169,7 @@ export default {
   data() {
     return {
       categories: [],
-      type: "customer"
+      type: "customer",
     };
   },
   methods: {
@@ -154,6 +179,13 @@ export default {
         return;
       }
       this.$router.replace("/marketplace/cart");
+    },
+    async signOut() {
+      if (this.$route.name !== "marketplace")
+        await this.$router.replace("/marketplace");
+      setTimeout(() => {
+        this.$store.dispatch("user/signOut");
+      })
     },
   },
 };

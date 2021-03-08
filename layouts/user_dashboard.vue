@@ -146,7 +146,7 @@ export default {
     title: "Dashboard",
   },
   mixins: [UserTypeCheckerMixin],
-  middleware: ["auth"],
+  middleware: ["authenticated"],
   components: {
     VueTailwindDropdown,
     TotalProfitCounter

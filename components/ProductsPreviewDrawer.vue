@@ -481,9 +481,9 @@ import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 import { ContentLoader } from "vue-content-loader";
+import { priceWithVatCeil, priceWithVat } from '@/plugins/price-calculator'
 
 const SERVICE_FEE = 0.12;
-const VAT = 0.12;
 
 export default {
   props: {
@@ -566,7 +566,7 @@ export default {
       if (this.meta.plan === "Sell")
         total = this.selectedProductBasePrice + this.selectedProductProfit;
 
-      return this.meta.plan === "Sell" ? Math.ceil(total + total * VAT) : total;
+      return this.meta.plan === "Sell" ? priceWithVatCeil(total) : total;
     },
     selectedVariantIndex() {
       if (!this.selectedProduct) return -1;
@@ -591,7 +591,7 @@ export default {
       if (this.meta.plan === "Sell")
         preTotal = this.selectedProductProfit + size.calculatedCost;
 
-      const total = preTotal + preTotal * VAT;
+      const total = priceWithVat(preTotal);
 
       return this.meta.plan === "Sell" ? Math.ceil(total) : total;
     },
@@ -797,7 +797,7 @@ export default {
         totalProfit -
         totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
       this.estimatedMinProfit =
-        this.meta.plan === "Sell" ? minProfit : printreeNet + printreeNet * VAT;
+        this.meta.plan === "Sell" ? minProfit : priceWithVat(printreeNet);
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });

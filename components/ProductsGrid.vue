@@ -11,17 +11,6 @@
         class="flex-grow sm:flex-grow-0 relative overflow-hidden hover:shadow-lg border rounded relative"
       >
         <div class="relative pt-3 px-8 flex items-center justify-center">
-          <div
-            class="absolute w-full h-full left-0 top-0 flex justify-center items-center flex-col z-10 bg-white opacity-0 hover:opacity-100 transition-opacity duration-300 ease-in-out"
-          >
-            <div class="w-full sm:w-10/12">
-              <PTButton
-                color="primary"
-                class="mb-2 w-full"
-                @click.prevent.stop="addToCart"
-              >Add to Cart</PTButton>
-            </div>
-          </div>
           <progressive-img
             class="relative w-40"
             :src="_firstThumbnailOf(product)"
@@ -56,6 +45,7 @@
 import first from "lodash/first";
 import find from "lodash/find";
 import { mapGetters } from "vuex";
+import { priceWithVatCeil } from '@/plugins/price-calculator'
 
 export default {
   props: ["products"],
@@ -76,7 +66,9 @@ export default {
       if (!firstVariant) return 0;
       const firstSize = first(firstVariant.sizes);
       if (!firstSize) return 0;
-      return firstSize.calculatedCost + firstSize.price;
+
+      const preTotal = firstSize.price + firstSize.calculatedCost
+      return priceWithVatCeil(preTotal);
     },
     _firstThumbnailOf(product) {
       const firstVariant = first(product.variants);

@@ -307,6 +307,9 @@ export default {
             }
             status
             created_at
+            customizableProduct {
+                preDescription
+            }
             parent_collection {
                 _id
                 name
@@ -314,6 +317,11 @@ export default {
                 handle
             }
             variants {
+                _id
+                customizableVariant {
+                    _id
+                    color
+                }
                 sizes {
                     name
                     quantity
@@ -326,6 +334,9 @@ export default {
                 contents {
                     fullThumb
                     isMainThumb
+                    printableArea {
+                        side
+                    }
                 }
             }
         }

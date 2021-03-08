@@ -100,8 +100,7 @@
 <script>
 import moment from "moment";
 import { mapGetters } from "vuex";
-
-const VAT = 0.12
+import { VAT } from '@/plugins/price-calculator'
 
 export default {
   layout: "user_dashboard",

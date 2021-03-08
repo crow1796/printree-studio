@@ -84,7 +84,8 @@ module.exports = {
     ],
     "@nuxtjs/universal-storage",
     'vue-social-sharing/nuxt',
-    '@nuxtjs/google-analytics'
+    '@nuxtjs/google-analytics',
+    'vue-social-sharing/nuxt'
   ],
   googleAnalytics: {
     id: 'G-95953L4HX1'
