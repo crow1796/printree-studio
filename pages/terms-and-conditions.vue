@@ -8,7 +8,7 @@
     <div class="my-10">
       <div
         class="mb-6"
-      >By accessing and placing an order with , you confirm that you are in agreement with and bound by the terms of service contained in the Terms & Conditions outlined below. These terms apply to the entire website and any email or other type of communication between you and.</div>
+      >By accessing Printree Studio, you confirm that you are in agreement with and bound by the terms of service contained in the Terms & Conditions outlined below. These terms apply to the entire website and any email or other type of communication between you and.</div>
       <div
         class="mb-6"
       >Under no circumstances shall team be liable for any direct, indirect, special, incidental or consequential damages, including, but not limited to, loss of data or profit, arising out of the use, or the inability to use, the materials on this site, even if team or an authorized representative has been advised of the possibility of such damages. If your use of materials from this site results in the need for servicing, repair or correction of equipment or data, you assume any costs thereof.</div>
@@ -102,6 +102,43 @@
       </ul>
     </div>
 
+    <h2 class="text-3xl font-bold">Copyright Claims</h2>
+
+    <div class="my-10">
+      <div
+        class="mb-6"
+      >Printree Studio does not claim ownership rights in the contents uploaded by the designer in Printree Studio platform. By creating collection in Printree Studio's platform, you constitute and necessitate that you own the works or hold a license of all trademark, copyright, publicity rights and other intellectual property rights in order to create art collections.
+      </div>
+
+      <div
+        class="mb-6"
+      >Fair use: There are times that you will be using someone's copyright or trademarks into your designs. This is considered under "fair use" or a way that qualifies as another permissible use. However, if you created a design covered by "fair use" or another permissible use, we suggest you  should talk to a legal practioner  before using Printree Studio's platform and services.
+      </div>
+      <div
+        class="mb-6"
+      >At the most basic level, you as the designer take full responsibility for the arts/works you upload in Printree Studio's platform.
+      </div>
+    </div>
+
+    <h2 class="text-3xl font-bold">Reports, Complaints and Take down procedure</h2>
+
+    <div class="my-10">
+      <div class="mb-6">
+        In an event in which you believe that your content has been used in such a way that it comprise an infringement of your rights, please notify Printree Studio by sending a Notice of Takedown and must include the following information:
+      </div>
+      <ul class="ml-10 mt-6 mb-6">
+        <li>1. Description of the matter. Please indicate the art that has been infringed and the URL.</li>
+        <li>2. Your address, contact number and email address</li>
+        <li>3. A statement from you that you have good faith belief that the art is not authorized by the owner or the law.</li>
+        <li>4. A statement from you which is made under penalty of mendacity that
+        - the information stated above is accurate
+        - you are permitted on behalf of the owner of the rights implied</li>
+      </ul>
+      <div class="mb-6">
+        You can reach us at contact@printreestudio.com for your complaints
+      </div>
+    </div>
+
     <h2 class="text-3xl font-bold">Return and Refund Policy</h2>
 
     <div class="my-10">
@@ -166,13 +203,15 @@
 
     <div
       class="my-10"
-    >This Agreement shall remain in effect until terminated by you or us. We may, in its sole discretion, at any time and for any or no reason, suspend or terminate this Agreement with or without prior notice. This Agreement will terminate immediately, without prior notice from us, in the event that you fail to comply with any provision of this Agreement. You may also terminate this Agreement by deleting the service and all copies thereof from your computer. Upon termination of this Agreement, you shall cease all use of the service and delete all copies of the service from your computer. Termination of this Agreement will not limit any of our rights or remedies at law or in equity in case of breach by you (during the term of this Agreement) of any of your obligations under the present Agreement.</div>
+    >
+      <div class="mb-6">
+        This Agreement shall remain in effect until terminated by you or us. We may, in its sole discretion, at any time and for any or no reason, suspend or terminate this Agreement with or without prior notice. This Agreement will terminate immediately, without prior notice from us, in the event that you fail to comply with any provision of this Agreement. You may also terminate this Agreement by deleting the service and all copies thereof from your computer. Upon termination of this Agreement, you shall cease all use of the service and delete all copies of the service from your computer. Termination of this Agreement will not limit any of our rights or remedies at law or in equity in case of breach by you (during the term of this Agreement) of any of your obligations under the present Agreement.
+      </div>
 
-    <h2 class="text-3xl font-bold">Term and Termination</h2>
-
-    <div
-      class="my-10"
+      <div
+      class="my-6"
     >If you are a copyright owner or such owner’s agent and believe any material from us constitutes an infringement on your copyright, please contact us setting forth the following information: (a) a physical or electronic signature of the copyright owner or a person authorized to act on his behalf; (b) identification of the material that is claimed to be infringing; (c) your contact information, including your address, telephone number, and an email; (d) a statement by you that you have a good faith belief that use of the material is not authorized by the copyright owners; and (e) the a statement that the information in the notification is accurate, and, under penalty of perjury you are authorized to act on behalf of the owner.</div>
+    </div>
 
     <h2 class="text-3xl font-bold">Indemnification</h2>
 

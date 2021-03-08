@@ -61,7 +61,7 @@
           >
             <span>Sell my designs</span>
           </button>
-          <!-- TODO: Uncomment when ready <button
+          <!-- TODO: Uncomment if ready <button
             type="button"
             class="border bg-white border px-10 py-4 text-sm rounded font-bold rounded hover:bg-gray-100 sm:mb-0 mb-4 sm:w-auto w-full"
             @click="() => !isLoading ? showAvailableProducts('buyer') : false"

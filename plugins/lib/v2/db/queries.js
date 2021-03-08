@@ -18,6 +18,8 @@ export default {
       customizableProducts {
           _id
           name
+          preDescription
+          fabricDescription
           category {
               _id
               name
