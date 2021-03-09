@@ -27,11 +27,16 @@ const actions = {
     const prod = await db.getProductFromCollection(collection, product)
     return prod
   },
-  async addToCartOf(context, {item, user}){
-    await db.addToCartOf(item, user)
+  async addToCart(context, item){
+    const res = await this.$api.marketplace.addToCart(item)
+    return res
   },
-  async getCartOf(context, user){
-    const cart = await db.getCartOf(user)
+  async removeItemFromCart(context, item){
+    const res = await this.$api.marketplace.removeItemFromCart(item)
+    return res
+  },
+  async getCartOfCurrentUser(context){
+    const cart = await this.$api.marketplace.getCartOfCurrentUser()
     return cart
   },
   async getPHAddresses(context, {province, city, barangay}){

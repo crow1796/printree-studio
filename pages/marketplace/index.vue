@@ -119,7 +119,7 @@
           </nuxt-link>
         </div>
       </div>
-      <ProductsGrid :products="featuredProducts" />
+      <ProductsGrid :products="featuredProducts" :grid="4"/>
     </div>
     <!-- Listing END -->
   </div>

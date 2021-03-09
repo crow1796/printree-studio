@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-grow text-gray-800">
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
+    <CartDrawer ref="cartDrawer"/>
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -150,6 +151,7 @@ import { mapGetters } from "vuex";
 import AuthModal from "@/components/Auth/AuthModal";
 import Footer from "@/components/Footer";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
+import CartDrawer from "@/components/marketplace/CartDrawer";
 
 export default {
   head: {
@@ -159,6 +161,7 @@ export default {
     AuthModal,
     Footer,
     VueTailwindDropdown,
+    CartDrawer,
   },
   computed: {
     ...mapGetters({
@@ -178,7 +181,7 @@ export default {
         this.$refs.authModal.show();
         return;
       }
-      this.$router.replace("/marketplace/cart");
+      this.$refs.cartDrawer.show()
     },
     async signOut() {
       if (this.$route.name !== "marketplace")

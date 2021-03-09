@@ -608,7 +608,7 @@ export default {
         }
     }
   `,
-  variantData: `
+    variantData: `
     query ($id: ID!){
         variantData(_id: $id){
             _id
@@ -638,9 +638,62 @@ export default {
         }
     }
   `,
-  totalEarningsOfUser: `
+    totalEarningsOfUser: `
     query ($id: ID!){
         totalEarningsOfUser(_id: $id)
     }
+  `,
+    addToCart: `
+    mutation ($item: AddToCartInput!){
+        addToCart(item: $item){
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                quantity
+                size
+            }
+        }
+    }
+  `,
+    getCartOfCurrentUser: `
+    query {
+        cartOfCurrentUser{
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                productName
+                collectionName
+                price
+                fullThumb
+                quantity
+                size
+            }
+        }
+    }
+  `,
+    removeItemFromCart: `
+        mutation ($id: ID!) {
+            removeItemFromCart(_id: $id) {
+                _id
+                items {
+                    _id
+                    variant {
+                        _id
+                    }
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+        }
   `
 };

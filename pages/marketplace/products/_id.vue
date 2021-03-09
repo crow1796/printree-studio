@@ -34,7 +34,7 @@
               <progressive-img :src="thumb[frontOrFirst]" class="lg:w-24 sm:w-16" />
             </div>
           </div>
-          <div class="flex lg:w-9/12 sm:w-full">
+          <div class="flex lg:w-9/12 items-start sm:w-full">
             <ZoomOnHover :img="thumbnails[selectedThumbnailIndex][selectedSide]" />
           </div>
         </div>
@@ -151,7 +151,7 @@ import VueTailwindModal from "@/components/VueTailwindModal";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import ColorRegulator from "~/plugins/color-regulator";
 import { mapGetters } from "vuex";
-import { priceWithVatCeil } from '@/plugins/price-calculator'
+import { priceWithVatCeil } from "@/plugins/price-calculator";
 
 export default {
   layout: "marketplace",
@@ -224,8 +224,10 @@ export default {
       return _.includes(this.sides, "front") ? "front" : this.sides[0];
     },
     selectedVariantSizePrice() {
-      const size = _.find(this.selectedVariant.sizes, { name: this.selectedSize })
-      const preTotal = size.price + size.calculatedCost
+      const size = _.find(this.selectedVariant.sizes, {
+        name: this.selectedSize,
+      });
+      const preTotal = size.price + size.calculatedCost;
       return priceWithVatCeil(preTotal);
     },
   },
@@ -252,20 +254,22 @@ export default {
       if (this.isAddingToCart) return;
       this.isAddingToCart = true;
       const item = {
-        variant: this.selectedVariant,
+        variant: this.selectedVariant._id,
         quantity: this.quantity,
         size: this.selectedSize,
       };
-      await this.$store.dispatch("marketplace/addToCartOf", {
-        item,
-        user: this.user,
+      await this.$store.dispatch("marketplace/addToCart", item);
+      this.$toast.success("Added to cart successfully.", {
+        position: "bottom",
       });
-      this.$toast.success(
-        "This item has been added to your cart successfully.",
-        {
-          position: "bottom",
-        }
-      );
+
+      // Find parent with authmodal
+      let parent = this.$parent;
+      while (!parent.$refs.cartDrawer) {
+        parent = parent.$parent;
+      }
+      parent.$refs.cartDrawer.show();
+
       this.isAddingToCart = false;
     },
     getContrastOf(color) {

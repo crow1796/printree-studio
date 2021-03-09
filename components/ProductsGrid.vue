@@ -1,7 +1,8 @@
 <template>
   <div class="flex flex-wrap items-center px-6">
     <nuxt-link
-      class="p-2 w-5/5"
+      class="p-2"
+      :class="gridClass"
       v-for="product in products"
       :key="product.id"
       :to="`/marketplace/products/${product._id}`"
@@ -45,29 +46,25 @@
 import first from "lodash/first";
 import find from "lodash/find";
 import { mapGetters } from "vuex";
-import { priceWithVatCeil } from '@/plugins/price-calculator'
+import { priceWithVatCeil } from "@/plugins/price-calculator";
 
 export default {
-  props: ["products"],
-  methods: {
-    addToCart() {
-      if (!this.isLoggedIn) {
-        // Find parent with authmodal
-        let parent = this.$parent;
-        while (!parent.$refs.authModal) {
-          parent = parent.$parent;
-        }
-        parent.$refs.authModal.show();
-        return;
-      }
+  props: {
+    products: {
+      default: () => [],
     },
+    grid: {
+      default: "5",
+    },
+  },
+  methods: {
     _startingPriceOf(product) {
       const firstVariant = first(product.variants);
       if (!firstVariant) return 0;
       const firstSize = first(firstVariant.sizes);
       if (!firstSize) return 0;
 
-      const preTotal = firstSize.price + firstSize.calculatedCost
+      const preTotal = firstSize.price + firstSize.calculatedCost;
       return priceWithVatCeil(preTotal);
     },
     _firstThumbnailOf(product) {
@@ -85,6 +82,19 @@ export default {
       isLoggedIn: "isLoggedIn",
       user: "user",
     }),
+    gridClass(){
+      let cls = 'w-5/5'
+
+      if(this.grid === 4) {
+        cls = 'w-3/12'
+      }
+
+      if(this.grid === 3) {
+        cls = 'w-4/12'
+      }
+      
+      return cls
+    }
   },
 };
 </script>
