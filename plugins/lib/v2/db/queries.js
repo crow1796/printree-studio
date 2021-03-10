@@ -695,5 +695,43 @@ export default {
                 }
             }
         }
+  `,
+    checkout: `
+    mutation ($items: [ID!]) {
+        checkout(items: $items) {
+            _id
+            items {
+                _id
+                productName
+                collectionName
+                price
+                fullThumb
+                quantity
+                size
+            }
+        }
+    }
+  `,
+    getCheckout: `
+    query ($id: ID!) {
+        getCheckout(_id: $id){
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                productName
+                collectionName
+                price
+                fullThumb
+                quantity
+                size
+            }
+        }
+    }
+  `,
+  getAddressesOfCurrentUser: `
+    
   `
 };

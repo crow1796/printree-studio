@@ -1,7 +1,7 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
 import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser } from './admin';
 import { getCollectionsOfUserId } from './users';
-import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart } from './marketplace';
+import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, productStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
@@ -39,6 +39,9 @@ export default (axios) => {
       addToCart: (item) => addToCart(axios, item),
       getCartOfCurrentUser: () => getCartOfCurrentUser(axios),
       removeItemFromCart: (id) => removeItemFromCart(axios, id),
+      checkout: (items) => checkout(axios, items),
+      getCheckout: (id) => getCheckout(axios, id),
+      getAddressesOfCurrentUser: () => getAddressesOfCurrentUser(axios),
     },
     userDashboard: {
       getUserProductsOf: (query) => getUserProductsOf(axios, query),

@@ -30,7 +30,8 @@ module.exports = {
         '60': 60,
         '70': 70,
         '100': 100,
-        'topmost': 99999
+        'topmost': 99999,
+        'topmost-2': 999999,
       },
       minHeight: {
         'area-loader': '370px'

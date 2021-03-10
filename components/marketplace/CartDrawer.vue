@@ -1,5 +1,5 @@
 <template>
-  <VueTailwindDrawer ref="drawer" class="cart-drawer" position="right">
+  <VueTailwindDrawer ref="drawer" class="cart-drawer" position="right" :closeOnBackdropClicked="!isLoading">
     <div class="relative h-full">
       <AreaLoader v-if="isLoading" />
 
@@ -10,7 +10,7 @@
             <div class="flex text-right">
               <div
                 class="select-none cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
-                @click="$refs.drawer.hide()"
+                @click="hide"
               >
                 <font-awesome-icon :icon="['fas', 'times']" class="text-xs" />
               </div>
@@ -88,7 +88,9 @@
                       style="width: 100%; height: 30px"
                       :min="1"
                       :max="product.max"
-                      v-model="product.quantity"
+                      :value="product.quantity"
+                      :disabled="isUpdatingQty"
+                      @change="(e) => updateQtyOf(product, e)"
                     />
                   </div>
                   <!-- <div class="text-xs mt-1 font-bold" :class="{'text-red-600': product.max <= 10}">
@@ -111,7 +113,7 @@
                 <number :to="subtotal" :format="(num) => num.formatMoney('₱ ')" :duration=".4" />
               </span>
             </div>
-            <PTButton color="primary" :disabled="!subtotal" @click="checkout">
+            <PTButton color="primary" :disabled="!subtotal || isUpdatingQty || isCheckingOut" @click="checkout">
               <span class="mr-2">CHECKOUT</span>
               <font-awesome-icon :icon="['fas', 'arrow-right']" />
             </PTButton>
@@ -155,9 +157,23 @@ export default {
       isLoading: true,
       products: [],
       selectedProducts: [],
+      isUpdatingQty: false,
+      isCheckingOut: false
     };
   },
   methods: {
+    async updateQtyOf(item, newQty) {
+      if(this.isUpdatingQty) return
+      this.isUpdatingQty = true;
+      await this.$store.dispatch("marketplace/addToCart", {
+        variant: item.variant._id,
+        quantity: newQty,
+        size: item.size,
+        isUpdatingQty: true
+      });
+      item.quantity = newQty
+      this.isUpdatingQty = false;
+    },
     async show() {
       this.isLoading = true;
       this.$refs.drawer.show();
@@ -166,6 +182,7 @@ export default {
     },
     hide() {
       this.$refs.drawer.hide();
+      document.body.style.overflow = 'auto'
     },
     isSelected(product) {
       return _.filter(
@@ -184,6 +201,7 @@ export default {
       this.isLoading = false;
     },
     async removeProduct(product) {
+      if(this.isUpdatingQty) return
       this.isLoading = true;
       const cart = await this.$store.dispatch(
         "marketplace/removeItemFromCart",
@@ -191,7 +209,7 @@ export default {
       );
       this.isLoading = false;
 
-      if(cart?.items?.length === this.products.length) return
+      if (cart?.items?.length === this.products.length) return;
 
       this.products = _.filter(
         this.products,
@@ -226,12 +244,16 @@ export default {
       }
       this.selectedProducts = [...this.selectedProducts, product];
     },
-    checkout() {
-      this.$storage.setLocalStorage(
-        "products_to_checkout",
-        JSON.stringify(this.selectedProducts)
-      );
-      this.$router.replace("/marketplace/cart/checkout");
+    async checkout() {
+      if(this.isUpdatingQty || this.isCheckingOut) return
+      this.isLoading = true
+      this.isCheckingOut = true
+      const checkout = await this.$store.dispatch('marketplace/checkout', _.map(this.selectedProducts, '_id'))
+
+      this.hide()
+      
+      this.$router.replace(`/marketplace/checkout/${checkout._id}`);
+      this.isCheckingOut = false
     },
   },
 };

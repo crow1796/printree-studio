@@ -40,3 +40,36 @@ export const removeItemFromCart = async (axios, id) => {
   const { removeItemFromCart } = data.data;
   return removeItemFromCart;
 }
+
+export const checkout = async (axios, items) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.checkout,
+    variables: {
+      items
+    }
+  });
+  const { checkout } = data.data;
+  return checkout;
+}
+
+export const getCheckout = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.getCheckout,
+    variables: {
+      id
+    }
+  });
+  const { getCheckout } = data.data;
+  return getCheckout;
+}
+
+export const getAddressesOfCurrentUser = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.getAddressesOfCurrentUser,
+    variables: {
+      id
+    }
+  });
+  const { getAddressesOfCurrentUser } = data.data;
+  return getAddressesOfCurrentUser;
+}

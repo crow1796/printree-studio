@@ -15,13 +15,17 @@ const getters = {
 }
 
 const actions = {
-  async getFeaturedProducts(context, query){
-    const products = await db.getFeaturedProducts(query)
-    return products
-  },
   async getProductsToSell(context, query){
     const products = await this.$api.marketplace.getProductsToSell(query)
     return products
+  },
+  async checkout(context, items){
+    const checkout = await this.$api.marketplace.checkout(items)
+    return checkout
+  },
+  async getCheckout(context, id){
+    const checkout = await this.$api.marketplace.getCheckout(id)
+    return checkout
   },
   async getProductFromCollection(context, {collection, product}){
     const prod = await db.getProductFromCollection(collection, product)
@@ -65,8 +69,8 @@ const actions = {
     const address = await db.saveAddress(data)
     return address
   },
-  async getAddressesOf(context, userId){
-    const addresses = await db.getAddressesOf(userId)
+  async getAddressesOfCurrentUser(context, userId){
+    const addresses = await this.$api.marketplace.getAddressesOfCurrentUser()
     return addresses
   },
   async confirmOrderFor(context, payload){

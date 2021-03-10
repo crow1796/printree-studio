@@ -165,8 +165,8 @@ export default {
       }
       this.selectedProducts = [...this.selectedProducts, product]
     },
-    checkout(){
-      this.$storage.setLocalStorage('products_to_checkout', JSON.stringify(this.selectedProducts))
+    async checkout(){
+      const checkout = this.$store.dispatch('marketplace/checkout')
       this.$router.replace('/marketplace/cart/checkout')
     }
   }

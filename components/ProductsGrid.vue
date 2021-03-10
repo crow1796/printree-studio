@@ -4,7 +4,7 @@
       class="p-2"
       :class="gridClass"
       v-for="product in products"
-      :key="product.id"
+      :key="product._id"
       :to="`/marketplace/products/${product._id}`"
       :title="product.meta.name"
     >

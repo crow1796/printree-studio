@@ -63,8 +63,10 @@
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
                 <nuxt-link
                   to="/marketplace/products"
-                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
+                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
                 >Products</nuxt-link>
+
+                <VueTailwindNotifications/>
 
                 <VueTailwindDropdown width="200px" v-if="isLoggedIn">
                   <template v-slot:trigger>
@@ -80,7 +82,7 @@
                   <template v-slot:content>
                     <div class="flex flex-col flex-grow">
                       <nuxt-link
-                        to="/marketplace/profile"
+                        to="/marketplace/account/profile"
                         class="flex items-center hover:bg-gray-200 px-4 py-2"
                       >
                         <span class="mr-2">
@@ -151,6 +153,7 @@ import { mapGetters } from "vuex";
 import AuthModal from "@/components/Auth/AuthModal";
 import Footer from "@/components/Footer";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
+import VueTailwindNotifications from "@/components/VueTailwindNotifications";
 import CartDrawer from "@/components/marketplace/CartDrawer";
 
 export default {
@@ -162,6 +165,7 @@ export default {
     Footer,
     VueTailwindDropdown,
     CartDrawer,
+    VueTailwindNotifications
   },
   computed: {
     ...mapGetters({

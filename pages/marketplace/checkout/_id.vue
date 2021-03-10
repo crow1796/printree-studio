@@ -2,7 +2,7 @@
   <div class="relative">
     <AreaLoader v-if="isLoading" fullscreen />
     <div class="mx-auto p-16 sm:p-16 lg:px-48 bg-gray-100">
-      <div class="flex-grow flex flex-col relative">
+      <div class="flex-grow flex flex-col relative w-full sm:w-7/12 mx-auto">
         <VueTailwindModal
           ref="addressSelectionModal"
           width="40%"
@@ -70,7 +70,7 @@
             <div class="modal-heading border-b w-full p-4">
               <div class="flex justify-between w-full items-center">
                 <div class="flex uppercase justify-between flex-grow">
-                  <strong>{{ addressFormData.id ? 'Update' : 'Add an' }} Address</strong>
+                  <strong>{{ addressFormData._id ? 'Update' : 'Add an' }} Address</strong>
                   <div
                     class="select-none absolute right-0 top-0 mr-3 mt-3 cursor-pointer w-8 h-8 border rounded-full flex justify-center items-center hover:border-gray-600 hover:text-gray-700"
                     @click="hideAddressFormModal"
@@ -261,7 +261,7 @@
               >Cancel</button>
 
               <button
-               @click="saveAddress"
+                @click="saveAddress"
                 type="button"
                 class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
               >SAVE</button>
@@ -269,25 +269,11 @@
           </div>
         </VueTailwindModal>
         <div class="flex justify-between">
-          <span class="font-bold pb-4 border-b flex-grow p-4">
+          <span class="font-bold pb-4 border-b flex-grow p-4 text-3xl text-center">
             <span>CHECKOUT</span>
           </span>
         </div>
         <div class="flex flex-col flex-grow overflow-auto">
-          <div class="border-b">
-            <div class="uppercase font-bold pb-4 border-b p-4">Choose your Delivery Option</div>
-            <div class="px-4 pb-4 pt-2">
-              <OptionButtons :options="deliveryOptions" v-model="deliveryOption">
-                <template v-slot:default="{option}">
-                  <div class="flex flex-col">
-                    <div>{{ option.meta.cost.formatMoney('₱ ') }}</div>
-                    <div class="text-xs font-normal">{{ option.label }}</div>
-                    <div class="text-xs font-normal">Est. Arrival: {{ option.meta.est }}</div>
-                  </div>
-                </template>
-              </OptionButtons>
-            </div>
-          </div>
           <div class="font-bold uppercase p-4 border-b">ITEMS</div>
           <div class="flex flex-col flex-grow overflow-auto">
             <div
@@ -297,18 +283,21 @@
             >
               <div class="w-2/12 flex-justify-between">
                 <div class="w-16 mx-auto">
-                  <progressive-img class="relative mx-auto" :src="product.thumbnail" />
+                  <progressive-img class="relative mx-auto" :src="product.fullThumb" />
                 </div>
               </div>
               <div class="flex flex-col w-4/12 justify-center">
                 <span class="font-bold leading-none">
                   {{
-                  product.name
+                  product.productName
                   }}
                 </span>
                 <span class="font-bold text-gray-500">
                   {{
                   product.price.formatMoney('₱ ')
+                  }},
+                  {{
+                  product.size
                   }}
                 </span>
               </div>
@@ -328,7 +317,7 @@
               </div>
             </div>
           </div>
-          <div class="font-bold uppercase p-4 border-b border-t">ADDRESS</div>
+          <div class="font-bold uppercase p-4 border-b">ADDRESS</div>
           <div class="flex flex-col py-4">
             <div class="flex">
               <div class="flex w-6/12 flex-col">
@@ -361,7 +350,7 @@
               </div>
               <div class="flex w-6/12 flex-col">
                 <div
-                  class="flex flex-col p-4 border rounded border-dashed mx-4 cursor-pointer hover:border-primary hover:text-primary bg-white"
+                  class="flex flex-col p-4 border rounded border-dashed mx-2 cursor-pointer hover:border-primary hover:text-primary bg-white"
                   @click="selectAddressFor('billing')"
                 >
                   <div
@@ -385,45 +374,31 @@
                 >{{ billingAddressError }}</span>
               </div>
             </div>
-            <div class="flex mt-4 pt-4 border-t">
-              <div class="flex flex-grow mx-4 flex-col">
-                <span class="uppercase font-bold text-xs mb-1">Phone Number</span>
-                <div class="flex">
-                  <input
-                    type="text"
-                    placeholder="Enter Your Phone Number"
-                    class="px-6 py-2 rounded outline-none border mr-4 flex-grow flex"
-                    v-model="contactNumber"
-                    name="contact_number"
-                    :class="{ 'border-red-400': errors.has('contact_number'), 'focus:border-gray-600': !errors.has('contact_number') }"
-                    data-vv-as="Phone Number"
-                    v-validate="'required|numeric'"
-                  />
-                </div>
-                <span
-                  class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('contact_number')"
-                >{{ errors.first('contact_number') }}</span>
-              </div>
-              <div class="flex flex-grow flex-col">
-                <span class="uppercase font-bold text-xs mb-1">Email Address</span>
-                <div class="flex">
-                  <input
-                    type="email"
-                    placeholder="Enter Your Email Address"
-                    class="px-6 py-2 rounded outline-none border mr-4 flex-grow flex"
-                    v-model="contactEmail"
-                    name="contact_email"
-                    :class="{ 'border-red-400': errors.has('contact_email'), 'focus:border-gray-600': !errors.has('contact_email') }"
-                    data-vv-as="Email"
-                    v-validate="'required|email'"
-                  />
-                </div>
-                <span
-                  class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('contact_email')"
-                >{{ errors.first('contact_email') }}</span>
-              </div>
+          </div>
+          <div class="border-t">
+            <div class="uppercase font-bold pb-4 border-b p-4">Choose your payment method</div>
+            <div class="px-4 pb-4 pt-2">
+              <OptionButtons :options="paymentMethods" v-model="paymentMethod">
+                <template v-slot:default="{option}">
+                  <div class="flex flex-col">
+                    {{ option.label }}
+                  </div>
+                </template>
+              </OptionButtons>
+            </div>
+          </div>
+          <div class="border-t">
+            <div class="uppercase font-bold pb-4 border-b p-4">Choose your Delivery Option</div>
+            <div class="px-4 pb-4 pt-2">
+              <OptionButtons :options="deliveryOptions" v-model="deliveryOption">
+                <template v-slot:default="{option}">
+                  <div class="flex flex-col">
+                    <div>{{ option.meta.cost.formatMoney('₱ ') }}</div>
+                    <div class="text-xs font-normal">{{ option.label }}</div>
+                    <!-- <div class="text-xs font-normal">Est. Arrival: {{ option.meta.est }}</div> -->
+                  </div>
+                </template>
+              </OptionButtons>
             </div>
           </div>
         </div>
@@ -457,7 +432,7 @@
         </div>
         <div class="flex justify-between p-4 items-center border-t">
           <div class="flex flex-col">
-            <span class="text-xs">Total</span>
+            <span class="text-xs">Grand Total</span>
             <span class="font-bold text-primary leading-none my-1">
               <number :to="total" :format="(num) => num.formatMoney('₱ ')" :duration=".4" />
             </span>
@@ -474,23 +449,33 @@
 </template>
 
 <script>
-import OptionButtons from '@/components/OptionButtons'
-import VueTailwindModal from '@/components/VueTailwindModal'
-import { mapGetters } from 'vuex'
-import { validate } from 'vee-validate'
+import OptionButtons from "@/components/OptionButtons";
+import VueTailwindModal from "@/components/VueTailwindModal";
+import { mapGetters } from "vuex";
 
 export default {
-  layout: 'marketplace',
+  layout: "marketplace",
   components: {
     OptionButtons,
-    VueTailwindModal
+    VueTailwindModal,
   },
   created() {
-    this.deliveryOption = _.first(this.deliveryOptions).value
+    this.deliveryOption = _.first(this.deliveryOptions).value;
+    this.paymentMethod = _.first(this.paymentMethods).value;
+  },
+  async mounted() {
+    const checkout = await this.$store.dispatch(
+      "marketplace/getCheckout",
+      this.$route.params.id
+    );
+
+    this.products = checkout.items;
+
+    this.isLoading = false;
   },
   data() {
     return {
-      isLoading: false,
+      isLoading: true,
       products: [],
       selectingAddressFor: null,
       userAddresses: [],
@@ -498,13 +483,13 @@ export default {
       billingAddressError: null,
       addressLabels: [
         {
-          label: 'Home',
-          value: 'Home'
+          label: "Home",
+          value: "Home",
         },
         {
-          label: 'Office',
-          value: 'Office'
-        }
+          label: "Office",
+          value: "Office",
+        },
       ],
       provinces: [],
       cities: [],
@@ -517,7 +502,7 @@ export default {
       contactNumber: null,
       contactEmail: null,
       addressFormData: {
-        id: null,
+        _id: null,
         fullname: null,
         house_number: null,
         province: null,
@@ -526,115 +511,123 @@ export default {
         mobile_number: null,
         notes: null,
         label: null,
-        is_default: false
+        is_default: false,
       },
       deliveryOptions: [
         {
-          label: 'Standard Delivery',
-          value: 'standard',
-          meta: {
-            cost: 45,
-            est: 'Feb. 5 - Feb. 10'
-          }
-        },
-        {
-          label: 'Express Delivery',
-          value: 'express',
+          label: "Standard Delivery",
+          value: "lbc",
           meta: {
             cost: 105,
-            est: 'Feb. 5 - Feb. 10'
-          }
-        }
-      ]
-    }
+            est: "Feb. 5 - Feb. 10",
+          },
+        },
+      ],
+      paymentMethod: null,
+      paymentMethods: [
+        {
+          label: "Cash On Delivery",
+          value: "cod",
+        },
+        {
+          label: "GCash",
+          value: "gcash",
+        },
+      ],
+    };
   },
   computed: {
     ...mapGetters({
-      user: 'user'
+      user: "user",
     }),
     subtotal() {
       return _.sum(
         _.map(this.products, ({ quantity, price }) => quantity * price)
-      )
+      );
     },
     total() {
-      if (!this.deliveryOption) return this.subtotal
-      return this.subtotal + this.deliveryOptionValue
+      if (!this.deliveryOption) return this.subtotal;
+      return this.subtotal + this.deliveryOptionValue;
     },
     deliveryOptionValue() {
-      const option = _.find(this.deliveryOptions, { value: this.deliveryOption })
-      if(!option) return 0
-      return option.meta.cost
-    }
+      const option = _.find(this.deliveryOptions, {
+        value: this.deliveryOption,
+      });
+      if (!option) return 0;
+      return option.meta.cost;
+    },
   },
   methods: {
     async confirmOrder() {
-      this.billingAddressError = null
-      this.shippingAddressError = null
+      this.billingAddressError = null;
+      this.shippingAddressError = null;
       if (!this.billingAddress)
-        this.billingAddressError = 'Billing address is required.'
+        this.billingAddressError = "Billing address is required.";
       if (!this.shippingAddress)
-        this.shippingAddressError = 'Shipping address is required.'
-      let validationResponse = await this.$validator.validateAll()
+        this.shippingAddressError = "Shipping address is required.";
+      let validationResponse = await this.$validator.validateAll();
       if (
         !validationResponse ||
         this.billingAddressError ||
         this.shippingAddressError ||
         this.isLoading
       )
-        return
-      this.isLoading = true
+        return;
+      this.isLoading = true;
 
-      const order = await this.$store.dispatch('marketplace/confirmOrderFor', {
+      const order = await this.$store.dispatch("marketplace/confirmOrderFor", {
         user: this.user,
-        products: _.map(this.products, ({id, quantity}) => ({id, quantity})),
+        products: _.map(this.products, ({ id, quantity }) => ({
+          id,
+          quantity,
+        })),
         contact: {
           shipping_address: this.shippingAddress,
           billing_address: this.billingAddress,
           contact_number: this.contactNumber,
-          contact_email: this.contactEmail
+          contact_email: this.contactEmail,
         },
-        total: this.total
-      })
-      this.$storage.setLocalStorage('order_id', order.id)
-      this.$router.replace('/marketplace/cart/payment')
+        total: this.total,
+      });
+      this.$storage.setLocalStorage("order_id", order.id);
+      this.$router.replace("/marketplace/cart/payment");
     },
     selectAddress(address) {
       switch (this.selectingAddressFor) {
-        case 'shipping':
-          this.shippingAddress = address
-          break
-        case 'billing':
-          this.billingAddress = address
-          break
+        case "shipping":
+          this.shippingAddress = address;
+          break;
+        case "billing":
+          this.billingAddress = address;
+          break;
       }
-      this.$refs.addressSelectionModal.hide()
+      this.$refs.addressSelectionModal.hide();
     },
     selectAddressFor(address) {
-      this.selectingAddressFor = address
-      this.showAddressSelectionModal()
+      this.selectingAddressFor = address;
+      this.showAddressSelectionModal();
     },
     async editAddress(address) {
-      this.addressFormData = address
-      this.$refs.addressSelectionModal.hide()
-      this.$refs.addressFormModal.show()
-      this.isAddressModalLoading = true
-      await this.getPHAddresses()
-      this.isAddressModalLoading = false
+      this.addressFormData = address;
+      this.$refs.addressSelectionModal.hide();
+      this.$refs.addressFormModal.show();
+      this.isAddressModalLoading = true;
+      await this.getPHAddresses();
+      this.isAddressModalLoading = false;
     },
     async saveAddress() {
-      let validationResponse = await this.$validator.validateAll('addressForm')
-      if (!validationResponse || this.isAddressModalLoading) return
-      this.isAddressModalLoading = true
-      const address = await this.$store.dispatch('marketplace/saveAddress', {
+      let validationResponse = await this.$validator.validateAll("addressForm");
+      if (!validationResponse || this.isAddressModalLoading) return;
+      this.isAddressModalLoading = true;
+      const address = await this.$store.dispatch("marketplace/saveAddress", {
         ...this.addressFormData,
-        user_id: this.user.uid
-      })
-      this.$validator.reset()
-      this.$refs.addressFormModal.hide()
-      this.$refs.addressSelectionModal.show()
+        user_id: this.user._id,
+      });
+      this.$validator.reset();
+      this.$refs.addressFormModal.hide();
+      this.$refs.addressSelectionModal.show();
       this.$nextTick(() => {
-        this.userAddresses = [...this.userAddresses, address]
+        this.userAddresses = [...this.userAddresses, address];
         this.addressFormData = {
           fullname: null,
           house_number: null,
@@ -644,50 +637,49 @@ export default {
           mobile_number: null,
           notes: null,
           label: null,
-          is_default: false
-        }
-      })
-      this.isAddressModalLoading = false
+          is_default: false,
+        };
+      });
+      this.isAddressModalLoading = false;
     },
     async showAddressSelectionModal() {
-      this.isAddressModalLoading = true
-      this.$refs.addressSelectionModal.show()
-      this.userAddresses = await this.$store.dispatch(
-        'marketplace/getAddressesOf',
-        this.user.uid
-      )
-      this.isAddressModalLoading = false
+      this.isAddressModalLoading = true;
+      this.$refs.addressSelectionModal.show();
+      // this.userAddresses = await this.$store.dispatch(
+      //   "marketplace/getAddressesOfCurrentUser"
+      // );
+      this.isAddressModalLoading = false;
     },
     async getPHAddresses() {
       const { provinces, cities, barangays } = await this.$store.dispatch(
-        'marketplace/getPHAddresses',
+        "marketplace/getPHAddresses",
         {
           province: this.addressFormData.province
             ? this.addressFormData.province.provCode
-            : '',
+            : "",
           city: this.addressFormData.city
             ? this.addressFormData.city.citymunCode
-            : '',
+            : "",
           barangay: this.addressFormData.barangay
             ? this.addressFormData.barangay.brgyCode
-            : ''
+            : "",
         }
-      )
-      this.provinces = provinces
-      this.cities = cities
-      this.barangays = barangays
+      );
+      this.provinces = provinces;
+      this.cities = cities;
+      this.barangays = barangays;
     },
     async showAddressFormModal() {
-      this.$refs.addressSelectionModal.hide()
-      this.$refs.addressFormModal.show()
-      this.isAddressModalLoading = true
-      await this.getPHAddresses()
-      this.isAddressModalLoading = false
+      this.$refs.addressSelectionModal.hide();
+      this.$refs.addressFormModal.show();
+      this.isAddressModalLoading = true;
+      await this.getPHAddresses();
+      this.isAddressModalLoading = false;
     },
     hideAddressFormModal() {
-      this.$validator.reset()
-      this.$refs.addressFormModal.hide()
-      this.$refs.addressSelectionModal.show()
+      this.$validator.reset();
+      this.$refs.addressFormModal.hide();
+      this.$refs.addressSelectionModal.show();
       this.$nextTick(() => {
         this.addressFormData = {
           fullname: null,
@@ -698,10 +690,10 @@ export default {
           mobile_number: null,
           notes: null,
           label: null,
-          is_default: false
-        }
-      })
-    }
-  }
-}
+          is_default: false,
+        };
+      });
+    },
+  },
+};
 </script>

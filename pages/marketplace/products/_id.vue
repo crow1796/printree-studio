@@ -46,7 +46,13 @@
               >{{ product.parent_collection.name }}</span>
             </div>
             <h1 class="text-3xl font-bold leading-none">{{ product.meta.name }}</h1>
-            <h2 class="text-xl">{{ selectedVariantSizePrice.formatMoney('₱ ') }}</h2>
+            <h2 class="text-xl">
+              <number
+                :to="selectedVariantSizePrice"
+                :format="(num) => num.formatMoney('₱ ')"
+                :duration=".4"
+              />
+            </h2>
             <div class="font-bold mt-3">COLOR</div>
             <div class="mt-2 flex">
               <div
