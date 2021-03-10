@@ -63,13 +63,21 @@ export const getCheckout = async (axios, id) => {
   return getCheckout;
 }
 
-export const getAddressesOfCurrentUser = async (axios, id) => {
+export const getAddressesOfCurrentUser = async (axios) => {
   const { data } = await axios.post("/gql", {
-    query: queries.getAddressesOfCurrentUser,
-    variables: {
-      id
-    }
+    query: queries.getAddressesOfCurrentUser
   });
   const { getAddressesOfCurrentUser } = data.data;
   return getAddressesOfCurrentUser;
+}
+
+export const saveAddress = async (axios, address) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.saveAddress,
+    variables: {
+      address
+    }
+  });
+  const { saveAddress } = data.data;
+  return saveAddress;
 }

@@ -5,7 +5,7 @@
       <div class="flex-grow flex flex-col relative w-full sm:w-7/12 mx-auto">
         <VueTailwindModal
           ref="addressSelectionModal"
-          width="40%"
+          width="30%"
           content-class="rounded-none shadow-none text-gray-600"
           :backdrop="false"
         >
@@ -32,13 +32,17 @@
                 <div class="font-bold">ADD A NEW ADDRESS</div>
               </div>
               <div
-                class="flex flex-col px-4 py-5 border rounded cursor-pointer hover:border-primary hover:text-primary mb-4"
+                class="flex flex-col px-4 py-5 border rounded cursor-pointer hover:border-primary hover:text-primary mb-4 relative"
                 v-for="address in userAddresses"
                 :key="address.id"
                 @click="selectAddress(address)"
               >
+                <span
+                  v-if="address.isDefault"
+                  class="rounded-full text-xs px-2 mr-1 bg-primary text-white absolute top-0 left-0 mt-2 ml-3"
+                >Default</span>
                 <div class="flex justify-between items-end">
-                  <div class="font-bold">{{ address.fullname }}</div>
+                  <div class="font-bold">{{ address.fullName }}</div>
                   <button
                     type="button"
                     class="rounded border px-3 py-1 text-xs text-gray-700 hover:bg-gray-300"
@@ -50,10 +54,10 @@
                     </span>
                   </button>
                 </div>
-                <div class="font-normal">{{ address.mobile_number }}</div>
+                <div class="font-normal">{{ address.mobileNumber }}</div>
                 <div
                   class="font-normal"
-                >{{ `${address.house_number}, ${address.barangay.brgyDesc}, ${address.city.citymunDesc}, ${address.province.provDesc}` }}</div>
+                >{{ `${address.street}, ${_brgyDescOf(address.barangay)}, ${_cityDescOf(address.city)}, ${_provDescOf(address.province)}` }}</div>
                 <div class="font-normal" v-if="address.notes">{{ address.notes }}</div>
               </div>
             </div>
@@ -61,7 +65,7 @@
         </VueTailwindModal>
         <VueTailwindModal
           ref="addressFormModal"
-          width="40%"
+          width="30%"
           content-class="rounded-none shadow-none text-gray-600"
           :backdrop="false"
         >
@@ -84,12 +88,12 @@
               <div class="mb-3">
                 <div>
                   <input
-                    name="fullname"
+                    name="fullName"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('addressForm.fullname'), 'focus:border-gray-600': !errors.has('addressForm.fullname') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.fullName'), 'focus:border-gray-600': !errors.has('addressForm.fullName') }"
                     placeholder="Your Name"
-                    v-model="addressFormData.fullname"
+                    v-model="addressFormData.fullName"
                     data-vv-as="Full Name"
                     v-validate="'required'"
                     data-vv-scope="addressForm"
@@ -97,27 +101,8 @@
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('addressForm.fullname')"
-                >{{ errors.first('addressForm.fullname') }}</span>
-              </div>
-              <div class="mb-3">
-                <div>
-                  <input
-                    name="house_number"
-                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                    type="text"
-                    :class="{ 'border-red-400': errors.has('addressForm.house_number'), 'focus:border-gray-600': !errors.has('addressForm.house_number') }"
-                    placeholder="Your House Number, Building and Street Name"
-                    v-model="addressFormData.house_number"
-                    data-vv-as="House Number, Building and Street Name"
-                    v-validate="'required'"
-                    data-vv-scope="addressForm"
-                  />
-                </div>
-                <span
-                  class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('addressForm.house_number')"
-                >{{ errors.first('addressForm.house_number') }}</span>
+                  v-if="errors.has('addressForm.fullName')"
+                >{{ errors.first('addressForm.fullName') }}</span>
               </div>
               <div class="mb-3">
                 <div>
@@ -137,7 +122,7 @@
                     <option
                       v-for="province in provinces"
                       :key="province.i"
-                      :value="province"
+                      :value="province.provCode"
                     >{{ province.provDesc }}</option>
                   </select>
                 </div>
@@ -164,7 +149,7 @@
                     <option
                       v-for="city in cities"
                       :key="city.i"
-                      :value="city"
+                      :value="city.citymunCode"
                     >{{ city.citymunDesc }}</option>
                   </select>
                 </div>
@@ -190,7 +175,7 @@
                     <option
                       v-for="brgy in barangays"
                       :key="brgy.i"
-                      :value="brgy"
+                      :value="brgy.brgyCode"
                     >{{ brgy.brgyDesc }}</option>
                   </select>
                 </div>
@@ -199,15 +184,35 @@
                   v-if="errors.has('addressForm.barangay')"
                 >{{ errors.first('addressForm.barangay') }}</span>
               </div>
+
               <div class="mb-3">
                 <div>
                   <input
-                    name="mobile_number"
+                    name="street"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
-                    :class="{ 'border-red-400': errors.has('addressForm.mobile_number'), 'focus:border-gray-600': !errors.has('addressForm.mobile_number') }"
+                    :class="{ 'border-red-400': errors.has('addressForm.street'), 'focus:border-gray-600': !errors.has('addressForm.street') }"
+                    placeholder="Your House Number, Building and Street Name"
+                    v-model="addressFormData.street"
+                    data-vv-as="House Number, Building and Street Name"
+                    v-validate="'required'"
+                    data-vv-scope="addressForm"
+                  />
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('addressForm.street')"
+                >{{ errors.first('addressForm.street') }}</span>
+              </div>
+              <div class="mb-3">
+                <div>
+                  <input
+                    name="mobileNumber"
+                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                    type="text"
+                    :class="{ 'border-red-400': errors.has('addressForm.mobileNumber'), 'focus:border-gray-600': !errors.has('addressForm.mobileNumber') }"
                     placeholder="Your Mobile Number"
-                    v-model="addressFormData.mobile_number"
+                    v-model="addressFormData.mobileNumber"
                     data-vv-as="Mobile Number"
                     v-validate="'required|numeric'"
                     data-vv-scope="addressForm"
@@ -215,8 +220,8 @@
                 </div>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('addressForm.mobile_number')"
-                >{{ errors.first('addressForm.mobile_number') }}</span>
+                  v-if="errors.has('addressForm.mobileNumber')"
+                >{{ errors.first('addressForm.mobileNumber') }}</span>
               </div>
               <div>
                 <div>
@@ -228,7 +233,7 @@
                   />
                 </div>
               </div>
-              <!-- <div class="mb-3 flex items-center">
+              <div class="mb-3 flex items-center">
                 <label for="label" class="font-bold mr-4 mt-2">Address Label</label>
                 <div>
                   <OptionButtons
@@ -243,15 +248,20 @@
                 >{{ errors.first('label') }}</span>
               </div>
               <div>
-                <label for="is_default" class="font-bold">
-                  <input type="checkbox" name="is_default" id="is_default" v-model="addressFormData.is_default" />
+                <label for="isDefault" class="font-bold">
+                  <input
+                    type="checkbox"
+                    name="isDefault"
+                    id="isDefault"
+                    v-model="addressFormData.isDefault"
+                  />
                   Make this my default address
                 </label>
                 <span
                   class="text-red-700 text-xs pt-1 font-bold inline-block"
-                  v-if="errors.has('is_default')"
-                >{{ errors.first('is_default') }}</span>
-              </div>-->
+                  v-if="errors.has('isDefault')"
+                >{{ errors.first('isDefault') }}</span>
+              </div>
             </div>
             <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
               <button
@@ -280,11 +290,11 @@
           </button>
 
           <span class="font-bold pb-4 border-b flex-grow p-4 text-3xl text-center">
-            <span>CHECKOUT</span>
+            <span>Checkout</span>
           </span>
         </div>
         <div class="flex flex-col flex-grow overflow-auto">
-          <div class="font-bold uppercase p-4 border-b">ITEMS</div>
+          <div class="font-bold p-4 border-b">Items</div>
           <div class="flex flex-col flex-grow overflow-auto">
             <div
               class="flex flex-grow-0 border-b px-4 py-2"
@@ -327,31 +337,34 @@
               </div>
             </div>
           </div>
-          <div class="font-bold uppercase p-4 border-b">ADDRESS</div>
+          <div class="font-bold p-4 border-b">Address</div>
           <div class="flex flex-col py-4">
             <div class="flex">
               <div class="flex w-6/12 flex-col">
                 <div
                   class="flex flex-col p-4 border rounded border-dashed mx-2 cursor-pointer hover:border-primary hover:text-primary bg-white"
+                  :class="{
+                    'border-primary text-primary': shippingAddress
+                  }"
                   @click="selectAddressFor('shipping')"
                 >
                   <div
-                    class="font-bold uppercase text-sm mb-2 text-gray-600 flex items-center justify-between"
+                    class="font-bold text-sm mb-2 text-gray-600 flex items-center justify-between"
                   >
                     <div>Shipping Address</div>
                   </div>
                   <div v-if="shippingAddress">
-                    <div class="font-bold">{{ shippingAddress.fullname }}</div>
-                    <div class="font-normal">{{ shippingAddress.mobile_number }}</div>
+                    <div class="font-bold">{{ shippingAddress.fullName }}</div>
+                    <div class="font-normal">{{ shippingAddress.mobileNumber }}</div>
                     <div
                       class="font-normal"
-                    >{{ `${shippingAddress.house_number}, ${shippingAddress.barangay.brgyDesc}, ${shippingAddress.city.citymunDesc}, ${shippingAddress.province.provDesc}` }}</div>
+                    >{{ `${shippingAddress.street}, ${_brgyDescOf(shippingAddress.barangay)}, ${_cityDescOf(shippingAddress.city)}, ${_provDescOf(shippingAddress.province)}` }}</div>
                     <div
                       class="font-normal"
                       v-if="shippingAddress.notes"
                     >{{ shippingAddress.notes }}</div>
                   </div>
-                  <div class="font-bold" v-else>CHOOSE AN ADDRESS</div>
+                  <div class="font-bold" v-else>Choose an address</div>
                 </div>
                 <span
                   class="text-red-700 text-xs pl-2 pt-1 font-bold inline-block"
@@ -361,22 +374,25 @@
               <div class="flex w-6/12 flex-col">
                 <div
                   class="flex flex-col p-4 border rounded border-dashed mx-2 cursor-pointer hover:border-primary hover:text-primary bg-white"
+                  :class="{
+                    'border-primary text-primary': billingAddress
+                  }"
                   @click="selectAddressFor('billing')"
                 >
                   <div
-                    class="font-bold uppercase text-sm mb-2 text-gray-600 flex justify-between items-center"
+                    class="font-bold text-sm mb-2 text-gray-600 flex justify-between items-center"
                   >
                     <div>Billing Address</div>
                   </div>
                   <div v-if="billingAddress">
-                    <div class="font-bold">{{ billingAddress.fullname }}</div>
-                    <div class="font-normal">{{ billingAddress.mobile_number }}</div>
+                    <div class="font-bold">{{ billingAddress.fullName }}</div>
+                    <div class="font-normal">{{ billingAddress.mobileNumber }}</div>
                     <div
                       class="font-normal"
-                    >{{ `${billingAddress.house_number}, ${billingAddress.barangay.brgyDesc}, ${billingAddress.city.citymunDesc}, ${billingAddress.province.provDesc}` }}</div>
+                    >{{ `${billingAddress.street}, ${_brgyDescOf(billingAddress.barangay)}, ${_cityDescOf(billingAddress.city)}, ${_provDescOf(billingAddress.province)}` }}</div>
                     <div class="font-normal" v-if="billingAddress.notes">{{ billingAddress.notes }}</div>
                   </div>
-                  <div class="font-bold" v-else>CHOOSE AN ADDRESS</div>
+                  <div class="font-bold" v-else>Choose an address</div>
                 </div>
                 <span
                   class="text-red-700 text-xs pl-4 pt-1 font-bold inline-block"
@@ -386,7 +402,7 @@
             </div>
           </div>
           <div class="border-t">
-            <div class="uppercase font-bold pb-4 border-b p-4">Choose your payment method</div>
+            <div class="font-bold pb-4 border-b p-4">Choose your payment method</div>
             <div class="px-4 pb-4 pt-2">
               <OptionButtons :options="paymentMethods" v-model="paymentMethod">
                 <template v-slot:default="{option}">
@@ -396,7 +412,7 @@
             </div>
           </div>
           <div class="border-t">
-            <div class="uppercase font-bold pb-4 border-b p-4">Choose your Delivery Option</div>
+            <div class="font-bold pb-4 border-b p-4">Delivery Option</div>
             <div class="px-4 pb-4 pt-2">
               <OptionButtons :options="deliveryOptions" v-model="deliveryOption">
                 <template v-slot:default="{option}">
@@ -447,7 +463,7 @@
             <span class="text-xs text-gray-500">VAT included, where applicable</span>
           </div>
           <PTButton color="primary" :disabled="!total" @click="confirmOrder">
-            <span class="mr-2">PROCEED TO PAYMENT</span>
+            <span class="mr-2">Proceed to Payment</span>
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </PTButton>
         </div>
@@ -478,6 +494,11 @@ export default {
       this.$route.params.id
     );
 
+    await this._loadAddresses();
+
+    this.shippingAddress = _.find(this.userAddresses, { isDefault: true });
+    this.billingAddress = _.find(this.userAddresses, { isDefault: true });
+
     this.products = checkout.items;
 
     this.isLoading = false;
@@ -493,11 +514,11 @@ export default {
       addressLabels: [
         {
           label: "Home",
-          value: "Home",
+          value: "home",
         },
         {
           label: "Office",
-          value: "Office",
+          value: "office",
         },
       ],
       provinces: [],
@@ -512,15 +533,15 @@ export default {
       contactEmail: null,
       addressFormData: {
         _id: null,
-        fullname: null,
-        house_number: null,
+        fullName: null,
+        street: null,
         province: null,
         city: null,
         barangay: null,
-        mobile_number: null,
+        mobileNumber: null,
         notes: null,
-        label: null,
-        is_default: false,
+        label: "home",
+        isDefault: false,
       },
       deliveryOptions: [
         {
@@ -563,6 +584,18 @@ export default {
     },
   },
   methods: {
+    _brgyDescOf(code) {
+      const barangay = this.$locations.findBrgy(code);
+      return barangay?.brgyDesc;
+    },
+    _provDescOf(code) {
+      const province = this.$locations.findProvince(code);
+      return province?.provDesc;
+    },
+    _cityDescOf(code) {
+      const city = this.$locations.findCity(code);
+      return city?.citymunDesc;
+    },
     async confirmOrder() {
       this.billingAddressError = null;
       this.shippingAddressError = null;
@@ -613,7 +646,7 @@ export default {
       this.showAddressSelectionModal();
     },
     async editAddress(address) {
-      this.addressFormData = address;
+      this.addressFormData = JSON.parse(JSON.stringify(address));
       this.$refs.addressSelectionModal.hide();
       this.$refs.addressFormModal.show();
       this.isAddressModalLoading = true;
@@ -624,50 +657,49 @@ export default {
       let validationResponse = await this.$validator.validateAll("addressForm");
       if (!validationResponse || this.isAddressModalLoading) return;
       this.isAddressModalLoading = true;
-      const address = await this.$store.dispatch("marketplace/saveAddress", {
-        ...this.addressFormData,
-        user_id: this.user._id,
-      });
+      await this.$store.dispatch(
+        "marketplace/saveAddress",
+        this.addressFormData
+      );
       this.$validator.reset();
       this.$refs.addressFormModal.hide();
       this.$refs.addressSelectionModal.show();
+
+      await this._loadAddresses();
+      this.shippingAddress = _.find(this.userAddresses, { _id: this.shippingAddress?._id })
+      this.billingAddress = _.find(this.userAddresses, { _id: this.billingAddress?._id })
+
       this.$nextTick(() => {
-        this.userAddresses = [...this.userAddresses, address];
         this.addressFormData = {
-          fullname: null,
-          house_number: null,
+          fullName: null,
+          street: null,
           province: null,
           city: null,
+          barangay: null,
           postcode: null,
-          mobile_number: null,
+          mobileNumber: null,
           notes: null,
-          label: null,
-          is_default: false,
+          label: "home",
+          isDefault: false,
         };
       });
       this.isAddressModalLoading = false;
     },
+    async _loadAddresses() {
+      this.userAddresses = await this.$store.dispatch(
+        "marketplace/getAddressesOfCurrentUser"
+      );
+    },
     async showAddressSelectionModal() {
-      this.isAddressModalLoading = true;
       this.$refs.addressSelectionModal.show();
-      // this.userAddresses = await this.$store.dispatch(
-      //   "marketplace/getAddressesOfCurrentUser"
-      // );
-      this.isAddressModalLoading = false;
     },
     async getPHAddresses() {
       const { provinces, cities, barangays } = await this.$store.dispatch(
         "marketplace/getPHAddresses",
         {
-          province: this.addressFormData.province
-            ? this.addressFormData.province.provCode
-            : "",
-          city: this.addressFormData.city
-            ? this.addressFormData.city.citymunCode
-            : "",
-          barangay: this.addressFormData.barangay
-            ? this.addressFormData.barangay.brgyCode
-            : "",
+          province: this.addressFormData.province,
+          city: this.addressFormData.city,
+          barangay: this.addressFormData.barangay,
         }
       );
       this.provinces = provinces;
@@ -687,15 +719,16 @@ export default {
       this.$refs.addressSelectionModal.show();
       this.$nextTick(() => {
         this.addressFormData = {
-          fullname: null,
-          house_number: null,
+          fullName: null,
+          street: null,
           province: null,
           city: null,
+          barangay: null,
           postcode: null,
-          mobile_number: null,
+          mobileNumber: null,
           notes: null,
-          label: null,
-          is_default: false,
+          label: "home",
+          isDefault: false,
         };
       });
     },

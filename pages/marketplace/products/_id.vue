@@ -261,7 +261,7 @@ export default {
       this.isAddingToCart = true;
       const item = {
         variant: this.selectedVariant._id,
-        quantity: this.quantity,
+        quantity: this.quantity || 1,
         size: this.selectedSize,
       };
       await this.$store.dispatch("marketplace/addToCart", item);

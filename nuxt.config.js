@@ -53,6 +53,7 @@ module.exports = {
     "~/plugins/api.js",
     { src: '~plugins/vue-introjs.js', ssr: false },
     { src: '~plugins/flags.js', ssr: false },
+    { src: '~plugins/locations.js', ssr: false },
   ],
   /*
    ** Nuxt.js modules

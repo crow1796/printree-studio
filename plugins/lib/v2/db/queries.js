@@ -732,6 +732,35 @@ export default {
     }
   `,
   getAddressesOfCurrentUser: `
-    
+    query {
+        getAddressesOfCurrentUser {
+            _id
+            fullName
+            street
+            province
+            city
+            barangay
+            mobileNumber
+            notes
+            label
+            isDefault
+        }
+    }
+  `,
+  saveAddress: `
+    mutation ($address: AddressInput!) {
+        saveAddress(address: $address){
+            _id
+            fullName
+            street
+            province
+            city
+            barangay
+            mobileNumber
+            notes
+            label
+            isDefault
+        }
+    }
   `
 };
