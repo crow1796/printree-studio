@@ -268,7 +268,17 @@
             </div>
           </div>
         </VueTailwindModal>
-        <div class="flex justify-between">
+        <div class="flex justify-between relative">
+          <button
+            type="button"
+            href="#"
+            @click.prevent="$router.back"
+            class="text-xs text-blue-500 hover:text-blue-700 absolute left-0 top-0"
+          >
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+            <span class="ml-1">Back</span>
+          </button>
+
           <span class="font-bold pb-4 border-b flex-grow p-4 text-3xl text-center">
             <span>CHECKOUT</span>
           </span>
@@ -380,9 +390,7 @@
             <div class="px-4 pb-4 pt-2">
               <OptionButtons :options="paymentMethods" v-model="paymentMethod">
                 <template v-slot:default="{option}">
-                  <div class="flex flex-col">
-                    {{ option.label }}
-                  </div>
+                  <div class="flex flex-col">{{ option.label }}</div>
                 </template>
               </OptionButtons>
             </div>
@@ -454,7 +462,8 @@ import VueTailwindModal from "@/components/VueTailwindModal";
 import { mapGetters } from "vuex";
 
 export default {
-  layout: "marketplace",
+  layout: "empty",
+  middleware: ["authenticated"],
   components: {
     OptionButtons,
     VueTailwindModal,
@@ -528,10 +537,6 @@ export default {
         {
           label: "Cash On Delivery",
           value: "cod",
-        },
-        {
-          label: "GCash",
-          value: "gcash",
         },
       ],
     };
