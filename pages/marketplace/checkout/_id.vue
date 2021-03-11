@@ -354,7 +354,14 @@
                     <div>Shipping Address</div>
                   </div>
                   <div v-if="shippingAddress">
-                    <div class="font-bold">{{ shippingAddress.fullName }}</div>
+                    <div class="flex justify-between items-center">
+                      <div class="font-bold">{{ shippingAddress.fullName }}</div>
+
+                      <span
+                        v-if="shippingAddress.isDefault"
+                        class="rounded-full text-xs px-2 mr-1 bg-primary text-white py-1"
+                      >Default</span>
+                    </div>
                     <div class="font-normal">{{ shippingAddress.mobileNumber }}</div>
                     <div
                       class="font-normal"
@@ -385,7 +392,14 @@
                     <div>Billing Address</div>
                   </div>
                   <div v-if="billingAddress">
-                    <div class="font-bold">{{ billingAddress.fullName }}</div>
+                    <div class="flex justify-between items-center">
+                      <div class="font-bold">{{ billingAddress.fullName }}</div>
+
+                      <span
+                        v-if="billingAddress.isDefault"
+                        class="rounded-full text-xs px-2 mr-1 bg-primary text-white py-1"
+                      >Default</span>
+                    </div>
                     <div class="font-normal">{{ billingAddress.mobileNumber }}</div>
                     <div
                       class="font-normal"
@@ -402,7 +416,7 @@
             </div>
           </div>
           <div class="border-t">
-            <div class="font-bold pb-4 border-b p-4">Choose your payment method</div>
+            <div class="font-bold pb-4 border-b p-4">Payment Method</div>
             <div class="px-4 pb-4 pt-2">
               <OptionButtons :options="paymentMethods" v-model="paymentMethod">
                 <template v-slot:default="{option}">
@@ -412,7 +426,7 @@
             </div>
           </div>
           <div class="border-t">
-            <div class="font-bold pb-4 border-b p-4">Delivery Option</div>
+            <div class="font-bold pb-4 border-b p-4">Shipping Options</div>
             <div class="px-4 pb-4 pt-2">
               <OptionButtons :options="deliveryOptions" v-model="deliveryOption">
                 <template v-slot:default="{option}">
@@ -462,8 +476,8 @@
             </span>
             <span class="text-xs text-gray-500">VAT included, where applicable</span>
           </div>
-          <PTButton color="primary" :disabled="!total" @click="confirmOrder">
-            <span class="mr-2">Proceed to Payment</span>
+          <PTButton color="primary" :disabled="!total" @click="placeOrder">
+            <span class="mr-2">Place Order</span>
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </PTButton>
         </div>
@@ -484,10 +498,6 @@ export default {
     OptionButtons,
     VueTailwindModal,
   },
-  created() {
-    this.deliveryOption = _.first(this.deliveryOptions).value;
-    this.paymentMethod = _.first(this.paymentMethods).value;
-  },
   async mounted() {
     const checkout = await this.$store.dispatch(
       "marketplace/getCheckout",
@@ -495,6 +505,10 @@ export default {
     );
 
     await this._loadAddresses();
+    await this._loadPaymentMethods();
+
+    this.deliveryOption = _.first(this.deliveryOptions).value;
+    this.paymentMethod = _.first(this.paymentMethods).value;
 
     this.shippingAddress = _.find(this.userAddresses, { isDefault: true });
     this.billingAddress = _.find(this.userAddresses, { isDefault: true });
@@ -554,12 +568,7 @@ export default {
         },
       ],
       paymentMethod: null,
-      paymentMethods: [
-        {
-          label: "Cash On Delivery",
-          value: "cod",
-        },
-      ],
+      paymentMethods: [],
     };
   },
   computed: {
@@ -596,7 +605,7 @@ export default {
       const city = this.$locations.findCity(code);
       return city?.citymunDesc;
     },
-    async confirmOrder() {
+    async placeOrder() {
       this.billingAddressError = null;
       this.shippingAddressError = null;
       if (!this.billingAddress)
@@ -613,7 +622,7 @@ export default {
         return;
       this.isLoading = true;
 
-      const order = await this.$store.dispatch("marketplace/confirmOrderFor", {
+      const order = await this.$store.dispatch("marketplace/placeOrder", {
         user: this.user,
         products: _.map(this.products, ({ id, quantity }) => ({
           id,
@@ -666,8 +675,12 @@ export default {
       this.$refs.addressSelectionModal.show();
 
       await this._loadAddresses();
-      this.shippingAddress = _.find(this.userAddresses, { _id: this.shippingAddress?._id })
-      this.billingAddress = _.find(this.userAddresses, { _id: this.billingAddress?._id })
+      this.shippingAddress = _.find(this.userAddresses, {
+        _id: this.shippingAddress?._id,
+      });
+      this.billingAddress = _.find(this.userAddresses, {
+        _id: this.billingAddress?._id,
+      });
 
       this.$nextTick(() => {
         this.addressFormData = {
@@ -689,6 +702,16 @@ export default {
       this.userAddresses = await this.$store.dispatch(
         "marketplace/getAddressesOfCurrentUser"
       );
+    },
+    async _loadPaymentMethods() {
+      const paymentMethods = await this.$store.dispatch(
+        "marketplace/paymentMethods"
+      );
+
+      this.paymentMethods = _.map(paymentMethods, (p) => ({
+        label: p.title,
+        value: p._id,
+      }));
     },
     async showAddressSelectionModal() {
       this.$refs.addressSelectionModal.show();

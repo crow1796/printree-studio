@@ -762,5 +762,15 @@ export default {
             isDefault
         }
     }
+  `,
+  paymentMethods: `
+    query {
+        paymentMethods{
+            _id
+            title
+            name
+            status
+        }
+    }
   `
 };

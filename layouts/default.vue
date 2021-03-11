@@ -106,6 +106,8 @@ export default {
     dashboardLink() {
       if (!this.user) return "/dashboard";
       const isAdmin = _.includes(_.map(this.user.roles, "name"), "admin");
+      const isCustomer = _.includes(_.map(this.user.roles, "name"), "customer");
+      if (isCustomer) return "/marketplace/account/profile";
       if (isAdmin) return "/admin/collections";
       return "/dashboard";
     },

@@ -63,6 +63,14 @@ export const getCheckout = async (axios, id) => {
   return getCheckout;
 }
 
+export const paymentMethods = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.paymentMethods
+  });
+  const { paymentMethods } = data.data;
+  return paymentMethods;
+}
+
 export const getAddressesOfCurrentUser = async (axios) => {
   const { data } = await axios.post("/gql", {
     query: queries.getAddressesOfCurrentUser

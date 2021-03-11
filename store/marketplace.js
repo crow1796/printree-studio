@@ -80,13 +80,13 @@ const actions = {
     const address = await this.$api.marketplace.saveAddress(data)
     return address
   },
+  async paymentMethods(_) {
+    const paymentMethods = await this.$api.marketplace.paymentMethods()
+    return paymentMethods
+  },
   async getAddressesOfCurrentUser(context, userId) {
     const addresses = await this.$api.marketplace.getAddressesOfCurrentUser()
     return addresses
-  },
-  async confirmOrderFor(context, payload) {
-    const order = await db.confirmOrderFor(payload)
-    return order
   },
   async placeOrder(context, { orderId, paymentMethod }) {
     await db.placeOrder(orderId, paymentMethod)
