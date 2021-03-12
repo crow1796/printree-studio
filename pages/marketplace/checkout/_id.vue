@@ -428,15 +428,34 @@
           <div class="border-t">
             <div class="font-bold pb-4 border-b p-4">Shipping Options</div>
             <div class="px-4 pb-4 pt-2">
-              <OptionButtons :options="deliveryOptions" v-model="deliveryOption">
-                <template v-slot:default="{option}">
-                  <div class="flex flex-col">
-                    <div>{{ option.meta.cost.formatMoney('₱ ') }}</div>
-                    <div class="text-xs font-normal">{{ option.label }}</div>
-                    <!-- <div class="text-xs font-normal">Est. Arrival: {{ option.meta.est }}</div> -->
-                  </div>
-                </template>
-              </OptionButtons>
+              <div v-if="!isCalculatingSF">
+                <OptionButtons
+                  :options="shippingRates"
+                  v-model="shippingRate"
+                >
+                  <template v-slot:default="{option}">
+                    <div class="flex flex-col">
+                      <div>{{ option.meta.cost.formatMoney('₱ ') }}</div>
+                      <div class="text-xs font-bold">{{ option.label }}</div>
+                      <div class="text-xs font-normal">{{ option.name }}</div>
+                    </div>
+                  </template>
+                </OptionButtons>
+              </div>
+
+              <div v-if="isCalculatingSF">
+                <ContentLoader
+                  :width="300"
+                  :height="33"
+                  :speed="2"
+                  primaryColor="#f3f3f3"
+                  secondaryColor="#ecebeb"
+                >
+                  <rect x="0" y="0" rx="0" ry="0" width="60" height="33" />
+                  <rect x="65" y="0" rx="0" ry="0" width="60" height="33" />
+                  <rect x="130" y="0" rx="0" ry="0" width="60" height="33" />
+                </ContentLoader>
+              </div>
             </div>
           </div>
         </div>
@@ -476,7 +495,7 @@
             </span>
             <span class="text-xs text-gray-500">VAT included, where applicable</span>
           </div>
-          <PTButton color="primary" :disabled="!total" @click="placeOrder">
+          <PTButton color="primary" :disabled="!total || isCalculatingSF" @click="placeOrder">
             <span class="mr-2">Place Order</span>
             <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </PTButton>
@@ -490,6 +509,7 @@
 import OptionButtons from "@/components/OptionButtons";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import { mapGetters } from "vuex";
+import { ContentLoader } from "vue-content-loader";
 
 export default {
   layout: "empty",
@@ -497,6 +517,7 @@ export default {
   components: {
     OptionButtons,
     VueTailwindModal,
+    ContentLoader,
   },
   async mounted() {
     const checkout = await this.$store.dispatch(
@@ -507,7 +528,6 @@ export default {
     await this._loadAddresses();
     await this._loadPaymentMethods();
 
-    this.deliveryOption = _.first(this.deliveryOptions).value;
     this.paymentMethod = _.first(this.paymentMethods).value;
 
     this.shippingAddress = _.find(this.userAddresses, { isDefault: true });
@@ -520,6 +540,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      isCalculatingSF: false,
       products: [],
       selectingAddressFor: null,
       userAddresses: [],
@@ -540,7 +561,7 @@ export default {
       barangays: [],
       isAddressModalLoading: false,
       voucherCode: null,
-      deliveryOption: null,
+      shippingRate: null,
       shippingAddress: null,
       billingAddress: null,
       contactNumber: null,
@@ -557,16 +578,7 @@ export default {
         label: "home",
         isDefault: false,
       },
-      deliveryOptions: [
-        {
-          label: "Standard Delivery",
-          value: "lbc",
-          meta: {
-            cost: 105,
-            est: "Feb. 5 - Feb. 10",
-          },
-        },
-      ],
+      shippingRates: [],
       paymentMethod: null,
       paymentMethods: [],
     };
@@ -581,12 +593,12 @@ export default {
       );
     },
     total() {
-      if (!this.deliveryOption) return this.subtotal;
+      if (!this.shippingRate) return this.subtotal;
       return this.subtotal + this.deliveryOptionValue;
     },
     deliveryOptionValue() {
-      const option = _.find(this.deliveryOptions, {
-        value: this.deliveryOption,
+      const option = _.find(this.shippingRates, {
+        value: this.shippingRate,
       });
       if (!option) return 0;
       return option.meta.cost;
@@ -617,27 +629,20 @@ export default {
         !validationResponse ||
         this.billingAddressError ||
         this.shippingAddressError ||
-        this.isLoading
+        this.isLoading ||
+        this.isCalculatingSF
       )
         return;
       this.isLoading = true;
 
       const order = await this.$store.dispatch("marketplace/placeOrder", {
-        user: this.user,
-        products: _.map(this.products, ({ id, quantity }) => ({
-          id,
-          quantity,
-        })),
-        contact: {
-          shipping_address: this.shippingAddress,
-          billing_address: this.billingAddress,
-          contact_number: this.contactNumber,
-          contact_email: this.contactEmail,
-        },
-        total: this.total,
+        checkout: this.$route.params.id,
+        shippingAddress: this.shippingAddress._id,
+        billingAddress: this.billingAddress._id,
+        shippingRate: this.shippingRate,
+        paymentMethod: this.paymentMethod
       });
-      this.$storage.setLocalStorage("order_id", order.id);
-      this.$router.replace("/marketplace/cart/payment");
+      this.$router.replace(`/marketplace/checkout/tracking/?order=${order._id}`);
     },
     selectAddress(address) {
       switch (this.selectingAddressFor) {
@@ -754,6 +759,31 @@ export default {
           isDefault: false,
         };
       });
+    },
+  },
+  watch: {
+    shippingAddress: {
+      deep: true,
+      immediate: true,
+      async handler(to) {
+        if (!to) return;
+        this.isCalculatingSF = true;
+
+        const rates = await this.$store.dispatch(
+          "marketplace/calculateShippingFee",
+          { checkout: this.$route.params.id, address: to._id }
+        );
+        this.shippingRates = _.map(rates, (rate) => ({
+          label: rate.zone.profile.name,
+          name: rate.name,
+          value: rate._id,
+          meta: {
+            cost: rate.price,
+          },
+        }));
+        this.shippingRate = _.first(this.shippingRates)?.value || null;
+        this.isCalculatingSF = false;
+      },
     },
   },
 };

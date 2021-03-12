@@ -88,6 +88,14 @@ const actions = {
     const collections = await this.$api.admin.getCollections(searchQuery)
     return collections
   },
+  async shippingProfiles(context) {
+    const profiles = await this.$api.admin.shippingProfiles()
+    return profiles
+  },
+  async saveShippingProfile(context, data) {
+    const profile = await this.$api.admin.saveShippingProfile(data)
+    return profile
+  },
   async updateUser(context, data) {
     const res = await this.$axios.patch(`/users/${data.uid}`, data)
     context.commit('UPDATE_USER', res.data.user)

@@ -89,3 +89,34 @@ export const saveAddress = async (axios, address) => {
   const { saveAddress } = data.data;
   return saveAddress;
 }
+
+export const calculateShippingFee = async (axios, variables) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.calculateShippingFee,
+    variables
+  });
+  const { calculateShippingFee } = data.data;
+  return calculateShippingFee;
+}
+
+export const placeOrder = async (axios, order) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.placeOrder,
+    variables: {
+      order
+    }
+  });
+  const { placeOrder } = data.data;
+  return placeOrder;
+}
+
+export const getMarketplaceOrder = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.getMarketplaceOrder,
+    variables: {
+      id
+    }
+  });
+  const { getMarketplaceOrder } = data.data;
+  return getMarketplaceOrder;
+}

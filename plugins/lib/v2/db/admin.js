@@ -136,3 +136,22 @@ export const totalEarningsOfUser = async (axios, _id) => {
   const { totalEarningsOfUser } = data.data;
   return totalEarningsOfUser;
 }
+
+export const saveShippingProfile = async (axios, profile) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.saveShippingProfile,
+    variables: {
+      profile
+    },
+  });
+  const { saveShippingProfile } = data.data;
+  return saveShippingProfile;
+}
+
+export const shippingProfiles = async (axios) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.shippingProfiles
+  });
+  const { shippingProfiles } = data.data;
+  return shippingProfiles;
+}

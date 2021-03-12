@@ -29,6 +29,10 @@ const actions = {
     const checkout = await this.$api.marketplace.getCheckout(id)
     return checkout
   },
+  async getMarketplaceOrder(context, id) {
+    const order = await this.$api.marketplace.getMarketplaceOrder(id)
+    return order
+  },
   async getProductFromCollection(context, { collection, product }) {
     const prod = await db.getProductFromCollection(collection, product)
     return prod
@@ -80,16 +84,25 @@ const actions = {
     const address = await this.$api.marketplace.saveAddress(data)
     return address
   },
+  async saveShippingProfile(context, data) {
+    const profile = await this.$api.marketplace.saveShippingProfile(data)
+    return profile
+  },
   async paymentMethods(_) {
     const paymentMethods = await this.$api.marketplace.paymentMethods()
     return paymentMethods
+  },
+  async calculateShippingFee(_, data) {
+    const shippingRates = await this.$api.marketplace.calculateShippingFee(data)
+    return shippingRates
   },
   async getAddressesOfCurrentUser(context, userId) {
     const addresses = await this.$api.marketplace.getAddressesOfCurrentUser()
     return addresses
   },
-  async placeOrder(context, { orderId, paymentMethod }) {
-    await db.placeOrder(orderId, paymentMethod)
+  async placeOrder(_, data) {
+    const order = await this.$api.marketplace.placeOrder(data)
+    return order
   }
 }
 

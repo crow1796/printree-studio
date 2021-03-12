@@ -1,7 +1,7 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles } from './admin';
 import { getCollectionsOfUserId } from './users';
-import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods } from './marketplace';
+import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, productStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
@@ -29,6 +29,8 @@ export default (axios) => {
       paidPayoutRequest: (payout) => paidPayoutRequest(axios, payout),
       generateVariantImages: (data) => generateVariantImages(axios, data),
       getUserById: (data) => getUserById(axios, data),
+      saveShippingProfile: (data) => saveShippingProfile(axios, data),
+      shippingProfiles: () => shippingProfiles(axios),
       approveAccount: (id) => approveAccount(axios, id),
       deleteUserById: (id) => deleteUserById(axios, id),
       totalEarningsOfUser: (id) => totalEarningsOfUser(axios, id),
@@ -41,8 +43,11 @@ export default (axios) => {
       removeItemFromCart: (id) => removeItemFromCart(axios, id),
       checkout: (items) => checkout(axios, items),
       getCheckout: (id) => getCheckout(axios, id),
+      getMarketplaceOrder: (id) => getMarketplaceOrder(axios, id),
       getAddressesOfCurrentUser: () => getAddressesOfCurrentUser(axios),
       saveAddress: (data) => saveAddress(axios, data),
+      calculateShippingFee: (data) => calculateShippingFee(axios, data),
+      placeOrder: (data) => placeOrder(axios, data),
       paymentMethods: () => paymentMethods(axios),
     },
     userDashboard: {

@@ -772,5 +772,155 @@ export default {
             status
         }
     }
+  `,
+  saveShippingProfile: `
+    mutation ($profile: ShippingProfileInput!) {
+        saveShippingProfile(profile: $profile) {
+            _id
+            name
+            zones {
+                _id
+                name
+                provinces
+                rates {
+                    _id
+                    name
+                    minWeight
+                    maxWeight
+                    price
+                }
+            }
+        }
+    }
+  `,
+  shippingProfiles: `
+    query {
+        shippingProfiles{
+            _id
+            name
+            zones {
+                _id
+                name
+                provinces
+                rates {
+                    _id
+                    name
+                    minWeight
+                    maxWeight
+                    price
+                }
+            }
+        }
+    }
+  `,
+  calculateShippingFee: `
+    query ($checkout: ID!, $address: ID!){
+        calculateShippingFee(checkout: $checkout, address: $address){
+            _id
+            name
+            minWeight
+            maxWeight
+            price
+            zone {
+                profile {
+                    name
+                }
+            }
+        }
+    }
+  `,
+  placeOrder: `
+    mutation ($order: OrderInput!){
+        placeOrder(order: $order){
+            _id
+            orderNumber
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                city
+                mobileNumber
+                notes
+                label
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                city
+                mobileNumber
+                notes
+                label
+            }
+            trackingUrl
+            fulfillmentStatus
+            financialStatus
+        }
+    }
+  `,
+  getMarketplaceOrder: `
+    query ($id: ID!) {
+        getMarketplaceOrder(_id: $id) {
+            _id
+            orderNumber
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                city
+                mobileNumber
+                notes
+                label
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                city
+                mobileNumber
+                notes
+                label
+            }
+            trackingUrl
+            fulfillmentStatus
+            financialStatus
+        }
+    }
   `
 };
