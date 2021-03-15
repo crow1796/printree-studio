@@ -29,9 +29,17 @@ const actions = {
     const checkout = await this.$api.marketplace.getCheckout(id)
     return checkout
   },
-  async getMarketplaceOrder(context, id) {
-    const order = await this.$api.marketplace.getMarketplaceOrder(id)
+  async getCheckoutsOfCurrentUser(context, query) {
+    const checkout = await this.$api.marketplace.getCheckoutsOfCurrentUser(query)
+    return checkout
+  },
+  async getMarketplaceOrder(context, query) {
+    const order = await this.$api.marketplace.getMarketplaceOrder(query)
     return order
+  },
+  async marketplaceOrders(context, query) {
+    const checkout = await this.$api.marketplace.marketplaceOrders(query)
+    return checkout
   },
   async getProductFromCollection(context, { collection, product }) {
     const prod = await db.getProductFromCollection(collection, product)
@@ -49,6 +57,12 @@ const actions = {
     const cart = await this.$api.marketplace.getCartOfCurrentUser()
     return cart
   },
+  
+  async getCollectionMeta(context, id) {
+    const meta = await this.$api.marketplace.getCollectionMeta(id)
+    return meta
+  },
+  
   async getPHAddresses(context, { province, city, barangay }) {
     const provinceCode = province
     const cityCode = city

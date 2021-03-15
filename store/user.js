@@ -47,8 +47,7 @@ const actions = {
       email: data.email,
       name: data.name,
     });
-    context.commit("USER_NAME", data.name);
-    context.commit("USER_EMAIL", data.email);
+    this.$auth.fetchUser();
     return response;
   },
 };

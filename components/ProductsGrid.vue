@@ -21,7 +21,7 @@
         <div class="relative text-grey-600 px-3 pb-3">
           <span
             class="block opacity-75 w-full truncate text-xs leading-none"
-          >{{product.parent_collection.name}}</span>
+          >{{product.parent_collection.user.shopName}}</span>
           <div class="flex items-center justify-between">
             <span class="font-black truncate">{{product.meta.name}}</span>
           </div>

@@ -207,6 +207,25 @@
               <div class="mb-3">
                 <div>
                   <input
+                    name="postcode"
+                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                    type="number"
+                    :class="{ 'border-red-400': errors.has('addressForm.postcode'), 'focus:border-gray-600': !errors.has('addressForm.postcode') }"
+                    placeholder="Your Zip Code"
+                    v-model="addressFormData.postcode"
+                    data-vv-as="Zip Code"
+                    v-validate="'required|numeric'"
+                    data-vv-scope="addressForm"
+                  />
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('addressForm.postcode')"
+                >{{ errors.first('addressForm.postcode') }}</span>
+              </div>
+              <div class="mb-3">
+                <div>
+                  <input
                     name="mobileNumber"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
                     type="text"
@@ -429,10 +448,7 @@
             <div class="font-bold pb-4 border-b p-4">Shipping Options</div>
             <div class="px-4 pb-4 pt-2">
               <div v-if="!isCalculatingSF">
-                <OptionButtons
-                  :options="shippingRates"
-                  v-model="shippingRate"
-                >
+                <OptionButtons :options="shippingRates" v-model="shippingRate">
                   <template v-slot:default="{option}">
                     <div class="flex flex-col">
                       <div>{{ option.meta.cost.formatMoney('₱ ') }}</div>
@@ -640,9 +656,11 @@ export default {
         shippingAddress: this.shippingAddress._id,
         billingAddress: this.billingAddress._id,
         shippingRate: this.shippingRate,
-        paymentMethod: this.paymentMethod
+        paymentMethod: this.paymentMethod,
       });
-      this.$router.replace(`/marketplace/checkout/tracking/?order=${order._id}`);
+      this.$router.replace(
+        `/marketplace/checkout/tracking/?order=${order._id}`
+      );
     },
     selectAddress(address) {
       switch (this.selectingAddressFor) {

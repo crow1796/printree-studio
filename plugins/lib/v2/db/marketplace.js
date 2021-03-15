@@ -63,6 +63,28 @@ export const getCheckout = async (axios, id) => {
   return getCheckout;
 }
 
+export const getCheckoutsOfCurrentUser = async (axios, searchQuery) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.getCheckoutsOfCurrentUser,
+    variables: {
+      searchQuery
+    }
+  });
+  const { getCheckoutsOfCurrentUser } = data.data;
+  return getCheckoutsOfCurrentUser;
+}
+
+export const marketplaceOrders = async (axios, query) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.marketplaceOrders,
+    variables: {
+      query
+    }
+  });
+  const { marketplaceOrders } = data.data;
+  return marketplaceOrders;
+}
+
 export const paymentMethods = async (axios, id) => {
   const { data } = await axios.post("/gql", {
     query: queries.paymentMethods
@@ -77,6 +99,17 @@ export const getAddressesOfCurrentUser = async (axios) => {
   });
   const { getAddressesOfCurrentUser } = data.data;
   return getAddressesOfCurrentUser;
+}
+
+export const getCollectionMeta = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.getCollectionMeta,
+    variables: {
+      id
+    }
+  });
+  const { collection } = data.data;
+  return collection;
 }
 
 export const saveAddress = async (axios, address) => {

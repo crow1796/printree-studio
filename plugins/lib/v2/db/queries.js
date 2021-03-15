@@ -315,6 +315,10 @@ export default {
                 name
                 plan
                 handle
+                user {
+                    _id
+                    shopName
+                }
             }
             variants {
                 _id
@@ -920,6 +924,86 @@ export default {
             trackingUrl
             fulfillmentStatus
             financialStatus
+        }
+    }
+  `,
+  getCheckoutsOfCurrentUser: `
+    query ($searchQuery: CheckoutsQueryInput){
+        getCheckoutsOfCurrentUser(query: $searchQuery){
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                productName
+                collectionName
+                quantity
+                size
+                price
+                fullThumb
+            }
+        }
+    }
+  `,
+  marketplaceOrders: `
+    query ($query: MarketplaceOrdersQueryInput) {
+        marketplaceOrders(query: $query) {
+            _id
+            orderNumber
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                city
+                mobileNumber
+                notes
+                label
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                city
+                mobileNumber
+                notes
+                label
+            }
+            trackingUrl
+            fulfillmentStatus
+            financialStatus
+        }
+    }
+  `,
+  getCollectionMeta: `
+    query ($id: ID!){
+        collection(_id: $id){
+            _id
+            name
+            handle
+            plan
+            user {
+                _id
+                shopName
+            }
         }
     }
   `

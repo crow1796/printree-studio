@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-grow text-gray-800">
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
-    <CartDrawer ref="cartDrawer"/>
+    <CartDrawer ref="cartDrawer" />
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -66,7 +66,7 @@
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
                 >Products</nuxt-link>
 
-                <VueTailwindNotifications/>
+                <VueTailwindNotifications />
 
                 <VueTailwindDropdown width="200px" v-if="isLoggedIn">
                   <template v-slot:trigger>
@@ -140,8 +140,15 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-grow flex-col">
-        <nuxt />
+      <div class="flex flex-grow flex-col sm:flex-row">
+        <div class="w-3/12">
+          <ProfileNav />
+        </div>
+        <div class="class flex flex-grow bg-gray-100 sm:pt-6 pb-0 sm:pr-6">
+          <div class="bg-white w-full">
+            <nuxt />
+          </div>
+        </div>
       </div>
       <Footer />
     </div>
@@ -155,6 +162,7 @@ import Footer from "@/components/Footer";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import VueTailwindNotifications from "@/components/VueTailwindNotifications";
 import CartDrawer from "@/components/marketplace/CartDrawer";
+import ProfileNav from "@/components/marketplace/ProfileNav";
 
 export default {
   head: {
@@ -165,7 +173,8 @@ export default {
     Footer,
     VueTailwindDropdown,
     CartDrawer,
-    VueTailwindNotifications
+    VueTailwindNotifications,
+    ProfileNav,
   },
   computed: {
     ...mapGetters({
@@ -185,14 +194,14 @@ export default {
         this.$refs.authModal.show();
         return;
       }
-      this.$refs.cartDrawer.show()
+      this.$refs.cartDrawer.show();
     },
     async signOut() {
       if (this.$route.name !== "marketplace")
         await this.$router.replace("/marketplace");
       setTimeout(() => {
         this.$store.dispatch("user/signOut");
-      })
+      });
     },
   },
 };

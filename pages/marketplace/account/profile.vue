@@ -9,7 +9,7 @@
 
 <script>
 export default {
-  layout: "marketplace",
+  layout: "marketplace_dashboard",
   data(){
     return {
       isLoading: false

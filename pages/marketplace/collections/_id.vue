@@ -1,11 +1,30 @@
 <template>
   <div class="container mx-auto">
-    <div class="font-bold text-2xl mt-6 mb-2 px-8">All Products</div>
     <div class="relative min-h-area-loader">
       <AreaLoader v-if="isLoading" />
+      <div class="font-bold text-2xl mt-6 mb-2 px-8">{{ meta ? meta.name : "Collection Products" }}</div>
+
+      <div class="flex justify-between items-center mx-8" v-if="meta">
+        <div>
+          <BreadCrumbs
+            home-link="/marketplace"
+            :items="[{
+          title: meta.user.shopName,
+          link: meta.user._id
+          }, {
+            title: meta.name,
+            active: true
+          }]"
+          />
+        </div>
+      </div>
       <ProductsGrid :products="products" />
       <div class="flex flex-grow justify-center pb-6 mt-4">
-        <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />
+        <SimplePagination
+          @prev="goTo(prev)"
+          @next="goTo(next)"
+          v-if="products && products.length >= query.pagination.limit"
+        />
       </div>
     </div>
   </div>
@@ -13,6 +32,7 @@
 
 <script>
 import ProductsGrid from "@/components/ProductsGrid";
+import BreadCrumbs from "@/components/BreadCrumbs";
 import SimplePagination from "@/components/SimplePagination";
 
 export default {
@@ -20,14 +40,21 @@ export default {
   components: {
     ProductsGrid,
     SimplePagination,
+    BreadCrumbs,
   },
   created() {
     const page = this.$route.query.page;
-    if (page === undefined) return this.$router.replace("/marketplace/products/?page=1");
+    if (page === undefined)
+      return this.$router.replace(
+        `/marketplace/collections/${this.$route.params.id}/?page=1`
+      );
     this.currentPage = parseInt(page);
   },
   async mounted() {
-    this._loadItems();
+    this.meta = await this.$store.dispatch(
+      "marketplace/getCollectionMeta",
+      this.$route.params.id
+    );
   },
   data() {
     return {
@@ -35,10 +62,12 @@ export default {
       firstItem: null,
       isLoading: true,
       products: [],
+      meta: null,
       currentPage: this.$route.query.page,
       query: {
         plan: ["Sell"],
         status: ["approved"],
+        collectionId: this.$route.params.id,
         sorting: {
           field: "created_at",
           order: "DESC",
@@ -58,7 +87,7 @@ export default {
     },
     _reloadRoute() {
       this.$router.replace({
-        path: "/marketplace/products/",
+        path: `/marketplace/collections/${this.$route.params.id}/`,
         query: {
           page: this.query.pagination.page,
         },
@@ -67,16 +96,13 @@ export default {
     },
     async _loadItems() {
       this.isLoading = true;
-      const res = await this.$store.dispatch(
-        "marketplace/getProductsToSell",
-        {
-          ...this.query,
-          pagination: {
-            ...this.query.pagination,
-            page: this.query.pagination.page - 1
-          }
-        }
-      );
+      const res = await this.$store.dispatch("marketplace/getProductsToSell", {
+        ...this.query,
+        pagination: {
+          ...this.query.pagination,
+          page: this.query.pagination.page - 1,
+        },
+      });
       this.products = res;
       this.isLoading = false;
     },

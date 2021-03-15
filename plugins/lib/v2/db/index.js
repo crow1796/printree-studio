@@ -1,7 +1,7 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
 import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles } from './admin';
 import { getCollectionsOfUserId } from './users';
-import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder } from './marketplace';
+import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder, getCheckoutsOfCurrentUser, marketplaceOrders, getCollectionMeta } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, productStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
@@ -43,7 +43,10 @@ export default (axios) => {
       removeItemFromCart: (id) => removeItemFromCart(axios, id),
       checkout: (items) => checkout(axios, items),
       getCheckout: (id) => getCheckout(axios, id),
+      getCheckoutsOfCurrentUser: (query) => getCheckoutsOfCurrentUser(axios, query),
+      marketplaceOrders: (query) => marketplaceOrders(axios, query),
       getMarketplaceOrder: (id) => getMarketplaceOrder(axios, id),
+      getCollectionMeta: (id) => getCollectionMeta(axios, id),
       getAddressesOfCurrentUser: () => getAddressesOfCurrentUser(axios),
       saveAddress: (data) => saveAddress(axios, data),
       calculateShippingFee: (data) => calculateShippingFee(axios, data),
