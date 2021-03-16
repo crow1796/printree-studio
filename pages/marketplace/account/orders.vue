@@ -12,18 +12,15 @@
                 <font-awesome-icon :icon="['fas', option.meta.icon]" />
               </div>
               <div class="font-bold">{{ option.label }}</div>
+              <div class="font-bold absolute top-0 right-0 py-2 px-3  flex justify-center items-center">{{ counts[option.value] }}</div>
             </div>
           </template>
         </OptionButtons>
       </div>
 
-      <div class="px-8" v-if="orderStatus === 'to pay'">
-        <div
-          v-for="checkout in checkouts"
-          :key="checkout._id"
-          class="border rounded px-8 pt-4 mb-8"
-        >
-          <div class="font-bold p-4 border-b flex items-center justify-between">
+      <div class="px-8" v-if="orderStatus === 'toPay'">
+        <div v-for="checkout in checkouts" :key="checkout._id" class="border rounded p-8 mb-8">
+          <div class="font-bold pb-4 border-b flex items-center justify-between">
             <span>Items</span>
             <nuxt-link
               class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
@@ -37,7 +34,7 @@
               :key="i"
             >
               <div class="w-2/12 flex-justify-between">
-                <div class="w-16 mx-auto">
+                <div class="w-16">
                   <progressive-img class="relative mx-auto" :src="product.fullThumb" />
                 </div>
               </div>
@@ -72,7 +69,22 @@
               </div>
             </div>
           </div>
-          <div class="flex justify-between p-4 pb-8 font-bold text-xl">
+
+          <div class="pb-4 border-b">
+            <div class="flex justify-between pt-4 pb-2">
+              <span>Subtotal</span>
+              <span class="font-bold">{{ _subTotalOf(checkout).formatMoney('₱ ') }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Shipping</span>
+              <nuxt-link
+                :to="`/marketplace/checkout/${checkout._id}`"
+                class="font-bold text-primary underline cursor-pointer"
+              >To compute</nuxt-link>
+            </div>
+          </div>
+
+          <div class="flex justify-between pt-4 font-bold text-xl">
             <span>Total</span>
             <span class="text-primary">{{ (_subTotalOf(checkout)).formatMoney('₱ ') }}</span>
           </div>
@@ -80,18 +92,16 @@
       </div>
 
       <div class="px-8" v-else>
-        <div v-for="order in orders" :key="order._id" class="border rounded px-8 pt-4 mb-8">
-          <div class="font-bold p-4 border-b flex items-center justify-between">
+        <div v-for="order in orders" :key="order._id" class="border rounded p-8 mb-8">
+          <div class="font-bold pb-4 border-b flex items-center justify-between">
             <span>Order #{{order.orderNumber}}</span>
             <a
               class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
               :href="`/marketplace/checkout/tracking/?order=${order._id}`"
               target="_blank"
             >
-            <span class="mr-2">
-              View Status
-            </span>
-            <font-awesome-icon :icon="['fas', 'external-link-alt']"/>
+              <span class="mr-2">View Status</span>
+              <font-awesome-icon :icon="['fas', 'external-link-alt']" />
             </a>
           </div>
           <div class="flex flex-col flex-grow overflow-auto">
@@ -101,7 +111,7 @@
               :key="i"
             >
               <div class="w-2/12 flex-justify-between">
-                <div class="w-16 mx-auto">
+                <div class="w-16">
                   <progressive-img class="relative mx-auto" :src="product.fullThumb" />
                 </div>
               </div>
@@ -137,19 +147,21 @@
             </div>
           </div>
           <div class="pb-4 border-b">
-            <div class="flex justify-between px-4 pt-4 pb-2">
+            <div class="flex justify-between pt-4 pb-2">
               <span>Subtotal</span>
               <span class="font-bold">{{ _subTotalOf(order.checkout).formatMoney('₱ ') }}</span>
             </div>
-            <div class="flex justify-between px-4">
+            <div class="flex justify-between">
               <span>Shipping</span>
               <span class="font-bold">{{ order.shippingFee.formatMoney('₱ ') }}</span>
             </div>
           </div>
 
-          <div class="flex justify-between p-4 pb-8 font-bold text-xl">
+          <div class="flex justify-between pt-4 font-bold text-xl">
             <span>Total</span>
-            <span class="text-primary">{{ ((_subTotalOf(order.checkout)) + order.shippingFee).formatMoney('₱ ') }}</span>
+            <span
+              class="text-primary"
+            >{{ ((_subTotalOf(order.checkout)) + order.shippingFee).formatMoney('₱ ') }}</span>
           </div>
         </div>
       </div>
@@ -161,6 +173,7 @@
 import OptionButtons from "@/components/OptionButtons";
 import sum from "lodash/sum";
 import map from "lodash/map";
+import { mapGetters } from 'vuex'
 
 export default {
   layout: "marketplace_dashboard",
@@ -175,21 +188,21 @@ export default {
       orderStatuses: [
         {
           label: "To Pay",
-          value: "to pay",
+          value: "toPay",
           meta: {
             icon: "wallet",
           },
         },
         {
           label: "To Ship",
-          value: "pending",
+          value: "toShip",
           meta: {
             icon: "dolly-flatbed",
           },
         },
         {
           label: "To Receive",
-          value: "fulfilled",
+          value: "toReceive",
           meta: {
             icon: "shipping-fast",
           },
@@ -205,6 +218,12 @@ export default {
       orderStatus: null,
     };
   },
+  computed: {
+    ...mapGetters({
+      user: "user",
+      counts: "marketplace/counts",
+    }),
+  },
   methods: {
     _subTotalOf(checkout) {
       return sum(map(checkout.items, (item) => item.price * item.quantity));
@@ -215,9 +234,10 @@ export default {
       async handler(to, from) {
         if (!to) return;
         this.isLoading = true;
+        let newStatus
 
         switch (to) {
-          case "to pay":
+          case "toPay":
             this.checkouts = await this.$store.dispatch(
               "marketplace/getCheckoutsOfCurrentUser",
               {
@@ -225,13 +245,16 @@ export default {
               }
             );
             break;
-          case "pending":
-          case "fulfilled":
+          case "toShip":
+          case "toReceive":
           case "delivered":
+            if(to === 'toShip') newStatus = 'pending'
+            if(to === 'toReceive') newStatus = 'fulfilled'
+            if(to === 'delivered') newStatus = 'delivered'
             this.orders = await this.$store.dispatch(
               "marketplace/marketplaceOrders",
               {
-                fulfillmentStatus: [to],
+                fulfillmentStatus: [newStatus],
               }
             );
             console.log(this.checkouts);

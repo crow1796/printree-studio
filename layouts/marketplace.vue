@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-grow text-gray-800">
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
-    <CartDrawer ref="cartDrawer"/>
+    <CartDrawer ref="cartDrawer" />
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -17,7 +17,7 @@
                 </nuxt-link>
               </div>
 
-              <div class="w-4/12 hidden sm:flex sm:items-center">
+              <!-- <div class="w-4/12 hidden sm:flex sm:items-center">
                 <div class="mr-3" v-if="categories.length">
                   <VueTailwindDropdown>
                     <template v-slot:trigger>
@@ -58,7 +58,7 @@
                     <span class="ml-2">Cart</span>
                   </button>
                 </div>
-              </div>
+              </div>-->
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
                 <nuxt-link
@@ -66,7 +66,20 @@
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
                 >Products</nuxt-link>
 
-                <VueTailwindNotifications/>
+                <button
+                  type="button"
+                  class="flex items-center hover:text-primary text-sm outline-none focus:outline-none px-4"
+                  @click="openCart"
+                >
+                  <div class="relative">
+                    <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    <span
+                      class="absolute bg-primary rounded-full p-1 px-2 text-white flex justify-center items-center text-xs"
+                      style="top: -15px; right: -15px;"
+                    >{{ counts.cart }}</span>
+                  </div>
+                </button>
+                <!-- <VueTailwindNotifications/> -->
 
                 <VueTailwindDropdown width="200px" v-if="isLoggedIn">
                   <template v-slot:trigger>
@@ -165,12 +178,22 @@ export default {
     Footer,
     VueTailwindDropdown,
     CartDrawer,
-    VueTailwindNotifications
+    VueTailwindNotifications,
+  },
+  async mounted() {
+    if(this.isLoggedIn && this.user) await this.$store.dispatch("marketplace/getMPCounts", [
+      "toPay",
+      "toShip",
+      "toReceive",
+      "delivered",
+      "cart",
+    ]);
   },
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
       user: "user",
+      counts: "marketplace/counts"
     }),
   },
   data() {
@@ -185,14 +208,14 @@ export default {
         this.$refs.authModal.show();
         return;
       }
-      this.$refs.cartDrawer.show()
+      this.$refs.cartDrawer.show();
     },
     async signOut() {
       if (this.$route.name !== "marketplace")
         await this.$router.replace("/marketplace");
       setTimeout(() => {
         this.$store.dispatch("user/signOut");
-      })
+      });
     },
   },
 };

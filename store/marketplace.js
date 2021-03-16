@@ -1,19 +1,41 @@
+import { _ } from 'core-js'
 import find from 'lodash/find'
 
 const state = () => ({
-  cart: []
+  cart: [],
+  counts: {
+    toPay: 0,
+    toShip: 0,
+    toReceive: 0,
+    delivered: 0,
+    cart: 0
+  }
 })
 
 const mutations = {
   CART(state, cart) {
     state.cart = cart
-  }
+  },
+  COUNTS(state, counts) {
+    _.map(counts, (count, k) => {
+      state.counts[k] = count
+    })
+  },
+  ADD_CART_ITEM_COUNT(state, quantity) {
+    state.counts.cart += quantity
+  },
+  CART_ITEM_COUNT(state, count) {
+    state.counts.cart = count
+  },
 }
 
 const getters = {
   cart(state) {
     return state.cart
-  }
+  },
+  counts(state) {
+    return state.counts
+  },
 }
 
 const actions = {
@@ -47,6 +69,7 @@ const actions = {
   },
   async addToCart(context, item) {
     const res = await this.$api.marketplace.addToCart(item)
+    await context.dispatch('getMPCounts')
     return res
   },
   async removeItemFromCart(context, item) {
@@ -57,12 +80,12 @@ const actions = {
     const cart = await this.$api.marketplace.getCartOfCurrentUser()
     return cart
   },
-  
+
   async getCollectionMeta(context, id) {
     const meta = await this.$api.marketplace.getCollectionMeta(id)
     return meta
   },
-  
+
   async getPHAddresses(context, { province, city, barangay }) {
     const provinceCode = province
     const cityCode = city
@@ -97,6 +120,11 @@ const actions = {
   async saveAddress(context, data) {
     const address = await this.$api.marketplace.saveAddress(data)
     return address
+  },
+  async getMPCounts(context, data = ["cart"]) {
+    const counts = await this.$api.marketplace.getMPCounts(data)
+    context.commit("COUNTS", counts)
+    return counts
   },
   async saveShippingProfile(context, data) {
     const profile = await this.$api.marketplace.saveShippingProfile(data)

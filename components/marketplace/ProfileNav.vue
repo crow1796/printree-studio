@@ -30,7 +30,7 @@
             <span class="ml-3">Orders</span>
             <span
               class="flex items-center justify-center text-sm text-gray-500 font-semibold bg-gray-200 h-6 px-2 rounded-full ml-auto"
-            >10</span>
+            >{{ counts.toPay + counts.toShip + counts.toReceive }}</span>
           </nuxt-link>
         </li>
         <!-- <li class="my-px">
@@ -65,5 +65,13 @@
 </template>
 
 <script>
-export default {};
+import { mapGetters } from 'vuex'
+
+export default {
+  computed: {
+    ...mapGetters({
+      counts: "marketplace/counts",
+    })
+  }
+};
 </script>

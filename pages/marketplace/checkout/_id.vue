@@ -209,7 +209,7 @@
                   <input
                     name="postcode"
                     class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
-                    type="number"
+                    type="text"
                     :class="{ 'border-red-400': errors.has('addressForm.postcode'), 'focus:border-gray-600': !errors.has('addressForm.postcode') }"
                     placeholder="Your Zip Code"
                     v-model="addressFormData.postcode"
@@ -481,7 +481,7 @@
               type="text"
               v-model="voucherCode"
               placeholder="Enter Voucher Code"
-              class="px-6 py-2 rounded outline-none border mr-2"
+              class="px-4 py-2 rounded outline-none border mr-2"
             />
             <PTButton color="primary" :disabled="!voucherCode">APPLY</PTButton>
           </div>

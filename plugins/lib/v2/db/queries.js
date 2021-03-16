@@ -860,19 +860,23 @@ export default {
                 fullName
                 street
                 province
+                barangay
                 city
                 mobileNumber
                 notes
                 label
+                postcode
             }
             billingAddress {
                 fullName
                 street
                 province
+                barangay
                 city
                 mobileNumber
                 notes
                 label
+                postcode
             }
             trackingUrl
             fulfillmentStatus
@@ -907,19 +911,23 @@ export default {
                 fullName
                 street
                 province
+                barangay
                 city
                 mobileNumber
                 notes
                 label
+                postcode
             }
             billingAddress {
                 fullName
                 street
                 province
+                barangay
                 city
                 mobileNumber
                 notes
                 label
+                postcode
             }
             trackingUrl
             fulfillmentStatus
@@ -973,19 +981,23 @@ export default {
                 fullName
                 street
                 province
+                barangay
                 city
                 mobileNumber
                 notes
                 label
+                postcode
             }
             billingAddress {
                 fullName
                 street
                 province
+                barangay
                 city
                 mobileNumber
                 notes
                 label
+                postcode
             }
             trackingUrl
             fulfillmentStatus
@@ -1004,6 +1016,72 @@ export default {
                 _id
                 shopName
             }
+        }
+    }
+  `,
+  getMPCounts: `
+    query ($counts: [String!]){
+        getMPCounts(counts: $counts) {
+            toPay
+            toShip
+            toReceive
+            delivered
+            cart
+        }
+    }
+  `,
+  allMarketplaceOrders: `
+    query ($query: MarketplaceOrdersQueryInput) {
+        allMarketplaceOrders(query: $query) {
+            _id
+            orderNumber
+            created_at
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                    variant {
+                        _id
+                    }
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            trackingUrl
+            fulfillmentStatus
+            financialStatus
         }
     }
   `

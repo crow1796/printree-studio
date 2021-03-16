@@ -155,3 +155,14 @@ export const shippingProfiles = async (axios) => {
   const { shippingProfiles } = data.data;
   return shippingProfiles;
 }
+
+export const allMarketplaceOrders = async (axios, query) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.allMarketplaceOrders,
+    variables: {
+      query
+    }
+  });
+  const { allMarketplaceOrders } = data.data;
+  return allMarketplaceOrders;
+}

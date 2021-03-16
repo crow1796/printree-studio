@@ -123,6 +123,17 @@ export const saveAddress = async (axios, address) => {
   return saveAddress;
 }
 
+export const getMPCounts = async (axios, counts) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.getMPCounts,
+    variables: {
+      counts
+    }
+  });
+  const { getMPCounts } = data.data;
+  return getMPCounts;
+}
+
 export const calculateShippingFee = async (axios, variables) => {
   const { data } = await axios.post("/gql", {
     query: queries.calculateShippingFee,

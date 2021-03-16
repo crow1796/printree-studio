@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="mx-auto p-8 sm:p-16 lg:px-48 bg-gray-100">
+    <!-- Carousel -->
+    <!-- <div class="mx-auto p-8 sm:p-16 lg:px-48 bg-gray-100"> -->
       <!-- Carousel Body -->
-      <div
+      <!-- <div
         class="relative rounded-lg block md:flex items-center bg-gray-100 shadow-xl"
         style="min-height: 19rem;"
       >
@@ -57,10 +58,10 @@
         >
           <span class="block" style="transform: scale(1);">&#x279c;</span>
         </button>
-      </div>
+      </div> -->
 
       <!-- Carousel Tabs -->
-      <div class="flex items-center pt-5 justify-between">
+      <!-- <div class="flex items-center pt-5 justify-between">
         <button class="px-2 opacity-50 hover:opacity-100 focus:opacity-100">
           <img
             class="w-full"
@@ -101,8 +102,9 @@
             style="max-height: 60px;"
           />
         </button>
-      </div>
-    </div>
+      </div> -->
+    <!-- </div> -->
+    
     <!-- Display Container (not part of component) END -->
     <!-- Listing START-->
     <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">

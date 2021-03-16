@@ -95,7 +95,7 @@
               <div>
                 <div class="font-bold">Shipping Address</div>
                 <div>{{ order.shippingAddress.fullName }}</div>
-                <div>{{ `${order.shippingAddress.street}, ${_brgyDescOf(order.shippingAddress.barangay)}, ${_cityDescOf(order.shippingAddress.city)}, ${_provDescOf(order.shippingAddress.province)}, ${order.shippingAddress.postCode}` }}</div>
+                <div>{{ `${order.shippingAddress.street}, ${_brgyDescOf(order.shippingAddress.barangay)}, ${_cityDescOf(order.shippingAddress.city)}, ${_provDescOf(order.shippingAddress.province)}, ${order.shippingAddress.postcode}` }}</div>
               </div>
               <div class="pt-4">
                 <div class="font-bold">Mobile Number</div>
@@ -111,7 +111,7 @@
               <div>
                 <div class="font-bold">Billing Address</div>
                 <div>{{ order.billingAddress.fullName }}</div>
-                <div>{{ `${order.billingAddress.street}, ${_brgyDescOf(order.billingAddress.barangay)}, ${_cityDescOf(order.billingAddress.city)}, ${_provDescOf(order.billingAddress.province)}, ${order.billingAddress.postCode}` }}</div>
+                <div>{{ `${order.billingAddress.street}, ${_brgyDescOf(order.billingAddress.barangay)}, ${_cityDescOf(order.billingAddress.city)}, ${_provDescOf(order.billingAddress.province)}, ${order.billingAddress.postcode}` }}</div>
               </div>
               <div class="pt-4">
                 <div class="font-bold">Mobile Number</div>

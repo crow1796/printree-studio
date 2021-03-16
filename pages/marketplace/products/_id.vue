@@ -102,16 +102,6 @@
                   <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin" />
                 </span>
               </button>
-              <button
-                type="button"
-                class="border border mt-2 bg-white px-8 py-4 font-bold rounded text-body hover:bg-gray-200 w-full sm:w-7/12"
-                @click="addToCart"
-              >
-                <span v-if="!isAddingToCart">BUY NOW</span>
-                <span v-if="isAddingToCart">
-                  <font-awesome-icon :icon="['fas', 'spinner']" class="fa-spin" />
-                </span>
-              </button>
             </div>
             <div>
               <div class="my-10" v-if="product.meta.description">{{ product.meta.description }}</div>

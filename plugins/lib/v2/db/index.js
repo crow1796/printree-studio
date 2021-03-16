@@ -1,7 +1,7 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, allMarketplaceOrders, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles } from './admin';
 import { getCollectionsOfUserId } from './users';
-import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder, getCheckoutsOfCurrentUser, marketplaceOrders, getCollectionMeta } from './marketplace';
+import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder, getCheckoutsOfCurrentUser, marketplaceOrders, getCollectionMeta, getMPCounts } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, productStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
@@ -23,6 +23,7 @@ export default (axios) => {
       getCollections: (data) => getCollections(axios, data),
       updateCollectionStatus: (data) => updateCollectionStatus(axios, data),
       getUsers: (query) => getUsers(axios, query),
+      allMarketplaceOrders: (query) => allMarketplaceOrders(axios, query),
       payoutRequests: (query) => payoutRequests(axios, query),
       processPayoutRequest: (payout) => processPayoutRequest(axios, payout),
       declinePayoutRequest: (payout) => declinePayoutRequest(axios, payout),
@@ -49,6 +50,7 @@ export default (axios) => {
       getCollectionMeta: (id) => getCollectionMeta(axios, id),
       getAddressesOfCurrentUser: () => getAddressesOfCurrentUser(axios),
       saveAddress: (data) => saveAddress(axios, data),
+      getMPCounts: (data) => getMPCounts(axios, data),
       calculateShippingFee: (data) => calculateShippingFee(axios, data),
       placeOrder: (data) => placeOrder(axios, data),
       paymentMethods: () => paymentMethods(axios),

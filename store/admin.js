@@ -118,9 +118,9 @@ const actions = {
     const total = await this.$api.admin.totalEarningsOfUser(id)
     return total
   },
-  async getOrders(context, query) {
-    const res = await this.$axios.get('/orders')
-    context.commit('ORDERS', res.data.orders)
+  async allMarketplaceOrders(context, query) {
+    const res = await this.$api.admin.allMarketplaceOrders(query)
+    return res
   },
   async processOrder(context, { order, status }) {
     let reqStatus = true
