@@ -81,7 +81,7 @@
                 </button>
                 <!-- <VueTailwindNotifications/> -->
 
-                <VueTailwindDropdown width="200px" v-if="isLoggedIn">
+                <VueTailwindDropdown width="200px" v-if="isLoggedIn && user._id">
                   <template v-slot:trigger>
                     <div
                       class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
@@ -181,7 +181,7 @@ export default {
     VueTailwindNotifications,
   },
   async mounted() {
-    if(this.isLoggedIn && this.user) await this.$store.dispatch("marketplace/getMPCounts", [
+    if(this.isLoggedIn && this.user._id) await this.$store.dispatch("marketplace/getMPCounts", [
       "toPay",
       "toShip",
       "toReceive",
