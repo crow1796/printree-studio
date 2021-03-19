@@ -1,0 +1,81 @@
+<template>
+  <div>
+    <AreaLoader v-if="isLoading" />
+    <ShopBanner src="https://ik.imagekit.io/8ho5utvhpgf/fb_cover_3hiccIjnHk7.png"/>
+    <div class="container mx-auto mt-12">
+      <ProductsGrid :products="products" />
+      <div class="flex flex-grow justify-center pb-6 mt-4">
+        <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import ShopBanner from "@/components/marketplace/ShopBanner";
+import ProductsGrid from "@/components/ProductsGrid";
+import SimplePagination from "@/components/SimplePagination";
+
+export default {
+  layout: "shop",
+  components: {
+    ShopBanner,
+    ProductsGrid,
+    SimplePagination,
+  },
+  created() {
+    const page = this.$route.query.page;
+    if (page === undefined)
+      return this.$router.replace(
+        `/marketplace/shop/${this.$route.params.slug}/?page=1`
+      );
+    this.currentPage = parseInt(page);
+  },
+  async mounted() {
+    this._loadItems();
+  },
+  data() {
+    return {
+      isLoading: true,
+      products: [],
+      currentPage: this.$route.query.page,
+      query: {
+        plan: ["Sell"],
+        status: ["approved"],
+        sorting: {
+          field: "created_at",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 15,
+          page: 1,
+        },
+        shop: this.$route.params.slug,
+      },
+    };
+  },
+  methods: {
+    async _loadItems() {
+      this.isLoading = true;
+      const res = await this.$store.dispatch("marketplace/getProductsToSell", {
+        ...this.query,
+        pagination: {
+          ...this.query.pagination,
+          page: this.query.pagination.page - 1,
+        },
+      });
+      this.products = res;
+      this.isLoading = false;
+    },
+  },
+  computed: {
+    next() {
+      return parseInt(this.$route.query.page) + 1;
+    },
+    prev() {
+      const page = parseInt(this.$route.query.page);
+      return page > 1 ? page - 1 : 1;
+    },
+  },
+};
+</script>

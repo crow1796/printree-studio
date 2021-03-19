@@ -5,6 +5,9 @@ module.exports = {
       width: {
         '28': '8rem'
       },
+      height: {
+        'shop-banner': "450px"
+      },
       colors: {
         'smoke-darkest': 'rgba(0, 0, 0, 0.9)',
         'smoke-darker': 'rgba(0, 0, 0, 0.75)',

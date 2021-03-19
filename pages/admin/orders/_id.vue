@@ -1,6 +1,178 @@
 <template>
   <div class="relative sm:px-8">
-    <AreaLoader v-if="isLoading" />
+    <AreaLoader v-if="isLoading" fullscreen/>
+    <VueTailwindModal
+      ref="fulfillmentStatusModal"
+      width="30%"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase justify-center flex-grow">
+              <strong>Update Fulfillment Status</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body p-4">
+          <form>
+            <div class="mb-4 flex-grow">
+              <label for="name" class="font-bold">Status</label>
+              <div class="mt-2">
+                <select
+                  name="fulfillmentStatus"
+                  class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                  type="text"
+                  :class="{ 'border-red-400': errors.has('fulfillmentFormData.fulfillmentStatus'), 'focus:border-gray-600': !errors.has('fulfillmentFormData.fulfillmentStatus') }"
+                  placeholder="Fulfillment Status"
+                  v-model="fulfillmentFormData.fulfillmentStatus"
+                  data-vv-as="Fulfillment Status"
+                  v-validate="'required'"
+                  data-vv-scope="fulfillmentFormData"
+                >
+                  <option :value="null">Select Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="shipping">Shipping</option>
+                  <option value="fulfilled">Fulfilled</option>
+                </select>
+              </div>
+              <span
+                class="text-red-700 text-xs pt-1 font-bold inline-block"
+                v-if="errors.has('fulfillmentFormData.fulfillmentStatus')"
+              >{{ errors.first('fulfillmentFormData.fulfillmentStatus') }}</span>
+            </div>
+
+            <div class="flex">
+              <div class="mr-2">
+                <div>
+                  <input
+                    name="statusUrl"
+                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                    type="text"
+                    :class="{ 'border-red-400': errors.has('fulfillmentFormData.statusUrl'), 'focus:border-gray-600': !errors.has('fulfillmentFormData.statusUrl') }"
+                    placeholder="Tracking URL"
+                    v-model="fulfillmentFormData.statusUrl"
+                  />
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('fulfillmentFormData.statusUrl')"
+                >{{ errors.first('fulfillmentFormData.statusUrl') }}</span>
+              </div>
+              <div class="ml-2">
+                <div>
+                  <input
+                    name="trackingCode"
+                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                    type="text"
+                    :class="{ 'border-red-400': errors.has('fulfillmentFormData.trackingCode'), 'focus:border-gray-600': !errors.has('fulfillmentFormData.trackingCode') }"
+                    placeholder="Tracking Code"
+                    v-model="fulfillmentFormData.trackingCode"
+                  />
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('fulfillmentFormData.trackingCode')"
+                >{{ errors.first('fulfillmentFormData.trackingCode') }}</span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="hideModal($refs.fulfillmentStatusModal)"
+          >Cancel</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="updateFulfillmentStatus"
+          >Save</button>
+        </div>
+      </div>
+    </VueTailwindModal>
+    <VueTailwindModal
+      ref="paymentStatusModal"
+      width="30%"
+      content-class="rounded-none shadow-none text-gray-600"
+    >
+      <div class="flex flex-col">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-between w-full items-center">
+            <div class="flex uppercase justify-center flex-grow">
+              <strong>Update Payment Status</strong>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body p-4">
+          <div>
+            <form>
+              <div class="mb-4 flex-grow">
+                <label for="name" class="font-bold">Status</label>
+                <div class="mt-2">
+                  <select
+                    name="financialStatus"
+                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                    type="text"
+                    :class="{ 'border-red-400': errors.has('financialFormData.financialStatus'), 'focus:border-gray-600': !errors.has('financialFormData.financialStatus') }"
+                    placeholder="Financial Status"
+                    v-model="financialFormData.financialStatus"
+                    data-vv-as="Financial Status"
+                    v-validate="'required'"
+                    data-vv-scope="financialFormData"
+                  >
+                    <option :value="null">Select Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="partial">Partially Paid</option>
+                    <option value="paid">Fully Paid</option>
+                    <option value="refunded">Refunded</option>
+                  </select>
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('financialFormData.financialStatus')"
+                >{{ errors.first('financialFormData.financialStatus') }}</span>
+              </div>
+
+              <div v-if="financialFormData.financialStatus === 'partial'">
+                <div>
+                  <input
+                    name="partialAmount"
+                    class="w-full py-2 px-3 border rounded focus:outline-none outline-none"
+                    type="text"
+                    :class="{ 'border-red-400': errors.has('financialFormData.partialAmount'), 'focus:border-gray-600': !errors.has('financialFormData.partialAmount') }"
+                    placeholder="Amount Paid"
+                    v-model.number="financialFormData.partialAmount"
+                    data-vv-as="Amount Paid"
+                    v-validate="'required|numeric|required_if:financialStatus,partial'"
+                    data-vv-scope="financialFormData"
+                  />
+                </div>
+                <span
+                  class="text-red-700 text-xs pt-1 font-bold inline-block"
+                  v-if="errors.has('financialFormData.partialAmount')"
+                >{{ errors.first('financialFormData.partialAmount') }}</span>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="flex modal-footer justify-between flex-shrink p-4 border-t items-center">
+          <button
+            type="button"
+            class="justify-center items-center focus:outline-none outline-none border px-3 py-2 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100"
+            @click="hideModal($refs.paymentStatusModal)"
+          >Cancel</button>
+
+          <button
+            type="button"
+            class="shadow-xl border border-white bg-primary px-8 py-2 font-bold rounded text-white hover:bg-primary-lighter"
+            @click="updateFinancialStatus"
+          >Save</button>
+        </div>
+      </div>
+    </VueTailwindModal>
     <button
       type="button"
       href="#"
@@ -25,8 +197,13 @@
               <div class="text-xs leading-none">Fulfillment Status:</div>
               <div class="uppercase text-green-600 flex items-center">
                 {{ order.fulfillmentStatus}}
-                <span class="ml-2 cursor-pointer text-blue-600 hover:underline text-xs" title="Edit" v-tippy="{arrow: true}">
-                  <font-awesome-icon :icon="['fas', 'edit']"/>
+                <span
+                  class="ml-2 cursor-pointer text-blue-600 hover:underline text-xs"
+                  title="Edit"
+                  v-tippy="{arrow: true}"
+                  @click="$refs.fulfillmentStatusModal.show()"
+                >
+                  <font-awesome-icon :icon="['fas', 'edit']" />
                 </span>
               </div>
             </div>
@@ -34,8 +211,13 @@
               <div class="text-xs leading-none">Payment Status:</div>
               <div class="uppercase text-green-600">
                 {{ order.financialStatus}}
-                <span class="ml-2 cursor-pointer text-blue-600 hover:underline text-xs" title="Edit" v-tippy="{arrow: true}">
-                  <font-awesome-icon :icon="['fas', 'edit']"/>
+                <span
+                  class="ml-2 cursor-pointer text-blue-600 hover:underline text-xs"
+                  title="Edit"
+                  v-tippy="{arrow: true}"
+                  @click="$refs.paymentStatusModal.show()"
+                >
+                  <font-awesome-icon :icon="['fas', 'edit']" />
                 </span>
               </div>
             </div>
@@ -46,6 +228,14 @@
             <div class="font-bold flex-flex-col ml-4">
               <div class="text-xs leading-none">Shipping Fee:</div>
               <div class="uppercas">{{ (order.shippingFee).formatMoney('₱ ')}}</div>
+            </div>
+            <div class="font-bold flex-flex-col ml-4" v-if="order.trackingCode">
+              <div class="text-xs leading-none">Tracking Code:</div>
+              <div class="uppercas">
+                <a :href="order.statusUrl" target="_blank" class="text-blue-600 hover:underline font-bold">
+                  {{ order.trackingCode }}
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -127,6 +317,7 @@
 </template>
 
 <script>
+import VueTailwindModal from "@/components/VueTailwindModal";
 import moment from "moment";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import VuePureLightbox from "vue-pure-lightbox";
@@ -137,18 +328,32 @@ export default {
   components: {
     VueTailwindDropdown,
     VuePureLightbox,
+    VueTailwindModal,
   },
   async mounted() {
     const res = await this.$store.dispatch("admin/allMarketplaceOrders", {
       _id: this.$route.params.id,
     });
     this.order = _.first(res);
+    this.fulfillmentFormData.fulfillmentStatus = this.order.fulfillmentStatus;
+    this.fulfillmentFormData.trackingCode = this.order.trackingCode;
+    this.fulfillmentFormData.statusUrl = this.order.statusUrl;
+    
+    this.financialFormData.financialStatus = this.order.financialStatus;
     this.isLoading = false;
   },
   data() {
     return {
       order: null,
       isLoading: true,
+      fulfillmentFormData: {
+        fulfillmentStatus: null,
+        trackingCode: null,
+        statusUrl: null,
+      },
+      financialFormData: {
+        financialStatus: null,
+      },
     };
   },
   computed: {
@@ -159,9 +364,61 @@ export default {
     },
   },
   methods: {
+    hideModal(ref) {
+      ref.hide();
+      this.fulfillmentFormData.fulfillmentStatus = this.order.fulfillmentStatus;
+      this.financialFormData.financialStatus = this.order.financialStatus;
+    },
+    async updateFulfillmentStatus() {
+      const isValid = await this.$validator.validateAll("fulfillmentFormData");
+      if (this.isLoading) return;
+      if (!isValid) {
+        this.$toast.error("Please fix the errors below.", { position: "top" });
+        return;
+      }
+      
+      this.isLoading = true;
+
+      const res = await this.$store.dispatch('admin/updateOrder', {
+        id: this.$route.params.id,
+        orderInput: this.fulfillmentFormData
+      })
+
+      this.order = {
+        ...this.order,
+        ...res
+      }
+
+      this.hideModal(this.$refs.fulfillmentStatusModal)
+      
+      this.isLoading = false;
+    },
+    async updateFinancialStatus() {
+      const isValid = await this.$validator.validateAll("financialFormData");
+      if (this.isLoading) return;
+      if (!isValid) {
+        this.$toast.error("Please fix the errors below.", { position: "top" });
+        return;
+      }
+
+      this.isLoading = true;
+
+      const res = await this.$store.dispatch('admin/updateOrder', {
+        id: this.$route.params.id,
+        orderInput: this.financialFormData
+      })
+
+      this.order = {
+        ...this.order,
+        ...res
+      }
+
+      this.hideModal(this.$refs.paymentStatusModal)
+
+      this.isLoading = false;
+    },
     _brgyDescOf(code) {
       const barangay = this.$locations.findBrgy(code);
-      console.log(barangay);
       return barangay?.brgyDesc;
     },
     _provDescOf(code) {

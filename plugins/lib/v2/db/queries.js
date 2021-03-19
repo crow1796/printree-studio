@@ -273,6 +273,7 @@ export default {
             name
             email
             status
+            slug
             created_at
             updated_at
             shopName
@@ -293,6 +294,7 @@ export default {
             email
             status
             portfolioLink
+            slug
         }
     }
   `,
@@ -371,6 +373,8 @@ export default {
             fulfillmentStatus
             financialStatus
             statusUrl
+            partialAmount
+            trackingCode
             created_at
             updated_at
             orderProducts {
@@ -878,7 +882,9 @@ export default {
                 label
                 postcode
             }
-            trackingUrl
+            statusUrl
+            partialAmount
+            trackingCode
             fulfillmentStatus
             financialStatus
         }
@@ -929,7 +935,9 @@ export default {
                 label
                 postcode
             }
-            trackingUrl
+            statusUrl
+            partialAmount
+            trackingCode
             fulfillmentStatus
             financialStatus
         }
@@ -999,7 +1007,9 @@ export default {
                 label
                 postcode
             }
-            trackingUrl
+            statusUrl
+            partialAmount
+            trackingCode
             fulfillmentStatus
             financialStatus
         }
@@ -1079,9 +1089,22 @@ export default {
                 label
                 postcode
             }
-            trackingUrl
+            statusUrl
+            partialAmount
+            trackingCode
             fulfillmentStatus
             financialStatus
+        }
+    }
+  `,
+  updateOrder: `
+    mutation ($id: ID!, $orderInput: UpdateOrderInput!) {
+        updateOrder(_id: $id, orderInput: $orderInput) {
+            _id
+            fulfillmentStatus
+            financialStatus
+            trackingCode
+            statusUrl
         }
     }
   `

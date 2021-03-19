@@ -1,6 +1,10 @@
-export default function ({ store, route, redirect }) {
+export default function ({ store, route, redirect, $auth }) {
   const user = store.getters['user']
   const isLoggedIn = store.getters['isLoggedIn']
+  if(!user?._id){
+    $auth.logout()
+    return redirect('/')
+  }
   if (!isLoggedIn) return redirect('/')
   const isAdmin = _.includes(_.map(user.roles, 'name'), 'admin')
   const isCustomer = _.includes(_.map(user.roles, 'name'), 'customer')

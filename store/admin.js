@@ -122,6 +122,10 @@ const actions = {
     const res = await this.$api.admin.allMarketplaceOrders(query)
     return res
   },
+  async updateOrder(context, data) {
+    const res = await this.$api.admin.updateOrder(data)
+    return res
+  },
   async processOrder(context, { order, status }) {
     let reqStatus = true
     try {

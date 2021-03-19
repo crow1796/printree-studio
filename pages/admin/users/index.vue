@@ -215,7 +215,7 @@
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Open Store"
                       target="_blank"
-                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+                      :href="`/marketplace/shop/${user.slug}`"
                       v-tippy="{arrow: true}"
                       v-if="_isSeller(user)"
                     >

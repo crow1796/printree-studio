@@ -69,7 +69,7 @@
           <div class="font-bold">Shop Name</div>
           <div>
             <a
-              :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+              :href="`/marketplace/shop/${user.slug}`"
               target="_blank"
               class="text-blue-500 hover:text-blue-700"
               title="Open store in new tab"

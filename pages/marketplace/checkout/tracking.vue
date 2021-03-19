@@ -5,10 +5,14 @@
       <div class="flex-grow flex flex-col relative w-full sm:w-7/12 mx-auto">
         <div class="flex justify-center mb-16">
           <a href="/marketplace">
-            <img src="~/assets/images/logo-nav.png" alt="Printree Studio Logo" class="w-4/12 mx-auto"/>
+            <img
+              src="~/assets/images/logo-nav.png"
+              alt="Printree Studio Logo"
+              class="w-4/12 mx-auto"
+            />
           </a>
         </div>
-      
+
         <div class="relative">
           <div>Order #{{ order.orderNumber }}</div>
           <div class="font-bold pb-4 border-b flex-grow text-3xl">
@@ -25,6 +29,22 @@
           <div
             v-if="order.fulfillmentStatus === 'pending'"
           >We’ve accepted your order, and we’re getting it ready. Come back to this page for updates on your shipment status.</div>
+
+          <div v-if="order.fulfillmentStatus === 'shipping'">
+            Your order is now on its way.
+            <span class="block" v-if="order.trackingCode">
+              You can track it
+              <a
+                class="text-blue-600 hover:text-blue-800 font-bold"
+                :href="order.statusUrl"
+                target="_blank"
+              >here</a>
+              using this tracking code:
+              <span class="font-bold">{{order.trackingCode}}</span>
+            </span>
+          </div>
+
+          <div v-if="order.fulfillmentStatus === 'fulfilled'">Your order has been delivered. Thank you for your patience.</div>
         </div>
 
         <div>
@@ -129,9 +149,7 @@
           >Contact Us</a>
         </div>
 
-        <div class="text-center text-sm mt-10">
-          All rights reserved Printree Studio.
-        </div>
+        <div class="text-center text-sm mt-10">All rights reserved Printree Studio.</div>
       </div>
     </div>
   </div>
