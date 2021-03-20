@@ -63,7 +63,7 @@
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
                 <nuxt-link
                   to="/marketplace/products"
-                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
+                  class="text-gray-800 font-semibold hover:text-primary-lighter"
                 >Products</nuxt-link>
 
                 <button
@@ -153,7 +153,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-grow flex-col">
+      <div class="flex flex-grow flex-col min-h-area-loader">
         <nuxt />
       </div>
       <Footer />

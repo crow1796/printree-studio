@@ -17,10 +17,10 @@
             </div>
 
             <div class="flex flex-grow hidden sm:flex sm:items-center justify-end">
-              <nuxt-link
+              <!-- <nuxt-link
                 to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Marketplace</nuxt-link>
+              >Marketplace</nuxt-link> -->
               <nuxt-link
                 :to="dashboardLink"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"

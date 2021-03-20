@@ -249,8 +249,8 @@ export default {
           case "toReceive":
           case "delivered":
             if(to === 'toShip') newStatus = 'pending'
-            if(to === 'toReceive') newStatus = 'fulfilled'
-            if(to === 'delivered') newStatus = 'delivered'
+            if(to === 'toReceive') newStatus = 'shipping'
+            if(to === 'delivered') newStatus = 'fulfilled'
             this.orders = await this.$store.dispatch(
               "marketplace/marketplaceOrders",
               {

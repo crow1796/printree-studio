@@ -65,7 +65,7 @@
           <div class="font-bold">Name</div>
           <div>{{ user.name }}</div>
         </div>
-        <div class="mr-16" v-if="user.shopName">
+        <div class="mr-16" v-if="`/marketplace/shop/${user.slug}`">
           <div class="font-bold">Shop Name</div>
           <div>
             <a

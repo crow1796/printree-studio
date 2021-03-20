@@ -5,7 +5,7 @@
       :class="gridClass"
       v-for="product in products"
       :key="product._id"
-      :to="`/marketplace/products/${product._id}`"
+      :to="`${rootUrl}${product._id}`"
       :title="product.meta.name"
     >
       <div
@@ -56,6 +56,9 @@ export default {
     grid: {
       default: "5",
     },
+    rootUrl: {
+      default: '/marketplace/products/'
+    }
   },
   methods: {
     _startingPriceOf(product) {

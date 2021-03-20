@@ -3,7 +3,7 @@
     <AreaLoader v-if="isLoading" />
     <ShopBanner src="https://ik.imagekit.io/8ho5utvhpgf/fb_cover_3hiccIjnHk7.png"/>
     <div class="container mx-auto mt-12">
-      <ProductsGrid :products="products" />
+      <ProductsGrid :rootUrl="rootUrl" :products="products" />
       <div class="flex flex-grow justify-center pb-6 mt-4">
         <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />
       </div>
@@ -55,6 +55,20 @@ export default {
     };
   },
   methods: {
+    goTo(page) {
+      if (page === this.query.pagination.page) return;
+      this.query.pagination.page = page;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: `/marketplace/shop/${this.$route.params.slug}`,
+        query: {
+          page: this.query.pagination.page,
+        },
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
     async _loadItems() {
       this.isLoading = true;
       const res = await this.$store.dispatch("marketplace/getProductsToSell", {
@@ -75,6 +89,25 @@ export default {
     prev() {
       const page = parseInt(this.$route.query.page);
       return page > 1 ? page - 1 : 1;
+    },
+    rootUrl(){
+      return `/marketplace/shop/${this.$route.params.slug}/products/`
+    }
+  },
+  watch: {
+    "$route.query.page": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
     },
   },
 };

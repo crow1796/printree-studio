@@ -64,7 +64,7 @@
                 <nuxt-link
                   to="/marketplace/products"
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
-                >Products</nuxt-link>
+                >All Products</nuxt-link>
 
                 <button
                   type="button"
