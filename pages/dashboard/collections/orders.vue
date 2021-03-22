@@ -26,7 +26,7 @@
               class="uppercase"
               :class="{'text-green-600': order.fulfillmentStatus === 'fulfilled', 'text-primary': order.fulfillmentStatus !== 'fulfilled'}"
             >
-              {{ order.fulfillmentStatus === "fulfilled" ? "Confirmed" : "Pending" }}
+              {{ order.fulfillmentStatus }}
               <font-awesome-icon
                 v-if="order.fulfillmentStatus === 'fulfilled'"
                 :icon="['fas', 'check-circle']"
@@ -39,7 +39,7 @@
               class="uppercase"
               :class="{'text-green-600': order.financialStatus === 'paid', 'text-primary': order.financialStatus !== 'paid'}"
             >
-              {{ order.financialStatus || "Pending" }}
+              {{ order.financialStatus }}
               <font-awesome-icon
                 v-if="order.financialStatus === 'paid'"
                 :icon="['fas', 'check-circle']"
@@ -100,8 +100,7 @@
 <script>
 import moment from "moment";
 import { mapGetters } from "vuex";
-
-const VAT = 0.12
+import { VAT } from '@/plugins/price-calculator'
 
 export default {
   layout: "user_dashboard",

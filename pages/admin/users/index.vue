@@ -176,10 +176,11 @@
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <div class="flex flex-wrap">
                     <span
-                      class="rounded-full text-xs text-white px-2 mr-1"
+                      class="rounded-full text-xs px-2 mr-1"
                       :class="{
-                        'bg-primary': role.name !== 'buyer',
-                        'bg-blue-400': role.name === 'buyer',
+                        'bg-primary text-white': !(['buyer', 'customer'].includes(role.name)),
+                        'bg-blue-400 text-white': role.name === 'buyer',
+                        'bg-yellow-400 text-body': role.name === 'customer',
                       }"
                       v-for="(role, i) in user.roles"
                       :key="role ? `${user._id}_role_${role._id}` : `${user._id}_role_${i}`"
@@ -191,7 +192,7 @@
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{user.email}}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.name }}</td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.shopName }}</td>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.shop ? user.shop.name : '' }}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
@@ -214,7 +215,7 @@
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Open Store"
                       target="_blank"
-                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(user.shopName)}`"
+                      :href="`/marketplace/shop/${user.slug}`"
                       v-tippy="{arrow: true}"
                       v-if="_isSeller(user)"
                     >

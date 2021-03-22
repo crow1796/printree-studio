@@ -97,7 +97,7 @@
     <div class="flex h-full w-full text-gray-600">
       <div class="flex flex-col w-full h-full">
         <div class="flex flex-grow-0 items-center border-b p-4 justify-between">
-          <div class="flex w-2/6 uppercase flex-col" v-if="userTypeIs('seller')">
+          <!-- TODO: Uncomment if ready <div class="flex w-2/6 uppercase flex-col" v-if="userTypeIs('seller')">
             <div class="font-bold">
               <span class="font-bold mr-1">I WANT TO</span>
               <toggle-button
@@ -115,10 +115,10 @@
             <div
               class="text-xs mt-1"
             >{{ meta.plan == 'Sell' ? '100% FREE + NO INVENTORY' : 'YOU CAN IMMEDIATELY FULFILL YOUR CUSTOMERS ORDERS' }}</div>
-          </div>
+          </div> -->
           <div
             class="flex h-8 items-center font-bold"
-            :class="{ 'w-3/6': userTypeIs('buyer'), 'w-2/6 justify-center': userTypeIs('seller') }"
+            :class="{ 'w-3/6': userTypeIs('buyer'), 'w-2/6 justify-start': userTypeIs('seller') }"
           >Set Collection Details</div>
           <div
             class="flex justify-end"
@@ -250,7 +250,10 @@
                         <th class="w-2/12 text-center py-4 border-r border-white">
                           <span>Size</span>
                         </th>
-                        <th class="w-5/12 text-center py-4 border-r border-white" v-if="meta.plan === 'Sell'">
+                        <th
+                          class="w-5/12 text-center py-4 border-r border-white"
+                          v-if="meta.plan === 'Sell'"
+                        >
                           <span>Base Cost</span>
                         </th>
                         <th class="w-5/12 text-center py-4 border-r border-white">
@@ -478,9 +481,9 @@ import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 import { ContentLoader } from "vue-content-loader";
+import { priceWithVatCeil, priceWithVat } from '@/plugins/price-calculator'
 
 const SERVICE_FEE = 0.12;
-const VAT = 0.12;
 
 export default {
   props: {
@@ -504,6 +507,7 @@ export default {
   mixins: [UserTypeCheckerMixin],
   data() {
     return {
+      isSingle: this.$flags.flagIs("single", "on"),
       selectedProductSide: "front",
       isLoading: false,
       productErrors: [],
@@ -562,7 +566,7 @@ export default {
       if (this.meta.plan === "Sell")
         total = this.selectedProductBasePrice + this.selectedProductProfit;
 
-      return this.meta.plan === "Sell" ? Math.ceil(total + total * VAT) : total;
+      return this.meta.plan === "Sell" ? priceWithVatCeil(total) : total;
     },
     selectedVariantIndex() {
       if (!this.selectedProduct) return -1;
@@ -587,7 +591,7 @@ export default {
       if (this.meta.plan === "Sell")
         preTotal = this.selectedProductProfit + size.calculatedCost;
 
-      const total = preTotal + preTotal * VAT;
+      const total = priceWithVat(preTotal);
 
       return this.meta.plan === "Sell" ? Math.ceil(total) : total;
     },
@@ -756,8 +760,9 @@ export default {
           return;
         }
         if (
-          this.currentDesignName === "Untitled Collection" ||
-          !this.currentDesignName
+          (this.currentDesignName === "Untitled Collection" ||
+            !this.currentDesignName) &&
+          !this.isSingle
         )
           return this.showCollectionRenameModal();
         this.$refs.publishConfirmationModal.show();
@@ -792,7 +797,7 @@ export default {
         totalProfit -
         totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
       this.estimatedMinProfit =
-        this.meta.plan === "Sell" ? minProfit : printreeNet + printreeNet * VAT;
+        this.meta.plan === "Sell" ? minProfit : priceWithVat(printreeNet);
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });

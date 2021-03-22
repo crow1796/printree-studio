@@ -1,6 +1,7 @@
 <template>
   <div class="flex flex-grow text-gray-800">
-    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" />
+    <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
+    <CartDrawer ref="cartDrawer" />
     <div class="flex flex-col flex-grow">
       <div class="bg-white shadow font-sans w-full m-0">
         <div class="bg-white">
@@ -8,11 +9,15 @@
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
-                  <img src="~/assets/images/logo.png" alt="Printree Studio" class="w-24" />
+                  <img
+                    src="~/assets/images/logo-nav.png"
+                    alt="Printree Studio"
+                    class="w-28 object-fit"
+                  />
                 </nuxt-link>
               </div>
 
-              <div class="w-4/12 hidden sm:flex sm:items-center">
+              <!-- <div class="w-4/12 hidden sm:flex sm:items-center">
                 <div class="mr-3" v-if="categories.length">
                   <VueTailwindDropdown>
                     <template v-slot:trigger>
@@ -53,33 +58,73 @@
                     <span class="ml-2">Cart</span>
                   </button>
                 </div>
-              </div>
+              </div>-->
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
-              <nuxt-link
-                to="/marketplace/products"
-                class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Products</nuxt-link>
-                
                 <nuxt-link
-                  to="/dashboard"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
-                  v-if="isLoggedIn"
+                  to="/marketplace/products"
+                  class="text-gray-800 font-semibold hover:text-primary-lighter"
+                >Products</nuxt-link>
+
+                <button
+                  type="button"
+                  class="flex items-center hover:text-primary text-sm outline-none focus:outline-none px-4"
+                  @click="openCart"
                 >
-                  <span>
-                    <span>{{ user.email }}</span>
-                    <span class="ml-3">
-                      <font-awesome-icon :icon="['fas', 'arrow-right']" />
-                    </span>
-                  </span>
-                </nuxt-link>
+                  <div class="relative">
+                    <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    <span
+                      class="absolute bg-primary rounded-full p-1 px-2 text-white flex justify-center items-center text-xs"
+                      style="top: -15px; right: -15px;"
+                    >{{ counts.cart }}</span>
+                  </div>
+                </button>
+                <!-- <VueTailwindNotifications/> -->
+
+                <VueTailwindDropdown width="200px" v-if="isLoggedIn && user._id">
+                  <template v-slot:trigger>
+                    <div
+                      class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
+                    >
+                      <span class="mr-1 font-bold">{{ user.name }}</span>
+                      <div>
+                        <font-awesome-icon :icon="['fas', 'chevron-down']" />
+                      </div>
+                    </div>
+                  </template>
+                  <template v-slot:content>
+                    <div class="flex flex-col flex-grow">
+                      <nuxt-link
+                        to="/marketplace/account/orders"
+                        class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      >
+                        <span class="mr-2">
+                          <font-awesome-icon :icon="['fas', 'cog']" />
+                        </span>
+                        <span>Account</span>
+                      </nuxt-link>
+                    </div>
+                    <div class="flex flex-col flex-grow">
+                      <a
+                        href="#"
+                        class="flex items-center hover:bg-gray-200 px-4 py-2"
+                        @click.prevent="signOut"
+                      >
+                        <span class="mr-2">
+                          <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                        </span>
+                        <span>Logout</span>
+                      </a>
+                    </div>
+                  </template>
+                </VueTailwindDropdown>
                 <a
                   href="#"
-                  class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                  class="text-gray-800 text-sm font-semibold border px-4 py-2 hover:text-primary-lighter hover:border-primary-lighter bg-white"
                   id="get-started-btn"
                   @click.prevent="$refs.authModal.show()"
                   v-else
-                >Get Started</a>
+                >Sign In</a>
               </div>
 
               <div class="sm:hidden cursor-pointer">
@@ -108,7 +153,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-grow flex-col">
+      <div class="flex flex-grow flex-col min-h-area-loader">
         <nuxt />
       </div>
       <Footer />
@@ -117,39 +162,61 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import AuthModal from '@/components/Auth/AuthModal'
-import Footer from '@/components/Footer'
-import VueTailwindDropdown from '@/components/VueTailwindDropdown'
+import { mapGetters } from "vuex";
+import AuthModal from "@/components/Auth/AuthModal";
+import Footer from "@/components/Footer";
+import VueTailwindDropdown from "@/components/VueTailwindDropdown";
+import VueTailwindNotifications from "@/components/VueTailwindNotifications";
+import CartDrawer from "@/components/marketplace/CartDrawer";
 
 export default {
   head: {
-    title: 'Printree Studio'
+    title: "Printree Studio",
   },
   components: {
     AuthModal,
     Footer,
-    VueTailwindDropdown
+    VueTailwindDropdown,
+    CartDrawer,
+    VueTailwindNotifications,
+  },
+  async mounted() {
+    if(this.isLoggedIn && this.user._id) await this.$store.dispatch("marketplace/getMPCounts", [
+      "toPay",
+      "toShip",
+      "toReceive",
+      "delivered",
+      "cart",
+    ]);
   },
   computed: {
     ...mapGetters({
-      isLoggedIn: 'isLoggedIn',
-      user: 'user'
-    })
+      isLoggedIn: "isLoggedIn",
+      user: "user",
+      counts: "marketplace/counts"
+    }),
   },
-  data(){
+  data() {
     return {
-      categories: []
-    }
+      categories: [],
+      type: "customer",
+    };
   },
   methods: {
-    openCart(){
-      if(!this.isLoggedIn){
-        this.$refs.authModal.show()
-        return
+    openCart() {
+      if (!this.isLoggedIn) {
+        this.$refs.authModal.show();
+        return;
       }
-      this.$router.replace('/marketplace/cart')
-    }
-  }
-}
+      this.$refs.cartDrawer.show();
+    },
+    async signOut() {
+      if (this.$route.name !== "marketplace")
+        await this.$router.replace("/marketplace");
+      setTimeout(() => {
+        this.$store.dispatch("user/signOut");
+      });
+    },
+  },
+};
 </script>

@@ -1,5 +1,6 @@
 const state = () => ({
   userCollections: [],
+  userProducts: [],
   userPurchases: [],
   payouts: [],
   totalProfit: 0,
@@ -14,6 +15,9 @@ const mutations = {
   },
   USER_COLLECTIONS(state, userCollections) {
     state.userCollections = userCollections
+  },
+  USER_PRODUCTS(state, userProducts) {
+    state.userProducts = userProducts
   },
   USER_PURCHASES(state, purchases) {
     state.userPurchases = purchases
@@ -57,6 +61,10 @@ const mutations = {
     const index = _.findIndex(state.userCollections, { _id })
     state.userCollections[index].status = newStatus
   },
+  UPDATE_PRODUCT_STATUS(state, { _id, newStatus }) {
+    const index = _.findIndex(state.userProducts, { _id })
+    state.userProducts[index].status = newStatus
+  },
   UPDATE_COLLECTION_HANDLE(state, { _id, handle }) {
     const index = _.findIndex(state.userCollections, { _id })
     state.userCollections[index].handle = handle
@@ -66,6 +74,9 @@ const mutations = {
 const getters = {
   userCollections(state) {
     return state.userCollections
+  },
+  userProducts(state) {
+    return state.userProducts
   },
   userPurchases(state) {
     return state.userPurchases
@@ -91,9 +102,18 @@ const actions = {
     context.commit('USER_COLLECTIONS', collections)
     return collections
   },
+  async getUserProductsOf(context, query) {
+    const products = await this.$api.userDashboard.getUserProductsOf(query)
+    context.commit('USER_PRODUCTS', products)
+    return products
+  },
   async collectionStatus(context, collectionId) {
     const collection = await this.$api.userDashboard.collectionStatus(collectionId)
     return collection
+  },
+  async productStatus(context, productId) {
+    const product = await this.$api.userDashboard.productStatus(productId)
+    return product
   },
   async updateCollectionName(context, { _id, newName }) {
     await this.$api.updateCollectionName({ _id, name: newName });

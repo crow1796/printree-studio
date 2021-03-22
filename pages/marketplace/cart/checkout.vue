@@ -486,14 +486,12 @@ export default {
     VueTailwindModal
   },
   created() {
-    if(!this.$storage.getLocalStorage('products_to_checkout')) return this.$router.replace('/marketplace/cart')
-    this.products = this.$storage.getLocalStorage('products_to_checkout')
     this.deliveryOption = _.first(this.deliveryOptions).value
   },
   data() {
     return {
       isLoading: false,
-      isLoading: false,
+      products: [],
       selectingAddressFor: null,
       userAddresses: [],
       shippingAddressError: null,
@@ -599,7 +597,6 @@ export default {
         total: this.total
       })
       this.$storage.setLocalStorage('order_id', order.id)
-      this.$storage.removeLocalStorage('products_to_checkout')
       this.$router.replace('/marketplace/cart/payment')
     },
     selectAddress(address) {

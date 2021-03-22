@@ -143,7 +143,9 @@
             style="animation-duration: .3s;"
           >{{ autoSavingText }}</div>
         </transition>
-        <RightActions :isExpandable="currentProduct.customizableProduct.customizableVariants.length > 2">
+        <RightActions
+          :isExpandable="currentProduct.customizableProduct.customizableVariants.length > 2"
+        >
           <div
             class="w-8 h-8 rounded-full cursor-pointer mx-2 my-1 border border-gray-300 flex justify-center items-center relative"
             v-for="(variant, variantIndex) in currentProduct.customizableProduct.customizableVariants"
@@ -344,6 +346,17 @@ export default {
         families: _.map(this.webfonts, "value"),
       },
     });
+
+    if (this.$route.query.prod) {
+      const productIndex = _.findIndex(this.selectedProducts, {
+        _id: this.$route.query.prod,
+      });
+      if (productIndex !== -1) {
+        this.selectProduct(productIndex);
+        this.isLoading = false;
+        return;
+      }
+    }
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]));
     this.currentVariant = this.currentProduct.variants[0];
     this.$store.commit("designer/CURRENT_VARIANT_INDEX", 0);

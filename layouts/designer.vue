@@ -65,12 +65,7 @@
           </div>
         </div>
         <div class="flex w-1/3 items-center justify-end">
-          <a
-            href="#"
-            @click.stop="goToDashboard"
-            class="text-blue-400"
-            v-if="!isSingle"
-          >Go to Dashboard</a>
+          <a href="#" @click.stop="goToDashboard" class="text-blue-400">Go to Dashboard</a>
           <div class="w-4"></div>
           <PTButton
             color="primary"
@@ -140,6 +135,7 @@ export default {
         "designer/fetchDesignDataAndCommit",
         this.currentDesignId
       );
+
       await this.$store.dispatch("designer/fetchArts");
       this.isLoading = false;
     }
@@ -173,7 +169,9 @@ export default {
     },
     dontSave() {
       this.$refs.saveConfirmationModal.hide();
-      this.$router.push("/dashboard");
+      let route = '/dashboard'
+      if(this.$route.query.prod) route = '/dashboard/products'
+      this.$router.push(route);
     },
     async saveChanges() {
       this.$refs.saveConfirmationModal.hide();
@@ -182,7 +180,9 @@ export default {
         shouldGenerateImages: false,
       });
       this.isLoading = false;
-      this.$router.push("/dashboard");
+      let route = '/dashboard'
+      if(this.$route.query.prod) route = '/dashboard/products'
+      this.$router.push(route);
     },
     goToDashboard() {
       this.$refs.saveConfirmationModal.show();
@@ -233,9 +233,16 @@ export default {
         shouldGenerateImages: false,
       });
 
-      this.generatedImages = _.map(this.selectedProducts, () => null);
+      let productsToSave = this.selectedProducts;
+      if (this.$route.query.prod) {
+        productsToSave = this.selectedProducts.filter(
+          (p) => p._id === this.$route.query.prod
+        );
+        if (!productsToSave.length) productsToSave = this.selectedProducts;
+      }
+      this.generatedImages = _.map(productsToSave, () => null);
 
-      await this.selectedProducts.reduce(async (promise, product, i) => {
+      await productsToSave.reduce(async (promise, product, i) => {
         await promise;
 
         const res = await this.$axios.post("/create-images", {

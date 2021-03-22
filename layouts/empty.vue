@@ -4,6 +4,8 @@
 
 <script>
 export default {
-  
+  head: {
+    title: "Printree Studio",
+  },
 }
 </script>

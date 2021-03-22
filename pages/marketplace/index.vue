@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="mx-auto p-8 sm:p-16 lg:px-48 bg-gray-100">
+    <!-- Carousel -->
+    <!-- <div class="mx-auto p-8 sm:p-16 lg:px-48 bg-gray-100"> -->
       <!-- Carousel Body -->
-      <div
+      <!-- <div
         class="relative rounded-lg block md:flex items-center bg-gray-100 shadow-xl"
         style="min-height: 19rem;"
       >
@@ -57,10 +58,10 @@
         >
           <span class="block" style="transform: scale(1);">&#x279c;</span>
         </button>
-      </div>
+      </div> -->
 
       <!-- Carousel Tabs -->
-      <div class="flex items-center pt-5 justify-between">
+      <!-- <div class="flex items-center pt-5 justify-between">
         <button class="px-2 opacity-50 hover:opacity-100 focus:opacity-100">
           <img
             class="w-full"
@@ -101,48 +102,65 @@
             style="max-height: 60px;"
           />
         </button>
-      </div>
-    </div>
+      </div> -->
+    <!-- </div> -->
+    
     <!-- Display Container (not part of component) END -->
     <!-- Listing START-->
     <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">
-      <AreaLoader v-if="isFeaturedProductLoading"/>
+      <AreaLoader v-if="isFeaturedProductLoading" />
       <div class="flex justify-between lg:px-8 font-bold mb-4">
         <div class="font-black">Featured Products</div>
         <div>
-          <nuxt-link class="text-primary hover:text-primary-lighter flex items-center" to="/marketplace/products">
+          <nuxt-link
+            class="text-primary hover:text-primary-lighter flex items-center"
+            to="/marketplace/products"
+          >
             <span class="mr-2">See all Products</span>
-            <font-awesome-icon :icon="['fas', 'arrow-right']"/>
+            <font-awesome-icon :icon="['fas', 'arrow-right']" />
           </nuxt-link>
         </div>
       </div>
-      <ProductsGrid :products="featuredProducts" />
+      <ProductsGrid :products="featuredProducts" :grid="4"/>
     </div>
     <!-- Listing END -->
   </div>
 </template>
 
 <script>
-import ProductsGrid from '@/components/ProductsGrid'
+import ProductsGrid from "@/components/ProductsGrid";
 
 export default {
-  layout: 'marketplace',
+  layout: "marketplace",
   components: {
-    ProductsGrid
+    ProductsGrid,
   },
-  async mounted(){
-    this.isFeaturedProductLoading = true
-    const res = await this.$store.dispatch('marketplace/getProductsToSell', { is_featured: true })
-    if(res.status){
-      this.featuredProducts = res.data
-    }
-    this.isFeaturedProductLoading = false
+  async mounted() {
+    this.isFeaturedProductLoading = true;
+    const res = await this.$store.dispatch(
+      "marketplace/getProductsToSell",
+      this.query
+    );
+    this.featuredProducts = res;
+    this.isFeaturedProductLoading = false;
   },
-  data(){
+  data() {
     return {
       isFeaturedProductLoading: true,
-      featuredProducts: []
-    }
-  }
-}
+      featuredProducts: [],
+      query: {
+        plan: ["Sell"],
+        status: ["approved"],
+        sorting: {
+          field: "featuredAt",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 8,
+          page: 0,
+        },
+      },
+    };
+  },
+};
 </script>

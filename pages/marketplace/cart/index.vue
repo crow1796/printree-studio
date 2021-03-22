@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <AreaLoader v-if="isLoading"/>
+    <!-- <AreaLoader v-if="isLoading"/> -->
     <div class="mx-auto p-16 sm:p-16 lg:px-48 bg-gray-100">
       <div class="flex-grow flex flex-col">
         <div class="flex justify-between">
@@ -122,7 +122,7 @@ export default {
     }
   },
   async mounted(){
-    await this.loadItems()
+    // await this.loadItems()
   },
   data() {
     return {
@@ -165,8 +165,8 @@ export default {
       }
       this.selectedProducts = [...this.selectedProducts, product]
     },
-    checkout(){
-      this.$storage.setLocalStorage('products_to_checkout', JSON.stringify(this.selectedProducts))
+    async checkout(){
+      const checkout = this.$store.dispatch('marketplace/checkout')
       this.$router.replace('/marketplace/cart/checkout')
     }
   }

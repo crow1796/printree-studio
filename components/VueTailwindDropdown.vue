@@ -4,7 +4,7 @@
       <slot name="trigger" />
     </div>
     <div
-      class="absolute bg-white shadow-xl rounded border right-0"
+      class="absolute z-10 bg-white shadow-xl rounded border right-0 mt-3"
       :style="{width}"
       v-show="isOpen"
       v-click-outside="hide"

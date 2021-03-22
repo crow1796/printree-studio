@@ -295,7 +295,7 @@
                       <div class="flex w-full">
                         <ShareNetwork
                           network="facebook"
-                          :url="col.handle"
+                          :url="`${urlOrigin}/marketplace/shop/${user.shop.slug}/collections/${col._id}`"
                           :title="col.name"
                           class="px-3 flex justify-center items-center bg-blue-700 mr-2 rounded"
                         >
@@ -303,7 +303,7 @@
                         </ShareNetwork>
                         <ShareNetwork
                           network="twitter"
-                          :url="col.handle"
+                          :url="`${urlOrigin}/marketplace/shop/${user.shop.slug}/collections/${col._id}`"
                           :title="col.name"
                           class="px-3 flex justify-center items-center bg-blue-400 mr-2 rounded"
                         >
@@ -313,7 +313,7 @@
                           <input
                             class="flex flex-grow pl-4 w-1/2 rounded-l text-black bg-white"
                             disabled
-                            :value="col.handle"
+                            :value="`${urlOrigin}/marketplace/shop/${user.shop.slug}/collections/${col._id}`"
                             :ref="`copy-link-${col._id}`"
                           />
                           <button
@@ -356,6 +356,7 @@ export default {
   },
   mixins: [UserTypeCheckerMixin],
   async mounted() {
+    this.urlOrigin = window.location.origin
     await this.$store.dispatch(
       "user_dashboard/getUserCollectionsOf",
       this.user.uid
@@ -365,6 +366,7 @@ export default {
   },
   data() {
     return {
+      urlOrigin: "",
       isLoading: true,
       isLoadingFull: false,
       isRenameLoading: false,

@@ -5,73 +5,106 @@
       <AreaLoader v-if="isLoading" />
       <ProductsGrid :products="products" />
       <div class="flex flex-grow justify-center pb-6 mt-4">
-        <ul class="flex">
-          <li class="mx-1 px-3 py-2 text-sm font-semibold border px-6 py-4 rounded-lg text-xs items-center justify-center flex" :class="{
-            'hover:text-primary-lighter hover:border-primary-lighter bg-white cursor-pointer text-gray-800': page.currentPage > 1, 'opacity-50': page.currentPage === 1
-          }" @click="previous">
-            <span class="flex items-center font-bold">
-              <font-awesome-icon :icon="['fas', 'chevron-left']"/>
-            </span>
-          </li>
-          <li
-            class="mx-1 px-3text-sm font-semibold border px-6 py-4 rounded-lg text-xs items-center justify-center flex" :class="{ 'hover:text-primary-lighter hover:border-primary-lighter bg-white cursor-pointer text-gray-800': page.currentPage < totalNumberOfPages, 'opacity-50': page.currentPage === totalNumberOfPages }" @click="next"
-          >
-            <span class="flex items-center font-bold">
-              <font-awesome-icon :icon="['fas', 'chevron-right']"/>
-            </span>
-          </li>
-        </ul>
+        <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import ProductsGrid from '@/components/ProductsGrid'
+import ProductsGrid from "@/components/ProductsGrid";
+import SimplePagination from "@/components/SimplePagination";
 
 export default {
-  layout: 'marketplace',
+  layout: "marketplace",
   components: {
-    ProductsGrid
+    ProductsGrid,
+    SimplePagination,
+  },
+  created() {
+    const page = this.$route.query.page;
+    if (page === undefined) return this.$router.replace("/marketplace/products/?page=1");
+    this.currentPage = parseInt(page);
   },
   async mounted() {
-    this._loadItems()
+    this._loadItems();
   },
   data() {
     return {
-      previousFirstItem: null,
       lastItem: null,
       firstItem: null,
       isLoading: true,
       products: [],
-      totalNumberOfPages: 3,
-      page: {
-        perPage: 2,
-        currentPage: 1
-      }
-    }
+      currentPage: this.$route.query.page,
+      query: {
+        plan: ["Sell"],
+        status: ["approved"],
+        sorting: {
+          field: "created_at",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 15,
+          page: 0,
+        },
+      },
+    };
   },
   methods: {
-    async next(){
-      if(this.page.currentPage === this.totalNumberOfPages) return
-      this.page.currentPage = this.page.currentPage + 1
-      this._loadItems(1)
+    goTo(page) {
+      if (page === this.query.pagination.page) return;
+      this.query.pagination.page = page;
+      this._reloadRoute();
     },
-    async previous(){
-      if(this.page.currentPage === 1) return
-      this.page.currentPage = this.page.currentPage - 1
-      this._loadItems(-1)
+    _reloadRoute() {
+      this.$router.replace({
+        path: "/marketplace/products/",
+        query: {
+          page: this.query.pagination.page,
+        },
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    async _loadItems(step = 0){
-      this.isLoading = true
-      const res = await this.$store.dispatch('marketplace/getProductsToSell', { per_page: this.page.perPage, last_item: this.lastItem, first_item: this.firstItem, step })
-      this.products = res.data
-      if(res.page){
-        this.firstItem = res.page.first
-        this.lastItem = res.page.last
-      }
-      this.isLoading = false
-    }
-  }
-}
+    async _loadItems() {
+      this.isLoading = true;
+      const res = await this.$store.dispatch(
+        "marketplace/getProductsToSell",
+        {
+          ...this.query,
+          pagination: {
+            ...this.query.pagination,
+            page: this.query.pagination.page - 1
+          }
+        }
+      );
+      this.products = res;
+      this.isLoading = false;
+    },
+  },
+  computed: {
+    next() {
+      return parseInt(this.$route.query.page) + 1;
+    },
+    prev() {
+      const page = parseInt(this.$route.query.page);
+      return page > 1 ? page - 1 : 1;
+    },
+  },
+  watch: {
+    "$route.query.page": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
+    },
+  },
+};
 </script>
