@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader mt-40">
+  <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader mt-32">
     <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product" :key="product._id">
       <div class="flex lg:flex-row sm:flex-col">

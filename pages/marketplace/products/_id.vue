@@ -223,7 +223,7 @@ export default {
       const size = _.find(this.selectedVariant.sizes, {
         name: this.selectedSize,
       });
-      const preTotal = size.price + size.calculatedCost;
+      const preTotal = size.approvedPrice + size.approvedBaseCost;
       return priceWithVatCeil(preTotal);
     },
   },

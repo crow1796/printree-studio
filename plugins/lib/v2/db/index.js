@@ -1,7 +1,7 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
 import { getCollections, updateCollectionStatus, getUsers, allMarketplaceOrders, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles, updateOrder } from './admin';
 import { getCollectionsOfUserId } from './users';
-import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder, getCheckoutsOfCurrentUser, marketplaceOrders, getCollectionMeta, getMPCounts } from './marketplace';
+import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder, getCheckoutsOfCurrentUser, marketplaceOrders, getCollectionMeta, getMPCounts, shopConfig } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, productStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
 import { fetchAvailableProducts, getArts } from './designer';
 
@@ -55,6 +55,7 @@ export default (axios) => {
       calculateShippingFee: (data) => calculateShippingFee(axios, data),
       placeOrder: (data) => placeOrder(axios, data),
       paymentMethods: () => paymentMethods(axios),
+      shopConfig: (slug) => shopConfig(axios, slug)
     },
     userDashboard: {
       getUserProductsOf: (query) => getUserProductsOf(axios, query),

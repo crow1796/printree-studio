@@ -81,7 +81,7 @@
       <nuxt-link
         :to="`/admin/users/${meta.user._id}`"
         class="text-blue-500 hover:text-blue-700 font-bold text-xl"
-      >{{ meta.user.shopName || meta.user.name }}</nuxt-link>
+      >{{ meta.user.shop.name || meta.user.name }}</nuxt-link>
     </div>
     <div class="flex flex-grow text-gray-600 pb-10" v-if="selectedProduct">
       <div class="flex flex-col flex-grow">

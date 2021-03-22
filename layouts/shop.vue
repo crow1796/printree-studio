@@ -2,18 +2,14 @@
   <div>
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
     <CartDrawer ref="cartDrawer" />
-    <div class="fixed z-10 top-0 left-0 w-full" :style="{backgroundColor: navBG}">
-      <div class="flex flex-grow bg-transparent z-10">
+    <div class="fixed z-10 top-0 left-0 w-full" :style="{backgroundColor: navBG, height: '80px'}">
+      <div class="flex flex-grow bg-transparent h-full">
         <div class="flex flex-grow">
           <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between py-4">
+            <div class="flex items-center justify-between py-4 relative h-full">
               <div class="flex flex-grow">
-                <nuxt-link :to="shopHome">
-                  <img
-                    src="~/assets/images/logo-nav.png"
-                    alt="Printree Studio"
-                    class="w-28 object-fit"
-                  />
+                <nuxt-link :to="shopHome" style="max-height: 80px;">
+                  <img :src="shopLogo" alt="Printree Studio" class="w-20 absolute top-0 left-0 object-fit center-y" />
                 </nuxt-link>
               </div>
 
@@ -115,10 +111,11 @@ export default {
     AuthModal,
     Footer,
     VueTailwindDropdown,
-    CartDrawer
+    CartDrawer,
   },
   async mounted() {
     window.addEventListener("scroll", this.updateScroll);
+    await this.$store.dispatch("shop/shopConfig", this.$route.params.slug);
     if (this.isLoggedIn && this.user._id)
       await this.$store.dispatch("marketplace/getMPCounts", [
         "toPay",
@@ -127,10 +124,11 @@ export default {
         "delivered",
         "cart",
       ]);
+    this.isLoading = false;
   },
   data() {
     return {
-      isLoading: false,
+      isLoading: true,
       scrollPosition: null,
       type: "customer",
     };
@@ -142,11 +140,14 @@ export default {
       counts: "marketplace/counts",
       shopConfig: "shop/shopConfig",
     }),
+    shopLogo() {
+      return this.shopConfig?.logo || "~/assets/images/logo-nav.png";
+    },
     shopHome() {
       return `/marketplace/shop/${this.$route.params.slug}`;
     },
     navBG() {
-      let bg = this.shopConfig.navBG;
+      let bg = this.shopConfig.colors.navBG;
       return this.scrollPosition > 100 ? bg : "transparent";
     },
   },

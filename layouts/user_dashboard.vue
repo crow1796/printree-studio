@@ -30,7 +30,7 @@
                   <div
                     class="hidden md:block md:flex md:items-center ml-2 cursor-pointer hover:text-primary"
                   >
-                    <span class="text-sm mr-1">{{ user.shopName ? `${user.shopName}'s` : user.name }}</span>
+                    <span class="text-sm mr-1">{{ user.shop ? `${user.shop.name}'s` : user.name }}</span>
                     <div>
                       <font-awesome-icon :icon="['fas', 'chevron-down']" />
                     </div>
@@ -70,7 +70,7 @@
         <div class="container mx-auto px-4">
           <div class="md:flex justify-between items-center">
             <div class="flex">
-              <div class="flex -mb-px mr-8">
+              <!-- <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/products"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
@@ -81,7 +81,7 @@
                   </span>
                   My Products
                 </nuxt-link>
-              </div>
+              </div> -->
               <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/collections"
@@ -105,13 +105,24 @@
                   </span> Payouts
                 </nuxt-link>
               </div>
+              <div class="flex -mb-px mr-8" v-if="userTypeIs('seller')">
+                <nuxt-link
+                  to="/dashboard/shop/settings"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
+                    <font-awesome-icon :icon="['fas', 'cog']" />
+                  </span> Shop Settings
+                </nuxt-link>
+              </div>
             </div>
 
             <div v-if="userTypeIs('seller')" class="flex items-center">
               <div>
                 <TotalProfitCounter/>
               </div>
-              <div class="flex -mb-px ml-8" v-if="userTypeIs('seller')">
+              <div class="flex -mb-px ml-8">
                 <a
                   :href="`/marketplace/shop/${user.slug}`"
                   target="_blank"

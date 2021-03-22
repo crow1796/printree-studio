@@ -9,7 +9,7 @@
           <BreadCrumbs
             home-link="/marketplace"
             :items="[{
-          title: meta.user.shopName,
+          title: meta.user.shop.name,
           link: meta.user._id
           }, {
             title: meta.name,

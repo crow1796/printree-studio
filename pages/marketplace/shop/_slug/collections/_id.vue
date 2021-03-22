@@ -1,26 +1,28 @@
 <template>
-  <div>
-    <AreaLoader v-if="isLoading" />
-    <ShopBanner :src="shopBanner" v-if="shopBanner"/>
-    <div class="container mx-auto mt-12" :class="{'mt-12': shopBanner, 'mt-32': !shopBanner}">
+  <div class="container mx-auto mt-32">
+    <div class="relative min-h-area-loader">
+      <AreaLoader v-if="isLoading" />
+      <div class="font-bold text-2xl mt-6 mb-2 px-8">{{ meta ? meta.name : "Collection Products" }}</div>
+      
       <ProductsGrid :rootUrl="rootUrl" :products="products" />
       <div class="flex flex-grow justify-center pb-6 mt-4">
-        <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />
+        <SimplePagination
+          @prev="goTo(prev)"
+          @next="goTo(next)"
+          v-if="products && products.length >= query.pagination.limit"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import ShopBanner from "@/components/marketplace/ShopBanner";
 import ProductsGrid from "@/components/ProductsGrid";
 import SimplePagination from "@/components/SimplePagination";
-import { mapGetters } from 'vuex'
 
 export default {
   layout: "shop",
   components: {
-    ShopBanner,
     ProductsGrid,
     SimplePagination,
   },
@@ -28,30 +30,36 @@ export default {
     const page = this.$route.query.page;
     if (page === undefined)
       return this.$router.replace(
-        `/marketplace/shop/${this.$route.params.slug}/?page=1`
+        `/marketplace/shop/${this.$route.params.slug}/collections/${this.$route.params.id}/?page=1`
       );
     this.currentPage = parseInt(page);
   },
   async mounted() {
-    this._loadItems();
+    this.meta = await this.$store.dispatch(
+      "marketplace/getCollectionMeta",
+      this.$route.params.id
+    );
   },
   data() {
     return {
+      lastItem: null,
+      firstItem: null,
       isLoading: true,
       products: [],
+      meta: null,
       currentPage: this.$route.query.page,
       query: {
         plan: ["Sell"],
         status: ["approved"],
+        collectionId: this.$route.params.id,
         sorting: {
           field: "created_at",
           order: "DESC",
         },
         pagination: {
           limit: 15,
-          page: 1,
+          page: 0,
         },
-        shop: this.$route.params.slug,
       },
     };
   },
@@ -63,7 +71,7 @@ export default {
     },
     _reloadRoute() {
       this.$router.replace({
-        path: `/marketplace/shop/${this.$route.params.slug}`,
+        path: `/marketplace/shop/${this.$route.params.slug}/collections/${this.$route.params.id}/`,
         query: {
           page: this.query.pagination.page,
         },
@@ -84,9 +92,6 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      shopConfig: "shop/shopConfig",
-    }),
     next() {
       return parseInt(this.$route.query.page) + 1;
     },
@@ -96,10 +101,7 @@ export default {
     },
     rootUrl(){
       return `/marketplace/shop/${this.$route.params.slug}/products/`
-    },
-    shopBanner() {
-      return this.shopConfig?.banner;
-    },
+    }
   },
   watch: {
     "$route.query.page": {

@@ -21,7 +21,7 @@
         <div class="relative text-grey-600 px-3 pb-3">
           <span
             class="block opacity-75 w-full truncate text-xs leading-none"
-          >{{product.parent_collection.user.shopName}}</span>
+          >{{product.parent_collection.user.shop.name}}</span>
           <div class="flex items-center justify-between">
             <span class="font-black truncate">{{product.meta.name}}</span>
           </div>
@@ -67,7 +67,7 @@ export default {
       const firstSize = first(firstVariant.sizes);
       if (!firstSize) return 0;
 
-      const preTotal = firstSize.price + firstSize.calculatedCost;
+      const preTotal = firstSize.approvedPrice + firstSize.approvedBaseCost;
       return priceWithVatCeil(preTotal);
     },
     _firstThumbnailOf(product) {

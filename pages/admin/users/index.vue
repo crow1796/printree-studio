@@ -192,7 +192,7 @@
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{user.email}}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.name }}</td>
-                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.shopName }}</td>
+                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{{ user.shop ? user.shop.name : '' }}</td>
                 <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <span
                     class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"

@@ -27,7 +27,7 @@
                 v-if="isLoggedIn && user"
               >
                 <span>
-                  <span>{{ user.shopName ? `${user.shopName}'s` : user.email }}</span>
+                  <span>{{ user.shop ? `${user.shop.name}'s` : user.email }}</span>
                   <span class="ml-3">
                     <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </span>

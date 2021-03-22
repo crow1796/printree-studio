@@ -65,17 +65,17 @@
           <div class="font-bold">Name</div>
           <div>{{ user.name }}</div>
         </div>
-        <div class="mr-16" v-if="`/marketplace/shop/${user.slug}`">
+        <div class="mr-16" v-if="user.shop">
           <div class="font-bold">Shop Name</div>
           <div>
             <a
-              :href="`/marketplace/shop/${user.slug}`"
+              :href="`/marketplace/shop/${user.shop.slug}`"
               target="_blank"
               class="text-blue-500 hover:text-blue-700"
               title="Open store in new tab"
               v-tippy="{arrow: true}"
             >
-              <span>{{ user.shopName }}</span>
+              <span>{{ user.shop.name }}</span>
               <font-awesome-icon :icon="['fas', 'external-link-alt']" />
             </a>
           </div>

@@ -164,3 +164,14 @@ export const getMarketplaceOrder = async (axios, id) => {
   const { getMarketplaceOrder } = data.data;
   return getMarketplaceOrder;
 }
+
+export const shopConfig = async (axios, slug) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.shopConfig,
+    variables: {
+      slug
+    }
+  });
+  const { shopConfig } = data.data;
+  return shopConfig;
+}

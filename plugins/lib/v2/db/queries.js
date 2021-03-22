@@ -102,6 +102,11 @@ export default {
                 _id
                 name
                 shopName
+                shop {
+                    _id
+                    slug
+                    name
+                }
             }
             products {
                 _id
@@ -254,6 +259,11 @@ export default {
                 name
                 email
                 shopName
+                shop {
+                    _id
+                    slug
+                    name
+                }
             }
             products {
                 _id
@@ -277,6 +287,11 @@ export default {
             created_at
             updated_at
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             roles {
                 _id
                 name
@@ -291,6 +306,11 @@ export default {
             _id
             name
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             email
             status
             portfolioLink
@@ -320,6 +340,11 @@ export default {
                 user {
                     _id
                     shopName
+                    shop {
+                        _id
+                        slug
+                        name
+                    }
                 }
             }
             variants {
@@ -546,6 +571,11 @@ export default {
             _id
             name
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             email
             created_at
             updated_at
@@ -593,6 +623,11 @@ export default {
             _id
             name
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             email
             status
             portfolioLink
@@ -1025,6 +1060,11 @@ export default {
             user {
                 _id
                 shopName
+                shop {
+                    _id
+                    slug
+                    name
+                }
             }
         }
     }
@@ -1105,6 +1145,24 @@ export default {
             financialStatus
             trackingCode
             statusUrl
+        }
+    }
+  `,
+  shopConfig: `
+    query ($slug: String!){
+        shopConfig(slug: $slug) {
+            _id
+            name
+            slug
+            logo
+            banner
+            colors {
+                navBG
+                navTextColor
+                navTextHoverColor
+                bannerBGColor
+                bannerBGSize
+            }
         }
     }
   `

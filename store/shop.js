@@ -1,27 +1,36 @@
 const state = () => ({
   shopConfig: {
-    navBG: "#ffffff",
-    navTextColor: "rgb(45, 55, 72)",
-    navTextHoverColor: "red",
-    bannerBGColor: "#ffffff",
-    bannerBGSize: "cover",
+    _id: null,
+    logo: null,
+    banner: null,
+    slug: null,
+    colors: {
+      navBG: "#ffffff",
+      navTextColor: "rgb(45, 55, 72)",
+      navTextHoverColor: "red",
+      bannerBGColor: "#ffffff",
+      bannerBGSize: "cover",
+    }
   }
 })
 
 const getters = {
-  shopConfig(state){
+  shopConfig(state) {
     return state.shopConfig
   }
 }
 
 const mutations = {
-
+  SHOP_CONFIG(state, config) {
+    state.shopConfig = config
+  }
 }
 
 const actions = {
-  async loadConfig(context){
-    const res = await this.$api.marketplace.loadConfig()
-    return res
+  async shopConfig(context, slug) {
+    const config = await this.$api.marketplace.shopConfig(slug)
+    context.commit("SHOP_CONFIG", config)
+    return config
   }
 }
 
