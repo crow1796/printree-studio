@@ -12,7 +12,9 @@
                 <font-awesome-icon :icon="['fas', option.meta.icon]" />
               </div>
               <div class="font-bold">{{ option.label }}</div>
-              <div class="font-bold absolute top-0 right-0 py-2 px-3  flex justify-center items-center">{{ counts[option.value] }}</div>
+              <div
+                class="font-bold absolute top-0 right-0 py-2 px-3 flex justify-center items-center"
+              >{{ counts[option.value] }}</div>
             </div>
           </template>
         </OptionButtons>
@@ -93,6 +95,37 @@
 
       <div class="px-8" v-else>
         <div v-for="order in orders" :key="order._id" class="border rounded p-8 mb-8">
+
+          <div class="border rounded p-4 mb-4">
+            <div class="font-bold mb-2">
+              Your order is
+              <span class="text-primary">{{ order.fulfillmentStatus }}</span>
+            </div>
+
+            <div
+              v-if="order.fulfillmentStatus === 'pending'"
+            >We’ve accepted your order, and we’re getting it ready. Come back to this page for updates on your shipment status.</div>
+
+            <div v-if="order.fulfillmentStatus === 'shipping'">
+              Your order is now on its way.
+              <span class="block" v-if="order.trackingCode">
+                You can track it
+                <a
+                  class="text-blue-600 hover:text-blue-800 font-bold"
+                  :href="order.statusUrl"
+                  target="_blank"
+                >here</a>
+                using this tracking code:
+                <span
+                  class="font-bold"
+                >{{order.trackingCode}}</span>
+              </span>
+            </div>
+
+            <div
+              v-if="order.fulfillmentStatus === 'fulfilled'"
+            >Your order has been delivered. Thank you for your patience.</div>
+          </div>
           <div class="font-bold pb-4 border-b flex items-center justify-between">
             <span>Order #{{order.orderNumber}}</span>
             <a
@@ -100,7 +133,7 @@
               :href="`/marketplace/checkout/tracking/?order=${order._id}`"
               target="_blank"
             >
-              <span class="mr-2">View Status</span>
+              <span class="mr-2">View Order Page</span>
               <font-awesome-icon :icon="['fas', 'external-link-alt']" />
             </a>
           </div>
@@ -173,7 +206,7 @@
 import OptionButtons from "@/components/OptionButtons";
 import sum from "lodash/sum";
 import map from "lodash/map";
-import { mapGetters } from 'vuex'
+import { mapGetters } from "vuex";
 
 export default {
   layout: "marketplace_dashboard",
@@ -234,7 +267,7 @@ export default {
       async handler(to, from) {
         if (!to) return;
         this.isLoading = true;
-        let newStatus
+        let newStatus;
 
         switch (to) {
           case "toPay":
@@ -248,9 +281,9 @@ export default {
           case "toShip":
           case "toReceive":
           case "delivered":
-            if(to === 'toShip') newStatus = 'pending'
-            if(to === 'toReceive') newStatus = 'shipping'
-            if(to === 'delivered') newStatus = 'fulfilled'
+            if (to === "toShip") newStatus = "pending";
+            if (to === "toReceive") newStatus = "shipping";
+            if (to === "delivered") newStatus = "fulfilled";
             this.orders = await this.$store.dispatch(
               "marketplace/marketplaceOrders",
               {

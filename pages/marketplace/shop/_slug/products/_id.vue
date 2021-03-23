@@ -14,11 +14,11 @@
               :key="i"
               @click="selectedThumbnailIndex = i"
             >
-              <progressive-img :src="thumb[frontOrFirst]" class="lg:w-24 sm:w-16" />
+              <progressive-img :src="thumb" class="lg:w-24 sm:w-16" />
             </div>
           </div>
           <div class="flex lg:w-9/12 items-start sm:w-full">
-            <ZoomOnHover :img="thumbnails[selectedThumbnailIndex][selectedSide]" />
+            <ZoomOnHover :img="thumbnails[selectedThumbnailIndex]" />
           </div>
         </div>
         <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2">
@@ -211,20 +211,18 @@ export default {
       const size = _.find(this.selectedVariant.sizes, {
         name: this.selectedSize,
       });
-      const preTotal = size.price + size.calculatedCost;
+      const preTotal = size.approvedPrice + size.approvedBaseCost;
       return priceWithVatCeil(preTotal);
     },
   },
   methods: {
     _setDisplayMeta() {
-      let tmpThumbnails = [];
+      let tmpThumbnails = {};
       this.sides = _.map(this.selectedVariant.contents, "printableArea.side");
 
-      _.map(this.product.variants, (variant, i) => {
-        if (!tmpThumbnails[i]) tmpThumbnails.push({});
-        _.map(this.selectedVariant.contents, (content) => {
-          tmpThumbnails[i][content.printableArea.side] = content.fullThumb;
-        });
+      _.map(this.selectedVariant.contents, (content) => {
+        if(tmpThumbnails[content.printableArea.side]) return
+        tmpThumbnails[content.printableArea.side] = content.fullThumb;
       });
 
       this.selectedSide = this.frontOrFirst;

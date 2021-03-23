@@ -14,6 +14,15 @@
         </div>
 
         <div class="relative">
+          <nuxt-link
+            v-if="shop"
+            :to="`/marketplace/shop/${shop}`"
+            class="text-xs text-blue-500 hover:text-blue-700 mb-2 inline-block"
+          >
+            <font-awesome-icon :icon="['fas', 'arrow-left']" />
+            <span class="ml-1">Back to Shop</span>
+          </nuxt-link>
+
           <div>Order #{{ order.orderNumber }}</div>
           <div class="font-bold pb-4 border-b flex-grow text-3xl">
             <span>Thank you for your order!</span>
@@ -44,7 +53,9 @@
             </span>
           </div>
 
-          <div v-if="order.fulfillmentStatus === 'fulfilled'">Your order has been delivered. Thank you for your patience.</div>
+          <div
+            v-if="order.fulfillmentStatus === 'fulfilled'"
+          >Your order has been delivered. Thank you for your patience.</div>
         </div>
 
         <div>
@@ -172,6 +183,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      shop: this.$storage.getCookie("shop"),
       order: null,
     };
   },

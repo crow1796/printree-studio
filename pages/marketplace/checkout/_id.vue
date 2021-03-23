@@ -480,10 +480,10 @@
             <input
               type="text"
               v-model="voucherCode"
-              placeholder="Enter Voucher Code"
+              placeholder="Enter Coupon Code"
               class="px-4 py-2 rounded outline-none border mr-2"
             />
-            <PTButton color="primary" :disabled="!voucherCode">APPLY</PTButton>
+            <PTButton color="primary" :disabled="!voucherCode" @click="applyCoupon">APPLY</PTButton>
           </div>
           <div class="flex flex-col">
             <div class="font-bold flex items-center">
@@ -505,7 +505,7 @@
         </div>
         <div class="flex justify-between p-4 items-center border-t">
           <div class="flex flex-col">
-            <span class="text-xs">Grand Total</span>
+            <span class="text-xs font-bold">Grand Total</span>
             <span class="font-bold text-primary leading-none my-1">
               <number :to="total" :format="(num) => num.formatMoney('₱ ')" :duration=".4" />
             </span>
@@ -621,6 +621,11 @@ export default {
     },
   },
   methods: {
+    applyCoupon(){
+      this.$toast.error("Invalid coupon code.", {
+        position: "top"
+      })
+    },
     _brgyDescOf(code) {
       const barangay = this.$locations.findBrgy(code);
       return barangay?.brgyDesc;

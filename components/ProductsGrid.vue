@@ -15,7 +15,7 @@
           <progressive-img
             class="relative w-40"
             :src="_firstThumbnailOf(product)"
-            style="width: 160px"
+            style="width: 160px;"
           />
         </div>
         <div class="relative text-grey-600 px-3 pb-3">

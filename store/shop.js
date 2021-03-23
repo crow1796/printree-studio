@@ -29,7 +29,6 @@ const mutations = {
 const actions = {
   async shopConfig(context, slug) {
     const config = await this.$api.marketplace.shopConfig(slug)
-    context.commit("SHOP_CONFIG", config)
     return config
   }
 }

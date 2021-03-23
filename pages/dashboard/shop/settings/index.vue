@@ -18,11 +18,17 @@
                     url: `${apiUrl}/shop/upload-logo`,
                       thumbnailWidth: 150,
                       maxFiles: 1,
-                      acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Click here or drop file here to upload.',
+                      acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp',
                       }"
               @vdropzone-sending="(a, b) => assetSending(a, b, 'logo')"
-              @vdropzone-success="assetAdded($refs.logoDropzone)"
-            />
+              @vdropzone-success="(res, b) => assetAdded(res, b, $refs.logoDropzone)"
+              useCustomSlot
+            >
+              <div class="dropzone-custom-content">
+                <img v-if="shop && shop.logo" :src="shop.logo" />
+                <div v-else>Click here or drop file here to upload.</div>
+              </div>
+            </vue-dropzone>
           </div>
           <span
             class="text-red-700 text-xs pt-1 font-bold inline-block"
@@ -40,11 +46,17 @@
               :options="{
                     url: `${apiUrl}/shop/upload-banner`,
                       maxFiles: 1,
-                      acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp', dictDefaultMessage: 'Click here or drop file here to upload banner.',
+                      acceptedFiles: 'image/svg+xml, image/png, image/jpeg, image/bmp',
                       }"
               @vdropzone-sending="(a, b) => assetSending(a, b, 'banner')"
-              @vdropzone-success="assetAdded($refs.bannerDropzone)"
-            />
+              @vdropzone-success="(res, b) => assetAdded(res, b, $refs.bannerDropzone)"
+              useCustomSlot
+            >
+              <div class="dropzone-custom-content">
+                <img v-if="shop && shop.banner" :src="shop.banner" />
+                <div v-else>Click here or drop file here to upload.</div>
+              </div>
+            </vue-dropzone>
           </div>
           <span
             class="text-red-700 text-xs pt-1 font-bold inline-block"
@@ -61,12 +73,21 @@ import { mapGetters } from "vuex";
 
 export default {
   layout: "user_dashboard",
+  async mounted() {
+    const config = await this.$store.dispatch(
+      "shop/shopConfig",
+      this.user.shop.slug
+    );
+    this.shop = config;
+    this.isLoading = false;
+  },
   data() {
     return {
-      isLoading: false,
+      isLoading: true,
       apiUrl: process.env.apiUrl,
       isBannerLoading: false,
       isLogoLoading: false,
+      shop: null,
       formData: {
         name: null,
         email: null,
@@ -95,9 +116,10 @@ export default {
       });
       this.isLoading = false;
     },
-    assetAdded(ref) {
+    assetAdded(res, b, ref) {
       this.$toast.success("Shop updated.", { position: "top" });
-      ref.removeAllFiles()
+      ref.removeAllFiles();
+      this.shop = b.data
     },
     assetSending(e, xhr, type) {
       switch (type) {

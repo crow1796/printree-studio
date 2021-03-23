@@ -124,7 +124,7 @@
               </div>
               <div class="flex -mb-px ml-8">
                 <a
-                  :href="`/marketplace/shop/${user.slug}`"
+                  :href="`/marketplace/shop/${user.shop.slug}`"
                   target="_blank"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                 >
