@@ -110,16 +110,7 @@
     <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">
       <AreaLoader v-if="isFeaturedProductLoading" />
       <div class="flex justify-between lg:px-8 font-bold mb-4">
-        <div class="font-black">Featured Products</div>
-        <div>
-          <nuxt-link
-            class="text-primary hover:text-primary-lighter flex items-center"
-            to="/marketplace/products"
-          >
-            <span class="mr-2">See all Products</span>
-            <font-awesome-icon :icon="['fas', 'arrow-right']" />
-          </nuxt-link>
-        </div>
+        <div class="font-black">Shops</div>
       </div>
       <ProductsGrid :products="featuredProducts" :grid="4"/>
     </div>
@@ -134,6 +125,9 @@ export default {
   layout: "marketplace",
   components: {
     ProductsGrid,
+  },
+  async created(){
+    this.$router.replace('/marketplace/products')
   },
   async mounted() {
     this.isFeaturedProductLoading = true;

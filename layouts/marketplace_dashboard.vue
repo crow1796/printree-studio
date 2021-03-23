@@ -3,7 +3,7 @@
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
     <CartDrawer ref="cartDrawer" />
     <div class="flex flex-col flex-grow bg-gray-100">
-      <div class="bg-white shadow font-sans w-full m-0">
+      <div class="bg-white font-sans w-full m-0">
         <div class="bg-white">
           <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-4">
@@ -62,9 +62,9 @@
 
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
                 <nuxt-link
-                  to="/marketplace/products"
+                  to="/marketplace/"
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
-                >All Products</nuxt-link>
+                >Shops</nuxt-link>
 
                 <button
                   type="button"
@@ -95,13 +95,24 @@
                   <template v-slot:content>
                     <div class="flex flex-col flex-grow">
                       <nuxt-link
-                        to="/marketplace/account/orders"
+                        to="/marketplace/account/settings"
                         class="flex items-center hover:bg-gray-200 px-4 py-2"
                       >
                         <span class="mr-2">
                           <font-awesome-icon :icon="['fas', 'cog']" />
                         </span>
-                        <span>Account</span>
+                        <span>Account Settings</span>
+                      </nuxt-link>
+                    </div>
+                    <div class="flex flex-col flex-grow">
+                      <nuxt-link
+                        to="/marketplace/account/orders"
+                        class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      >
+                        <span class="mr-2">
+                          <font-awesome-icon :icon="['fas', 'boxes']" />
+                        </span>
+                        <span>My Orders</span>
                       </nuxt-link>
                     </div>
                     <div class="flex flex-col flex-grow">

@@ -10,11 +10,7 @@
                 <nuxt-link to="/">Home</nuxt-link>
               </li>
               <li class="hover:text-primary text-grey-darker">
-                <a
-                  :href="shopifyUrl"
-                  target="_blank"
-                  class="hover:text-primary-lighter mr-4"
-                >Shop</a>
+                <nuxt-link to="/marketplace">Marketplace</nuxt-link>
               </li>
             </ul>
           </div>

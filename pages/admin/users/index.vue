@@ -215,9 +215,9 @@
                       class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
                       title="Open Store"
                       target="_blank"
-                      :href="`/marketplace/shop/${user.slug}`"
+                      :href="`/marketplace/shop/${user.shop.slug}`"
                       v-tippy="{arrow: true}"
-                      v-if="_isSeller(user)"
+                      v-if="user.shop && _isSeller(user)"
                     >
                       <font-awesome-icon :icon="['fas', 'shopping-cart']" />
                     </a>

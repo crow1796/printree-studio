@@ -50,13 +50,24 @@
                   <template v-slot:content>
                     <div class="flex flex-col flex-grow">
                       <nuxt-link
-                        to="/marketplace/account/orders"
+                        to="/marketplace/account/settings"
                         class="flex items-center hover:bg-gray-200 px-4 py-2"
                       >
                         <span class="mr-2">
                           <font-awesome-icon :icon="['fas', 'cog']" />
                         </span>
-                        <span>Account</span>
+                        <span>Account Settings</span>
+                      </nuxt-link>
+                    </div>
+                    <div class="flex flex-col flex-grow">
+                      <nuxt-link
+                        to="/marketplace/account/orders"
+                        class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      >
+                        <span class="mr-2">
+                          <font-awesome-icon :icon="['fas', 'boxes']" />
+                        </span>
+                        <span>My Orders</span>
                       </nuxt-link>
                     </div>
                     <div class="flex flex-col flex-grow">
@@ -104,8 +115,10 @@ import CartDrawer from "@/components/marketplace/CartDrawer";
 import { mapGetters } from "vuex";
 
 export default {
-  head: {
-    title: "Printree Studio",
+  head(){
+    return {
+      title: `${this.shopConfig?.name || ''} | Printree Studio`
+    }
   },
   components: {
     AuthModal,
@@ -113,9 +126,13 @@ export default {
     VueTailwindDropdown,
     CartDrawer,
   },
+  async created(){
+    this.$storage.setCookie("shop", this.$route.params.slug)
+  },
   async mounted() {
     window.addEventListener("scroll", this.updateScroll);
-    await this.$store.dispatch("shop/shopConfig", this.$route.params.slug);
+    const config = await this.$store.dispatch("shop/shopConfig", this.$route.params.slug);
+    this.$store.commit("shop/SHOP_CONFIG", config)
     if (this.isLoggedIn && this.user._id)
       await this.$store.dispatch("marketplace/getMPCounts", [
         "toPay",
