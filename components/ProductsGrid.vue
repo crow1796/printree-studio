@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-wrap items-center px-6">
     <nuxt-link
-      class="p-2 flex-grow"
-      :class="gridClass"
+      class="p-2 flex-grow sm:flex-grow-0"
       v-for="product in products"
       :key="product._id"
       :to="`${rootUrl}${product._id}`"
