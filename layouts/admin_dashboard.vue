@@ -17,7 +17,11 @@
             </div>
             <div class="w-1/2 md:w-auto text-center">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
+                <img
+                  src="~/assets/images/logo-nav.png"
+                  alt="Printree Studio"
+                  class="w-28 object-fit"
+                />
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right" v-if="isLoggedIn && user">
@@ -127,25 +131,28 @@ import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 
 export default {
   head: {
-    title: "Admin Dashboard"
+    title: "Admin Dashboard",
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   middleware: ["admin-auth"],
   components: {
-    VueTailwindDropdown
+    VueTailwindDropdown,
   },
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
-      user: "user"
-    })
+      user: "user",
+    }),
   },
   methods: {
     async signOut(e) {
       this.$router.replace("/");
       setTimeout(() => {
         this.$store.dispatch("user/signOut");
-      })
-    }
-  }
+      });
+    },
+  },
 };
 </script>

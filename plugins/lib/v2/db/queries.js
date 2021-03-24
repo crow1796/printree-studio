@@ -1165,5 +1165,23 @@ export default {
             }
         }
     }
+  `,
+  shops: `
+    query ($searchQuery: ShopsQueryInput!){
+        shops(searchQuery: $searchQuery) {
+            _id
+            name
+            slug
+            logo
+            banner
+            colors {
+                navBG
+                navTextColor
+                navTextHoverColor
+                bannerBGColor
+                bannerBGSize
+            }
+        }
+    }
   `
 };

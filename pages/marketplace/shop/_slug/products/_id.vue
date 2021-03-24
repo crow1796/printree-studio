@@ -2,14 +2,17 @@
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader mt-32">
     <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product" :key="product._id">
-      <div class="flex lg:flex-row sm:flex-col">
-        <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2 lg:flex-row sm:flex-col">
+      <div class="flex lg:flex-row flex-col">
+        <div class="flex sm:w-6/12 flex-col sm:flex-row w-full p-2 sm:p-2">
           <div
-            class="flex lg:flex-col sm:flex-row lg:w-3/12 sm:w-full lg:px-2 sm:px-0 overflow-auto sm:mb-4"
+            class="flex sm:flex-col flex-row sm:w-3/12 lg:px-2 sm:px-0 overflow-auto sm:mb-4"
           >
             <div
               class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
-              :class="{'border-primary': i === selectedThumbnailIndex}"
+              :class="[
+                {'border-primary': i === selectedThumbnailIndex},
+                `w-full`
+              ]"
               v-for="(thumb, i) in thumbnails"
               :key="i"
               @click="selectedThumbnailIndex = i"
@@ -17,7 +20,7 @@
               <progressive-img :src="thumb" class="lg:w-24 sm:w-16" />
             </div>
           </div>
-          <div class="flex lg:w-9/12 items-start sm:w-full">
+          <div class="flex lg:w-9/12 items-start flex-grow">
             <ZoomOnHover :img="thumbnails[selectedThumbnailIndex]" />
           </div>
         </div>
@@ -227,6 +230,7 @@ export default {
 
       this.selectedSide = this.frontOrFirst;
       this.thumbnails = tmpThumbnails;
+      this.selectedThumbnailIndex = this.selectedSide
     },
     async addToCart() {
       if (!this.isLoggedIn) {

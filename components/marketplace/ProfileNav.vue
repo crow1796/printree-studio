@@ -1,7 +1,7 @@
 <template>
   <!-- component -->
   <div class="flex items-start justify-center bg-gray-100 sm:p-6 pb-0 flex-shrink-0 h-full">
-    <div class="flex w-full max-w-xs p-4 bg-white">
+    <div class="flex w-full sm:max-w-xs p-4 bg-white">
       <ul class="flex flex-col w-full">
         <li class="my-px">
           <span class="flex font-medium text-sm text-gray-400 px-4 my-4 uppercase">Account</span>

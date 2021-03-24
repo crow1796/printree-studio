@@ -1,11 +1,11 @@
 <template>
   <div class="relative">
     <AreaLoader v-if="isLoading" fullscreen />
-    <div class="mx-auto p-16 sm:p-16 lg:px-48 bg-gray-100">
+    <div class="mx-auto p-8 sm:p-16 sm:p-16 lg:px-48 bg-gray-100">
       <div class="flex-grow flex flex-col relative w-full sm:w-7/12 mx-auto">
         <VueTailwindModal
           ref="addressSelectionModal"
-          width="30%"
+          width="500px"
           content-class="rounded-none shadow-none text-gray-600"
           :backdrop="false"
         >
@@ -298,15 +298,13 @@
           </div>
         </VueTailwindModal>
         <div class="flex justify-between relative">
-          <button
-            type="button"
-            href="#"
-            @click.prevent="$router.back"
+          <nuxt-link
+            to="/marketplace/account/orders"
             class="text-xs text-blue-500 hover:text-blue-700 absolute left-0 top-0"
           >
             <font-awesome-icon :icon="['fas', 'arrow-left']" />
             <span class="ml-1">Back</span>
-          </button>
+          </nuxt-link>
 
           <span class="font-bold pb-4 border-b flex-grow p-4 text-3xl text-center">
             <span>Checkout</span>
@@ -358,8 +356,8 @@
           </div>
           <div class="font-bold p-4 border-b">Address</div>
           <div class="flex flex-col py-4">
-            <div class="flex">
-              <div class="flex w-6/12 flex-col">
+            <div class="flex sm:flex-row flex-col">
+              <div class="flex w-full sm:w-6/12 flex-col sm:mb-0 mb-4">
                 <div
                   class="flex flex-col p-4 border rounded border-dashed mx-2 cursor-pointer hover:border-primary hover:text-primary bg-white"
                   :class="{
@@ -397,7 +395,7 @@
                   v-if="shippingAddressError"
                 >{{ shippingAddressError }}</span>
               </div>
-              <div class="flex w-6/12 flex-col">
+              <div class="flex w-full sm:w-6/12 flex-col">
                 <div
                   class="flex flex-col p-4 border rounded border-dashed mx-2 cursor-pointer hover:border-primary hover:text-primary bg-white"
                   :class="{
@@ -475,7 +473,7 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-between p-4 border-t">
+        <div class="flex justify-between p-4 border-t sm:flex-row flex-col">
           <div class="flex mr-4">
             <input
               type="text"
@@ -485,7 +483,7 @@
             />
             <PTButton color="primary" :disabled="!voucherCode" @click="applyCoupon">APPLY</PTButton>
           </div>
-          <div class="flex flex-col">
+          <div class="flex flex-col sm:mt-0 mt-4">
             <div class="font-bold flex items-center">
               <div class="flex flex-col">
                 <span class="text-xs font-normal">Items Total</span>
@@ -509,7 +507,7 @@
             <span class="font-bold text-primary leading-none my-1">
               <number :to="total" :format="(num) => num.formatMoney('₱ ')" :duration=".4" />
             </span>
-            <span class="text-xs text-gray-500">VAT included, where applicable</span>
+            <span class="text-xs text-gray-500 leading-none">VAT included, where applicable</span>
           </div>
           <PTButton color="primary" :disabled="!total || isCalculatingSF" @click="placeOrder">
             <span class="mr-2">Place Order</span>
@@ -556,6 +554,7 @@ export default {
   data() {
     return {
       isLoading: true,
+      shop: this.$storage.getCookie("shop"),
       isCalculatingSF: false,
       products: [],
       selectingAddressFor: null,

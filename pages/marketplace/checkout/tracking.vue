@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <AreaLoader v-if="isLoading" fullscreen />
-    <div class="mx-auto pb-8 sm:pb-8 p-16 sm:p-16 lg:px-48 bg-gray-100" v-if="order">
+    <div class="mx-auto p-8 sm:p-16 sm:p-16 lg:px-48 bg-gray-100" v-if="order">
       <div class="flex-grow flex flex-col relative w-full sm:w-7/12 mx-auto">
         <div class="flex justify-center mb-16">
           <a href="/marketplace">

@@ -17,6 +17,9 @@ import SimplePagination from "@/components/SimplePagination";
 
 export default {
   layout: "marketplace",
+  head: {
+    title: "All Products | Printree Studio"
+  },
   components: {
     ProductsGrid,
     SimplePagination,

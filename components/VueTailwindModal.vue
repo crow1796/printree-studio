@@ -1,13 +1,13 @@
 <template>
   <div
-    class="inset-0 z-70 overflow-auto bg-smoke-light flex"
+    class="inset-0 z-70 overflow-auto bg-smoke-light flex vue-tailwind-modal"
     :class="position"
     v-if="isShown"
     @click="() => backdrop ? hide() : makeBounce()"
   >
     <transition name="slide" enter-active-class="slideInDown" leave-active-class="slideOutUp">
       <div
-        class="relative bg-white m-auto flex-col flex rounded shadow overflow-hidden"
+        class="relative bg-white m-auto flex-col flex rounded shadow overflow-hidden -content"
         @click.stop
         v-if="isContentShown"
         :class="[{ '-bounce': bounce },contentClass]"
