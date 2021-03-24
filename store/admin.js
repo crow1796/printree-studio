@@ -88,6 +88,14 @@ const actions = {
     const collections = await this.$api.admin.getCollections(searchQuery)
     return collections
   },
+  async shippingProfiles(context) {
+    const profiles = await this.$api.admin.shippingProfiles()
+    return profiles
+  },
+  async saveShippingProfile(context, data) {
+    const profile = await this.$api.admin.saveShippingProfile(data)
+    return profile
+  },
   async updateUser(context, data) {
     const res = await this.$axios.patch(`/users/${data.uid}`, data)
     context.commit('UPDATE_USER', res.data.user)
@@ -110,9 +118,13 @@ const actions = {
     const total = await this.$api.admin.totalEarningsOfUser(id)
     return total
   },
-  async getOrders(context, query) {
-    const res = await this.$axios.get('/orders')
-    context.commit('ORDERS', res.data.orders)
+  async allMarketplaceOrders(context, query) {
+    const res = await this.$api.admin.allMarketplaceOrders(query)
+    return res
+  },
+  async updateOrder(context, data) {
+    const res = await this.$api.admin.updateOrder(data)
+    return res
   },
   async processOrder(context, { order, status }) {
     let reqStatus = true
@@ -127,8 +139,8 @@ const actions = {
     }
     return reqStatus
   },
-  async payoutRequests(context, data) {
-    const payouts = await this.$api.admin.payoutRequests(data)
+  async payoutRequests(context, query) {
+    const payouts = await this.$api.admin.payoutRequests(query)
     context.commit('PAYOUTS', payouts)
     return payouts
   },

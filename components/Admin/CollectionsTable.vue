@@ -137,15 +137,15 @@
                   </div>
                 </td>
                 <td class="px-5 py-5 border-b border-gray-200 text-sm text-left">
-                  <div class="text-gray-900 whitespace-no-wrap" v-if="col.user && col.user.shopName">
+                  <div class="text-gray-900 whitespace-no-wrap" v-if="col.user && col.user.shop">
                     <a
-                      :href="`${shopifyUrl}collections/vendors?q=${_encodeUri(col.user.shopName)}`"
+                      :href="`/marketplace/shop/${_encodeUri(col.user.shop.slug)}`"
                       target="_blank"
                       class="text-blue-500 hover:text-blue-700"
                       title="Open store in new tab"
                       v-tippy="{arrow: true}"
                     >
-                      <span>{{ col.user.shopName }}</span>
+                      <span>{{ col.user.shop.name }}</span>
                       <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                     </a>
                   </div>

@@ -17,18 +17,17 @@
             </div>
 
             <div class="flex flex-grow hidden sm:flex sm:items-center justify-end">
-              <a
-                :href="shopifyUrl"
-                target="_blank"
+              <!-- <nuxt-link
+                to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Shop</a>
+              >Marketplace</nuxt-link> -->
               <nuxt-link
                 :to="dashboardLink"
-                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 v-if="isLoggedIn && user"
               >
                 <span>
-                  <span>{{ user.shopName ? `${user.shopName}'s` : user.email }}</span>
+                  <span>{{ user.shop ? `${user.shop.name}'s` : user.email }}</span>
                   <span class="ml-3">
                     <font-awesome-icon :icon="['fas', 'arrow-right']" />
                   </span>
@@ -36,7 +35,7 @@
               </nuxt-link>
               <a
                 href="#"
-                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded-full hover:text-primary-lighter hover:border-primary-lighter bg-white"
+                class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"
                 @click.prevent="showAuthModal"
                 v-else
               >Get Started</a>
@@ -52,7 +51,7 @@
               <nuxt-link
                 to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mb-1"
-              >Shop</nuxt-link>
+              >Marketplace</nuxt-link>
               <div class="flex justify-between items-center border-t-2 pt-2">
                 <a
                   href="#"
@@ -84,6 +83,9 @@ import { isMobile } from "@/helpers";
 export default {
   head: {
     title: "Printree Studio",
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   components: {
     Footer,
@@ -107,6 +109,8 @@ export default {
     dashboardLink() {
       if (!this.user) return "/dashboard";
       const isAdmin = _.includes(_.map(this.user.roles, "name"), "admin");
+      const isCustomer = _.includes(_.map(this.user.roles, "name"), "customer");
+      if (isCustomer) return "/marketplace/account/profile";
       if (isAdmin) return "/admin/collections";
       return "/dashboard";
     },

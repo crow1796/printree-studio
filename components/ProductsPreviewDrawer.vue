@@ -197,9 +197,9 @@
                     v-if="selectedProduct && meta.plan === 'Sell'"
                     type="text"
                     class="font-bold w-full outline-none border rounded px-4 py-2"
-                    placeholder="What's the name of this product?*"
+                    placeholder="Product Name*"
                     v-model="selectedProduct.meta.name"
-                    @keyup="updateProductMeta"
+                    @input="updateProductMeta"
                   />
 
                   <ContentLoader
@@ -256,7 +256,7 @@
                         >
                           <span>Base Cost</span>
                         </th>
-                        <th class="w-5/12 text-center py-4 border-r border-white">
+                        <th class="w-5/12 text-center py-4 border-r border-white" v-if="meta.plan === 'Buy'">
                           <span>{{ meta.plan === "Buy" ? "Quantity" : "If I sell..." }}</span>
                         </th>
                         <th class="w-5/12 text-center py-4">
@@ -277,7 +277,7 @@
                         <td class="text-center py-4 border-r" v-if="meta.plan === 'Sell'">
                           <span>PHP {{size.calculatedCost}}</span>
                         </td>
-                        <td class="text-center py-4 border-r">
+                        <td class="text-center py-4 border-r" v-if="meta.plan == 'Buy'">
                           <VueNumericInput
                             :key="`${selectedProductVariantKey}_${size.name}`"
                             align="center"
@@ -299,7 +299,7 @@
                           <div class="text-xs font-normal">VAT Included</div>
                         </td>
                       </tr>
-                      <tr class="bg-primary border border-top text-white">
+                      <tr class="bg-primary border border-top text-white" v-if="meta.plan === 'Buy'">
                         <td
                           :colspan="meta.plan ==='Sell' ? 3 : 2"
                           class="p-4 font-bold text-right"
@@ -481,9 +481,9 @@ import AutosizeInput from "@/components/AutosizeInput";
 import { mapGetters } from "vuex";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 import { ContentLoader } from "vue-content-loader";
+import { priceWithVatCeil, priceWithVat } from '@/plugins/price-calculator'
 
 const SERVICE_FEE = 0.12;
-const VAT = 0.12;
 
 export default {
   props: {
@@ -566,7 +566,7 @@ export default {
       if (this.meta.plan === "Sell")
         total = this.selectedProductBasePrice + this.selectedProductProfit;
 
-      return this.meta.plan === "Sell" ? Math.ceil(total + total * VAT) : total;
+      return this.meta.plan === "Sell" ? priceWithVatCeil(total) : total;
     },
     selectedVariantIndex() {
       if (!this.selectedProduct) return -1;
@@ -591,7 +591,7 @@ export default {
       if (this.meta.plan === "Sell")
         preTotal = this.selectedProductProfit + size.calculatedCost;
 
-      const total = preTotal + preTotal * VAT;
+      const total = priceWithVat(preTotal);
 
       return this.meta.plan === "Sell" ? Math.ceil(total) : total;
     },
@@ -797,7 +797,7 @@ export default {
         totalProfit -
         totalProfit * (this.meta.plan === "Sell" ? SERVICE_FEE : 1);
       this.estimatedMinProfit =
-        this.meta.plan === "Sell" ? minProfit : printreeNet + printreeNet * VAT;
+        this.meta.plan === "Sell" ? minProfit : priceWithVat(printreeNet);
       this.$nextTick(() => {
         if (this.$refs.estMinProfit) this.$refs.estMinProfit.play();
       });

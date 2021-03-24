@@ -102,6 +102,11 @@ export default {
                 _id
                 name
                 shopName
+                shop {
+                    _id
+                    slug
+                    name
+                }
             }
             products {
                 _id
@@ -254,6 +259,11 @@ export default {
                 name
                 email
                 shopName
+                shop {
+                    _id
+                    slug
+                    name
+                }
             }
             products {
                 _id
@@ -273,9 +283,15 @@ export default {
             name
             email
             status
+            slug
             created_at
             updated_at
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             roles {
                 _id
                 name
@@ -290,9 +306,15 @@ export default {
             _id
             name
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             email
             status
             portfolioLink
+            slug
         }
     }
   `,
@@ -305,10 +327,48 @@ export default {
                 description
                 tags
             }
+            status
             created_at
+            customizableProduct {
+                preDescription
+            }
             parent_collection {
                 _id
                 name
+                plan
+                handle
+                user {
+                    _id
+                    shopName
+                    shop {
+                        _id
+                        slug
+                        name
+                    }
+                }
+            }
+            variants {
+                _id
+                customizableVariant {
+                    _id
+                    color
+                }
+                sizes {
+                    name
+                    quantity
+                    calculatedCost
+                    price
+                    approvedPrice
+                    approvedBaseCost
+                    shopId
+                }
+                contents {
+                    fullThumb
+                    isMainThumb
+                    printableArea {
+                        side
+                    }
+                }
             }
         }
     }
@@ -338,6 +398,8 @@ export default {
             fulfillmentStatus
             financialStatus
             statusUrl
+            partialAmount
+            trackingCode
             created_at
             updated_at
             orderProducts {
@@ -509,6 +571,11 @@ export default {
             _id
             name
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             email
             created_at
             updated_at
@@ -542,12 +609,25 @@ export default {
         }
     }
   `,
+    productStatus: `
+    query ($id: ID!){
+        productStatus(_id: $id){
+            status
+            handle
+        }
+    }
+  `,
     approveAccount: `
     mutation ($id: ID!){
         approveAccount(_id: $id){
             _id
             name
             shopName
+            shop {
+                _id
+                slug
+                name
+            }
             email
             status
             portfolioLink
@@ -571,7 +651,7 @@ export default {
         }
     }
   `,
-  variantData: `
+    variantData: `
     query ($id: ID!){
         variantData(_id: $id){
             _id
@@ -601,9 +681,507 @@ export default {
         }
     }
   `,
-  totalEarningsOfUser: `
+    totalEarningsOfUser: `
     query ($id: ID!){
         totalEarningsOfUser(_id: $id)
+    }
+  `,
+    addToCart: `
+    mutation ($item: AddToCartInput!){
+        addToCart(item: $item){
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                quantity
+                size
+            }
+        }
+    }
+  `,
+    getCartOfCurrentUser: `
+    query {
+        cartOfCurrentUser{
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                productName
+                collectionName
+                price
+                fullThumb
+                quantity
+                size
+            }
+        }
+    }
+  `,
+    removeItemFromCart: `
+        mutation ($id: ID!) {
+            removeItemFromCart(_id: $id) {
+                _id
+                items {
+                    _id
+                    variant {
+                        _id
+                    }
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+        }
+  `,
+    checkout: `
+    mutation ($items: [ID!]) {
+        checkout(items: $items) {
+            _id
+            items {
+                _id
+                productName
+                collectionName
+                price
+                fullThumb
+                quantity
+                size
+            }
+        }
+    }
+  `,
+    getCheckout: `
+    query ($id: ID!) {
+        getCheckout(_id: $id){
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                productName
+                collectionName
+                price
+                fullThumb
+                quantity
+                size
+            }
+        }
+    }
+  `,
+  getAddressesOfCurrentUser: `
+    query {
+        getAddressesOfCurrentUser {
+            _id
+            fullName
+            street
+            province
+            city
+            barangay
+            mobileNumber
+            notes
+            label
+            isDefault
+        }
+    }
+  `,
+  saveAddress: `
+    mutation ($address: AddressInput!) {
+        saveAddress(address: $address){
+            _id
+            fullName
+            street
+            province
+            city
+            barangay
+            mobileNumber
+            notes
+            label
+            isDefault
+        }
+    }
+  `,
+  paymentMethods: `
+    query {
+        paymentMethods{
+            _id
+            title
+            name
+            status
+        }
+    }
+  `,
+  saveShippingProfile: `
+    mutation ($profile: ShippingProfileInput!) {
+        saveShippingProfile(profile: $profile) {
+            _id
+            name
+            zones {
+                _id
+                name
+                provinces
+                rates {
+                    _id
+                    name
+                    minWeight
+                    maxWeight
+                    price
+                }
+            }
+        }
+    }
+  `,
+  shippingProfiles: `
+    query {
+        shippingProfiles{
+            _id
+            name
+            zones {
+                _id
+                name
+                provinces
+                rates {
+                    _id
+                    name
+                    minWeight
+                    maxWeight
+                    price
+                }
+            }
+        }
+    }
+  `,
+  calculateShippingFee: `
+    query ($checkout: ID!, $address: ID!){
+        calculateShippingFee(checkout: $checkout, address: $address){
+            _id
+            name
+            minWeight
+            maxWeight
+            price
+            zone {
+                profile {
+                    name
+                }
+            }
+        }
+    }
+  `,
+  placeOrder: `
+    mutation ($order: OrderInput!){
+        placeOrder(order: $order){
+            _id
+            orderNumber
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            statusUrl
+            partialAmount
+            trackingCode
+            fulfillmentStatus
+            financialStatus
+        }
+    }
+  `,
+  getMarketplaceOrder: `
+    query ($id: ID!) {
+        getMarketplaceOrder(_id: $id) {
+            _id
+            orderNumber
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            statusUrl
+            partialAmount
+            trackingCode
+            fulfillmentStatus
+            financialStatus
+        }
+    }
+  `,
+  getCheckoutsOfCurrentUser: `
+    query ($searchQuery: CheckoutsQueryInput){
+        getCheckoutsOfCurrentUser(query: $searchQuery){
+            _id
+            items {
+                _id
+                variant {
+                    _id
+                }
+                productName
+                collectionName
+                quantity
+                size
+                price
+                fullThumb
+            }
+        }
+    }
+  `,
+  marketplaceOrders: `
+    query ($query: MarketplaceOrdersQueryInput) {
+        marketplaceOrders(query: $query) {
+            _id
+            orderNumber
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            statusUrl
+            partialAmount
+            trackingCode
+            fulfillmentStatus
+            financialStatus
+        }
+    }
+  `,
+  getCollectionMeta: `
+    query ($id: ID!){
+        collection(_id: $id){
+            _id
+            name
+            handle
+            plan
+            user {
+                _id
+                shopName
+                shop {
+                    _id
+                    slug
+                    name
+                }
+            }
+        }
+    }
+  `,
+  getMPCounts: `
+    query ($counts: [String!]){
+        getMPCounts(counts: $counts) {
+            toPay
+            toShip
+            toReceive
+            delivered
+            cart
+        }
+    }
+  `,
+  allMarketplaceOrders: `
+    query ($query: MarketplaceOrdersQueryInput) {
+        allMarketplaceOrders(query: $query) {
+            _id
+            orderNumber
+            created_at
+            paymentMethod {
+                _id
+                title
+                name
+            }
+            checkout {
+                items {
+                    _id
+                    productName
+                    collectionName
+                    price
+                    fullThumb
+                    quantity
+                    size
+                    variant {
+                        _id
+                    }
+                }
+            }
+            shippingFee
+            shippingProfileName
+            shippingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            billingAddress {
+                fullName
+                street
+                province
+                barangay
+                city
+                mobileNumber
+                notes
+                label
+                postcode
+            }
+            statusUrl
+            partialAmount
+            trackingCode
+            fulfillmentStatus
+            financialStatus
+        }
+    }
+  `,
+  updateOrder: `
+    mutation ($id: ID!, $orderInput: UpdateOrderInput!) {
+        updateOrder(_id: $id, orderInput: $orderInput) {
+            _id
+            fulfillmentStatus
+            financialStatus
+            trackingCode
+            statusUrl
+        }
+    }
+  `,
+  shopConfig: `
+    query ($slug: String!){
+        shopConfig(slug: $slug) {
+            _id
+            name
+            slug
+            logo
+            banner
+            colors {
+                navBG
+                navTextColor
+                navTextHoverColor
+                bannerBGColor
+                bannerBGSize
+            }
+        }
+    }
+  `,
+  shops: `
+    query ($searchQuery: ShopsQueryInput!){
+        shops(searchQuery: $searchQuery) {
+            _id
+            name
+            slug
+            logo
+            banner
+            colors {
+                navBG
+                navTextColor
+                navTextHoverColor
+                bannerBGColor
+                bannerBGSize
+            }
+        }
     }
   `
 };

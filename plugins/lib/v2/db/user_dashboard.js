@@ -36,6 +36,17 @@ export const collectionStatus = async (axios, id) => {
   return collectionStatus;
 }
 
+export const productStatus = async (axios, id) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.productStatus,
+    variables: {
+      id
+    }
+  });
+  const productStatus = data.data.productStatus;
+  return productStatus;
+}
+
 export const setVariantMainThumbnail = async (axios, variables) => {
   const { data } = await axios.post("/gql", {
     query: queries.setVariantMainThumbnail,
@@ -110,4 +121,15 @@ export const variantData = async (axios, id) => {
   });
   const variantData = data.data.variantData;
   return variantData;
+}
+
+export const getUserProductsOf = async (axios, searchQuery) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.products,
+    variables: {
+      searchQuery,
+    }
+  });
+  const products = data.data.products;
+  return products;
 }

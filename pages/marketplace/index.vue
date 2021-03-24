@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div class="mx-auto p-8 sm:p-16 lg:px-48 bg-gray-100">
+    <!-- Carousel -->
+    <!-- <div class="mx-auto p-8 sm:p-16 lg:px-48 bg-gray-100"> -->
       <!-- Carousel Body -->
-      <div
+      <!-- <div
         class="relative rounded-lg block md:flex items-center bg-gray-100 shadow-xl"
         style="min-height: 19rem;"
       >
@@ -57,10 +58,10 @@
         >
           <span class="block" style="transform: scale(1);">&#x279c;</span>
         </button>
-      </div>
+      </div> -->
 
       <!-- Carousel Tabs -->
-      <div class="flex items-center pt-5 justify-between">
+      <!-- <div class="flex items-center pt-5 justify-between">
         <button class="px-2 opacity-50 hover:opacity-100 focus:opacity-100">
           <img
             class="w-full"
@@ -101,48 +102,118 @@
             style="max-height: 60px;"
           />
         </button>
-      </div>
-    </div>
+      </div> -->
+    <!-- </div> -->
+    
     <!-- Display Container (not part of component) END -->
     <!-- Listing START-->
-    <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">
-      <AreaLoader v-if="isFeaturedProductLoading"/>
-      <div class="flex justify-between lg:px-8 font-bold mb-4">
-        <div class="font-black">Featured Products</div>
-        <div>
-          <nuxt-link class="text-primary hover:text-primary-lighter flex items-center" to="/marketplace/products">
-            <span class="mr-2">See all Products</span>
-            <font-awesome-icon :icon="['fas', 'arrow-right']"/>
-          </nuxt-link>
-        </div>
+    <div class="container mx-auto mt-12">
+      <AreaLoader v-if="isLoading" />
+      <div class="flex justify-between px-8 font-bold mb-4">
+        <div class="font-black">Shops</div>
       </div>
-      <ProductsGrid :products="featuredProducts" />
+      <ShopsGrid :shops="shops"/>
+      <div class="flex flex-grow justify-center pb-6 mt-4">
+        <SimplePagination @prev="goTo(prev)" @next="goTo(next)"/>
+      </div>
     </div>
     <!-- Listing END -->
   </div>
 </template>
 
 <script>
-import ProductsGrid from '@/components/ProductsGrid'
+import ShopsGrid from "@/components/ShopsGrid";
+import SimplePagination from "@/components/SimplePagination";
 
 export default {
-  layout: 'marketplace',
+  layout: "marketplace",
+  head: {
+    title: "Marketplace | Printree Studio"
+  },
   components: {
-    ProductsGrid
+    ShopsGrid,
+    SimplePagination
   },
-  async mounted(){
-    this.isFeaturedProductLoading = true
-    const res = await this.$store.dispatch('marketplace/getProductsToSell', { is_featured: true })
-    if(res.status){
-      this.featuredProducts = res.data
-    }
-    this.isFeaturedProductLoading = false
+  created() {
+    const page = this.$route.query.page;
+    if (page === undefined)
+      return this.$router.replace(
+        `/marketplace/?page=1`
+      );
+    this.currentPage = parseInt(page);
   },
-  data(){
+  async mounted() {
+    this._loadItems();
+  },
+  data() {
     return {
-      isFeaturedProductLoading: true,
-      featuredProducts: []
-    }
-  }
-}
+      isLoading: true,
+      shops: [],
+      currentPage: this.$route.query.page,
+      query: {
+        sorting: {
+          field: "created_at",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 15,
+          page: 1,
+        },
+      },
+    };
+  },
+  methods: {
+    goTo(page) {
+      if (page === this.query.pagination.page) return;
+      this.query.pagination.page = page;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: `/marketplace/`,
+        query: {
+          page: this.query.pagination.page,
+        },
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    async _loadItems() {
+      this.isLoading = true;
+      const res = await this.$store.dispatch("marketplace/shops", {
+        ...this.query,
+        pagination: {
+          ...this.query.pagination,
+          page: this.query.pagination.page - 1,
+        },
+      });
+      this.shops = res;
+      this.isLoading = false;
+    },
+  },
+  computed: {
+    next() {
+      return parseInt(this.$route.query.page) + 1;
+    },
+    prev() {
+      const page = parseInt(this.$route.query.page);
+      return page > 1 ? page - 1 : 1;
+    },
+  },
+  watch: {
+    "$route.query.page": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
+    },
+  },
+};
 </script>

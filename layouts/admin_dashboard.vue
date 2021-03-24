@@ -17,7 +17,11 @@
             </div>
             <div class="w-1/2 md:w-auto text-center">
               <nuxt-link to="/">
-                <img src="~/assets/images/logo-nav.png" alt="Printree Studio" class="w-28 object-fit" />
+                <img
+                  src="~/assets/images/logo-nav.png"
+                  alt="Printree Studio"
+                  class="w-28 object-fit"
+                />
               </nuxt-link>
             </div>
             <div class="w-1/4 md:w-auto md:flex text-right" v-if="isLoggedIn && user">
@@ -61,7 +65,7 @@
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2">
+                  <span class="fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'boxes']" />
                   </span> Collections
                 </nuxt-link>
@@ -72,7 +76,7 @@
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2">
+                  <span class="fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'users']" />
                   </span> Users
                 </nuxt-link>
@@ -83,9 +87,31 @@
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2">
+                  <span class="fill-current mr-2">
                     <font-awesome-icon :icon="['fas', 'cubes']" />
                   </span> PAYOUT REQUESTS
+                </nuxt-link>
+              </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/admin/orders"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="fill-current mr-2">
+                    <font-awesome-icon :icon="['fas', 'shipping-fast']" />
+                  </span> Orders
+                </nuxt-link>
+              </div>
+              <div class="flex -mb-px mr-8">
+                <nuxt-link
+                  to="/admin/settings/shipping-profiles"
+                  class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
+                  active-class="text-primary"
+                >
+                  <span class="fill-current mr-2">
+                    <font-awesome-icon :icon="['fas', 'shipping-fast']" />
+                  </span> Shipping Zones & Rates
                 </nuxt-link>
               </div>
             </div>
@@ -105,25 +131,28 @@ import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 
 export default {
   head: {
-    title: "Admin Dashboard"
+    title: "Admin Dashboard",
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   middleware: ["admin-auth"],
   components: {
-    VueTailwindDropdown
+    VueTailwindDropdown,
   },
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
-      user: "user"
-    })
+      user: "user",
+    }),
   },
   methods: {
     async signOut(e) {
       this.$router.replace("/");
       setTimeout(() => {
         this.$store.dispatch("user/signOut");
-      })
-    }
-  }
+      });
+    },
+  },
 };
 </script>

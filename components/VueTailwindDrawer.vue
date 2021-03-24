@@ -13,7 +13,7 @@
     <transition name="slide"
       :enter-active-class="position == 'right' ? 'slideInRight' : 'slideInLeft'"
       :leave-active-class="position == 'right' ? 'slideOutRight' : 'slideOutLeft'">
-      <div class="flex h-full flex-col z-10 bg-white absolute overflow-auto"
+      <div class="flex h-full flex-col z-10 bg-white absolute overflow-auto drawer-content"
         :class="{
           'border-l right-0': position == 'right',
           'border-r left-0': position == 'left'
