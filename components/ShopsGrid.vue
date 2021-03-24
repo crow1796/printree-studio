@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-wrap items-center px-6">
     <nuxt-link
-      class="p-2 flex-grow"
+      class="p-2 flex-grow sm:flex-grow-0"
       v-for="shop in shops"
       :key="shop.slug"
       :to="`${rootUrl}${shop.slug}`"
