@@ -5,7 +5,7 @@
     <div class="fixed z-10 top-0 left-0 w-full" :style="{backgroundColor: navBG, height: '80px'}">
       <div class="flex flex-grow bg-transparent h-full">
         <div class="flex flex-grow relative">
-          <div class="container mx-auto px-4">
+          <div class="container mx-auto px-4 sm:relative">
             <div class="flex items-center justify-between py-4 h-full">
               <div class="flex flex-grow">
                 <nuxt-link :to="shopHome" style="max-height: 80px;">

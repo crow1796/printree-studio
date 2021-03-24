@@ -5,7 +5,7 @@
     <div class="flex flex-col flex-grow">
       <div class="bg-white font-sans w-full m-0">
         <div class="bg-white relative">
-          <div class="container mx-auto px-4">
+          <div class="container mx-auto px-4 sm:relative">
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
                 <nuxt-link to="/marketplace">
