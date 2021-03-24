@@ -10,7 +10,7 @@
             home-link="/marketplace"
             :items="[{
           title: meta.user.shop.name,
-          link: meta.user._id
+          link: `/marketplace/shop/${meta.user.shop.slug}`
           }, {
             title: meta.name,
             active: true
@@ -41,6 +41,11 @@ export default {
     ProductsGrid,
     SimplePagination,
     BreadCrumbs,
+  },
+  head(){
+    return {
+      title: `${this.meta?.name || ''} | Printree Studio`
+    }
   },
   created() {
     const page = this.$route.query.page;

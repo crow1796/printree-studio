@@ -4,12 +4,16 @@
     <CartDrawer ref="cartDrawer" />
     <div class="fixed z-10 top-0 left-0 w-full" :style="{backgroundColor: navBG, height: '80px'}">
       <div class="flex flex-grow bg-transparent h-full">
-        <div class="flex flex-grow">
+        <div class="flex flex-grow relative">
           <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between py-4 relative h-full">
+            <div class="flex items-center justify-between py-4 h-full">
               <div class="flex flex-grow">
                 <nuxt-link :to="shopHome" style="max-height: 80px;">
-                  <img :src="shopLogo" alt="Printree Studio" class="w-20 absolute top-0 left-0 object-fit center-y" />
+                  <img
+                    :src="shopLogo"
+                    alt="Printree Studio"
+                    class="w-20 absolute top-0 left-0 object-fit center-y"
+                  />
                 </nuxt-link>
               </div>
 
@@ -94,9 +98,92 @@
                 >Sign In</a>
               </div>
 
-              <div class="sm:hidden cursor-pointer">
-                <font-awesome-icon :icon="['fas', 'bars']" />
+              <div class="sm:hidden cursor-pointer flex items-center">
+                <button
+                  type="button"
+                  class="flex items-center hover:text-primary text-sm outline-none focus:outline-none pr-6"
+                  @click="openCart"
+                >
+                  <div class="relative">
+                    <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    <span
+                      class="absolute bg-primary rounded-full p-1 px-2 text-white flex justify-center items-center text-xs"
+                      style="top: -15px; right: -15px;"
+                    >{{ counts.cart }}</span>
+                  </div>
+                </button>
+
+                <font-awesome-icon :icon="['fas', 'bars']" @click="isNavOpened = !isNavOpened" />
               </div>
+
+              <div
+                class="sm:hidden absolute w-full top-full z-10 bg-white shadow-xl left-0"
+                v-if="isNavOpened"
+                v-click-outside="() => isNavOpened = false"
+              >
+                <div>
+                  <nuxt-link
+                    :to="shopHome"
+                    :style="{color: shopConfig.navTextColor, '--hover-color': shopConfig.navTextHoverColor}"
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'tags']" />
+                    </span>
+                    <span>All Products</span>
+                  </nuxt-link>
+                </div>
+                <div v-if="isLoggedIn && user._id">
+                  <div>
+                    <nuxt-link
+                      to="/marketplace/account/settings"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'cog']" />
+                      </span>
+                      <span>Account Settings</span>
+                    </nuxt-link>
+                  </div>
+                  <div>
+                    <nuxt-link
+                      to="/marketplace/account/orders"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'boxes']" />
+                      </span>
+                      <span>My Orders</span>
+                    </nuxt-link>
+                  </div>
+                  <div>
+                    <a
+                      href="#"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      @click.prevent="signOut"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                      </span>
+                      <span>Logout</span>
+                    </a>
+                  </div>
+                </div>
+                <div v-else>
+                  <a
+                    href="#"
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    id="get-started-btn"
+                    @click.prevent="$refs.authModal.show()"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                    </span>
+                    <span>Sign In</span>
+                  </a>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -115,10 +202,13 @@ import CartDrawer from "@/components/marketplace/CartDrawer";
 import { mapGetters } from "vuex";
 
 export default {
-  head(){
+  head() {
     return {
-      title: `${this.shopConfig?.name || ''} | Printree Studio`
-    }
+      title: `${this.shopConfig?.name || ""} | Printree Studio`,
+      meta: [
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+      ],
+    };
   },
   components: {
     AuthModal,
@@ -126,13 +216,16 @@ export default {
     VueTailwindDropdown,
     CartDrawer,
   },
-  async created(){
-    this.$storage.setCookie("shop", this.$route.params.slug)
+  async created() {
+    this.$storage.setCookie("shop", this.$route.params.slug);
   },
   async mounted() {
     window.addEventListener("scroll", this.updateScroll);
-    const config = await this.$store.dispatch("shop/shopConfig", this.$route.params.slug);
-    this.$store.commit("shop/SHOP_CONFIG", config)
+    const config = await this.$store.dispatch(
+      "shop/shopConfig",
+      this.$route.params.slug
+    );
+    this.$store.commit("shop/SHOP_CONFIG", config);
     if (this.isLoggedIn && this.user._id)
       await this.$store.dispatch("marketplace/getMPCounts", [
         "toPay",
@@ -148,6 +241,7 @@ export default {
       isLoading: true,
       scrollPosition: null,
       type: "customer",
+      isNavOpened: false,
     };
   },
   computed: {

@@ -21,6 +21,11 @@ export default {
   components: {
     Preview,
   },
+  head: {
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
+  },
   async mounted() {
     this.variant = await this.$store.dispatch("user_dashboard/variantData", {
       _id: this.$route.params.variantId,

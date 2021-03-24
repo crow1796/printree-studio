@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-wrap items-center px-6">
     <nuxt-link
-      class="p-2"
+      class="p-2 flex-grow"
       :class="gridClass"
       v-for="product in products"
       :key="product._id"
@@ -9,7 +9,8 @@
       :title="product.meta.name"
     >
       <div
-        class="flex-grow sm:flex-grow-0 relative overflow-hidden hover:shadow-lg border rounded relative"
+        class="flex-grow sm:flex-grow-0 relative overflow-hidden hover:shadow-lg border rounded relative w-full"
+      :class="gridClass"
       >
         <div class="relative pt-3 px-8 flex items-center justify-center">
           <progressive-img
@@ -96,7 +97,7 @@ export default {
         cls = 'w-4/12'
       }
       
-      return cls
+      return `sm:${cls}`
     }
   },
 };

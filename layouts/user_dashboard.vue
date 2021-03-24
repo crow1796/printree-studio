@@ -154,7 +154,10 @@ import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
 
 export default {
   head: {
-    title: "Dashboard",
+    title: "Printree Studio",
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   mixins: [UserTypeCheckerMixin],
   middleware: ["authenticated"],

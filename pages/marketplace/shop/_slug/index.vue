@@ -7,8 +7,8 @@
         No available products yet.
       </div>
       <ProductsGrid :rootUrl="rootUrl" :products="products" />
-      <div class="flex flex-grow justify-center pb-6 mt-4" v-if="products.length >= query.pagination.limit">
-        <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />
+      <div class="flex flex-grow justify-center pb-6 mt-4">
+        <SimplePagination @prev="goTo(prev)" @next="goTo(next)"/>
       </div>
     </div>
   </div>

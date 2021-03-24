@@ -101,6 +101,9 @@ export default {
     bodyAttrs: {
       class: "no-scroll",
     },
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   components: {
     VueTailwindModal,

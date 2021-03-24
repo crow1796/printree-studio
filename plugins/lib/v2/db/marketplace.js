@@ -175,3 +175,14 @@ export const shopConfig = async (axios, slug) => {
   const { shopConfig } = data.data;
   return shopConfig;
 }
+
+export const shops = async (axios, searchQuery) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.shops,
+    variables: {
+      searchQuery
+    }
+  });
+  const { shops } = data.data;
+  return shops;
+}

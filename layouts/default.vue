@@ -83,6 +83,9 @@ import { isMobile } from "@/helpers";
 export default {
   head: {
     title: "Printree Studio",
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   components: {
     Footer,

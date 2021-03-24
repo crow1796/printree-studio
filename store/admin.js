@@ -139,8 +139,8 @@ const actions = {
     }
     return reqStatus
   },
-  async payoutRequests(context, data) {
-    const payouts = await this.$api.admin.payoutRequests(data)
+  async payoutRequests(context, query) {
+    const payouts = await this.$api.admin.payoutRequests(query)
     context.commit('PAYOUTS', payouts)
     return payouts
   },

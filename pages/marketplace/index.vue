@@ -107,54 +107,113 @@
     
     <!-- Display Container (not part of component) END -->
     <!-- Listing START-->
-    <div class="flex flex-col p-24 pb-6 pt-6 container mx-auto px-4 relative">
-      <AreaLoader v-if="isFeaturedProductLoading" />
-      <div class="flex justify-between lg:px-8 font-bold mb-4">
+    <div class="container mx-auto mt-12">
+      <AreaLoader v-if="isLoading" />
+      <div class="flex justify-between px-8 font-bold mb-4">
         <div class="font-black">Shops</div>
       </div>
-      <ProductsGrid :products="featuredProducts" :grid="4"/>
+      <ShopsGrid :shops="shops"/>
+      <div class="flex flex-grow justify-center pb-6 mt-4">
+        <SimplePagination @prev="goTo(prev)" @next="goTo(next)"/>
+      </div>
     </div>
     <!-- Listing END -->
   </div>
 </template>
 
 <script>
-import ProductsGrid from "@/components/ProductsGrid";
+import ShopsGrid from "@/components/ShopsGrid";
+import SimplePagination from "@/components/SimplePagination";
 
 export default {
   layout: "marketplace",
-  components: {
-    ProductsGrid,
+  head: {
+    title: "Marketplace | Printree Studio"
   },
-  async created(){
-    this.$router.replace('/marketplace/products')
+  components: {
+    ShopsGrid,
+    SimplePagination
+  },
+  created() {
+    const page = this.$route.query.page;
+    if (page === undefined)
+      return this.$router.replace(
+        `/marketplace/?page=1`
+      );
+    this.currentPage = parseInt(page);
   },
   async mounted() {
-    this.isFeaturedProductLoading = true;
-    const res = await this.$store.dispatch(
-      "marketplace/getProductsToSell",
-      this.query
-    );
-    this.featuredProducts = res;
-    this.isFeaturedProductLoading = false;
+    this._loadItems();
   },
   data() {
     return {
-      isFeaturedProductLoading: true,
-      featuredProducts: [],
+      isLoading: true,
+      shops: [],
+      currentPage: this.$route.query.page,
       query: {
-        plan: ["Sell"],
-        status: ["approved"],
         sorting: {
-          field: "featuredAt",
+          field: "created_at",
           order: "DESC",
         },
         pagination: {
-          limit: 8,
-          page: 0,
+          limit: 15,
+          page: 1,
         },
       },
     };
+  },
+  methods: {
+    goTo(page) {
+      if (page === this.query.pagination.page) return;
+      this.query.pagination.page = page;
+      this._reloadRoute();
+    },
+    _reloadRoute() {
+      this.$router.replace({
+        path: `/marketplace/`,
+        query: {
+          page: this.query.pagination.page,
+        },
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    async _loadItems() {
+      this.isLoading = true;
+      const res = await this.$store.dispatch("marketplace/shops", {
+        ...this.query,
+        pagination: {
+          ...this.query.pagination,
+          page: this.query.pagination.page - 1,
+        },
+      });
+      this.shops = res;
+      this.isLoading = false;
+    },
+  },
+  computed: {
+    next() {
+      return parseInt(this.$route.query.page) + 1;
+    },
+    prev() {
+      const page = parseInt(this.$route.query.page);
+      return page > 1 ? page - 1 : 1;
+    },
+  },
+  watch: {
+    "$route.query.page": {
+      immediate: true,
+      handler(to, from) {
+        if (!to) return;
+        this.query.pagination.page = parseInt(to);
+      },
+    },
+    query: {
+      deep: true,
+      immediate: true,
+      async handler(to, from) {
+        await this._loadItems();
+      },
+    },
   },
 };
 </script>

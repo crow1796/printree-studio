@@ -1,0 +1,7 @@
+.vue-tailwind-modal {
+  .-content {
+    @media(max-width: 600px){
+      width: 100% !important;
+    }
+  }
+}

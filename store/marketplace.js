@@ -145,6 +145,10 @@ const actions = {
   async placeOrder(_, data) {
     const order = await this.$api.marketplace.placeOrder(data)
     return order
+  },
+  async shops(_, query) {
+    const shop = await this.$api.marketplace.shops(query)
+    return shop
   }
 }
 

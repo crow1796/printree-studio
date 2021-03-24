@@ -4,7 +4,7 @@
     <CartDrawer ref="cartDrawer" />
     <div class="flex flex-col flex-grow bg-gray-100">
       <div class="bg-white font-sans w-full m-0">
-        <div class="bg-white">
+        <div class="bg-white relative">
           <div class="container mx-auto px-4">
             <div class="flex items-center justify-between py-4">
               <div class="w-4/12">
@@ -63,8 +63,13 @@
               <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
                 <nuxt-link
                   to="/marketplace/"
-                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-2"
-                >Shops</nuxt-link>
+                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
+                >All Shops</nuxt-link>
+
+                <nuxt-link
+                  to="/marketplace/products"
+                  class="text-gray-800 font-semibold hover:text-primary-lighter"
+                >All Products</nuxt-link>
 
                 <button
                   type="button"
@@ -138,34 +143,108 @@
                 >Sign In</a>
               </div>
 
-              <div class="sm:hidden cursor-pointer">
-                <font-awesome-icon :icon="['fas', 'bars']" />
-              </div>
-            </div>
+              <div class="sm:hidden cursor-pointer flex items-center">
+                <button
+                  type="button"
+                  class="flex items-center hover:text-primary text-sm outline-none focus:outline-none pr-6"
+                  @click="openCart"
+                >
+                  <div class="relative">
+                    <font-awesome-icon :icon="['fas', 'shopping-cart']" />
+                    <span
+                      class="absolute bg-primary rounded-full p-1 px-2 text-white flex justify-center items-center text-xs"
+                      style="top: -15px; right: -15px;"
+                    >{{ counts.cart }}</span>
+                  </div>
+                </button>
 
-            <div class="block sm:hidden bg-white border-t-2 py-2">
-              <div class="flex flex-col">
-                <a
-                  href="#"
-                  class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mb-1"
-                >Products</a>
-                <div class="flex justify-between items-center border-t-2 pt-2">
+                <font-awesome-icon :icon="['fas', 'bars']" @click="isNavOpened = !isNavOpened" />
+              </div>
+
+              <div
+                class="sm:hidden absolute w-full top-full z-10 bg-white shadow-xl left-0"
+                v-if="isNavOpened"
+                v-click-outside="() => isNavOpened = false"
+              >
+                <div>
+                  <nuxt-link
+                    to="/marketplace/"
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'store']" />
+                    </span>
+                    <span>All Shops</span>
+                  </nuxt-link>
+                </div>
+                <div>
+                  <nuxt-link
+                    to="/marketplace/products"
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'tags']" />
+                    </span>
+                    <span>All Products</span>
+                  </nuxt-link>
+                </div>
+                <div v-if="isLoggedIn && user._id">
+                  <div>
+                    <nuxt-link
+                      to="/marketplace/account/settings"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'cog']" />
+                      </span>
+                      <span>Account Settings</span>
+                    </nuxt-link>
+                  </div>
+                  <div>
+                    <nuxt-link
+                      to="/marketplace/account/orders"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'boxes']" />
+                      </span>
+                      <span>My Orders</span>
+                    </nuxt-link>
+                  </div>
+                  <div>
+                    <a
+                      href="#"
+                      class="flex items-center hover:bg-gray-200 px-4 py-2"
+                      @click.prevent="signOut"
+                    >
+                      <span class="mr-2">
+                        <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                      </span>
+                      <span>Logout</span>
+                    </a>
+                  </div>
+                </div>
+                <div v-else>
                   <a
                     href="#"
-                    class="text-gray-800 text-sm font-semibold hover:text-primary-lighter mr-4"
-                  >Sign in</a>
-                  <a
-                    href="#"
-                    class="text-gray-800 text-sm font-semibold border px-4 py-1 rounded-lg hover:text-primary-lighter hover:border-primary-lighter"
-                  >Sign up</a>
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    id="get-started-btn"
+                    @click.prevent="$refs.authModal.show()"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                    </span>
+                    <span>Sign In</span>
+                  </a>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
       </div>
-      <div class="flex flex-grow flex-col sm:flex-row sm:w-10/12 mx-auto">
-        <div class="w-3/12">
+      <div class="flex flex-grow flex-col sm:flex-row sm:w-10/12 w-full mx-auto">
+        <div class="w-full sm:w-3/12">
           <ProfileNav />
         </div>
         <div class="class flex flex-grow bg-gray-100 sm:pt-6 pb-0 sm:pr-6">
@@ -191,6 +270,9 @@ import ProfileNav from "@/components/marketplace/ProfileNav";
 export default {
   head: {
     title: "Printree Studio",
+    meta: [
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+    ],
   },
   components: {
     AuthModal,
@@ -221,6 +303,7 @@ export default {
     return {
       categories: [],
       type: "customer",
+      isNavOpened: false
     };
   },
   methods: {
