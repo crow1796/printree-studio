@@ -110,7 +110,7 @@
     <div class="container mx-auto mt-12">
       <AreaLoader v-if="isLoading" />
       <div class="flex justify-between px-8 font-bold mb-4">
-        <div class="font-black">Shops</div>
+        <div class="font-bold text-2xl">Shops</div>
       </div>
       <ShopsGrid :shops="shops"/>
       <div class="flex flex-grow justify-center pb-6 mt-4">
@@ -151,6 +151,7 @@ export default {
       shops: [],
       currentPage: this.$route.query.page,
       query: {
+        status: ['active'],
         sorting: {
           field: "created_at",
           order: "DESC",

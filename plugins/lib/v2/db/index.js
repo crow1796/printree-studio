@@ -8,7 +8,7 @@ import { fetchAvailableProducts, getArts } from './designer';
 export default (axios) => {
   return {
     // users.js
-    getUserCollectionsOf: (userId) => getCollectionsOfUserId(axios, userId),
+    getUserCollectionsOf: () => getCollectionsOfUserId(axios),
     // designer.js
     fetchAvailableProducts: () => fetchAvailableProducts(axios),
     getArts: () => getArts(axios),

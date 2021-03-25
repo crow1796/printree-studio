@@ -51,6 +51,7 @@ export default {
       query: {
         plan: ["Sell"],
         status: ["approved"],
+        productStatus: ["approved"],
         collectionId: this.$route.params.id,
         sorting: {
           field: "created_at",

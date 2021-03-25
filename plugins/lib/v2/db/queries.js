@@ -1,18 +1,21 @@
 export default {
     currentUserCollections: `
-  query{
-      currentUserCollections{
-          _id
-          name
-          handle
-          plan
-          approved_at
-          declined_at
-          status
-          created_at
-          updated_at
-      }
-  }`,
+        query ($status: [String!]){
+            currentUserCollections(status: $status){
+                _id
+                name
+                plan
+                approved_at
+                declined_at
+                status
+                created_at
+                updated_at
+                products {
+                    _id
+                    status
+                }
+            }
+        }`,
     customizableProducts: `
   query {
       customizableProducts {
@@ -111,6 +114,7 @@ export default {
             products {
                 _id
                 shopId
+                status
                 meta {
                     name
                     description
@@ -170,6 +174,7 @@ export default {
             status
             products {
                 _id
+                status
                 meta {
                     name
                     description
@@ -481,6 +486,11 @@ export default {
             channel
             notes
             status
+            user {
+                _id
+                email
+                name
+            }
         }
     }
   `,
@@ -496,6 +506,11 @@ export default {
             channel
             notes
             status
+            user {
+                _id
+                email
+                name
+            }
         }
     }
   `,
@@ -532,6 +547,11 @@ export default {
             channel
             notes
             status
+            user {
+                _id
+                name
+                email
+            }
         }
     }
   `,
@@ -547,6 +567,11 @@ export default {
             channel
             notes
             status
+            user {
+                _id
+                email
+                name
+            }
         }
     }
   `,
@@ -562,6 +587,11 @@ export default {
             channel
             notes
             status
+            user {
+                _id
+                email
+                name
+            }
         }
     }
   `,

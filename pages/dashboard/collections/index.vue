@@ -235,7 +235,7 @@
                           <span>{{ col.name }}</span>
                         </a>
                         <a
-                          v-if="!['approved', 'reviewing', 'to pay', 'printing process'].includes(col.status)"
+                          v-if="!['reviewing', 'to pay', 'printing process'].includes(col.status)"
                           href="#"
                           class="text-xs ml-1 hover:text-gray-800 text-gray-700"
                           @click.prevent="showCollectionRenameModal(col)"
@@ -358,8 +358,7 @@ export default {
   async mounted() {
     this.urlOrigin = window.location.origin
     await this.$store.dispatch(
-      "user_dashboard/getUserCollectionsOf",
-      this.user.uid
+      "user_dashboard/getUserCollectionsOf"
     );
     this.$store.commit("designer/SELECTED_PRODUCTS", []);
     this.isLoading = false;

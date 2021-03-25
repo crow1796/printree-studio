@@ -1,6 +1,6 @@
 <template>
   <div class="relative sm:px-8">
-    <AreaLoader v-if="isLoading" fullscreen/>
+    <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="fulfillmentStatusModal"
       width="30%"
@@ -34,6 +34,7 @@
                   <option value="pending">Pending</option>
                   <option value="shipping">Shipping</option>
                   <option value="fulfilled">Fulfilled</option>
+                  <option value="cancelled">Cancelled</option>
                 </select>
               </div>
               <span
@@ -128,6 +129,7 @@
                     <option value="partial">Partially Paid</option>
                     <option value="paid">Fully Paid</option>
                     <option value="refunded">Refunded</option>
+                    <option value="cancelled">Cancelled</option>
                   </select>
                 </div>
                 <span
@@ -232,9 +234,11 @@
             <div class="font-bold flex-flex-col ml-4" v-if="order.trackingCode">
               <div class="text-xs leading-none">Tracking Code:</div>
               <div class="uppercas">
-                <a :href="order.statusUrl" target="_blank" class="text-blue-600 hover:underline font-bold">
-                  {{ order.trackingCode }}
-                </a>
+                <a
+                  :href="order.statusUrl"
+                  target="_blank"
+                  class="text-blue-600 hover:underline font-bold"
+                >{{ order.trackingCode }}</a>
               </div>
             </div>
           </div>
@@ -338,7 +342,7 @@ export default {
     this.fulfillmentFormData.fulfillmentStatus = this.order.fulfillmentStatus;
     this.fulfillmentFormData.trackingCode = this.order.trackingCode;
     this.fulfillmentFormData.statusUrl = this.order.statusUrl;
-    
+
     this.financialFormData.financialStatus = this.order.financialStatus;
     this.isLoading = false;
   },
@@ -376,21 +380,21 @@ export default {
         this.$toast.error("Please fix the errors below.", { position: "top" });
         return;
       }
-      
+
       this.isLoading = true;
 
-      const res = await this.$store.dispatch('admin/updateOrder', {
+      const res = await this.$store.dispatch("admin/updateOrder", {
         id: this.$route.params.id,
-        orderInput: this.fulfillmentFormData
-      })
+        orderInput: this.fulfillmentFormData,
+      });
 
       this.order = {
         ...this.order,
-        ...res
-      }
+        ...res,
+      };
 
-      this.hideModal(this.$refs.fulfillmentStatusModal)
-      
+      this.hideModal(this.$refs.fulfillmentStatusModal);
+
       this.isLoading = false;
     },
     async updateFinancialStatus() {
@@ -403,17 +407,17 @@ export default {
 
       this.isLoading = true;
 
-      const res = await this.$store.dispatch('admin/updateOrder', {
+      const res = await this.$store.dispatch("admin/updateOrder", {
         id: this.$route.params.id,
-        orderInput: this.financialFormData
-      })
+        orderInput: this.financialFormData,
+      });
 
       this.order = {
         ...this.order,
-        ...res
-      }
+        ...res,
+      };
 
-      this.hideModal(this.$refs.paymentStatusModal)
+      this.hideModal(this.$refs.paymentStatusModal);
 
       this.isLoading = false;
     },

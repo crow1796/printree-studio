@@ -81,7 +81,7 @@
                   </span>
                   My Products
                 </nuxt-link>
-              </div> -->
+              </div>-->
               <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/collections"
@@ -100,7 +100,12 @@
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
+                  <span
+                    class="h-6 w-6 fill-current mr-2 flex items-center justify-center"
+                    flex
+                    items-center
+                    justify-center
+                  >
                     <font-awesome-icon :icon="['fas', 'receipt']" />
                   </span> Payouts
                 </nuxt-link>
@@ -111,7 +116,12 @@
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                   active-class="text-primary"
                 >
-                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
+                  <span
+                    class="h-6 w-6 fill-current mr-2 flex items-center justify-center"
+                    flex
+                    items-center
+                    justify-center
+                  >
                     <font-awesome-icon :icon="['fas', 'cog']" />
                   </span> Shop Settings
                 </nuxt-link>
@@ -120,7 +130,7 @@
 
             <div v-if="userTypeIs('seller')" class="flex items-center">
               <div>
-                <TotalProfitCounter/>
+                <TotalProfitCounter />
               </div>
               <div class="flex -mb-px ml-8">
                 <a
@@ -128,9 +138,20 @@
                   target="_blank"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
                 >
-                  <span class="h-6 w-6 fill-current mr-2 flex items-center justify-center" flex items-center justify-center>
+                  <span
+                    class="h-6 w-6 fill-current mr-2 flex items-center justify-center"
+                    flex
+                    items-center
+                    justify-center
+                  >
                     <font-awesome-icon :icon="['fas', 'shopping-cart']" />
-                  </span> My Shop <span class="h-6 w-6 fill-current ml-2 flex items-center justify-center" flex items-center justify-center>
+                  </span> My Shop
+                  <span
+                    class="h-6 w-6 fill-current ml-2 flex items-center justify-center"
+                    flex
+                    items-center
+                    justify-center
+                  >
                     <font-awesome-icon :icon="['fas', 'external-link-alt']" />
                   </span>
                 </a>
@@ -148,9 +169,9 @@
 
 <script>
 import TotalProfitCounter from "@/components/TotalProfitCounter";
-import VueTailwindDropdown from '@/components/VueTailwindDropdown'
-import { mapGetters } from 'vuex'
-import UserTypeCheckerMixin from '@/components/Mixins/UserTypeChecker'
+import VueTailwindDropdown from "@/components/VueTailwindDropdown";
+import { mapGetters } from "vuex";
+import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 
 export default {
   head: {
@@ -163,32 +184,32 @@ export default {
   middleware: ["authenticated"],
   components: {
     VueTailwindDropdown,
-    TotalProfitCounter
+    TotalProfitCounter,
   },
-  data(){
+  data() {
     return {
-      shopifyUrl: process.env.shopifyUrl
-    }
+      shopifyUrl: process.env.shopifyUrl,
+    };
   },
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
-    })
+    }),
   },
-  mounted(){
-    document.body.style.overflow = 'auto'
-    this.$flags.set('single', 'off')
+  mounted() {
+    document.body.style.overflow = "auto";
+    this.$flags.set("single", "off");
   },
   methods: {
     async signOut() {
       await this.$router.replace("/");
       setTimeout(() => {
         this.$store.dispatch("user/signOut");
-      })
+      });
     },
-    _encodeUri(uri){
-      return encodeURIComponent(uri)
-    }
+    _encodeUri(uri) {
+      return encodeURIComponent(uri);
+    },
   },
 };
 </script>

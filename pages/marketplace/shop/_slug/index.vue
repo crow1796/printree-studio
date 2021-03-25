@@ -2,7 +2,7 @@
   <div>
     <AreaLoader v-if="isLoading" />
     <ShopBanner :src="shopBanner" v-if="shopBanner"/>
-    <div class="container mx-auto mt-12" :class="{'mt-12': shopBanner, 'mt-32': !shopBanner}">
+    <div class="container mx-auto" :class="{'mt-12': shopBanner, 'mt-32': !shopBanner}">
       <div class="text-center text-3xl my-48" v-if="!products.length">
         No available products yet.
       </div>
@@ -46,6 +46,7 @@ export default {
       query: {
         plan: ["Sell"],
         status: ["approved"],
+        productStatus: ["approved"],
         sorting: {
           field: "created_at",
           order: "DESC",

@@ -98,6 +98,15 @@
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
                 @click="selectProduct(index)"
               >
+                <div
+                  class="absolute font-bold text-xs top-0 left-0 ml-1 mt-1 rounded-full px-4 py-1 ml-2 uppercase"
+                  :class="{
+                    'bg-green-600 text-white': product.status === 'approved',
+                    'bg-red-600 text-white': product.status === 'declined',
+                    'bg-blue-600 text-white': product.status === 'pending',
+                    'bg-gray-600 text-white': !['approved', 'declined', 'pending'].includes(product.status),
+                  }"
+                >{{product.status}}</div>
                 <div class="absolute right-0 top-0" v-if="selectedProducts.length > 1">
                   <button
                     type="button"
