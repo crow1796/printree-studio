@@ -28,7 +28,7 @@
             class="flex flex-wrap"
           >
             <div
-              class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center mr-2 w-24"
+              class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center mr-2 mb-2 w-24"
               :class="{'border-primary': i === selectedThumbnailIndex}"
               v-for="(thumb, i) in thumbnails"
               :key="i"
@@ -204,6 +204,7 @@ export default {
       otherQuery: {
         plan: ["Sell"],
         status: ["approved"],
+        productStatus: ["approved"],
         collectionId: null,
         id: this.$route.params.id,
         pagination: {
