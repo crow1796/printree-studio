@@ -28,7 +28,7 @@
               </div>
             </div>
             <div
-              class="flex flex-grow-0 border-b relative"
+              class="flex flex-grow-0 border-b relative py-2"
               v-for="(product, i) in products"
               :key="i"
             >
@@ -56,7 +56,7 @@
               </div>
               <div class="w-3/12 flex-justify-between">
                 <div class="w-32 mx-auto">
-                  <progressive-img class="relative mx-auto w-8/12" :src="product.fullThumb" />
+                  <progressive-img class="relative mx-auto" :src="product.fullThumb" style="width: 80px"/>
                 </div>
               </div>
               <div class="flex flex-col w-3/12 justify-center">

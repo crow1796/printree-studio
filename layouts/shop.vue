@@ -2,7 +2,7 @@
   <div>
     <AuthModal ref="authModal" @login-success="$refs.authModal.hide()" :type="type" />
     <CartDrawer ref="cartDrawer" />
-    <div class="fixed z-10 top-0 left-0 w-full" :style="{backgroundColor: navBG, height: '80px'}">
+    <div class="fixed z-20 top-0 left-0 w-full" :style="{backgroundColor: navBG, height: '80px'}">
       <div class="flex flex-grow bg-transparent h-full">
         <div class="flex flex-grow relative">
           <div class="container mx-auto px-4 sm:relative">

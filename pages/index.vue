@@ -80,9 +80,9 @@
         HOW DOES
         <span class="text-primary">PRINTREE STUDIO</span> WORKS?
       </div>
-      <div class="flex sm:flex-row flex-col justify-center items-start">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         <div
-          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+          class="p-6 border rounded"
         >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/sign_in.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
@@ -91,13 +91,13 @@
           <div class="text-center text-gray-600 mt-4">
             You can create an account if you don't have one or login. If you want to sell products, send us an email at:
             <a
-              class="text-primary"
+              class="text-primary truncate"
               href="mailto:contact@printreestudio.com"
             >contact@printreestudio.com</a>
           </div>
         </div>
         <div
-          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+          class="p-6 border rounded"
         >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/design.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
@@ -108,7 +108,7 @@
           >You choose from variety of products and add your designs on them.</div>
         </div>
         <div
-          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+          class="p-6 border rounded"
         >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/shopping.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
@@ -119,7 +119,7 @@
           >Share it to your friends/community and start earning.</div>
         </div>
         <div
-          class="p-6 border rounded mx-4 mb-4 sm:mb-0 sm:w-3/12 justify-between flex flex-col flex-grow"
+          class="p-6 border rounded"
         >
           <div class="vis text-center mb-8">
             <img src="~/assets/images/delivery.svg" class="sm:w-48 w-64 mx-auto my-2 sm:my-0" />
