@@ -11,8 +11,7 @@
         <span class="ml-1">Back</span>
       </button>
       <a
-        v-if="meta.handle"
-        :href="meta.handle"
+        :href="`/marketplace/collections/${meta._id}`"
         target="_blank"
         class="text-xs text-blue-500 hover:text-blue-700"
       >
@@ -35,10 +34,12 @@
           </div>
         </div>
         <div class="modal-body p-4 text-center">
-          <div v-if="confirmationAction !== 'review'">Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
-          <div v-if="confirmationAction === 'review'">
-            Are you sure you want to start reviewing this collection?
-          </div>
+          <div
+            v-if="confirmationAction !== 'review'"
+          >Are you sure you want to {{ confirmationAction === 'approval' ? 'publish' : 'decline' }} this collection?</div>
+          <div
+            v-if="confirmationAction === 'review'"
+          >Are you sure you want to start reviewing this collection?</div>
           <div class="mt-4" v-if="confirmationAction !== 'review'">
             <textarea
               name="notes"
@@ -68,7 +69,18 @@
     </VueTailwindModal>
     <div v-if="meta.name" class="mt-4 flex justify-between items-center">
       <span class="font-bold text-body text-xl">
-        <span class="block">{{ meta.name }}</span>
+        <span class="block flex items-center">
+          <span>{{ meta.name }}</span>
+          <span
+            class="rounded-full px-4 py-1 text-xs ml-2 uppercase"
+            :class="{
+            'bg-green-600 text-white': meta.status === 'approved',
+            'bg-red-600 text-white': meta.status === 'declined',
+            'bg-blue-600 text-white': meta.status === 'pending',
+            'bg-gray-600 text-white': !['approved', 'declined', 'pending'].includes(meta.status),
+          }"
+          >{{ meta.status }}</span>
+        </span>
         <span class="text-xs">
           Shop ID:
           <a
@@ -81,7 +93,7 @@
       <nuxt-link
         :to="`/admin/users/${meta.user._id}`"
         class="text-blue-500 hover:text-blue-700 font-bold text-xl"
-      >{{ meta.user.shop.name || meta.user.name }}</nuxt-link>
+      >By: {{ meta.user.shop ? meta.user.shop.name : meta.user.name }}</nuxt-link>
     </div>
     <div class="flex flex-grow text-gray-600 pb-10" v-if="selectedProduct">
       <div class="flex flex-col flex-grow">
@@ -355,6 +367,15 @@
                       v-if="product"
                     >
                       <div class="px-2 pt-2">
+                        <div
+                          class="absolute font-bold text-xs top-0 left-0 ml-1 mt-1 rounded-full px-4 py-1 ml-2 uppercase"
+                          :class="{
+                            'bg-green-600 text-white': product.status === 'approved',
+                            'bg-red-600 text-white': product.status === 'declined',
+                            'bg-blue-600 text-white': product.status === 'pending',
+                            'bg-gray-600 text-white': !['approved', 'declined', 'pending'].includes(product.status),
+                          }"
+                        >{{product.status}}</div>
                         <div class="absolute right-0 top-0">
                           <CustomCheckbox
                             @change="(e) => toggleProductToApprove(product._id, e)"
@@ -376,13 +397,9 @@
           </div>
         </div>
         <div
-          class="flex p-4 items-center border-t fixed bottom-0 w-full bg-white left-0"
-          :class="{'justify-end': ['declined', 'approved'].includes(meta.status), 'justify-between': ['pending', 'reviewing'].includes(meta.status)}"
+          class="flex p-4 items-center border-t fixed bottom-0 w-full bg-white left-0 justify-between"
         >
-          <PTButton
-            @click="confirmAction('decline')"
-            v-if="['pending', 'reviewing'].includes(meta.status)"
-          >DECLINE</PTButton>
+          <PTButton @click="confirmAction('decline')">DECLINE</PTButton>
           <div>
             <PTButton
               color="primary"
@@ -408,7 +425,7 @@ import VueNumericInput from "@/components/VueNumericInput";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 import CustomCheckbox from "@/components/CustomCheckbox";
 import { ContentLoader } from "vue-content-loader";
-import { priceWithVatCeil, priceWithVat } from '@/plugins/price-calculator'
+import { priceWithVatCeil, priceWithVat } from "@/plugins/price-calculator";
 
 const SERVICE_FEE = 0.12;
 
@@ -684,7 +701,7 @@ export default {
       if (this.meta.plan === "Sell")
         total = this.selectedProductBasePrice + this.selectedProductProfit;
 
-      return this.meta.plan === "Sell" ? priceWithVatCeil(total): total;
+      return this.meta.plan === "Sell" ? priceWithVatCeil(total) : total;
     },
     hasPreviousProductOrVariant() {
       const variationKeys = _.keys(this.selectedProduct.variants);

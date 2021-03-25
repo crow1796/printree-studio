@@ -19,13 +19,16 @@
           />
         </div>
       </div>
-      <div class="flex">
-        <div class="flex w-6/12 w-full p-2 sm:p-2">
+      <div class="flex lg:flex-row flex-col">
+        <div class="flex sm:w-6/12 flex-col w-full p-2 sm:p-2">
+          <div class="flex flex-start">
+            <ZoomOnHover :img="thumbnails[selectedThumbnailIndex][selectedSide]" />
+          </div>
           <div
-            class="flex w-3/12 lg:px-2 sm:px-0 overflow-auto sm:mb-4"
+            class="flex flex-wrap"
           >
             <div
-              class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center lg:mb-2 sm:mr-2"
+              class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center mr-2 w-24"
               :class="{'border-primary': i === selectedThumbnailIndex}"
               v-for="(thumb, i) in thumbnails"
               :key="i"
@@ -33,9 +36,6 @@
             >
               <progressive-img :src="thumb[frontOrFirst]" class="lg:w-24 sm:w-16" />
             </div>
-          </div>
-          <div class="flex lg:w-9/12 items-start flex-grow">
-            <ZoomOnHover :img="thumbnails[selectedThumbnailIndex][selectedSide]" />
           </div>
         </div>
         <div class="flex lg:w-6/12 sm:w-full p-2 sm:p-2">

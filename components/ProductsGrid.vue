@@ -1,16 +1,18 @@
 <template>
-  <div class="flex flex-wrap items-center px-6">
+  <div class="mx-6 grid-cols-1 sm:grid-cols-3" :class="['grid', `md:grid-cols-${grid}`]">
     <nuxt-link
-      class="p-2 flex-grow sm:flex-grow-0"
+      class="p-2"
       v-for="product in products"
       :key="product._id"
       :to="`${rootUrl}${product._id}`"
       :title="product.meta.name"
     >
       <div
-        class="flex-grow sm:flex-grow-0 relative overflow-hidden hover:shadow-lg border rounded relative w-full"
-      :class="gridClass"
+        class="hover:shadow-lg border rounded relative w-full"
       >
+        <span
+          class="absolute font-bold text-xs top-0 right-0 ml-1 mt-1 rounded-full px-4 py-1 mr-1 uppercase z-10 bg-primary text-white truncate max-w-full" :style="{top: '-10px', right: '-10px'}"
+        >{{product.parent_collection.user.shop.name}}</span>
         <div class="relative pt-3 px-8 flex items-center justify-center">
           <progressive-img
             class="relative w-40"
@@ -21,7 +23,7 @@
         <div class="relative text-grey-600 px-3 pb-3">
           <span
             class="block opacity-75 w-full truncate text-xs leading-none"
-          >{{product.parent_collection.user.shop.name}}</span>
+          >{{product.parent_collection.name}}</span>
           <div class="flex items-center justify-between">
             <span class="font-black truncate">{{product.meta.name}}</span>
           </div>

@@ -1,15 +1,14 @@
 <template>
-  <div class="flex flex-wrap items-center px-6">
+  <div class="mx-6 grid-cols-1 sm:grid-cols-3" :class="['grid', `md:grid-cols-${grid}`]">
     <nuxt-link
-      class="p-2 flex-grow sm:flex-grow-0"
+      class="p-2"
       v-for="shop in shops"
       :key="shop.slug"
       :to="`${rootUrl}${shop.slug}`"
       :title="shop.name"
     >
       <div
-        class="flex-grow sm:flex-grow-0 relative overflow-hidden hover:shadow-lg border rounded relative w-full"
-      :class="gridClass"
+        class="overflow-hidden hover:shadow-lg border rounded relative w-full"
       >
         <div class="relative pt-3 px-8 flex items-center justify-center" :style="{height: '200px'}">
           <progressive-img class="relative w-40" :src="logoOf(shop)" style="width: 160px;" />

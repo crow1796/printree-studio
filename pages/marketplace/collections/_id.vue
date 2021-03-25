@@ -6,16 +6,7 @@
 
       <div class="flex justify-between items-center mx-8" v-if="meta">
         <div>
-          <BreadCrumbs
-            home-link="/marketplace"
-            :items="[{
-          title: meta.user.shop.name,
-          link: `/marketplace/shop/${meta.user.shop.slug}`
-          }, {
-            title: meta.name,
-            active: true
-          }]"
-          />
+          <BreadCrumbs home-link="/marketplace" :items="breadCrumbItems" />
         </div>
       </div>
       <ProductsGrid :products="products" />
@@ -42,10 +33,10 @@ export default {
     SimplePagination,
     BreadCrumbs,
   },
-  head(){
+  head() {
     return {
-      title: `${this.meta?.name || ''} | Printree Studio`
-    }
+      title: `${this.meta?.name || ""} | Printree Studio`,
+    };
   },
   created() {
     const page = this.$route.query.page;
@@ -72,6 +63,7 @@ export default {
       query: {
         plan: ["Sell"],
         status: ["approved"],
+        productStatus: ["approved"],
         collectionId: this.$route.params.id,
         sorting: {
           field: "created_at",
@@ -119,6 +111,22 @@ export default {
     prev() {
       const page = parseInt(this.$route.query.page);
       return page > 1 ? page - 1 : 1;
+    },
+    breadCrumbItems() {
+      let items = [];
+
+      if (this.meta.user?.shop)
+        items.push({
+          title: this.meta.user.shop.name,
+          link: `/marketplace/shop/${this.meta.user.shop.slug}`,
+        });
+
+      items.push({
+        title: this.meta.name,
+        active: true,
+      });
+
+      return items;
     },
   },
   watch: {

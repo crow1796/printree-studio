@@ -42,6 +42,7 @@ export default {
       query: {
         plan: ["Sell"],
         status: ["approved"],
+        productStatus: ["approved"],
         sorting: {
           field: "created_at",
           order: "DESC",

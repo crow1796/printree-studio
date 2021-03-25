@@ -60,7 +60,7 @@
                 </div>
               </div>-->
 
-              <div class="w-4/12 hidden sm:flex sm:items-center justify-end">
+              <div class="hidden sm:flex sm:items-center justify-end">
                 <nuxt-link
                   to="/marketplace/"
                   class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
