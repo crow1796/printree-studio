@@ -126,7 +126,7 @@ module.exports = {
           user: { url: 'me', method: 'post', propertyName: 'user' },
           logout: false
         },
-        autoLogout: true
+        resetOnError: true
       }
     }
   },
