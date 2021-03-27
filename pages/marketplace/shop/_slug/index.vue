@@ -36,7 +36,7 @@ export default {
     this.currentPage = parseInt(page);
   },
   async mounted() {
-    this._loadItems();
+    await this._loadItems();
   },
   data() {
     return {

@@ -284,7 +284,7 @@ export default {
         },
         pagination: {
           limit: 15,
-          page: 0,
+          page: 1,
         },
       },
       selectedUser: null,

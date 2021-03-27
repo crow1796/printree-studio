@@ -58,7 +58,17 @@ export default {
   data() {
     return {
       orders: [],
-      isLoading: true
+      isLoading: true,
+      query: {
+        sorting: {
+          field: "created_at",
+          order: "DESC",
+        },
+        pagination: {
+          limit: 15,
+          page: 1,
+        },
+      },
     }
   },
   methods: {

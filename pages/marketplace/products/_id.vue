@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
-    <AreaLoader v-if="isLoading" class="my-2" />
+    <AreaLoader v-if="$fetchState.pending" class="my-2" />
     <div v-if="product" :key="product._id">
       <div class="flex justify-between items-center mb-12">
         <div>
@@ -163,7 +163,7 @@ export default {
       title: `${this.product?.meta?.name || ''} | Printree Studio`
     }
   },
-  async mounted() {
+  async fetch() {
     const res = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.query
@@ -179,12 +179,9 @@ export default {
       "marketplace/getProductsToSell",
       this.otherQuery
     );
-
-    this.isLoading = false;
   },
   data() {
     return {
-      isLoading: true,
       product: null,
       selectedVariant: null,
       selectedSize: null,
