@@ -125,7 +125,8 @@ module.exports = {
           login: { url: 'login', method: 'post', propertyName: 'token' },
           user: { url: 'me', method: 'post', propertyName: 'user' },
           logout: false
-        }
+        },
+        autoLogout: true
       }
     }
   },
