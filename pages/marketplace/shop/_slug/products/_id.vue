@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader mt-32">
-    <AreaLoader v-if="isLoading" class="my-2" />
+    <AreaLoader v-if="$fetchState.pending" class="my-2" />
     <div v-if="product" :key="product._id">
       <div class="flex lg:flex-row flex-col">
         <div class="flex sm:w-6/12 flex-col w-full p-2 sm:p-2">
@@ -134,6 +134,14 @@ import { priceWithVatCeil } from "@/plugins/price-calculator";
 
 export default {
   layout: "shop",
+  head() {
+    return {
+      title: `${this.product?.meta?.name || ""} | Printree Studio`,
+      meta: [
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+      ],
+    };
+  },
   components: {
     ProductsGrid,
     VueNumericInput,
@@ -141,7 +149,7 @@ export default {
     VueTailwindModal,
     BreadCrumbs,
   },
-  async mounted() {
+  async fetch() {
     const res = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.query
@@ -162,12 +170,9 @@ export default {
       products,
       (prod) => prod._id !== this.$route.params.id
     );
-
-    this.isLoading = false;
   },
   data() {
     return {
-      isLoading: true,
       product: null,
       selectedVariant: null,
       selectedSize: null,
@@ -203,7 +208,7 @@ export default {
       user: "user",
     }),
     currentUrl() {
-      return window.location.href;
+      return this.$route.fullPath
     },
     frontOrFirst() {
       return _.includes(this.sides, "front") ? "front" : this.sides[0];

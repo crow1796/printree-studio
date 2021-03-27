@@ -219,8 +219,7 @@ export default {
   async created() {
     this.$storage.setCookie("shop", this.$route.params.slug);
   },
-  async mounted() {
-    window.addEventListener("scroll", this.updateScroll);
+  async fetch() {
     const config = await this.$store.dispatch(
       "shop/shopConfig",
       this.$route.params.slug
@@ -234,7 +233,9 @@ export default {
         "delivered",
         "cart",
       ]);
-    this.isLoading = false;
+  },
+  mounted(){
+    window.addEventListener("scroll", this.updateScroll);
   },
   data() {
     return {
