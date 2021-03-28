@@ -13,7 +13,8 @@
     "build": "nuxt build",
     "start": "node server/index.js",
     "generate": "nuxt generate",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "npm run build",
+    "vercel-build": "yarn global add node-gyp"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
