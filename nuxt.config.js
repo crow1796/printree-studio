@@ -61,7 +61,7 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     "@nuxtjs/axios",
-    "@nuxtjs/auth",
+    "@nuxtjs/auth-next",
     "@nuxtjs/pwa",
     [
       "nuxt-fontawesome",
@@ -117,16 +117,22 @@ module.exports = {
     redirect: {
       login: '/',
       callback: '/',
-      home: false
     },
     strategies: {
       local: {
-        endpoints: {
-          login: { url: 'login', method: 'post', propertyName: 'token' },
-          user: { url: 'me', method: 'post', propertyName: 'user' },
-          logout: false
+        token: {
+          property: "token",
+          maxAge: 604800
         },
-        resetOnError: true
+        user: {
+          property: "user",
+          autoFetch: true
+        },
+        endpoints: {
+          login: { url: 'login', method: 'post' },
+          user: { url: 'me', method: 'post' },
+          logout: false
+        }
       }
     }
   },
