@@ -270,7 +270,6 @@ export default {
   data() {
     return {
       isLoading: true,
-      shopifyUrl: process.env.shopifyUrl,
       formData: {
         email: null,
         name: null,

@@ -224,7 +224,6 @@ export default {
   },
   data() {
     return {
-      shopifyUrl: process.env.shopifyUrl,
       totalEarnings: 0,
       confirmationAction: null,
       isLoading: true,

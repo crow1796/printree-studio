@@ -186,11 +186,6 @@ export default {
     VueTailwindDropdown,
     TotalProfitCounter,
   },
-  data() {
-    return {
-      shopifyUrl: process.env.shopifyUrl,
-    };
-  },
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",

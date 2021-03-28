@@ -201,7 +201,6 @@ export default {
   },
   data() {
     return {
-      shopifyUrl: process.env.shopifyUrl,
       generatedImages: [],
       defaultValue: "all",
       filterValues: [],

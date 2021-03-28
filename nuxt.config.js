@@ -5,8 +5,7 @@ module.exports = {
     port: process.env.PORT || 4123
   },
   env: {
-    apiUrl: process.env.API_URL,
-    shopifyUrl: process.env.SHOPIFY_URL,
+    apiUrl: process.env.API_URL
   },
   /*
    ** Headers of the page
