@@ -300,16 +300,16 @@
                       <div class="flex w-full">
                         <ShareNetwork
                           network="facebook"
-                          :url="prod.parent_collection.handle"
-                          :title="prod.parent_collection.name"
+                          :url="`/marketplace/products/${prod._id}`"
+                          :title="prod.meta.name"
                           class="px-3 flex justify-center items-center bg-blue-700 mr-2 rounded"
                         >
                           <font-awesome-icon :icon="['fab', 'facebook-square']" />
                         </ShareNetwork>
                         <ShareNetwork
                           network="twitter"
-                          :url="prod.parent_collection.handle"
-                          :title="prod.parent_collection.name"
+                          :url="`/marketplace/products/${prod._id}`"
+                          :title="prod.meta.name"
                           class="px-3 flex justify-center items-center bg-blue-400 mr-2 rounded"
                         >
                           <font-awesome-icon :icon="['fab', 'twitter']" />
@@ -318,7 +318,7 @@
                           <input
                             class="flex flex-grow pl-4 w-1/2 rounded-l text-black bg-white"
                             disabled
-                            :value="prod.parent_collection.handle"
+                            :value="`/marketplace/products/${prod._id}`"
                             :ref="`copy-link-${prod.parent_collection._id}`"
                           />
                           <button
@@ -502,7 +502,7 @@ export default {
     confirmEditCollectionConfirmation() {
       this.$refs.editConfirmationModal.hide();
 
-      this._goToCollectionDesigner(this.selectedProduct);
+      this._goToCollectionDesigner(this.selectedProduct, 'product');
     },
     _goToCollectionDesigner(product, type) {
       localStorage.removeItem("_stored_ptree");
@@ -512,12 +512,14 @@ export default {
       );
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
       
+      console.log(type)
       let route = `/collection/designer`;
       if (type === 'product')
         route = `/collection/designer/?single=on&prod=${product._id}`;
       this.$router.replace(route);
     },
     async editCollection(prod, type = 'product') {
+      console.log(prod, type)
       this.isLoading = true;
       const statusValidation = await this._validateStatusOf(prod);
       if (!statusValidation) {

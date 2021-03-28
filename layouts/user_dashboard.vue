@@ -70,7 +70,7 @@
         <div class="container mx-auto px-4">
           <div class="md:flex justify-between items-center">
             <div class="flex">
-              <!-- <div class="flex -mb-px mr-8">
+              <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/products"
                   class="no-underline flex items-center py-4 border-b border-transparent md:hover:border-grey-dark uppercase font-bold text-sm"
@@ -81,7 +81,7 @@
                   </span>
                   My Products
                 </nuxt-link>
-              </div>-->
+              </div>
               <div class="flex -mb-px mr-8">
                 <nuxt-link
                   to="/dashboard/collections"
