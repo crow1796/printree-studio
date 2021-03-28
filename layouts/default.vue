@@ -96,11 +96,6 @@ export default {
     const inviteCode = this.$route.query.invite;
     if (inviteCode) this.$storage.setCookie("invite", inviteCode);
   },
-  data() {
-    return {
-      shopifyUrl: process.env.shopifyUrl,
-    };
-  },
   computed: {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",

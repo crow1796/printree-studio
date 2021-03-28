@@ -44,7 +44,6 @@
 export default {
   data() {
     return {
-      shopifyUrl: process.env.shopifyUrl,
       year: (new Date()).getFullYear()
     };
   },
