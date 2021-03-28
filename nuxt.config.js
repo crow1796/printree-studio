@@ -85,7 +85,24 @@ module.exports = {
     "@nuxtjs/universal-storage",
     'vue-social-sharing/nuxt',
     '@nuxtjs/google-analytics',
-    'vue-social-sharing/nuxt'
+    'vue-social-sharing/nuxt',
+    [
+      '@aceforth/nuxt-optimized-images',
+      {
+        optimizedImages: {
+          optimizeImages: true
+        },
+        optimizeImagesInDev: true,
+
+        mozjpeg: {
+          quality: 80
+        },
+        pngquant: {
+          quality: [0.4, 0.8]
+        },
+        svgo: {}
+      }
+    ]
   ],
   googleAnalytics: {
     id: 'G-95953L4HX1'
