@@ -51,6 +51,7 @@
     <div class="outline-none select-none relative w-full h-full text-center">
       <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
         <div class="canvas-section outline-none select-none relative w-full h-full text-center">
+          
           <DesignerActions>
             <TopActions
               @action-clicked="topActionClicked"
@@ -434,7 +435,7 @@ export default {
       this.assetSending(e, xhr);
     },
     assetSending(e, xhr) {
-      xhr.setRequestHeader("Authorization", this.$auth.getToken("local"));
+      xhr.setRequestHeader("Authorization", this.$auth.getStrategy("local").token.get());
     },
     acceptFiles(file, done) {
       var reader = new FileReader();

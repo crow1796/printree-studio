@@ -130,7 +130,7 @@ export default {
           this.isBannerLoading = false;
           break;
       }
-      xhr.setRequestHeader("Authorization", this.$auth.getToken("local"));
+      xhr.setRequestHeader("Authorization", this.$auth.getStrategy("local").token.get());
     },
   },
 };

@@ -131,8 +131,10 @@ module.exports = {
       }
     },
     redirect: {
-      login: '/',
-      callback: '/',
+      login: false,
+      callback: false,
+      home: false,
+      logout: false
     },
     strategies: {
       local: {
