@@ -6,7 +6,11 @@
         v-for="(collection, i) in userCollections"
         :key="collection._id"
       >
-        <button type="button" class="w-full px-8 py-6 outline-none text-left" @click="toggleContainer(i)">
+        <button
+          type="button"
+          class="w-full px-8 py-6 outline-none text-left"
+          @click="toggleContainer(i)"
+        >
           <div class="flex items-center justify-between">
             <div class="font-bold">
               <div class="text-gray-900 whitespace-no-wrap flex items-center">
@@ -55,7 +59,7 @@
                 v-if="!['reviewing'].includes(collection.status) && collection.plan === 'Sell'"
                 type="button"
                 class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
-                title="Delete"
+                title="Delete Collection"
                 v-tippy="{ arrow: true }"
                 @click.stop="$emit('delete-collection', collection)"
               >
@@ -114,7 +118,7 @@
 
         <div
           class="relative overflow-hidden transition-all duration-700"
-          :class="{'min-area-loader': selected === i}"
+          :class="{'min-h-area-loader': selected === i}"
           :ref="`acc-container-${i}`"
         >
           <div class="p-6 border-t" v-if="selected === i">
@@ -138,7 +142,9 @@
 </template>
 
 <script>
-import first from 'lodash/first'
+import first from "lodash/first";
+import find from "lodash/find";
+import findIndex from "lodash/findIndex";
 import ProductsGrid from "@/components/ProductsGrid";
 import { mapGetters } from "vuex";
 
@@ -168,6 +174,16 @@ export default {
           "printing process",
           "completed",
         ],
+        productStatus: [
+          "draft",
+          "approved",
+          "declined",
+          "pending",
+          "reviewing",
+          "to pay",
+          "printing process",
+          "completed",
+        ],
         sorting: {
           field: "created_at",
           order: "DESC",
@@ -185,6 +201,15 @@ export default {
       document.execCommand("copy");
       copyText.disabled = true;
     },
+    _firstThumbnailOf(product) {
+      const firstVariant = first(product.variants);
+      if (!firstVariant) return "";
+      const firstContent =
+        find(firstVariant.contents, { isMainThumb: true }) ||
+        first(firstVariant.contents);
+      if (!firstContent) return "";
+      return firstContent.fullThumb;
+    },
     async toggleContainer(i) {
       if (this.selected === i) return (this.selected = null);
 
@@ -200,6 +225,32 @@ export default {
       );
 
       this.sectionIsLoading = false;
+      this.selectedProducts = JSON.parse(JSON.stringify(this.selectedProducts))
+
+      await this.selectedProducts.reduce(async (promise, product) => {
+        await promise;
+
+        const thumbnail = this._firstThumbnailOf(product);
+
+        if (!thumbnail) {
+          const res = await this.$axios.post("/create-images", {
+            products: [product],
+          });
+
+          if (res.data?.length) {
+            const generated = res.data;
+            product.variants.map((variant) => {
+              const generatedProductIndex = findIndex(generated, {
+                _id: product._id,
+              });
+
+              variant.contents.map((content) => {
+                content.fullThumb = generated[generatedProductIndex].variants[variant._id].sides[content.printableArea.side]?.with_placeholder;
+              });
+            });
+          }
+        }
+      }, Promise.resolve());
     },
   },
   computed: {

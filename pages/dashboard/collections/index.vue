@@ -372,6 +372,7 @@ export default {
     },
     async deleteCollection() {
       this.isLoading = true;
+      this.isLoadingFull = true;
       this.$refs.deleteConfirmationModal.hide();
       this.$storage.removeLocalStorage("current_design_id");
       await this.$store.dispatch(
@@ -383,6 +384,7 @@ export default {
         this.selectedProduct.id
       );
       this.isLoading = false;
+      this.isLoadingFull = false;
     },
     showCollectionRenameModal(prod) {
       this.collectionToRename = { ...prod };

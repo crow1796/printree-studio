@@ -669,7 +669,11 @@ export default {
         setVariantMainThumbnail(_id: $_id, side: $side) {
             _id
             contents {
+                _id
                 isMainThumb
+                printableArea {
+                    side
+                }
             }
         }
     }

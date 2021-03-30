@@ -281,6 +281,12 @@
     left: -20px;
   }
 
+  .preview-resizer-btn.-main-img {
+    left: initial;
+    top: 30px;
+    right: 25px;
+  }
+
   &.-maximized {
     transform: scale(0.9) !important;
 
@@ -291,6 +297,11 @@
 
   &.-maximized .preview-resizer-btn {
     transform: scale(1.4) !important;
+  }
+
+  &.-maximized .preview-resizer-btn.-main-img {
+    top: 20px;
+    right: 20px;
   }
 }
 

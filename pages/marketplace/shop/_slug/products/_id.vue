@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader mt-32">
-    <AreaLoader v-if="$fetchState.pending" class="my-2" />
+    <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product" :key="product._id">
       <div class="flex lg:flex-row flex-col">
         <div class="flex sm:w-6/12 flex-col w-full p-2 sm:p-2">
@@ -129,6 +129,7 @@ import ZoomOnHover from "@/components/ZoomOnHover/index";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import ColorRegulator from "~/plugins/color-regulator";
+import map from 'lodash/map'
 import { mapGetters } from "vuex";
 import { priceWithVatCeil } from "@/plugins/price-calculator";
 
@@ -149,7 +150,7 @@ export default {
     VueTailwindModal,
     BreadCrumbs,
   },
-  async fetch() {
+  async mounted() {
     const res = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.query
@@ -159,8 +160,8 @@ export default {
     this.selectedVariant = _.first(this.product.variants);
     this.selectedSize = _.first(this.selectedVariant.sizes).name;
     this._setDisplayMeta();
-
-    this.otherQuery.userId = this.$route.params.slug;
+    
+    this.otherQuery.shop = this.$route.params.slug;
     const products = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.otherQuery
@@ -170,10 +171,12 @@ export default {
       products,
       (prod) => prod._id !== this.$route.params.id
     );
+    this.isLoading = false
   },
   data() {
     return {
       product: null,
+      isLoading: true,
       selectedVariant: null,
       selectedSize: null,
       thumbnails: [],
@@ -194,7 +197,6 @@ export default {
         status: ["approved"],
         productStatus: ["approved"],
         collectionId: null,
-        id: this.$route.params.id,
         pagination: {
           limit: 5,
           page: 0,
@@ -224,9 +226,9 @@ export default {
   methods: {
     _setDisplayMeta() {
       let tmpThumbnails = {};
-      this.sides = _.map(this.selectedVariant.contents, "printableArea.side");
+      this.sides = map(this.selectedVariant.contents, "printableArea.side");
 
-      _.map(this.selectedVariant.contents, (content) => {
+      map(this.selectedVariant.contents, (content) => {
         if(tmpThumbnails[content.printableArea.side]) return
         tmpThumbnails[content.printableArea.side] = content.fullThumb;
       });

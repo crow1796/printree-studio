@@ -221,6 +221,7 @@
           :content="currentVariantContent"
           :resizable="true"
           class="designer-preview"
+          @main-thumb-changed="updateMainThumb"
         />
 
         <Canvas
@@ -361,7 +362,7 @@ export default {
         families: _.map(this.webfonts, "value"),
       },
     });
-    
+
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]));
     this.currentVariant = this.currentProduct.variants[0];
     this.$store.commit("designer/CURRENT_VARIANT_INDEX", 0);
@@ -425,6 +426,13 @@ export default {
     },
   },
   methods: {
+    updateMainThumb(contents) {
+      _.map(this.currentVariant.contents, (content, k) => {
+        content.isMainThumb = _.find(contents, {
+          _id: content._id,
+        })?.isMainThumb;
+      });
+    },
     _variantIndexOf(variant) {
       const selectedProduct = this.selectedProducts[this.currentProductIndex];
       return _.findIndex(

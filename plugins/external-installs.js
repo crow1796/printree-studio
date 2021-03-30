@@ -10,6 +10,7 @@ import VeeValidate from 'vee-validate'
 import VueCurrencyInput from 'vue-currency-input'
 import VueToast from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
+import LoaderImage from "~/assets/images/loader.gif"
 
 Vue.use(VeeValidate)
 Vue.component('simplebar', simplebar)
@@ -44,6 +45,9 @@ if (process.client) {
   Vue.use(VTooltip)
   Vue.use(vClickOutside)
   Vue.use(VueKonva)
-  Vue.use(VueProgressiveImage)
+  Vue.use(VueProgressiveImage, {
+    placeholder: LoaderImage,
+    blur: 100
+  })
   Vue.component('star-rating', StarRating)
 }

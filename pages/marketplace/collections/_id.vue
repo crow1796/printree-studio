@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto">
     <div class="relative min-h-area-loader">
-      <AreaLoader v-if="isLoading" />
+      <AreaLoader v-if="$fetchState.pending" />
       <div class="font-bold text-2xl mt-6 mb-2 px-8">{{ meta ? meta.name : "Collection Products" }}</div>
 
       <div class="flex justify-between items-center mx-8" v-if="meta">
@@ -46,11 +46,12 @@ export default {
       );
     this.currentPage = parseInt(page);
   },
-  async mounted() {
+  async fetch() {
     this.meta = await this.$store.dispatch(
       "marketplace/getCollectionMeta",
       this.$route.params.id
     );
+    console.log(this.meta)
   },
   data() {
     return {

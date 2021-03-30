@@ -8,8 +8,9 @@
       :to="`${rootUrl}${product._id}`"
       :title="product.meta.name"
       @click="() => $emit('item-clicked', product)"
+      :style="{minHeight: '180px'}"
     >
-      <div class="hover:shadow-lg border rounded relative w-full h-full">
+      <div class="hover:shadow-lg border rounded relative w-full h-full flex flex-col justify-between">
         <span
           v-if="showDesignerName"
           class="absolute font-bold text-xs top-0 right-0 ml-1 mt-1 rounded-full px-4 py-1 mr-1 uppercase z-10 bg-primary text-white truncate max-w-full"
@@ -28,8 +29,10 @@
         >{{product.status}}</span>
         <div class="relative pt-3 px-8 flex items-center justify-center">
           <progressive-img
+            :key="`${product._id}_fullthumb`"
+            v-if="_firstThumbnailOf(product)"
             class="relative w-40"
-            :src="_firstThumbnailOf(product)"
+            :src="`${_firstThumbnailOf(product)}?${_randomTime()}`"
             style="width: 160px;"
           />
         </div>
@@ -119,6 +122,9 @@ export default {
       if (!firstContent) return "";
       return firstContent.fullThumb;
     },
+    _randomTime(){
+      return Math.floor(Date.now() / 1000)
+    }
   },
   computed: {
     ...mapGetters({

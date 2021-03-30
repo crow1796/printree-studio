@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto pb-16 pt-0 relative min-h-area-loader">
-    <AreaLoader v-if="$fetchState.pending" class="my-2" />
+    <AreaLoader v-if="isLoading" class="my-2" />
     <div v-if="product" :key="product._id">
       <div class="flex justify-between items-center mb-12">
         <div>
@@ -24,9 +24,7 @@
           <div class="flex flex-start">
             <ZoomOnHover :img="thumbnails[selectedThumbnailIndex]" />
           </div>
-          <div
-            class="flex flex-wrap"
-          >
+          <div class="flex flex-wrap">
             <div
               class="cursor-pointer border hover:border-primary p-2 rounded flex justify-center items-center mr-2 mb-2 w-24"
               :class="{'border-primary': i === selectedThumbnailIndex}"
@@ -129,7 +127,7 @@
           </div>
         </div>
       </div>
-      <div class="flex flex-col lg:pt-16 sm:pt-6">
+      <div class="flex flex-col lg:pt-16 sm:pt-6" v-if="otherCollectionProducts.length">
         <div class="flex lg:px-8 font-bold">
           <div class="w-full lg:text-left sm:text-center">YOU MAY ALSO LIKE</div>
         </div>
@@ -146,6 +144,7 @@ import ZoomOnHover from "@/components/ZoomOnHover/index";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import ColorRegulator from "~/plugins/color-regulator";
+import map from 'lodash/map'
 import { mapGetters } from "vuex";
 import { priceWithVatCeil } from "@/plugins/price-calculator";
 
@@ -158,12 +157,12 @@ export default {
     VueTailwindModal,
     BreadCrumbs,
   },
-  head(){
+  head() {
     return {
-      title: `${this.product?.meta?.name || ''} | Printree Studio`
-    }
+      title: `${this.product?.meta?.name || ""} | Printree Studio`,
+    };
   },
-  async fetch() {
+  async mounted() {
     const res = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.query
@@ -173,16 +172,18 @@ export default {
     this.selectedVariant = _.first(this.product.variants);
     this.selectedSize = _.first(this.selectedVariant.sizes).name;
     this._setDisplayMeta();
-
+    
     this.otherQuery.collectionId = this.product.parent_collection._id;
     this.otherCollectionProducts = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.otherQuery
     );
+    this.isLoading = false
   },
   data() {
     return {
       product: null,
+      isLoading: true,
       selectedVariant: null,
       selectedSize: null,
       thumbnails: [],
@@ -233,16 +234,16 @@ export default {
   methods: {
     _setDisplayMeta() {
       let tmpThumbnails = {};
-      this.sides = _.map(this.selectedVariant.contents, "printableArea.side");
+      this.sides = map(this.selectedVariant.contents, "printableArea.side");
 
-      _.map(this.selectedVariant.contents, (content) => {
-        if(tmpThumbnails[content.printableArea.side]) return
+      map(this.selectedVariant.contents, (content) => {
+        if (tmpThumbnails[content.printableArea.side]) return;
         tmpThumbnails[content.printableArea.side] = content.fullThumb;
       });
 
       this.selectedSide = this.frontOrFirst;
       this.thumbnails = tmpThumbnails;
-      this.selectedThumbnailIndex = this.selectedSide
+      this.selectedThumbnailIndex = this.selectedSide;
     },
     async addToCart() {
       if (!this.isLoggedIn) {
