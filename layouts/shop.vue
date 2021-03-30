@@ -12,7 +12,7 @@
                   <img
                     :src="shopLogo"
                     alt="Printree Studio"
-                    class="w-20 absolute top-0 left-0 object-fit center-y"
+                    class="w-20 absolute top-0 left-0 object-fit center-y object-contain h-3/5"
                   />
                 </nuxt-link>
               </div>

@@ -39,6 +39,12 @@ export default {
       "marketplace/getCollectionMeta",
       this.$route.params.id
     );
+
+    this.$ga.page({
+      page: window.location.href,
+      title: `Collection: ${this.meta?.name || ""}`,
+      location: window.location.href,
+    });
   },
   data() {
     return {

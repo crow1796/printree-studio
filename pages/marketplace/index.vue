@@ -143,6 +143,11 @@ export default {
     this.currentPage = parseInt(page);
   },
   async mounted() {
+    this.$ga.page({
+      page: "/marketplace",
+      title: "Marketplace page",
+      location: window.location.href,
+    });
     this._loadItems();
   },
   data() {

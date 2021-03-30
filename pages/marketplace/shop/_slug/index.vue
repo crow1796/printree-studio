@@ -36,6 +36,11 @@ export default {
     this.currentPage = parseInt(page);
   },
   async mounted() {
+    this.$ga.page({
+      page: window.location.href,
+      title: `Shop: ${this.shopConfig?.name || ""}`,
+      location: window.location.href,
+    });
     await this._loadItems();
   },
   data() {
