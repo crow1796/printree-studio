@@ -540,7 +540,7 @@ export default {
     },
     async setAsMainImage() {
       try {
-        const res = this.$store.dispatch(
+        const res = await this.$store.dispatch(
           "user_dashboard/setVariantMainThumbnail",
           {
             _id: this.selectedProductVariantKey,

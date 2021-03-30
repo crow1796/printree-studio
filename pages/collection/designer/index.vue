@@ -78,10 +78,10 @@
         </div>
       </VueTailwindModal>
 
-      <div class="flex w-1/4 border-r flex-grow flex-col" v-if="!isSingle">
+      <div class="flex w-1/5 border-r flex-grow flex-col" v-if="!isSingle">
         <div class="flex overflow-hidden w-full flex-grow flex-col overflow-auto flex-grow">
           <div
-            class="mx-4 mt-4 px-4 h-24 flex-shrink-0 select-none w-auto justify-center items-center flex rounded border-dashed cursor-pointer hover:bg-primary-lighter bg-primary text-white"
+            class="h-20 cursor-pointer flex items-center justify-center m-4 border border-dashed border-gray-500 hover:border-gray-700 hover:bg-gray-100"
             @click="showAvailableProducts"
             v-if="selectedProducts.length < 10"
             v-intro="'And if you want to add more products, just click on this button... (Note: You can add the same products multiple times)'"
@@ -91,22 +91,13 @@
             <font-awesome-icon :icon="['fas', 'cubes']" class="mr-2 text-lg" />
             <span class="font-bold">ADD MORE PRODUCTS</span>
           </div>
-          <div class="flex flex-wrap flex mt-4 overflow-auto px-4 pb-4">
-            <div class="p-1 w-6/12" v-for="(product, index) in selectedProducts" :key="index">
+          <div class="flex flex-wrap flex overflow-auto border-t">
+            <div class="w-full" v-for="(product, index) in selectedProducts" :key="index">
               <div
-                class="p-2 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border rounded relative"
+                class="p-1 relative cursor-pointer hover:bg-gray-100 select-none text-gray-600 w-auto justify-center items-center flex border-b relative"
                 :class="{ 'bg-gray-100': index == currentProductIndex }"
                 @click="selectProduct(index)"
               >
-                <div
-                  class="absolute font-bold text-xs top-0 left-0 ml-1 mt-1 rounded-full px-4 py-1 ml-2 uppercase"
-                  :class="{
-                    'bg-green-600 text-white': product.status === 'approved',
-                    'bg-red-600 text-white': product.status === 'declined',
-                    'bg-blue-600 text-white': product.status === 'pending',
-                    'bg-gray-600 text-white': !['approved', 'declined', 'pending'].includes(product.status),
-                  }"
-                >{{product.status}}</div>
                 <div class="absolute right-0 top-0" v-if="selectedProducts.length > 1">
                   <button
                     type="button"
@@ -118,22 +109,36 @@
                     <font-awesome-icon :icon="['fas', 'trash']" class="text-xs" />
                   </button>
                 </div>
-                <div class="flex w-full flex-col justify-center items-center">
-                  <div class="flex justify-center items-center w-full">
-                    <img :src="_firstVariantPlaceholderOf(product)" style="height: 100px" />
-                  </div>
-                  <div class="flex-grow flex flex-col pt-2">
-                    <div class="font-bold text-gray-600">{{ product.meta.name }}</div>
-                    <div class="flex">
+                <div class="flex w-full items-center">
+                  <img :src="_firstVariantPlaceholderOf(product)" style="height: 70px" />
+                  <div class="flex flex-col pt-2 flex-grow">
+                    <div>
                       <div
-                        class="rounded-full p-1 border border-white m-1 hover:border-gray-300"
-                        v-for="(variant, variantIndex) in product.variants"
-                        :key="variantIndex"
-                      >
+                        class="font-bold text-xs rounded-full ml-2 uppercase inline-block px-2 py-1"
+                        :class="{
+                    'bg-green-600 text-white': product.status === 'approved',
+                    'bg-red-600 text-white': product.status === 'declined',
+                    'bg-blue-600 text-white': product.status === 'pending',
+                    'bg-gray-600 text-white': !['approved', 'declined', 'pending'].includes(product.status),
+                  }"
+                      >{{product.status}}</div>
+                    </div>
+                    <div
+                      class="font-bold text-gray-600 px-2 truncate w-full"
+                    >{{ product.meta.name }}</div>
+                    <div class="flex ml-2 mt-3 flex-col mb-2">
+                      <span class="mr-1 text-xs">Variants</span>
+                      <div class="flex mt-1 flex-wrap">
                         <div
-                          class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-200"
-                          :style="{ 'background-color': variant.customizableVariant.color }"
-                        ></div>
+                          class="rounded-full border border-white mr-1"
+                          v-for="(variant, variantIndex) in product.variants"
+                          :key="variantIndex"
+                        >
+                          <div
+                            class="flex justify-center items-center rounded-full cursor-pointer w-3 h-3 border border-gray-600"
+                            :style="{ 'background-color': variant.customizableVariant.color }"
+                          ></div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -153,6 +158,7 @@
           >{{ autoSavingText }}</div>
         </transition>
         <RightActions
+          v-if="currentProduct"
           :isExpandable="currentProduct.customizableProduct.customizableVariants.length > 2"
         >
           <div
@@ -215,6 +221,7 @@
           :content="currentVariantContent"
           :resizable="true"
           class="designer-preview"
+          @main-thumb-changed="updateMainThumb"
         />
 
         <Canvas
@@ -356,16 +363,6 @@ export default {
       },
     });
 
-    if (this.$route.query.prod) {
-      const productIndex = _.findIndex(this.selectedProducts, {
-        _id: this.$route.query.prod,
-      });
-      if (productIndex !== -1) {
-        this.selectProduct(productIndex);
-        this.isLoading = false;
-        return;
-      }
-    }
     this.currentProduct = JSON.parse(JSON.stringify(this.selectedProducts[0]));
     this.currentVariant = this.currentProduct.variants[0];
     this.$store.commit("designer/CURRENT_VARIANT_INDEX", 0);
@@ -429,6 +426,13 @@ export default {
     },
   },
   methods: {
+    updateMainThumb(contents) {
+      _.map(this.currentVariant.contents, (content, k) => {
+        content.isMainThumb = _.find(contents, {
+          _id: content._id,
+        })?.isMainThumb;
+      });
+    },
     _variantIndexOf(variant) {
       const selectedProduct = this.selectedProducts[this.currentProductIndex];
       return _.findIndex(

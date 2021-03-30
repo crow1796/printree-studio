@@ -3,6 +3,9 @@
     <div class="font-bold text-2xl mt-6 mb-2 px-8">All Products</div>
     <div class="relative min-h-area-loader">
       <AreaLoader v-if="isLoading" />
+      <div class="text-center text-3xl my-48" v-if="!products.length">
+        No product(s).
+      </div>
       <ProductsGrid :products="products" />
       <div class="flex flex-grow justify-center pb-6 mt-4">
         <SimplePagination @prev="goTo(prev)" @next="goTo(next)" />

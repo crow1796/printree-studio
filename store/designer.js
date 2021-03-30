@@ -603,8 +603,8 @@ const actions = {
     const design = await this.$api.getCollection(id);
     return design;
   },
-  async fetchDesignDataAndCommit(context, id) {
-    const collection = await this.$api.getCollection(id);
+  async fetchDesignDataAndCommit(context, { id, products }) {
+    let collection = await this.$api.getCollection(id);
     context.commit("DESIGN_META", {
       id: collection._id,
       name: collection.name,
@@ -612,6 +612,8 @@ const actions = {
       plan: collection.plan,
       status: collection.status,
     });
+    if (products) collection.products = collection.products.filter((prod) => products.includes(prod._id))
+    
     context.commit("SELECTED_PRODUCTS", collection.products);
     return collection;
   },
@@ -652,6 +654,7 @@ const actions = {
     const defaultParams = {
       shouldGenerateImages: true,
       isFinal: false,
+      products: context.getters.selectedProducts
     };
 
     const newParams = {
@@ -664,7 +667,7 @@ const actions = {
         id: context.getters.currentDesignId,
         name: context.getters.designMeta.name,
         plan: context.getters.designMeta.plan,
-        selectedProducts: context.getters.selectedProducts,
+        selectedProducts: newParams.products,
         status: context.getters.designMeta.status,
         isFinal: newParams.isFinal
       });

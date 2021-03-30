@@ -18,6 +18,17 @@
         :rotation="90"
       />
     </button>
+    <button
+      v-if="resizable"
+      type="button"
+      class="justify-center items-center mx-2 my-1 w-8 h-8 focus:outline-none outline-none flex flex-grow border font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs absolute bg-white right-0 top-0 preview-resizer-btn -main-img z-10"
+      :class="{'text-primary border-primary': content.isMainThumb}"
+      title="Set as main image"
+      @click="setAsMainImage"
+      v-tippy="{ arrow: true }"
+    >
+      <font-awesome-icon :icon="['fas', 'star']" :rotation="90" />
+    </button>
     <div
       class="outline-none select-none relative text-center overflow-hidden"
       :class="{'w-full h-full': fullSize}"
@@ -81,6 +92,7 @@
 
 <script>
 import ColorRegulator from "~/plugins/color-regulator.js";
+import find from 'lodash/find'
 import { Output } from "@/components/Designer/Canvas/Default/index.js";
 
 export default {
@@ -111,6 +123,28 @@ export default {
     };
   },
   methods: {
+    async setAsMainImage() {
+      try {
+        const res = await this.$store.dispatch(
+          "user_dashboard/setVariantMainThumbnail",
+          {
+            _id: this.variant._id,
+            side: this.content.side,
+          }
+        );
+
+        this.$emit('main-thumb-changed', res.contents)
+
+        this.$toast.success("Saved!", {
+          position: "top",
+        });
+      } catch (error) {
+        console.log(error);
+        this.$toast.error("Unable to set main image. Please try again.", {
+          position: "top",
+        });
+      }
+    },
     togglePreviewSize() {
       this.isPreviewExpanded = !this.isPreviewExpanded;
     },

@@ -200,6 +200,7 @@ import AuthModal from "@/components/Auth/AuthModal";
 import VueTailwindDropdown from "@/components/VueTailwindDropdown";
 import CartDrawer from "@/components/marketplace/CartDrawer";
 import { mapGetters } from "vuex";
+import DefaultLogo from "~/assets/images/logo-nav.png"
 
 export default {
   head() {
@@ -216,10 +217,7 @@ export default {
     VueTailwindDropdown,
     CartDrawer,
   },
-  async created() {
-    this.$storage.setCookie("shop", this.$route.params.slug);
-  },
-  async fetch() {
+  async mounted() {
     const config = await this.$store.dispatch(
       "shop/shopConfig",
       this.$route.params.slug
@@ -233,9 +231,9 @@ export default {
         "delivered",
         "cart",
       ]);
-  },
-  mounted(){
+      
     window.addEventListener("scroll", this.updateScroll);
+    this.$storage.setCookie("shop", this.$route.params.slug);
   },
   data() {
     return {
@@ -253,7 +251,7 @@ export default {
       shopConfig: "shop/shopConfig",
     }),
     shopLogo() {
-      return this.shopConfig?.logo || "~/assets/images/logo-nav.png";
+      return this.shopConfig?.logo || DefaultLogo;
     },
     shopHome() {
       return `/marketplace/shop/${this.$route.params.slug}`;

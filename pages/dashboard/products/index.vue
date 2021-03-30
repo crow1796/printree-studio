@@ -181,164 +181,16 @@
         >Create new product</button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-        <div class="inline-block min-w-full border-l border-r overflow-hidden">
-          <table class="min-w-full leading-normal table-fixed">
-            <thead>
-              <tr>
-                <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-left"
-                >Name</th>
-                <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >Status</th>
-                <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >Collection</th>
-                <th
-                  class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-xs font-semibold text-gray-600 uppercase tracking-wider text-center"
-                >Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="!userProducts.length">
-                <td
-                  colspan="3"
-                  class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
-                >You have no products(s).</td>
-              </tr>
-              <tr
-                v-for="prod in userProducts"
-                :key="prod.id"
-                :class="{
-                'bg-red-100': prod.status === 'declined'}"
-              >
-                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <div class="flex items-center">
-                    <div class="ml-3">
-                      <p class="text-gray-900 whitespace-no-wrap">
-                        <span
-                          class="relative text-xs inline-block px-3 py-1 font-semibold leading-tight mr-1"
-                          :class="{
-                            'text-white': prod.parent_collection.plan === 'Sell',
-                            'text-blue-800': prod.parent_collection.plan === 'Buy',
-                          }"
-                        >
-                          <span
-                            aria-hidden
-                            class="absolute inset-0 rounded-full"
-                            :class="{
-                              'bg-primary': prod.parent_collection.plan === 'Sell',
-                              'bg-blue-400': prod.parent_collection.plan === 'Buy',
-                            }"
-                          ></span>
-                          <span class="relative uppercase">{{ prod.parent_collection.plan }}</span>
-                        </span>
-                        <a
-                          href="#"
-                          class="text-blue-600 hover:underline"
-                          @click.prevent="editCollection(prod)"
-                        >
-                          <span>{{ prod.meta.name }}</span>
-                        </a>
-                      </p>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <span
-                    class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight text-xs"
-                  >
-                    <span
-                      aria-hidden
-                      class="absolute inset-0 opacity-50 rounded-full"
-                      :class="{
-                        'bg-green-200':['approved', 'completed'].includes(prod.status),
-                        'bg-blue-200': prod.status === 'pending',
-                        'bg-red-300': ['draft', 'declined'].includes(prod.status),
-                      }"
-                    ></span>
-                    <span class="relative uppercase">{{ prod.status }}</span>
-                  </span>
-                </td>
-                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <a
-                    href="#"
-                    class="text-blue-600 hover:underline"
-                    @click.prevent="editCollection(prod, 'collection')"
-                  >
-                    <span class="relative">{{ prod.parent_collection.name }}</span>
-                  </a>
-                </td>
-                <td class="px-5 py-5 border-b border-gray-200 text-sm text-center">
-                  <div class="flex items-center justify-center">
-                    <button
-                      v-if="!['reviewing'].includes(prod.status) && prod.parent_collection.plan === 'Sell'"
-                      type="button"
-                      class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
-                      title="Delete"
-                      v-tippy="{ arrow: true }"
-                      @click="showDeleteCollectionConfirmation(prod)"
-                    >
-                      <font-awesome-icon :icon="['fas', 'trash']" />
-                    </button>
-                    <tippy
-                      trigger="click"
-                      arrow
-                      interactive
-                      v-if="['approved'].includes(prod.status) && prod.parent_collection.plan === 'Sell'"
-                    >
-                      <template v-slot:trigger>
-                        <button
-                          type="button"
-                          class="px-2 py-1 text-xs hover:bg-gray-200 border rounded mx-1"
-                          title="Share Collection"
-                          v-tippy="{arrow: true}"
-                        >
-                          <font-awesome-icon :icon="['fas', 'share-alt']" />
-                        </button>
-                      </template>
-                      <div class="flex w-full">
-                        <ShareNetwork
-                          network="facebook"
-                          :url="prod.parent_collection.handle"
-                          :title="prod.parent_collection.name"
-                          class="px-3 flex justify-center items-center bg-blue-700 mr-2 rounded"
-                        >
-                          <font-awesome-icon :icon="['fab', 'facebook-square']" />
-                        </ShareNetwork>
-                        <ShareNetwork
-                          network="twitter"
-                          :url="prod.parent_collection.handle"
-                          :title="prod.parent_collection.name"
-                          class="px-3 flex justify-center items-center bg-blue-400 mr-2 rounded"
-                        >
-                          <font-awesome-icon :icon="['fab', 'twitter']" />
-                        </ShareNetwork>
-                        <div class="flex">
-                          <input
-                            class="flex flex-grow pl-4 w-1/2 rounded-l text-black bg-white"
-                            disabled
-                            :value="prod.parent_collection.handle"
-                            :ref="`copy-link-${prod.parent_collection._id}`"
-                          />
-                          <button
-                            type="button"
-                            class="text-xs w-10 flex items-center justify-center rounded-r bg-white text-black py-2 border-l"
-                            v-tippy="{arrow: true}"
-                            title="Copy Link"
-                            @click="copyCollectionLinkToClipboard(prod.parent_collection)"
-                          >
-                            <font-awesome-icon :icon="['fas', 'clipboard']" />
-                          </button>
-                        </div>
-                      </div>
-                    </tippy>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <ProductsGrid
+          :products="userProducts"
+          grid="5"
+          :showDesignerName="false"
+          showProductStatus
+          :showProductPrice="false"
+          mx="0"
+          @item-clicked="editCollection"
+          :isLink="false"
+        />
       </div>
     </div>
   </div>
@@ -348,7 +200,9 @@
 import { mapGetters } from "vuex";
 import { TippyComponent } from "vue-tippy";
 import VueTailwindModal from "@/components/VueTailwindModal";
+import ProductsGrid from "@/components/ProductsGrid";
 import first from "lodash/first";
+import filter from "lodash/filter";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
 import UserTypeCheckerMixin from "@/components/Mixins/UserTypeChecker";
 
@@ -356,6 +210,7 @@ export default {
   layout: "user_dashboard",
   components: {
     VueTailwindModal,
+    ProductsGrid,
     AvailableProducts,
     tippy: TippyComponent,
   },
@@ -364,13 +219,29 @@ export default {
     this.query.userId = this.user._id;
   },
   async mounted() {
-    await this.$store.dispatch("user_dashboard/getUserProductsOf", this.query);
+    this.userProducts = await this.$store.dispatch(
+      "user_dashboard/getUserProductsOf",
+      this.query
+    );
     this.$store.commit("designer/SELECTED_PRODUCTS", []);
     this.isLoading = false;
+
+    await this.userProducts.reduce(async (promise, product) => {
+      await promise;
+
+      const thumbnail = this._firstThumbnailOf(product);
+
+      if (!thumbnail) {
+        const res = await this.$axios.post("/create-images", {
+          products: [product],
+        });
+      }
+    }, Promise.resolve());
   },
   data() {
     return {
       isLoading: true,
+      userProducts: [],
       isLoadingFull: false,
       isRenameLoading: false,
       tmpSelectedProducts: [],
@@ -403,7 +274,6 @@ export default {
   },
   computed: {
     ...mapGetters({
-      userProducts: "user_dashboard/userProducts",
       isLoggedIn: "isLoggedIn",
       user: "user",
     }),
@@ -417,6 +287,15 @@ export default {
       copyText.setSelectionRange(0, 99999);
       document.execCommand("copy");
       copyText.disabled = true;
+    },
+    _firstThumbnailOf(product) {
+      const firstVariant = first(product.variants);
+      if (!firstVariant) return "";
+      const firstContent =
+        find(firstVariant.contents, { isMainThumb: true }) ||
+        first(firstVariant.contents);
+      if (!firstContent) return "";
+      return firstContent.fullThumb;
     },
     async showAvailableProducts() {
       this.isLoading = false;
@@ -439,9 +318,9 @@ export default {
       product,
       statusToCheck = ["approved", "reviewing", "to pay", "printing process"]
     ) {
-      let type = 'product'
-      if(!product.parent_collection) type = 'collection'
-      
+      let type = "product";
+      if (!product.parent_collection) type = "collection";
+
       const statusCheckAction =
         type === "collection"
           ? "user_dashboard/collectionStatus"
@@ -502,7 +381,7 @@ export default {
     confirmEditCollectionConfirmation() {
       this.$refs.editConfirmationModal.hide();
 
-      this._goToCollectionDesigner(this.selectedProduct);
+      this._goToCollectionDesigner(this.selectedProduct, "product");
     },
     _goToCollectionDesigner(product, type) {
       localStorage.removeItem("_stored_ptree");
@@ -511,13 +390,13 @@ export default {
         product.parent_collection._id
       );
       this.$store.commit("designer/CURRENT_PRODUCT_INDEX", 0);
-      
+
       let route = `/collection/designer`;
-      if (type === 'product')
+      if (type === "product")
         route = `/collection/designer/?single=on&prod=${product._id}`;
       this.$router.replace(route);
     },
-    async editCollection(prod, type = 'product') {
+    async editCollection(prod, type = "product") {
       this.isLoading = true;
       const statusValidation = await this._validateStatusOf(prod);
       if (!statusValidation) {

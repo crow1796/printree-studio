@@ -4,7 +4,7 @@
     <ShopBanner :src="shopBanner" v-if="shopBanner"/>
     <div class="container mx-auto" :class="{'mt-12': shopBanner, 'mt-32': !shopBanner}">
       <div class="text-center text-3xl my-48" v-if="!products.length">
-        No available products yet.
+        No product(s).
       </div>
       <ProductsGrid :rootUrl="rootUrl" :products="products" />
       <div class="flex flex-grow justify-center pb-6 mt-4">

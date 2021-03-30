@@ -46,7 +46,7 @@
         </div>
         <div class="flex w-1/3 justify-center items-center">
           <div class="flex" v-if="!isEditingDesignName" style="animation-duration: 0.2s">
-            <span class="text-primary uppercase font-bold">Designer</span>
+            <span class="text-primary uppercase font-bold">Collection</span>
             <span class="mx-1">/</span>
             <span
               class="font-normal text-gray-600 hover:underline hover:text-gray-700"
@@ -136,7 +136,10 @@ export default {
       );
       await this.$store.dispatch(
         "designer/fetchDesignDataAndCommit",
-        this.currentDesignId
+        {
+          id: this.currentDesignId,
+          products: this.$route.query.prod ? [this.$route.query.prod] : null
+        }
       );
 
       await this.$store.dispatch("designer/fetchArts");
@@ -172,8 +175,7 @@ export default {
     },
     dontSave() {
       this.$refs.saveConfirmationModal.hide();
-      let route = '/dashboard'
-      if(this.$route.query.prod) route = '/dashboard/products'
+      let route = '/dashboard/collections'
       this.$router.push(route);
     },
     async saveChanges() {
@@ -183,8 +185,7 @@ export default {
         shouldGenerateImages: false,
       });
       this.isLoading = false;
-      let route = '/dashboard'
-      if(this.$route.query.prod) route = '/dashboard/products'
+      let route = '/dashboard/collections'
       this.$router.push(route);
     },
     goToDashboard() {
@@ -207,7 +208,11 @@ export default {
     },
     async nextStep() {
       let contentsValidation = true;
-      _.map(this.selectedProducts, (product) => {
+      let products = this.selectedProducts
+      if(this.$route.query.prod) {
+        products = products.filter((prod) => prod._id === this.$route.query.prod)
+      }
+      _.map(products, (product) => {
         _.map(product.variants, (variant) => {
           const sidesThatHasContents = _.filter(
             variant.contents,
@@ -234,18 +239,12 @@ export default {
       this.isLoading = true;
       await this.$store.dispatch("designer/saveData", {
         shouldGenerateImages: false,
+        products
       });
 
-      let productsToSave = this.selectedProducts;
-      if (this.$route.query.prod) {
-        productsToSave = this.selectedProducts.filter(
-          (p) => p._id === this.$route.query.prod
-        );
-        if (!productsToSave.length) productsToSave = this.selectedProducts;
-      }
-      this.generatedImages = _.map(productsToSave, () => null);
+      this.generatedImages = _.map(products, () => null);
 
-      await productsToSave.reduce(async (promise, product, i) => {
+      await products.reduce(async (promise, product, i) => {
         await promise;
 
         const res = await this.$axios.post("/create-images", {
