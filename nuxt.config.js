@@ -83,6 +83,7 @@ module.exports = {
       },
     ],
     "@nuxtjs/universal-storage",
+    'nuxt-purgecss',
     'vue-social-sharing/nuxt',
     '@nuxtjs/google-analytics',
     'vue-social-sharing/nuxt',
@@ -105,7 +106,7 @@ module.exports = {
     ]
   ],
   googleAnalytics: {
-    id: 'G-95953L4HX1'
+    id: 'UA-190265434-1'
   },
   storage: {
     cookie: {

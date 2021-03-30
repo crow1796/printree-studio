@@ -160,6 +160,12 @@ export default {
     this.selectedVariant = _.first(this.product.variants);
     this.selectedSize = _.first(this.selectedVariant.sizes).name;
     this._setDisplayMeta();
+
+    this.$ga.page({
+      page: window.location.href,
+      title: `Product: ${this.product?.meta?.name || ""}`,
+      location: window.location.href,
+    });
     
     this.otherQuery.shop = this.$route.params.slug;
     const products = await this.$store.dispatch(
