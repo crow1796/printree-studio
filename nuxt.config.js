@@ -83,7 +83,6 @@ module.exports = {
       },
     ],
     "@nuxtjs/universal-storage",
-    'nuxt-purgecss',
     'vue-social-sharing/nuxt',
     '@nuxtjs/google-analytics',
     'vue-social-sharing/nuxt',
