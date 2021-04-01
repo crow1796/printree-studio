@@ -126,6 +126,10 @@ const actions = {
     const res = await this.$api.admin.updateOrder(data)
     return res
   },
+  async updateCustomizableProduct(context, data) {
+    const res = await this.$api.admin.updateCustomizableProduct(data)
+    return res
+  },
   async processOrder(context, { order, status }) {
     let reqStatus = true
     try {

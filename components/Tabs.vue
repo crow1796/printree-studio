@@ -10,7 +10,7 @@
       </button>
     </div>
     <div v-for="tab in tabs" :key="`content${tab.name}`">
-      <div class="tabs-content flex w-full h-full py-4 flex-wrap overflow-auto"
+      <div class="tabs-content flex w-full h-full py-4 flex-wrap"
         v-if="_isActive(tab)">
         <slot :name="tab.name"/>
       </div>

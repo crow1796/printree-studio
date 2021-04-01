@@ -591,7 +591,7 @@ const actions = {
     context.commit("SELECTED_PRODUCTS", products);
   },
   async fetchAvailableProducts(context, data) {
-    const products = await this.$api.fetchAvailableProducts();
+    const products = await this.$api.fetchAvailableProducts(data);
     context.commit("AVAILABLE_PRODUCTS", products);
     return products;
   },

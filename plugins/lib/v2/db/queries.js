@@ -17,12 +17,13 @@ export default {
             }
         }`,
     customizableProducts: `
-  query {
-      customizableProducts {
+    query ($query: CustomizableProductQueryInput){
+        customizableProducts(query: $query) {
           _id
           name
           preDescription
           fabricDescription
+          status
           category {
               _id
               name
@@ -42,8 +43,11 @@ export default {
               }
               color
               sizes {
-                  name
-                  baseCost
+                name
+                baseCost
+                serviceCost
+                weightInGrams
+                stock
               }
           }
           printingOptions {
@@ -357,6 +361,10 @@ export default {
                 customizableVariant {
                     _id
                     color
+                    sizes {
+                        name
+                        stock
+                    }
                 }
                 sizes {
                     name
@@ -743,6 +751,14 @@ export default {
                 _id
                 variant {
                     _id
+                    customizableVariant {
+                        _id
+                        color
+                        sizes {
+                            name
+                            stock
+                        }
+                    }
                 }
                 productName
                 collectionName
@@ -1215,6 +1231,39 @@ export default {
                 bannerBGColor
                 bannerBGSize
             }
+        }
+    }
+  `,
+  updateCustomizableProduct: `
+    mutation($product: UpdateCustomizableProductInput) {
+        updateCustomizableProduct(product: $product) {
+            _id
+            name
+            category {
+                _id
+                name
+            }
+            customizableVariants {
+                _id
+                printableArea {
+                side   
+                }
+                color
+                sizes {
+                    name
+                    baseCost
+                    weightInGrams
+                    serviceCost
+                    stock
+                }
+            }
+            printingOptions {
+                _id
+                displayName
+                name
+            }
+            created_at
+            updated_at
         }
     }
   `
