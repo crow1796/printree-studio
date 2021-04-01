@@ -1,5 +1,10 @@
 <template>
-  <VueTailwindDrawer ref="drawer" class="cart-drawer" position="right" :closeOnBackdropClicked="!isLoading">
+  <VueTailwindDrawer
+    ref="drawer"
+    class="cart-drawer"
+    position="right"
+    :closeOnBackdropClicked="!isLoading"
+  >
     <div class="relative h-full">
       <AreaLoader v-if="isLoading" />
 
@@ -56,7 +61,11 @@
               </div>
               <div class="w-3/12 flex-justify-between">
                 <div class="w-32 mx-auto">
-                  <progressive-img class="relative mx-auto" :src="product.fullThumb" style="width: 80px"/>
+                  <progressive-img
+                    class="relative mx-auto"
+                    :src="product.fullThumb"
+                    style="width: 80px"
+                  />
                 </div>
               </div>
               <div class="flex flex-col w-3/12 justify-center">
@@ -87,7 +96,7 @@
                       align="center"
                       style="width: 100%; height: 30px"
                       :min="1"
-                      :max="product.max"
+                      :max="stocksOf(product)"
                       :value="product.quantity"
                       :disabled="isUpdatingQty"
                       @change="(e) => updateQtyOf(product, e)"
@@ -113,7 +122,11 @@
                 <number :to="subtotal" :format="(num) => num.formatMoney('₱ ')" :duration=".4" />
               </span>
             </div>
-            <PTButton color="primary" :disabled="!subtotal || isUpdatingQty || isCheckingOut" @click="checkout">
+            <PTButton
+              color="primary"
+              :disabled="!subtotal || isUpdatingQty || isCheckingOut"
+              @click="checkout"
+            >
               <span class="mr-2">CHECKOUT</span>
               <font-awesome-icon :icon="['fas', 'arrow-right']" />
             </PTButton>
@@ -158,20 +171,30 @@ export default {
       products: [],
       selectedProducts: [],
       isUpdatingQty: false,
-      isCheckingOut: false
+      isCheckingOut: false,
     };
   },
   methods: {
+    stocksOf(product) {
+      return (
+        _.find(product.variant.customizableVariant.sizes, {
+          name: product.size,
+        })?.stock || 0
+      );
+    },
     async updateQtyOf(item, newQty) {
-      if(this.isUpdatingQty) return
+      if (this.isUpdatingQty) return;
+      if(newQty > this.stocksOf(item)){
+        newQty = this.stocksOf(item)
+      }
       this.isUpdatingQty = true;
       await this.$store.dispatch("marketplace/addToCart", {
         variant: item.variant._id,
         quantity: newQty,
         size: item.size,
-        isUpdatingQty: true
+        isUpdatingQty: true,
       });
-      item.quantity = newQty
+      item.quantity = newQty;
       this.isUpdatingQty = false;
     },
     async show() {
@@ -182,7 +205,7 @@ export default {
     },
     hide() {
       this.$refs.drawer.hide();
-      document.body.style.overflow = 'auto'
+      document.body.style.overflow = "auto";
     },
     isSelected(product) {
       return _.filter(
@@ -201,7 +224,7 @@ export default {
       this.isLoading = false;
     },
     async removeProduct(product) {
-      if(this.isUpdatingQty) return
+      if (this.isUpdatingQty) return;
       this.isLoading = true;
       const cart = await this.$store.dispatch(
         "marketplace/removeItemFromCart",
@@ -245,15 +268,18 @@ export default {
       this.selectedProducts = [...this.selectedProducts, product];
     },
     async checkout() {
-      if(this.isUpdatingQty || this.isCheckingOut) return
-      this.isLoading = true
-      this.isCheckingOut = true
-      const checkout = await this.$store.dispatch('marketplace/checkout', _.map(this.selectedProducts, '_id'))
+      if (this.isUpdatingQty || this.isCheckingOut) return;
+      this.isLoading = true;
+      this.isCheckingOut = true;
+      const checkout = await this.$store.dispatch(
+        "marketplace/checkout",
+        _.map(this.selectedProducts, "_id")
+      );
 
-      this.hide()
-      
+      this.hide();
+
       this.$router.replace(`/marketplace/checkout/${checkout._id}`);
-      this.isCheckingOut = false
+      this.isCheckingOut = false;
     },
   },
 };

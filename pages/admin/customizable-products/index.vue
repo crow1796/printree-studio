@@ -1,27 +1,34 @@
 <template>
-  <div class="relative flex flex-grow flex-wrap overflow-auto">
+  <div class="relative sm:px-8 min-h-area-loader">
     <AreaLoader v-if="isLoading" />
-    <div class="flex flex-wrap flex-grow p-4 text-gray-600">
+    <div class="my-2 flex sm:flex-row justify-between items-center">
+      <h2 class="text-2xl font-semibold leading-tight">Customizable Products</h2>
+    </div>
+    <div class="flex flex-wrap flex-grow py-4 text-gray-600">
       <Tabs :tabs="categories">
         <template v-for="category in categories" :slot="category.name">
-          <div class="flex flex-wrap w-full" :key="category.name">
-            <div
-              class="flex sm:w-1/3 w-full p-1"
+          <div class="grid grid-cols-3 w-full" :key="category.name">
+            <nuxt-link
+              class="p-1 relative"
               v-for="product in _productsOf(category.name)"
               :key="product._id"
-              @click="toggleProduct(product)"
+              :to="`/admin/customizable-products/${product._id}`"
             >
+              <span
+                class="absolute font-bold text-xs top-0 right-0 ml-1 mt-1 rounded-full px-4 py-1 mr-1 uppercase z-10 truncate max-w-full"
+                :style="{top: '-10px', right: '-10px'}"
+                :class="{
+                  'bg-primary text-white': product.status === 'active',
+                  'bg-gray-600 text-white': product.status === 'inactive'
+                }"
+              >{{product.status}}</span>
               <div
-                class="select-product flex border flex-grow rounded cursor-pointer select-none"
-                :class="{ 'border-primary hover:border-primary-lighter': _hasBeenSelected(product), 'hover:border-gray-500': !_hasBeenSelected(product) }"
+                class="select-product flex border flex-grow rounded cursor-pointer select-none hover:border-gray-500"
               >
                 <div class="flex w-1/3 product-thumb p-4 items-center justify-center">
                   <progressive-img :src="_firstVariantPlaceholderOf(product)" class="w-full" />
                 </div>
-                <div
-                  class="flex flex-grow flex-col product-desc p-4 relative"
-                  :class="{ 'text-primary hover:text-primary-lighter': _hasBeenSelected(product) }"
-                >
+                <div class="flex flex-grow flex-col product-desc p-4 relative">
                   <div class="font-bold text-lg mb-4">{{ product.name }}</div>
                   <div class="flex flex-col">
                     <div class="flex py-1 items-center">
@@ -56,18 +63,9 @@
                       </div>
                     </div>
                   </div>
-                  <div
-                    class="absolute outline-none focus:outline-none bg-white select-icon rounded-full border w-10 flex h-10 items-center justify-center"
-                    :class="{ 'border-primary hover:border-primary-lighter hover:text-primary-lighter text-primary': _hasBeenSelected(product) }"
-                    style="right: 10px; bottom: 10px;"
-                  >
-                    <font-awesome-icon
-                      :icon="['fas', _hasBeenSelected(product) ? 'check' : 'plus']"
-                    />
-                  </div>
                 </div>
               </div>
-            </div>
+            </nuxt-link>
           </div>
         </template>
       </Tabs>
@@ -80,14 +78,13 @@ import Tabs from "@/components/Tabs";
 import { mapGetters } from "vuex";
 
 export default {
+  layout: "admin_dashboard",
   components: {
     Tabs,
   },
   async mounted() {
     this.isLoading = true;
-    await this.$store.dispatch("designer/fetchAvailableProducts", {
-      status: ['active']
-    });
+    await this.$store.dispatch("designer/fetchAvailableProducts", this.query);
     this.isLoading = false;
     this.categories = [
       {
@@ -103,7 +100,9 @@ export default {
       categories: [],
       tmpProducts: [],
       isLoading: false,
-      isSingle: this.$flags.flagIs("single", "on"),
+      query: {
+        status: ["active", "inactive"],
+      },
     };
   },
   computed: {
@@ -119,32 +118,6 @@ export default {
     },
   },
   methods: {
-    toggleProduct(product) {
-      if (this._hasBeenSelected(product)) {
-        let index = _.findIndex(this.tmpProducts, { _id: product._id });
-        this.tmpProducts.splice(index, 1);
-        this.$emit("input", this.tmpProducts);
-        return;
-      }
-      if (this.isSingle && this.tmpProducts.length) {
-        this.$toast.error("You can only select 1 product.", {
-          position: "top",
-        });
-        return;
-      }
-      if (this.tmpProducts.length + this.selectedProducts.length >= 10) {
-        this.$toast.error(
-          "Each collection can only have a maximum of 10 products.",
-          {
-            position: "top",
-          }
-        );
-        return;
-      }
-      product = JSON.parse(JSON.stringify(product));
-      this.tmpProducts.push(product);
-      this.$emit("input", this.tmpProducts);
-    },
     _firstVariantPlaceholderOf(product) {
       if (!product.customizableVariants.length) return;
       const areaKeys = _.map(
@@ -161,9 +134,6 @@ export default {
       let sizeNames = _.map(product.customizableVariants[0].sizes, "name");
       return sizeNames.join(", ");
     },
-    _hasBeenSelected(product) {
-      return _.find(this.tmpProducts, { _id: product._id });
-    },
     _productsOf(category) {
       if (category === "all") return this.availableProducts;
 
@@ -175,10 +145,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.thumbnail:not([lazy="loaded"]) {
-  width: 16px;
-  height: 16px;
-}
-</style>

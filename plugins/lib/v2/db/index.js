@@ -1,5 +1,5 @@
 import { createDesignFor, getCollection, saveCollection, deleteCollection, updateCollectionName } from './collections';
-import { getCollections, updateCollectionStatus, getUsers, allMarketplaceOrders, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles, updateOrder } from './admin';
+import { getCollections, updateCollectionStatus, getUsers, allMarketplaceOrders, payoutRequests, processPayoutRequest, declinePayoutRequest, paidPayoutRequest, generateVariantImages, getUserById, approveAccount, deleteUserById, totalEarningsOfUser, saveShippingProfile, shippingProfiles, updateOrder, updateCustomizableProduct } from './admin';
 import { getCollectionsOfUserId } from './users';
 import { getProductsToSell, addToCart, getCartOfCurrentUser, removeItemFromCart, checkout, getCheckout, getAddressesOfCurrentUser, saveAddress, paymentMethods, calculateShippingFee, placeOrder, getMarketplaceOrder, getCheckoutsOfCurrentUser, marketplaceOrders, getCollectionMeta, getMPCounts, shopConfig, shops } from './marketplace';
 import { ordersOfCurrentUser, totalEarningsOfCurrentUser, payoutsOfCurrentUser, payoutRequest, cancelPayoutRequest, editPayoutRequest, updateAccount, removeProductFromCollection, collectionStatus, productStatus, setVariantMainThumbnail, variantData, getUserProductsOf } from './user_dashboard';
@@ -10,7 +10,7 @@ export default (axios) => {
     // users.js
     getUserCollectionsOf: () => getCollectionsOfUserId(axios),
     // designer.js
-    fetchAvailableProducts: () => fetchAvailableProducts(axios),
+    fetchAvailableProducts: (query) => fetchAvailableProducts(axios, query),
     getArts: () => getArts(axios),
     // collections.js
     createDesignFor: (products) => createDesignFor(axios, products),
@@ -23,6 +23,7 @@ export default (axios) => {
       getCollections: (data) => getCollections(axios, data),
       updateCollectionStatus: (data) => updateCollectionStatus(axios, data),
       updateOrder: (data) => updateOrder(axios, data),
+      updateCustomizableProduct: (data) => updateCustomizableProduct(axios, data),
       getUsers: (query) => getUsers(axios, query),
       allMarketplaceOrders: (query) => allMarketplaceOrders(axios, query),
       payoutRequests: (query) => payoutRequests(axios, query),

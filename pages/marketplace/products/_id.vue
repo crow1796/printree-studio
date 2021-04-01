@@ -70,22 +70,21 @@
             <div class="font-bold mt-3">SIZE</div>
             <div class="mt-2 flex">
               <div
-                class="w-10 h-10 rounded flex justify-center items-center font-bold text-xs mr-1 border cursor-pointer hover:border-primary hover:text-primary"
+                class="w-10 h-10 rounded flex justify-center items-center font-bold text-xs mr-1 border cursor-pointer select-none"
                 v-for="(size, i) in selectedVariant.sizes"
-                :class="{'text-primary border-primary': selectedSize === size.name}"
+                :class="{'text-primary border-primary': selectedSize === size.name, 'hover:border-primary hover:text-primary': stocksOf(size), 'opacity-50 cursor-auto': !stocksOf(size)}"
                 :key="i"
-                @click="() => selectedSize = size.name"
+                @click="() => stocksOf(size) ? selectedSize = size.name : null"
               >{{size.name}}</div>
             </div>
-            <!-- <div
-              class="text-xs text-red-600 font-bold mt-2"
-            >Only {{ selectedVariant.sizes[selectedSize].quantity }} stock(s) left!</div>-->
+            <div class="text-xs text-red-600 font-bold mt-2">Only {{ stocksLeft }} stock(s) left!</div>
             <div class="font-bold mt-3">QUANTITY</div>
             <div class="mt-2 flex">
               <VueNumericInput
                 align="center"
                 style="width: 90px; height: 40px;"
                 :min="1"
+                :max="stocksLeft"
                 v-model="quantity"
               />
             </div>
@@ -144,7 +143,7 @@ import ZoomOnHover from "@/components/ZoomOnHover/index";
 import VueTailwindModal from "@/components/VueTailwindModal";
 import BreadCrumbs from "@/components/BreadCrumbs";
 import ColorRegulator from "~/plugins/color-regulator";
-import map from 'lodash/map'
+import map from "lodash/map";
 import { mapGetters } from "vuex";
 import { priceWithVatCeil } from "@/plugins/price-calculator";
 
@@ -172,13 +171,13 @@ export default {
     this.selectedVariant = _.first(this.product.variants);
     this.selectedSize = _.first(this.selectedVariant.sizes).name;
     this._setDisplayMeta();
-    
+
     this.otherQuery.collectionId = this.product.parent_collection._id;
     this.otherCollectionProducts = await this.$store.dispatch(
       "marketplace/getProductsToSell",
       this.otherQuery
     );
-    this.isLoading = false
+    this.isLoading = false;
   },
   data() {
     return {
@@ -217,6 +216,13 @@ export default {
       isLoggedIn: "isLoggedIn",
       user: "user",
     }),
+    stocksLeft() {
+      return (
+        _.find(this.selectedVariant.customizableVariant.sizes, {
+          name: this.selectedSize,
+        })?.stock || 0
+      );
+    },
     currentUrl() {
       return this.$route.fullPath;
     },
@@ -232,6 +238,13 @@ export default {
     },
   },
   methods: {
+    stocksOf(size) {
+      return (
+        _.find(this.selectedVariant.customizableVariant.sizes, {
+          name: size.name,
+        })?.stock || 0
+      );
+    },
     _setDisplayMeta() {
       let tmpThumbnails = {};
       this.sides = map(this.selectedVariant.contents, "printableArea.side");
