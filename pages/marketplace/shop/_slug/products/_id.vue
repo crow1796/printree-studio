@@ -57,10 +57,16 @@
                 v-for="(size, i) in selectedVariant.sizes"
                 :class="{'text-primary border-primary': selectedSize === size.name, 'hover:border-primary hover:text-primary': stocksOf(size), 'opacity-50 cursor-auto': !stocksOf(size)}"
                 :key="i"
-                @click="() => stocksOf(size) ? selectedSize = size.name : null"
+                @click="() => selectedSize = size.name"
               >{{size.name}}</div>
             </div>
-            <div class="text-xs text-red-600 font-bold mt-2">Only {{ stocksLeft }} stock(s) left!</div>
+            <div
+              class="text-xs font-bold mt-2"
+              :class="{'text-red-600': stocksLeft <= 10}"
+            >
+              <span v-if="stocksLeft < 10">Only</span>
+              {{ stocksLeft }} stock(s) left
+            </div>
             <div class="font-bold mt-3">QUANTITY</div>
             <div class="mt-2 flex">
               <VueNumericInput
@@ -74,8 +80,12 @@
             <div class="mt-3">
               <button
                 type="button"
-                class="border border-white bg-primary px-8 py-4 font-bold rounded text-white hover:bg-primary-lighter w-full sm:w-7/12"
+                class="border border-white px-8 py-4 font-bold rounded w-full sm:w-7/12"
                 @click="addToCart"
+                :class="{
+                  'bg-gray-300 text-gray-400 cursor-auto': !stocksLeft,
+                  'bg-primary hover:bg-primary-lighter text-white': stocksLeft,
+                }"
               >
                 <span v-if="!isAddingToCart">ADD TO CART</span>
                 <span v-if="isAddingToCart">
@@ -155,7 +165,19 @@ export default {
     if (!res.length) return;
     this.product = _.first(res);
     this.selectedVariant = _.first(this.product.variants);
-    this.selectedSize = _.first(this.selectedVariant.sizes).name;
+
+    const inStockSizes = _.filter(
+      this.selectedVariant.customizableVariant.sizes,
+      (size) => size.stock
+    );
+    const inStockSizeNames = _.map(inStockSizes, "name");
+    this.selectedSize =
+      _.first(
+        _.filter(this.selectedVariant.sizes, (size) =>
+          inStockSizeNames.includes(size.name)
+        )
+      )?.name || _.first(this.selectedVariant.sizes)?.name;
+
     this._setDisplayMeta();
 
     this.$ga.page({
@@ -255,6 +277,7 @@ export default {
       this.selectedThumbnailIndex = this.selectedSide;
     },
     async addToCart() {
+      if (!this.stocksLeft) return;
       if (!this.isLoggedIn) {
         document.getElementById("get-started-btn").click();
         return;

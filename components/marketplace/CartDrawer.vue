@@ -34,6 +34,7 @@
             </div>
             <div
               class="flex flex-grow-0 border-b relative py-2"
+              :class="{'opacity-50': !stocksOf(product)}"
               v-for="(product, i) in products"
               :key="i"
             >
@@ -52,6 +53,7 @@
                     <input
                       class="absolute opacity-0 left-0 top-0 cursor-pointer"
                       type="checkbox"
+                      v-if="stocksOf(product)"
                       :checked="isSelected(product)"
                       @change="reselectProducts({e: $event, product})"
                     />
@@ -95,17 +97,23 @@
                     <VueNumericInput
                       align="center"
                       style="width: 100%; height: 30px"
-                      :min="1"
+                      :min="stocksOf(product) ? 1 : 0"
                       :max="stocksOf(product)"
-                      :value="product.quantity"
+                      :value="stocksOf(product) ? product.quantity : 0"
                       :disabled="isUpdatingQty"
                       @change="(e) => updateQtyOf(product, e)"
                     />
                   </div>
-                  <!-- <div class="text-xs mt-1 font-bold" :class="{'text-red-600': product.max <= 10}">
-                    <span v-if="product.max <= 10">Only</span>
-                    {{ product.max }} stock(s) left
-                  </div>-->
+                  <div
+                    class="text-xs mt-1 font-bold"
+                    :class="{'text-red-600': stocksOf(product) <= 10}"
+                  >
+                    <span v-if="stocksOf(product) === 0">No more stocks left</span>
+                    <span v-if="stocksOf(product)">
+                      <span v-if="stocksOf(product) <= 10">Only</span>
+                      {{ stocksOf(product) }} stock(s) left
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -184,8 +192,8 @@ export default {
     },
     async updateQtyOf(item, newQty) {
       if (this.isUpdatingQty) return;
-      if(newQty > this.stocksOf(item)){
-        newQty = this.stocksOf(item)
+      if (newQty > this.stocksOf(item)) {
+        newQty = this.stocksOf(item);
       }
       this.isUpdatingQty = true;
       await this.$store.dispatch("marketplace/addToCart", {
@@ -220,7 +228,12 @@ export default {
         "marketplace/getCartOfCurrentUser"
       );
       this.products = cart.items;
-      this.selectedProducts = cart.items;
+      this.selectedProducts = _.filter(cart.items, (item) => {
+        const size = _.find(item.variant.customizableVariant.sizes, {
+          name: item.size,
+        });
+        return size.stock;
+      });
       this.isLoading = false;
     },
     async removeProduct(product) {
@@ -250,7 +263,12 @@ export default {
     },
     toggleSelectAll() {
       if (this.selectedProducts.length !== this.products.length) {
-        this.selectedProducts = this.products;
+        this.selectedProducts = _.filter(this.products, (item) => {
+          const size = _.find(item.variant.customizableVariant.sizes, {
+            name: item.size,
+          });
+          return size.stock;
+        });
         return;
       }
       this.selectedProducts = [];
