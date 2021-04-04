@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col items-center w-full pl-4 pb-4 pt-8">
+  <div class="flex flex-col items-center w-full sm:pl-4 sm:pb-4 pt-8">
     <AreaLoader v-if="isLoading" />
     <div class="content w-full flex flex-grow">
       <div class="text-center mt-8 mb-6" v-if="isSignUpSuccess">
@@ -32,7 +32,7 @@
 
           <div class="flex flex-wrap">
             <div
-              class="mb-3 flex-grow mr-3"
+              class="mb-3 flex-grow sm:mr-3 mr-0"
               v-if="formType == 'sign_up' && formData.type === 'seller'"
               key="shop_name"
             >
@@ -54,7 +54,7 @@
                 v-if="errors.has('shop_name')"
               >{{ errors.first('shop_name') }}</span>
             </div>
-            <div class="mb-3 flex-grow mr-3" v-if="formType == 'sign_up'" key="name">
+            <div class="mb-3 flex-grow sm:mr-3 mr-0" v-if="formType == 'sign_up'" key="name">
               <label for="name" class="font-bold">Name</label>
               <div class="mt-2">
                 <input
@@ -73,7 +73,7 @@
                 v-if="errors.has('name')"
               >{{ errors.first('name') }}</span>
             </div>
-            <div class="mb-3 w-full mr-3" key="email">
+            <div class="mb-3 w-full mr-0 sm:mr-3" key="email">
               <label for="email" class="font-bold">Email</label>
               <div class="mt-2">
                 <input
@@ -92,7 +92,7 @@
                 v-if="errors.has('email')"
               >{{ errors.first('email') }}</span>
             </div>
-            <div class="mb-3 w-full mr-3" v-if="formType != 'password_recovery'" key="password">
+            <div class="mb-3 w-full mr-0 sm:mr-3" v-if="formType != 'password_recovery'" key="password">
               <label for="pass" class="font-bold">Password</label>
               <div class="mt-2">
                 <input
@@ -111,7 +111,7 @@
                 v-if="errors.has('pass')"
               >{{ errors.first('pass') }}</span>
             </div>
-            <div class="mb-3 flex-grow mr-3" v-if="formType === 'sign_up'" key="terms">
+            <div class="mb-3 flex-grow sm:mr-3 mr-0" v-if="formType === 'sign_up'" key="terms">
               <div class="flex items-center">
                 <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
                   <input
@@ -137,7 +137,7 @@
                 </div>
               </div>
             </div>
-            <div class="mb-3 flex-grow mr-3" v-if="formType != 'password_recovery'">
+            <div class="mb-3 flex-grow sm:mr-3 mr-0" v-if="formType != 'password_recovery'">
               <a
                 href="#"
                 class="text-blue-400 font-bold"

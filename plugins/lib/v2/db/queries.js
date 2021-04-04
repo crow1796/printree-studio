@@ -479,6 +479,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
         }
     }
   `,
@@ -494,6 +496,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
             user {
                 _id
                 email
@@ -514,6 +518,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
             user {
                 _id
                 email

@@ -1,5 +1,5 @@
 <template>
-  <div class="w-1/2 mx-auto my-32">
+  <div class="w-full sm:w-1/2 mx-auto my-32">
     <h1 class="text-4xl font-bold mb-10">Frequently Asked Questions</h1>
 
     <h2 class="text-3xl font-bold">What is Printree Studio?</h2>
@@ -15,7 +15,7 @@
     <h2 class="text-3xl font-bold">How can I submit my work?</h2>
 
     <div class="mb-10 mt-6">
-      <div class="ml-10">
+      <div class="ml-4 sm:ml-10">
         <div>1. Create an account.</div>
         <div>2. Create a collection and choose any product that you want your design to be placed.</div>
         <div
@@ -60,7 +60,7 @@
 
     <div class="mb-10 mt-6">
       There can be many reasons why your collection was not showcased, but here are the most common ones:
-      <ul class="ml-10">
+      <ul class="ml-4 sm:ml-10">
         <li class="mb-2">The design is low quality which will then look bad when printed.</li>
         <li class="mb-2">You don't have the rights to sell the design that you used.</li>
         <li>It is not yet finished. (We will give you key points on the parts that you might have missed.)</li>

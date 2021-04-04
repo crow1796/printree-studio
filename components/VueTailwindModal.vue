@@ -7,7 +7,7 @@
   >
     <transition name="slide" enter-active-class="slideInDown" leave-active-class="slideOutUp">
       <div
-        class="relative bg-white m-auto flex-col flex rounded shadow overflow-hidden -content"
+        class="relative bg-white m-auto flex-col flex rounded shadow overflow-auto sm:overflow-hidden -content"
         @click.stop
         v-if="isContentShown"
         :class="[{ '-bounce': bounce },contentClass]"
