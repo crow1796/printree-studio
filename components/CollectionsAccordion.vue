@@ -8,7 +8,7 @@
       >
         <button
           type="button"
-          class="w-full px-8 py-6 outline-none text-left"
+          class="w-full sm:px-8 px-2 py-6 outline-none text-left"
           @click="toggleContainer(i)"
         >
           <div class="flex items-center justify-between">

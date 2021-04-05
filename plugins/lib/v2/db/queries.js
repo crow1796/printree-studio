@@ -13,6 +13,7 @@ export default {
                 products {
                     _id
                     status
+                    slug
                 }
             }
         }`,
@@ -337,6 +338,7 @@ export default {
                 tags
             }
             status
+            slug
             created_at
             customizableProduct {
                 preDescription
@@ -479,6 +481,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
         }
     }
   `,
@@ -494,6 +498,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
             user {
                 _id
                 email
@@ -514,6 +520,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
             user {
                 _id
                 email

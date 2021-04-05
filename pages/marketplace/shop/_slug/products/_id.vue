@@ -73,7 +73,7 @@
                 align="center"
                 style="width: 90px; height: 40px;"
                 :min="1"
-                :max="stocksLeft"
+                :max="stocksLeft" 
                 v-model="quantity"
               />
             </div>

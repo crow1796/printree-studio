@@ -102,7 +102,8 @@ module.exports = {
         },
         svgo: {}
       }
-    ]
+    ],
+    "@nuxtjs/device"
   ],
   googleAnalytics: {
     id: 'UA-190265434-1'

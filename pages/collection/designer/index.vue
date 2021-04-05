@@ -349,6 +349,9 @@ export default {
     VueTailwindModal,
     RightActions,
   },
+  created() {
+    if (this.$device.isMobile) return this.$router.replace("/no-mobile");
+  },
   async mounted() {
     if (!this.$storage.getLocalStorage("designer_tour")) {
       const intro = this.$intro();

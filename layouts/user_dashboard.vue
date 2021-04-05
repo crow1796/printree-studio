@@ -1,21 +1,22 @@
 <template>
   <div class="text-gray-800 flex flex-col min-h-screen w-full">
-    <div>
-      <div class="border-b">
+    <div class="relative">
+      <div class="border-b relative">
         <div class="container mx-auto px-4">
           <div class="flex items-center md:justify-between py-4">
-            <div class="w-1/4 md:hidden">
+            <div class="w-1/3 sm:w-1/4 md:hidden">
               <svg
                 class="fill-current h-8 w-8"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 20 20"
+                @click="isNavOpened = !isNavOpened"
               >
                 <path
                   d="M16.4 9H3.6c-.552 0-.6.447-.6 1 0 .553.048 1 .6 1h12.8c.552 0 .6-.447.6-1 0-.553-.048-1-.6-1zm0 4H3.6c-.552 0-.6.447-.6 1 0 .553.048 1 .6 1h12.8c.552 0 .6-.447.6-1 0-.553-.048-1-.6-1zM3.6 7h12.8c.552 0 .6-.447.6-1 0-.553-.048-1-.6-1H3.6c-.552 0-.6.447-.6 1 0 .553.048 1 .6 1z"
                 />
               </svg>
             </div>
-            <div class="w-1/2 md:w-auto text-center">
+            <div class="w-1/3 sm:w-1/2 md:w-auto text-center">
               <nuxt-link to="/">
                 <img
                   src="~/assets/images/logo-nav.png"
@@ -42,7 +43,7 @@
                       to="/dashboard/account-settings"
                       class="flex items-center hover:bg-gray-200 px-4 py-2"
                     >
-                      <span class="mr-2">
+                      <span class="mr-2 w-6">
                         <font-awesome-icon :icon="['fas', 'cog']" />
                       </span>
                       <span>Account Settings</span>
@@ -54,7 +55,7 @@
                       class="flex items-center hover:bg-gray-200 px-4 py-2"
                       @click.prevent="signOut"
                     >
-                      <span class="mr-2">
+                      <span class="mr-2 w-6">
                         <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
                       </span>
                       <span>Logout</span>
@@ -63,6 +64,58 @@
                 </template>
               </VueTailwindDropdown>
             </div>
+          </div>
+        </div>
+
+        <div
+          class="sm:hidden absolute w-full top-full z-10 bg-white shadow-xl left-0"
+          v-if="isNavOpened"
+          v-click-outside="() => isNavOpened = false"
+        >
+          <div>
+            <nuxt-link
+              to="/dashboard/collections/"
+              class="flex items-center hover:bg-gray-200 px-4 py-2"
+            >
+              <span class="mr-2 w-6">
+                <font-awesome-icon :icon="['fas', 'boxes']" />
+              </span>
+              <span>Collections</span>
+            </nuxt-link>
+          </div>
+          <div>
+            <nuxt-link
+              to="/dashboard/payout/"
+              class="flex items-center hover:bg-gray-200 px-4 py-2"
+            >
+              <span class="mr-2 w-6">
+                <font-awesome-icon :icon="['fas', 'receipt']" />
+              </span>
+              <span>Payouts</span>
+            </nuxt-link>
+          </div>
+          <div>
+            <nuxt-link
+              to="/dashboard/shop/settings"
+              class="flex items-center hover:bg-gray-200 px-4 py-2"
+            >
+              <span class="mr-2 w-6">
+                <font-awesome-icon :icon="['fas', 'store']" />
+              </span>
+              <span>Shop Settings</span>
+            </nuxt-link>
+          </div>
+          <div>
+            <a
+              href="#"
+              class="flex items-center hover:bg-gray-200 px-4 py-2"
+              @click.prevent="signOut"
+            >
+              <span class="mr-2 w-6">
+                <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+              </span>
+              <span>Logout</span>
+            </a>
           </div>
         </div>
       </div>
@@ -149,7 +202,7 @@
         </div>
       </div>
     </div>
-    <div class="flex-grow container mx-auto sm:px-4 pt-6 pb-8">
+    <div class="flex-grow container mx-auto sm:px-4 pt-6 pb-8 sm:px-0 px-4">
       <nuxt />
     </div>
   </div>
@@ -178,6 +231,11 @@ export default {
     ...mapGetters({
       isLoggedIn: "isLoggedIn",
     }),
+  },
+  data() {
+    return {
+      isNavOpened: false,
+    };
   },
   mounted() {
     document.body.style.overflow = "auto";

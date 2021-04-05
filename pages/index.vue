@@ -1,11 +1,10 @@
 <template>
   <div class="sm:w-11/12 mx-auto">
-    <NoMobileModal ref="noMobileModal" />
     <AreaLoader v-if="isLoading" fullscreen />
     <VueTailwindModal
       ref="availableProductsModal"
       width="100%"
-      content-class="rounded-none h-full shadow-none text-gray-600"
+      content-class="rounded-none max-h-full h-full shadow-none text-gray-600"
     >
       <div class="flex flex-col flex-grow">
         <div class="modal-heading border-b flex-grow p-4">
@@ -50,8 +49,8 @@
         class="flex z-20 relative sm:mt-32 mt-8 sm:w-6/12 w-full flex-col sm:pl-4 flex-grow sm:flex-grow-0"
       >
         <div class="sm:w-full text-center sm:text-left">
-          <h1 class="text-5xl font-black mb-6">Make money with your designs</h1>
-          <div class="text-2xl ml-2">Design, upload and sell your extraordinary artworks.</div>
+          <h1 class="text-5xl font-black mb-6 sm:text-center text-left leading-none">Make money with your designs</h1>
+          <div class="text-2xl ml-0 sm:ml-2 sm:text-center text-left">Design, upload and sell your extraordinary artworks.</div>
         </div>
         <div class="flex sm:mt-5 mt-2 sm:justify-start justify-center flex-wrap">
           <button
@@ -76,7 +75,7 @@
     </div>
 
     <div class="how-it-works mb-12 mt-20">
-      <div class="text-center text-4xl font-black tracking-widest my-6">
+      <div class="sm:text-center text-left text-4xl font-black tracking-widest my-6">
         HOW DOES
         <span class="text-primary">PRINTREE STUDIO</span> WORKS?
       </div>
@@ -139,15 +138,12 @@ import VueTailwindModal from "@/components/VueTailwindModal";
 import AvailableProducts from "@/components/Designer/AvailableProducts";
 import AuthModal from "@/components/Auth/AuthModal";
 import { mapGetters } from "vuex";
-import NoMobileModal from "@/components/NoMobileModal";
-import { isMobile } from "@/helpers";
 
 export default {
   components: {
     VueTailwindModal,
     AvailableProducts,
     AuthModal,
-    NoMobileModal,
   },
   data() {
     return {
@@ -183,10 +179,6 @@ export default {
   },
   methods: {
     async showAvailableProducts(type) {
-      if (isMobile()) {
-        this.$refs.noMobileModal.show();
-        return;
-      }
       if (!this.isLoggedIn) {
         this.type = type;
         this.$refs.authModal.show();
