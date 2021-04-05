@@ -13,6 +13,7 @@ export default {
                 products {
                     _id
                     status
+                    slug
                 }
             }
         }`,
@@ -337,6 +338,7 @@ export default {
                 tags
             }
             status
+            slug
             created_at
             customizableProduct {
                 preDescription
