@@ -1,0 +1,17 @@
+.shop-banner {
+  background-size: 100%;
+  min-height: 0px;
+  padding-bottom: 37%;
+  background-position: center center;
+  width: 100%;
+  margin: auto;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  grid-template-rows: auto;
+  justify-content: stretch;
+  background-size: cover;
+}

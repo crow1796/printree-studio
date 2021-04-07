@@ -81,8 +81,8 @@
               class="text-xs font-bold mt-2"
               :class="{'text-red-600': stocksLeft <= 10}"
             >
-              <span v-if="stocksLeft < 10">Only</span>
-              {{ stocksLeft }} stock(s) left
+              <span v-if="stocksLeft === 0">No more</span>
+              <span v-if="stocksLeft <= 10 && stocksLeft">Only</span> <span v-if="stocksLeft">{{ stocksLeft }}</span> stock(s) left
             </div>
             <div class="font-bold mt-3">QUANTITY</div>
             <div class="mt-2 flex">
