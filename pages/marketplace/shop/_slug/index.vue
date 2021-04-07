@@ -6,7 +6,7 @@
       <div class="text-center text-3xl my-48" v-if="!products.length">
         No product(s).
       </div>
-      <ProductsGrid :rootUrl="rootUrl" :products="products" />
+      <ProductsGrid :rootUrl="rootUrl" :products="products" :showDesignerName="false"/>
       <div class="flex flex-grow justify-center pb-6 mt-4">
         <SimplePagination @prev="goTo(prev)" @next="goTo(next)"/>
       </div>
