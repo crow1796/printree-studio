@@ -331,7 +331,11 @@ export default {
     confirmEditCollectionConfirmation() {
       this.$refs.editConfirmationModal.hide();
 
-      this._goToCollectionDesigner(this.selectedProduct, "product");
+      let type = 'product'
+
+      if(!this.selectedProduct.parent_collection) type = 'collection'
+
+      this._goToCollectionDesigner(this.selectedProduct, type);
     },
     _goToCollectionDesigner(product, type) {
       localStorage.removeItem("_stored_ptree");
