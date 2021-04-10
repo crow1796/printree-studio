@@ -48,6 +48,7 @@ export default {
   },
   methods: {
     toggle(opt) {
+      this.$emit("change", opt);
       if (this.isMultiple) {
         if (_.includes(this.selected, opt))
           return this.selected.splice(

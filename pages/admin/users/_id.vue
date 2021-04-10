@@ -92,7 +92,7 @@
             class="portfolio-link text-blue-400"
           >{{ user.portfolioLink }}</a>
         </div>
-        <div>
+        <div class="mr-16">
           <div class="font-bold">Status</div>
           <div>
             <span
@@ -109,6 +109,20 @@
               ></span>
               <span class="relative uppercase">{{ user.status }}</span>
             </span>
+          </div>
+        </div>
+        <div v-if="user.shop" class="flex items-center">
+          <div class="font-bold mr-4">Shop Status</div>
+          <div>
+            <OptionButtons
+              :options="storeStatuses"
+              v-model="user.shop.status"
+              @change="updateShopStatus"
+            >
+              <template v-slot:default="{option}">
+                <div class="flex flex-col text-xs">{{ option.label }}</div>
+              </template>
+            </OptionButtons>
           </div>
         </div>
       </div>
@@ -194,6 +208,7 @@ import moment from "moment";
 import TotalProfitCounter from "@/components/TotalProfitCounter";
 import CollectionsTable from "@/components/Admin/CollectionsTable";
 import VueTailwindModal from "@/components/VueTailwindModal";
+import OptionButtons from "@/components/OptionButtons";
 
 export default {
   layout: "admin_dashboard",
@@ -201,6 +216,7 @@ export default {
     TotalProfitCounter,
     CollectionsTable,
     VueTailwindModal,
+    OptionButtons,
   },
   created() {
     if (!this.$route.query.colpage)
@@ -228,10 +244,29 @@ export default {
       confirmationAction: null,
       isLoading: true,
       collections: [],
+      storeStatuses: [
+        {
+          label: "Off",
+          value: "inactive",
+        },
+        {
+          label: "On",
+          value: "active",
+        },
+      ],
       query: {
         userId: this.$route.params.id,
         plan: ["Buy", "Sell"],
-        status: ["draft", "approved", "declined", "pending", "reviewing", "to pay", "printing process", "completed"],
+        status: [
+          "draft",
+          "approved",
+          "declined",
+          "pending",
+          "reviewing",
+          "to pay",
+          "printing process",
+          "completed",
+        ],
         sorting: {
           field: "created_at",
           order: "DESC",
@@ -246,6 +281,16 @@ export default {
     };
   },
   methods: {
+    async updateShopStatus(opt) {
+      this.isLoading = true;
+      await this.$store.dispatch("admin/updateShop", {
+        id: this.user?.shop?._id,
+        shopInput: {
+          status: opt.value,
+        },
+      });
+      this.isLoading = false;
+    },
     goBack() {
       this.$router.back();
     },

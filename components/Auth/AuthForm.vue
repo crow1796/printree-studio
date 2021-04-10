@@ -319,7 +319,7 @@ export default {
         if (this.formType !== "sign_up") this.$emit("login-success");
         else {
           if (tmpFormData.type === "seller") {
-            if (res.isInvited) {
+            if (res?.user?.status === 'approved') {
               this.$storage.removeCookie("invite");
               await this.signIn();
               return;

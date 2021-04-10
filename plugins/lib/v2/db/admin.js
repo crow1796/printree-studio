@@ -175,3 +175,12 @@ export const updateOrder = async (axios, query) => {
   const { updateOrder } = data.data;
   return updateOrder;
 }
+
+export const updateShop = async (axios, query) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.updateShop,
+    variables: query
+  });
+  const { updateShop } = data.data;
+  return updateShop;
+}

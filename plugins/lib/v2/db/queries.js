@@ -315,6 +315,7 @@ export default {
                 _id
                 slug
                 name
+                status
             }
             email
             status
@@ -1215,6 +1216,15 @@ export default {
                 bannerBGColor
                 bannerBGSize
             }
+        }
+    }
+  `,
+  updateShop: `
+    mutation ($id: ID!, $shopInput: UpdateShopInput!) {
+        updateShop(_id: $id, shopInput: $shopInput) {
+            _id
+            name
+            status
         }
     }
   `
