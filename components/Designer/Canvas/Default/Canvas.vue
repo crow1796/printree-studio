@@ -15,10 +15,11 @@
       @vdropzone-success="assetAdded"
       @vdropzone-sending="globalAssetSending"
     />
-    <VueTailwindDrawer ref="artsModal" width="40%">
+    <VueTailwindDrawer ref="artsModal" width="40%" :closeOnBackdropClicked="!isUploading">
       <div class="flex p-4 h-full flex-col w-full">
         <div class="flex w-1/3 flex-col w-full">
-          <div class="uppercase font-bold text-gray-600 pb-2 px-1">Upload an Image</div>
+          <div class="uppercase font-bold text-gray-600 px-1 pb-2">Upload an Image</div>
+
           <div class="flex h-full w-full my-1">
             <div class="relative h-full w-full border border-dashed">
               <vue-dropzone
@@ -51,7 +52,6 @@
     <div class="outline-none select-none relative w-full h-full text-center">
       <div class="panzoom-container flex flex-grow w-full h-full justify-center overflow-hidden">
         <div class="canvas-section outline-none select-none relative w-full h-full text-center">
-          
           <DesignerActions>
             <TopActions
               @action-clicked="topActionClicked"
@@ -122,7 +122,7 @@
                       class="flex w-full h-full items-center justify-center"
                       v-if="obj.type == 'image' || obj.type == 'svg'"
                     >
-                      <img width="100%" :src="obj.value" />
+                      <progressive-img width="100%" :src="obj.value" />
                     </div>
                     <div
                       v-if="obj.editorData.isActive"
@@ -179,6 +179,7 @@ export default {
   data() {
     return {
       isGlobalUploading: false,
+      isUploading: false,
       apiUrl: process.env.apiUrl,
       activeObject: null,
       activeObjectIndex: 0,
@@ -242,6 +243,9 @@ export default {
     }),
   },
   methods: {
+    hide() {
+      if (this.$refs.artsModal) this.$refs.artsModal.hide();
+    },
     leftActionClicked({ action, args }) {
       switch (action) {
         case "add_text":
@@ -435,7 +439,11 @@ export default {
       this.assetSending(e, xhr);
     },
     assetSending(e, xhr) {
-      xhr.setRequestHeader("Authorization", this.$auth.getStrategy("local").token.get());
+      this.isUploading = true;
+      xhr.setRequestHeader(
+        "Authorization",
+        this.$auth.getStrategy("local").token.get()
+      );
     },
     acceptFiles(file, done) {
       var reader = new FileReader();
@@ -480,6 +488,7 @@ export default {
       this.$store.commit("designer/ADD_ASSET", res.data);
       this.$refs.artsModal.hide();
       this.isGlobalUploading = false;
+      this.isUploading = false;
       this.$refs.globalDropzone.removeAllFiles();
     },
     async useAsset(asset) {
@@ -775,7 +784,7 @@ export default {
       );
       this.moveTo(-(this.width / 3), 0);
       this.zoomTo(-0.4);
-      this.panzoomController.pause ();
+      this.panzoomController.pause();
 
       this.canvasSection.addEventListener("dblclick", (evt) => {
         this.panzoomController.pause();

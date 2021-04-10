@@ -1,7 +1,7 @@
 <template>
   <div class="top-actions absolute z-10 flex">
     <div
-      class="flex bg-white py-1 px-2 rounded border items-center flex-col"
+      class="flex bg-white py-1 px-2 rounded border items-center"
       v-if="activeObject && (activeObject.type == 'text' || activeObject.type == 'svg')"
     >
       <v-popover class="flex">
@@ -38,7 +38,7 @@
           </div>
         </template>
       </v-popover>
-      <div class="flex" v-if="activeObject && activeObject.type == 'text'">
+      <div class="flex items-center" v-if="activeObject && activeObject.type == 'text'">
         <div class="w-48 px-1 h-8 z-10 items-center">
           <v-select
             :options="webfonts"
@@ -54,7 +54,7 @@
         <button
           type="button"
           class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold' }"
+          :class="{ 'bg-gray-300': activeObject.style.fontWeight == 'bold', 'mx-1': isSingle, 'my-1': !isSingle }"
           @click="$emit('action-clicked', {action: 'toggle_font_weight', args: activeObject.style.fontWeight == 'bold' ? 'normal' : 'bold'})"
           title="Bold (Ctrl + B)"
           v-tippy="{ arrow: true }"
@@ -64,7 +64,7 @@
         <button
           type="button"
           class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic' }"
+          :class="{ 'bg-gray-300': activeObject.style.fontStyle == 'italic', 'mx-1': isSingle, 'my-1': !isSingle }"
           @click="$emit('action-clicked', {action: 'toggle_font_style', args: activeObject.style.fontStyle == 'italic' ? 'normal' : 'italic'})"
           title="Italic (Ctrl + I)"
           v-tippy="{ arrow: true }"
@@ -74,7 +74,7 @@
         <button
           type="button"
           class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          :class="{ 'bg-gray-300': hasTextDecoration('underline') }"
+          :class="{ 'bg-gray-300': hasTextDecoration('underline'), 'mx-1': isSingle, 'my-1': !isSingle }"
           @click="$emit('action-clicked', {action: 'toggle_text_decoration', args: 'underline'})"
           title="Underline (Ctrl + U)"
           v-tippy="{ arrow: true }"
@@ -84,7 +84,7 @@
         <button
           type="button"
           class="justify-center items-center focus:outline-none my-1 outline-none flex flex-grow border w-8 h-8 font-bold rounded text-gray-600 border-grey-lightest hover:bg-gray-100 text-xs"
-          :class="{ 'bg-gray-300': hasTextDecoration('line-through') }"
+          :class="{ 'bg-gray-300': hasTextDecoration('line-through'), 'mx-1': isSingle, 'my-1': !isSingle }"
           @click="$emit('action-clicked', {action: 'toggle_text_decoration', args: 'line-through'})"
           title="Strikethrough (Ctrl + K)"
           v-tippy="{ arrow: true }"

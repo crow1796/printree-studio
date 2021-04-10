@@ -176,12 +176,12 @@
         <h2 class="text-2xl font-semibold leading-tight">My Collections</h2>
         <button
           type="button"
-          class="border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
+          class="sm:flex hidden border px-8 py-2 font-bold rounded outline-none focus:outline-none border-white bg-primary text-white hover:bg-primary-lighter"
           @click="showAvailableProducts"
         >Create new collection</button>
       </div>
       <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-        <div class="inline-block min-w-full border-l border-r overflow-hidden">
+        <div class="inline-block min-w-full border-l border-r overflow-hidden w-full">
           <CollectionsAccordion
             @item-clicked="editCollection"
             @delete-collection="showDeleteCollectionConfirmation"
@@ -331,7 +331,11 @@ export default {
     confirmEditCollectionConfirmation() {
       this.$refs.editConfirmationModal.hide();
 
-      this._goToCollectionDesigner(this.selectedProduct, "product");
+      let type = 'product'
+
+      if(!this.selectedProduct.parent_collection) type = 'collection'
+
+      this._goToCollectionDesigner(this.selectedProduct, type);
     },
     _goToCollectionDesigner(product, type) {
       localStorage.removeItem("_stored_ptree");

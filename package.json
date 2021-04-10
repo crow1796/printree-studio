@@ -25,6 +25,7 @@
     "@minogin/vue-drag-resize-rotate": "^1.0.5",
     "@nuxtjs/auth-next": "^5.0.0-1616003482.75c20e6",
     "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/device": "^2.0.1",
     "@nuxtjs/pwa": "^2.6.0",
     "@nuxtjs/universal-storage": "^0.4.0",
     "babel-core": "7.0.0-bridge.0",

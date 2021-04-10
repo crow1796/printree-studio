@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <AreaLoader v-if="isLoading" />
-    <div class="py-4 w-6/12 mx-auto">
+    <div class="py-4 w-full sm:w-6/12 mx-auto">
       <div class="my-2 flex sm:flex-row justify-between items-center">
         <h2 class="text-2xl font-semibold leading-tight">Shop Settings</h2>
       </div>
@@ -10,7 +10,7 @@
           <label for="name" class="font-bold">Logo</label>
           <div class="mt-4">
             <vue-dropzone
-              class="h-full border-0 flex items-center justify-center w-6/12 cursor-pointer border border-dashed"
+              class="h-full border-0 flex items-center justify-center w-fulll sm:w-6/12 cursor-pointer border border-dashed"
               :class="{'-uploading': isLogoLoading}"
               ref="logoDropzone"
               id="logo-dropzone"

@@ -167,6 +167,17 @@ export const allMarketplaceOrders = async (axios, query) => {
   return allMarketplaceOrders;
 }
 
+export const updateCustomizableProduct = async (axios, product) => {
+  const { data } = await axios.post("/gql", {
+    query: queries.updateCustomizableProduct,
+    variables: {
+      product
+    }
+  });
+  const { updateCustomizableProduct } = data.data;
+  return updateCustomizableProduct;
+}
+
 export const updateOrder = async (axios, query) => {
   const { data } = await axios.post("/gql", {
     query: queries.updateOrder,

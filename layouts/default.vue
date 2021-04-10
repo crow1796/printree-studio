@@ -2,8 +2,8 @@
   <div class="flex flex-grow flex-col">
     <NoMobileModal ref="noMobileModal" />
     <AuthModal ref="authModal" @login-success="$router.replace('/dashboard')" />
-    <div class="flex flex-grow bg-transparent z-10">
-      <div class="flex flex-grow">
+    <div class="flex flex-grow">
+      <div class="flex flex-grow bg-white relative z-50">
         <div class="container mx-auto px-4">
           <div class="flex items-center justify-between py-4">
             <div class="flex flex-grow">
@@ -20,7 +20,7 @@
               <!-- <nuxt-link
                 to="/marketplace"
                 class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-              >Marketplace</nuxt-link> -->
+              >Marketplace</nuxt-link>-->
               <nuxt-link
                 :to="dashboardLink"
                 class="text-gray-800 text-sm font-semibold border px-4 py-2 rounded hover:text-primary-lighter hover:border-primary-lighter bg-white"
@@ -42,22 +42,59 @@
             </div>
 
             <div class="sm:hidden cursor-pointer">
-              <font-awesome-icon :icon="['fas', 'bars']" />
+              <font-awesome-icon :icon="['fas', 'bars']" @click="isNavOpened = !isNavOpened" />
             </div>
-          </div>
 
-          <div class="block sm:hidden bg-white border-t-2 py-2">
-            <div class="flex flex-col">
-              <nuxt-link
-                to="/marketplace"
-                class="text-gray-800 font-semibold hover:text-primary-lighter mb-1"
-              >Marketplace</nuxt-link>
-              <div class="flex justify-between items-center border-t-2 pt-2">
+            <div
+              class="sm:hidden absolute w-full top-full z-10 bg-white shadow-xl left-0"
+              v-if="isNavOpened"
+              v-click-outside="() => isNavOpened = false"
+            >
+              <div v-if="!isLoggedIn || !user">
+                <nuxt-link to="/marketplace/" class="flex items-center hover:bg-gray-200 px-4 py-2">
+                  <span class="mr-2">
+                    <font-awesome-icon :icon="['fas', 'store']" />
+                  </span>
+                  <span>View All Shops</span>
+                </nuxt-link>
+              </div>
+              <div v-if="isLoggedIn && user._id">
+                <div>
+                  <nuxt-link
+                    to="/dashboard"
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'cog']" />
+                    </span>
+                    <span>Dashboard</span>
+                  </nuxt-link>
+                </div>
+                <div>
+                  <a
+                    href="#"
+                    class="flex items-center hover:bg-gray-200 px-4 py-2"
+                    @click.prevent="signOut"
+                  >
+                    <span class="mr-2">
+                      <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                    </span>
+                    <span>Logout</span>
+                  </a>
+                </div>
+              </div>
+              <div v-else>
                 <a
                   href="#"
-                  class="text-gray-800 font-semibold hover:text-primary-lighter mr-4"
-                  @click.prevent="showAuthModal"
-                >Get Started</a>
+                  class="flex items-center hover:bg-gray-200 px-4 py-2"
+                  id="get-started-btn"
+                  @click.prevent="$refs.authModal.show()"
+                >
+                  <span class="mr-2">
+                    <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
+                  </span>
+                  <span>Sign In</span>
+                </a>
               </div>
             </div>
           </div>
@@ -65,7 +102,7 @@
       </div>
     </div>
     <div class="flex flex-grow">
-      <div class="container mx-auto">
+      <div class="container sm:mx-auto mx-4">
         <nuxt />
       </div>
     </div>
@@ -90,7 +127,7 @@ export default {
   components: {
     Footer,
     AuthModal,
-    NoMobileModal
+    NoMobileModal,
   },
   created() {
     const inviteCode = this.$route.query.invite;
@@ -110,13 +147,18 @@ export default {
       return "/dashboard";
     },
   },
+  data() {
+    return {
+      isNavOpened: false,
+    };
+  },
   methods: {
-    showAuthModal(){
+    showAuthModal() {
       if (isMobile()) {
         this.$refs.noMobileModal.show();
         return;
       }
-      this.$refs.authModal.show()
+      this.$refs.authModal.show();
     },
     async signOut() {
       this.$router.replace("/");

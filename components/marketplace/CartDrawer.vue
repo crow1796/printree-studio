@@ -1,5 +1,10 @@
 <template>
-  <VueTailwindDrawer ref="drawer" class="cart-drawer" position="right" :closeOnBackdropClicked="!isLoading">
+  <VueTailwindDrawer
+    ref="drawer"
+    class="cart-drawer"
+    position="right"
+    :closeOnBackdropClicked="!isLoading"
+  >
     <div class="relative h-full">
       <AreaLoader v-if="isLoading" />
 
@@ -29,6 +34,7 @@
             </div>
             <div
               class="flex flex-grow-0 border-b relative py-2"
+              :class="{'opacity-50': !stocksOf(product)}"
               v-for="(product, i) in products"
               :key="i"
             >
@@ -47,6 +53,7 @@
                     <input
                       class="absolute opacity-0 left-0 top-0 cursor-pointer"
                       type="checkbox"
+                      v-if="stocksOf(product)"
                       :checked="isSelected(product)"
                       @change="reselectProducts({e: $event, product})"
                     />
@@ -56,7 +63,11 @@
               </div>
               <div class="w-3/12 flex-justify-between">
                 <div class="w-32 mx-auto">
-                  <progressive-img class="relative mx-auto" :src="product.fullThumb" style="width: 80px"/>
+                  <progressive-img
+                    class="relative mx-auto"
+                    :src="product.fullThumb"
+                    style="width: 80px"
+                  />
                 </div>
               </div>
               <div class="flex flex-col w-3/12 justify-center">
@@ -86,17 +97,23 @@
                     <VueNumericInput
                       align="center"
                       style="width: 100%; height: 30px"
-                      :min="1"
-                      :max="product.max"
-                      :value="product.quantity"
+                      :min="stocksOf(product) ? 1 : 0"
+                      :max="stocksOf(product)"
+                      :value="stocksOf(product) ? product.quantity : 0"
                       :disabled="isUpdatingQty"
                       @change="(e) => updateQtyOf(product, e)"
                     />
                   </div>
-                  <!-- <div class="text-xs mt-1 font-bold" :class="{'text-red-600': product.max <= 10}">
-                    <span v-if="product.max <= 10">Only</span>
-                    {{ product.max }} stock(s) left
-                  </div>-->
+                  <div
+                    class="text-xs mt-1 font-bold"
+                    :class="{'text-red-600': stocksOf(product) <= 10}"
+                  >
+                    <span v-if="stocksOf(product) === 0">No more stocks left</span>
+                    <span v-if="stocksOf(product)">
+                      <span v-if="stocksOf(product) <= 10">Only</span>
+                      {{ stocksOf(product) }} stock(s) left
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -113,7 +130,11 @@
                 <number :to="subtotal" :format="(num) => num.formatMoney('₱ ')" :duration=".4" />
               </span>
             </div>
-            <PTButton color="primary" :disabled="!subtotal || isUpdatingQty || isCheckingOut" @click="checkout">
+            <PTButton
+              color="primary"
+              :disabled="!subtotal || isUpdatingQty || isCheckingOut"
+              @click="checkout"
+            >
               <span class="mr-2">CHECKOUT</span>
               <font-awesome-icon :icon="['fas', 'arrow-right']" />
             </PTButton>
@@ -158,20 +179,30 @@ export default {
       products: [],
       selectedProducts: [],
       isUpdatingQty: false,
-      isCheckingOut: false
+      isCheckingOut: false,
     };
   },
   methods: {
+    stocksOf(product) {
+      return (
+        _.find(product.variant.customizableVariant.sizes, {
+          name: product.size,
+        })?.stock || 0
+      );
+    },
     async updateQtyOf(item, newQty) {
-      if(this.isUpdatingQty) return
+      if (this.isUpdatingQty) return;
+      if (newQty > this.stocksOf(item)) {
+        newQty = this.stocksOf(item);
+      }
       this.isUpdatingQty = true;
       await this.$store.dispatch("marketplace/addToCart", {
         variant: item.variant._id,
         quantity: newQty,
         size: item.size,
-        isUpdatingQty: true
+        isUpdatingQty: true,
       });
-      item.quantity = newQty
+      item.quantity = newQty;
       this.isUpdatingQty = false;
     },
     async show() {
@@ -182,7 +213,7 @@ export default {
     },
     hide() {
       this.$refs.drawer.hide();
-      document.body.style.overflow = 'auto'
+      document.body.style.overflow = "auto";
     },
     isSelected(product) {
       return _.filter(
@@ -197,11 +228,16 @@ export default {
         "marketplace/getCartOfCurrentUser"
       );
       this.products = cart.items;
-      this.selectedProducts = cart.items;
+      this.selectedProducts = _.filter(cart.items, (item) => {
+        const size = _.find(item.variant.customizableVariant.sizes, {
+          name: item.size,
+        });
+        return size.stock;
+      });
       this.isLoading = false;
     },
     async removeProduct(product) {
-      if(this.isUpdatingQty) return
+      if (this.isUpdatingQty) return;
       this.isLoading = true;
       const cart = await this.$store.dispatch(
         "marketplace/removeItemFromCart",
@@ -227,7 +263,12 @@ export default {
     },
     toggleSelectAll() {
       if (this.selectedProducts.length !== this.products.length) {
-        this.selectedProducts = this.products;
+        this.selectedProducts = _.filter(this.products, (item) => {
+          const size = _.find(item.variant.customizableVariant.sizes, {
+            name: item.size,
+          });
+          return size.stock;
+        });
         return;
       }
       this.selectedProducts = [];
@@ -245,15 +286,18 @@ export default {
       this.selectedProducts = [...this.selectedProducts, product];
     },
     async checkout() {
-      if(this.isUpdatingQty || this.isCheckingOut) return
-      this.isLoading = true
-      this.isCheckingOut = true
-      const checkout = await this.$store.dispatch('marketplace/checkout', _.map(this.selectedProducts, '_id'))
+      if (this.isUpdatingQty || this.isCheckingOut) return;
+      this.isLoading = true;
+      this.isCheckingOut = true;
+      const checkout = await this.$store.dispatch(
+        "marketplace/checkout",
+        _.map(this.selectedProducts, "_id")
+      );
 
-      this.hide()
-      
+      this.hide();
+
       this.$router.replace(`/marketplace/checkout/${checkout._id}`);
-      this.isCheckingOut = false
+      this.isCheckingOut = false;
     },
   },
 };

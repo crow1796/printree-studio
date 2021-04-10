@@ -159,8 +159,8 @@
       </PTButton>
     </div>
     <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-      <div class="inline-block min-w-full border-l border-r overflow-hidden">
-        <table class="min-w-full leading-normal table-fixed">
+      <div class="inline-block min-w-full border-l border-r overflow-auto w-full">
+        <table class="min-w-full leading-normal table-fixed overflow-auto">
           <thead>
             <tr>
               <th
@@ -180,7 +180,7 @@
           <tbody>
             <tr v-if="!payouts.length">
               <td
-                colspan="3"
+                colspan="4"
                 class="text-xl text-gray-600 px-5 py-5 border-b border-gray-200 bg-white text-sm text-center"
               >You have no payout(s).</td>
             </tr>

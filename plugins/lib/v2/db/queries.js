@@ -13,16 +13,18 @@ export default {
                 products {
                     _id
                     status
+                    slug
                 }
             }
         }`,
     customizableProducts: `
-  query {
-      customizableProducts {
+    query ($query: CustomizableProductQueryInput){
+        customizableProducts(query: $query) {
           _id
           name
           preDescription
           fabricDescription
+          status
           category {
               _id
               name
@@ -42,8 +44,11 @@ export default {
               }
               color
               sizes {
-                  name
-                  baseCost
+                name
+                baseCost
+                serviceCost
+                weightInGrams
+                stock
               }
           }
           printingOptions {
@@ -334,6 +339,7 @@ export default {
                 tags
             }
             status
+            slug
             created_at
             customizableProduct {
                 preDescription
@@ -358,6 +364,10 @@ export default {
                 customizableVariant {
                     _id
                     color
+                    sizes {
+                        name
+                        stock
+                    }
                 }
                 sizes {
                     name
@@ -472,6 +482,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
         }
     }
   `,
@@ -487,6 +499,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
             user {
                 _id
                 email
@@ -507,6 +521,8 @@ export default {
             channel
             notes
             status
+            created_at
+            updated_at
             user {
                 _id
                 email
@@ -744,6 +760,14 @@ export default {
                 _id
                 variant {
                     _id
+                    customizableVariant {
+                        _id
+                        color
+                        sizes {
+                            name
+                            stock
+                        }
+                    }
                 }
                 productName
                 collectionName
@@ -1225,6 +1249,38 @@ export default {
             _id
             name
             status
+        }
+    }`,
+  updateCustomizableProduct: `
+    mutation($product: UpdateCustomizableProductInput) {
+        updateCustomizableProduct(product: $product) {
+            _id
+            name
+            category {
+                _id
+                name
+            }
+            customizableVariants {
+                _id
+                printableArea {
+                side   
+                }
+                color
+                sizes {
+                    name
+                    baseCost
+                    weightInGrams
+                    serviceCost
+                    stock
+                }
+            }
+            printingOptions {
+                _id
+                displayName
+                name
+            }
+            created_at
+            updated_at
         }
     }
   `
