@@ -103,8 +103,15 @@ module.exports = {
         svgo: {}
       }
     ],
-    "@nuxtjs/device"
+    "@nuxtjs/device",
+    'nuxt-facebook-pixel-module',
   ],
+  facebook: {
+    track: 'PageView',
+    pixelId: '530983760973398',
+    autoPageView: true,
+    disabled: false
+  },
   googleAnalytics: {
     id: 'UA-190265434-1'
   },
