@@ -15,7 +15,56 @@
       @vdropzone-success="assetAdded"
       @vdropzone-sending="globalAssetSending"
     />
-    <VueTailwindDrawer ref="artsModal" width="40%" :closeOnBackdropClicked="!isUploading">
+    <VueTailwindModal
+      ref="askConsentModal"
+      width="35%"
+      content-class="rounded-none shadow-none text-gray-600"
+      :backdrop="false"
+    >
+      <div class="flex flex-col relative">
+        <div class="modal-heading border-b w-full p-4">
+          <div class="flex justify-center w-full items-center">
+            <div class="flex uppercase">
+              <strong>CONFIRM COPYRIGHT PERMISSION</strong>
+            </div>
+          </div>
+        </div>
+        <div class="flex modal-body flex-col flex-grow p-4">
+          <div
+            class="mb-4"
+          >I have a license or written permission from the proper rights holder to use this design that I'm about to upload.</div>
+          <div class="mb-4">
+            On the off chance that under any condition the lawful proprietor of this design that I'm about to upload contacts
+            <strong>Printree Studio</strong>, they will be directed to me.
+          </div>
+          <div class="mb-4">
+            I will take full responsibility for all the designs that I upload in
+            <strong>Printree Studio</strong>'s platform.
+          </div>
+          <div class="flex items-center">
+            <label class="custom-checkbox block relative cursor-pointer text-xl pl-8 w-6 h-6">
+              <input
+                class="absolute opacity-0 left-0 top-0 cursor-pointer"
+                type="checkbox"
+                name="terms"
+                v-model="acceptCopyrightConditions"
+              />
+              <span class="h-6 w-6 checkmark absolute top-0 left-0 bg-gray-400"></span>
+            </label>
+            <div class="text-sm">
+              I fully agree to the conditions stated above.
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex modal-footer justify-between flex-shrink p-4 border-t items-celex modal-footer justify-center flex-shrink p-4 border-t nter"
+        >
+          <PTButton @click="hideStartUploadModal">CANCEL</PTButton>
+          <PTButton color="primary" @click="startUpload" :disabled="!acceptCopyrightConditions">CONTINUE</PTButton>
+        </div>
+      </div>
+    </VueTailwindModal>
+    <VueTailwindDrawer ref="artsModal" width="40%" :closeOnBackdropClicked="!isUploading" @hidden="canStartUpload = false">
       <div class="flex p-4 h-full flex-col w-full">
         <div class="flex w-1/3 flex-col w-full">
           <div class="uppercase font-bold text-gray-600 px-1 pb-2">Upload an Image</div>
@@ -24,6 +73,7 @@
             <div class="relative h-full w-full border border-dashed">
               <vue-dropzone
                 class="h-full border-0 flex items-center justify-center"
+                :class="{'hidden': !canStartUpload}"
                 ref="myVueDropzone"
                 id="dropzone"
                 :style="{ border: 0 }"
@@ -35,7 +85,17 @@
               }"
                 @vdropzone-success="assetAdded"
                 @vdropzone-sending="assetSending"
+                @vdropzone-canceled="hideStartUploadModal"
+                @vdropzone-complete="hideStartUploadModal"
               />
+              <button
+                class="relative h-full w-full border border-dashed py-10 justify-center flex cursor-pointer outline-none"
+                v-if="!canStartUpload"
+                type="button"
+                @click="showStartUploadModal"
+              >
+                <span style="margin: 2em 0">Click here to start uploading files.</span>
+              </button>
             </div>
           </div>
         </div>
@@ -148,6 +208,7 @@
 import panzoom from "panzoom";
 import ArtsList from "@/components/Designer/ArtsList";
 import VueTailwindDrawer from "@/components/VueTailwindDrawer";
+import VueTailwindModal from "@/components/VueTailwindModal";
 import LeftActions from "@/components/Designer/Canvas/Actions/Left";
 import TopActions from "@/components/Designer/Canvas/Actions/Top";
 import DesignerActions from "@/components/Designer/Canvas/Actions/index";
@@ -175,9 +236,12 @@ export default {
     LeftActions,
     TopActions,
     DesignerActions,
+    VueTailwindModal,
   },
   data() {
     return {
+      acceptCopyrightConditions: false,
+      canStartUpload: false,
       isGlobalUploading: false,
       isUploading: false,
       apiUrl: process.env.apiUrl,
@@ -243,6 +307,19 @@ export default {
     }),
   },
   methods: {
+    hideStartUploadModal() {
+      if (this.$refs.askConsentModal) this.$refs.askConsentModal.hide();
+      this.canStartUpload = false;
+    },
+    showStartUploadModal() {
+      if (this.$refs.askConsentModal) this.$refs.askConsentModal.show();
+    },
+    startUpload() {
+      if(!this.acceptCopyrightConditions) return
+      this.canStartUpload = true;
+      this.$refs.askConsentModal.hide();
+      if (this.$refs.myVueDropzone) this.$refs.myVueDropzone.$el.click();
+    },
     hide() {
       if (this.$refs.artsModal) this.$refs.artsModal.hide();
     },
@@ -489,6 +566,7 @@ export default {
       this.$refs.artsModal.hide();
       this.isGlobalUploading = false;
       this.isUploading = false;
+      this.canStartUpload = false;
       this.$refs.globalDropzone.removeAllFiles();
     },
     async useAsset(asset) {

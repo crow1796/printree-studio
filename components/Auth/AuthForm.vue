@@ -126,8 +126,8 @@
                 <div class="text-sm">
                   I agree to the
                   <strong>Printree Studio</strong>
-                  <a href="#" class="text-blue-400">Terms of Service</a> and
-                  <a href="#" class="text-blue-400">Privacy Policy</a>.
+                  <nuxt-link to="/terms-and-conditions" class="text-blue-400">Terms of Service</nuxt-link> and
+                  <nuxt-link to="/privacy-policy"  class="text-blue-400">Privacy Policy</nuxt-link>.
                   <div>
                     <span
                       class="text-red-700 text-xs pt-1 font-bold inline-block"
