@@ -2,7 +2,7 @@
   "name": "printreestudio",
   "version": "1.0.0",
   "description": "Printree Studio",
-  "author": "Joshua Tundag",
+  "author": "Printree Studio",
   "private": true,
   "engines": {
     "node": "12.x"
